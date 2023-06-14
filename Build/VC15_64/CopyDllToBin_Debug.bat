@@ -1,0 +1,1 @@
+copy /Y %OPENSSLDIR%\lib\x64\*.dll ..\..\Bin\DebugVC15_64

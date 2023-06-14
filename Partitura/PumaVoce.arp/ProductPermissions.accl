@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5068" Description="ACF"/>
+            <Version Id="1" Number="2182" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="FeaturePackage" X="475" Y="250" Note=""/>
+        <Element ComponentName="FeaturePackageRepresentationController" X="900" Y="100" Note=""/>
+        <Element ComponentName="PermissionsProvider" X="475" Y="100" Note=""/>
+        <Element ComponentName="QtResourceLoaderComp" X="475" Y="400" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>

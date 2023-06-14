@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5068" Description="ACF"/>
+            <Version Id="1" Number="2182" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description></Description>
+    <Keywords></Keywords>
+    <ElementsList>
+        <Element Id="Application" PackageId="ImtCoreVoce" ComponentId="ServiceApplicationFramework">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApplicationName" Type="Text" ExportId="">
+					    <Data IsEnabled="true" Value="Puma"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ApplicationType" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Server"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CompanyName" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="ImagingTools GmbH"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="LogPath" Type="String" ExportId="">
+					    <Data IsEnabled="true" Value="PumaServerLog.txt"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SeriviceDescription" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="User Management System server"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ServiceName" Type="String" ExportId="">
+					    <Data IsEnabled="true" Value="PumaServer"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ConsoleApplicationFramework" PackageId="ImtCoreVoce" ComponentId="ConsoleApplicationFramework">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApplicationName" Type="Text" ExportId="">
+					    <Data IsEnabled="true" Value="Puma"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ApplicationType" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Server"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CompanyName" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="ImagingTools GmbH"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ComponentsToInitialize" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+							    <Value>PumaServerBase</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="LogPath" Type="String" ExportId="">
+					    <Data IsEnabled="true" Value="PumaServerLog.txt"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ProductName" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="User Management System server"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="VersionInfo"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+		<Element Id="PumaServerBase" PackageId="PumaVoce" ComponentId="PumaServerBase">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ConsoleApplicationFramework/Log"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="VersionInfo"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+		<Element Id="VersionInfo" PackageId="PumaVoce" ComponentId="VersionInfo">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="VersionIdDesc" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="User Version"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="ibase::IApplication" ComponentId="ConsoleApplicationFramework"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="ConsoleApplicationFramework"/>
+    </ExportedInterfaces>
+    <ExportedComponents/>
+</Acf>
