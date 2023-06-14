@@ -14,31 +14,7 @@
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ApplicationName" Type="Text" ExportId="">
-					    <Data IsEnabled="true" Value="Puma"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ApplicationType" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="Server"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="CompanyName" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="ImagingTools GmbH"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="LogPath" Type="String" ExportId="">
-					    <Data IsEnabled="true" Value="PumaServerLog.txt"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="SeriviceDescription" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="User Management System server"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ServiceName" Type="String" ExportId="">
-					    <Data IsEnabled="true" Value="PumaServer"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="ConsoleApplicationFramework" PackageId="ImtCoreVoce" ComponentId="ConsoleApplicationFramework">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="ApplicationName" Type="Text" ExportId="">
-					    <Data IsEnabled="true" Value="Puma"/>
+                        <Data IsEnabled="true" Value="Puma"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ApplicationType" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value="Server"/>
@@ -49,15 +25,18 @@
                     <AttributeInfo Id="ComponentsToInitialize" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-							    <Value>PumaServerBase</Value>
+                                <Value>PumaServerBase</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="LogPath" Type="String" ExportId="">
-					    <Data IsEnabled="true" Value="PumaServerLog.txt"/>
+                        <Data IsEnabled="true" Value="PumaServerLog.txt"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ProductName" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="User Management System server"/>
+                    <AttributeInfo Id="SeriviceDescription" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="User Management System Server"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ServiceName" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="PumaServer"/>
                     </AttributeInfo>
                     <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="VersionInfo"/>
@@ -65,11 +44,11 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-		<Element Id="PumaServerBase" PackageId="PumaVoce" ComponentId="PumaServerBase">
+        <Element Id="PumaServerBase" PackageId="PumaVoce" ComponentId="PumaServerBase">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ConsoleApplicationFramework/Log"/>
+                        <Data IsEnabled="true" Value="Application/Log"/>
                     </AttributeInfo>
                     <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="VersionInfo"/>
@@ -77,7 +56,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-		<Element Id="VersionInfo" PackageId="PumaVoce" ComponentId="VersionInfo">
+        <Element Id="VersionInfo" PackageId="PumaVoce" ComponentId="VersionInfo">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="VersionIdDesc" Type="Text" ExportId="">
@@ -89,8 +68,7 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="ibase::IApplication" ComponentId="ConsoleApplicationFramework"/>
-        <Interface InterfaceId="istd::IPolymorphic" ComponentId="ConsoleApplicationFramework"/>
+        <Interface InterfaceId="ibase::IApplication" ComponentId="Application"/>
     </ExportedInterfaces>
     <ExportedComponents/>
 </Acf>

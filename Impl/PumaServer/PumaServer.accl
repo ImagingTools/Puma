@@ -9,8 +9,7 @@
     </AcfHeader>
     <PositionMap>
         <Element ComponentName="Application" X="625" Y="125" Note=""/>
-        <Element ComponentName="ConsoleApplicationFramework" X="625" Y="600" Note=""/>
-		<Element ComponentName="PumaServerBase" X="225" Y="400" Note=""/>
+        <Element ComponentName="PumaServerBase" X="225" Y="400" Note=""/>
         <Element ComponentName="VersionInfo" X="1000" Y="400" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
