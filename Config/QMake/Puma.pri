@@ -4,5 +4,5 @@ INCLUDEPATH += $(PUMADIR)/Include
 INCLUDEPATH += $(PUMADIR)/Impl
 INCLUDEPATH += $(PUMADIR)/$$AUXINCLUDEDIR
 
-LIBS += -L$$PWD/../../Lib/$$COMPILER_DIR -limtzip
+LIBS += -L$$PWD/../../Lib/$$COMPILER_DIR -lpumagql
 
