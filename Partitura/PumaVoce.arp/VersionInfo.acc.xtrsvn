@@ -33,7 +33,7 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="VersionId" ExportId="" Type="Integer">
-					    <Data IsEnabled="true" Value="2023"/>
+					    <Data IsEnabled="true" Value="1987"/>
                     </AttributeInfo>
                     <AttributeInfo Id="VersionIdDesc" ExportId="" Type="Text">
 					    <Data IsEnabled="true" Value="Puma"/>

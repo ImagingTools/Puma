@@ -15,7 +15,7 @@ namespace pumagql
 
 imtbase::CTreeItemModel* CPumaGqlRemoteRepresentationControllerComp::CreateInternalResponse(
 			const imtgql::CGqlRequest& gqlRequest,
-			QString& errorMessage) const
+			QString& /*errorMessage*/) const
 {
 	if (!IsRequestSupported(gqlRequest)){
 		return nullptr;

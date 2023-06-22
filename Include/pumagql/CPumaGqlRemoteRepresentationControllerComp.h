@@ -11,7 +11,7 @@ namespace pumagql
 
 
 class CPumaGqlRemoteRepresentationControllerComp:
-		public imtgql::CGqlRemoteRepresentationControllerComp
+			public imtgql::CGqlRemoteRepresentationControllerComp
 {
 public:
 	typedef imtgql::CGqlRemoteRepresentationControllerComp BaseClass;
