@@ -8,7 +8,7 @@ SUBDIRS += PumaGqlPck
 PumaGqlPck.file = ../../Impl/PumaGqlPck/QMake/PumaGqlPck.pro
 PumaGqlPck.depends = pumagql
 
-#SUBDIRS += PumaServer
-#PumaServer.file = ../../Impl/PumaServer/QMake/PumaServer.pro
-#PumaServer.depends = PumaGqlPck
+SUBDIRS += PumaServer
+PumaServer.file = ../../Impl/PumaServer/QMake/PumaServer.pro
+PumaServer.depends = PumaGqlPck
 

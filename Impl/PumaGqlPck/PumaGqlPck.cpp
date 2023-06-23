@@ -14,16 +14,6 @@ I_EXPORT_PACKAGE(
 			"GraphQL component package",
 			IM_PROJECT("\"ImagingTools Core Framework\"") IM_COMPANY("ImagingTools"));
 
-I_EXPORT_COMPONENT(
-			PumaGqlRemoteRepresentationController,
-			"Puma GraphQL remote representation controller",
-			"Puma GraphQL Gql Api Client Controller User");
-
-I_EXPORT_COMPONENT(
-			PumaRoleInfoProvider,
-			"Puma rol info provider",
-			"Puma Role Info Provider");
-
 
 } // namespace PumaGqlPck
 
