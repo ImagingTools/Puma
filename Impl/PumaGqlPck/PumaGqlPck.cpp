@@ -19,6 +19,11 @@ I_EXPORT_COMPONENT(
 			"Puma GraphQL remote representation controller",
 			"Puma GraphQL Gql Api Client Controller User");
 
+I_EXPORT_COMPONENT(
+			PumaRoleInfoProvider,
+			"Puma rol info provider",
+			"Puma Role Info Provider");
+
 
 } // namespace PumaGqlPck
 

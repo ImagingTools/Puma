@@ -27,12 +27,12 @@ BEGIN
         BEGIN
 			VALUE "Comments", "Internal build version ($AcfRawVersion:1987$), based on ACF $AcfVersion:0$ ($AcfRawVersion:0$), ACF-Solutions $AcfVersion:1$ ($AcfRawVersion:1$)  and Qt $AcfVersion:1023$, build on $AcfTimestamp$ ($CompilerName$)"
             VALUE "CompanyName", "ImagingTools GmbH"
-			VALUE "FileDescription", "UServer Runtime"
+			VALUE "FileDescription", "Puma Server Runtime"
 			VALUE "FileVersion", "$AcfVersion:1987$"
-			VALUE "InternalName", "UServer"
-            VALUE "LegalCopyright", "Copyright (C) 2017-2023 ImagingTools GmbH"
-			VALUE "OriginalFilename", "UServer.exe"
-			VALUE "ProductName", "UServer"
+			VALUE "InternalName", "Puma Server"
+			VALUE "LegalCopyright", "Copyright (C) 2017-1987 ImagingTools GmbH"
+			VALUE "OriginalFilename", "PumaServer.exe"
+			VALUE "ProductName", "Puma Server"
 			VALUE "ProductVersion", "$AcfVersion:1987$"
         END
     END
