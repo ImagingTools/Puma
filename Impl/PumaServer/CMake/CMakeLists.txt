@@ -17,7 +17,7 @@ if(APPLE)
 endif()
 
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS WebSockets)
-find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Sql REQUIRED)
+find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Sql Qml REQUIRED)
 
 include(${ACFDIR}/Config/CMake/CustomBuild.cmake)
 
@@ -30,9 +30,10 @@ include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
 
 target_link_libraries(${PROJECT_NAME} iauth iservice)
 target_link_libraries(${PROJECT_NAME} imtbase imtauth imtlicdb imtlic imtzip imtrest imtcrypt imtrepo imtdb imtfile imtqml)
-target_link_libraries(${PROJECT_NAME} imtlicgql imtgql imtauthgql imtauthdb imtcom imtapp)
+target_link_libraries(${PROJECT_NAME} imtlicgql imtgql imtauthgql imtauthdb imtcom imtapp imtguigql imtgui)
 target_link_libraries(${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::WebSockets)
 target_link_libraries(${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::Sql)
+target_link_libraries(${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::Qml)
 
 if(WIN32)
 	list(APPEND listOptions "--qmldir=${IMTCOREDIR}/Include/imtqml/Resources/qml")
