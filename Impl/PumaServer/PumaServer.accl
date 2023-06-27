@@ -4,12 +4,11 @@
         <VersionInfos>
             <Version Id="0" Number="5075" Description="ACF"/>
             <Version Id="1" Number="2183" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+            <Version Id="1023" Number="330758" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
         <Element ComponentName="Application" X="625" Y="125" Note=""/>
-        <Element ComponentName="ConsoleApplicationFramework" X="600" Y="550" Note=""/>
         <Element ComponentName="PumaServerBase" X="225" Y="400" Note=""/>
         <Element ComponentName="VersionInfo" X="1000" Y="400" Note=""/>
     </PositionMap>

@@ -4,7 +4,7 @@
         <VersionInfos>
             <Version Id="0" Number="5075" Description="ACF"/>
             <Version Id="1" Number="2183" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+            <Version Id="1023" Number="330758" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -29,6 +29,9 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
+                    <AttributeInfo Id="LogLocationType" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="105"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="LogPath" Type="String" ExportId="">
                         <Data IsEnabled="true" Value="PumaServerLog.txt"/>
                     </AttributeInfo>
@@ -44,33 +47,17 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="ConsoleApplicationFramework" PackageId="ImtCoreVoce" ComponentId="ConsoleApplicationFramework">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="ApplicationName" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="Puma"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ComponentsToInitialize" Type="Reference[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>PumaServerBase</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ProductName" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="Puma"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="VersionInfo"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
         <Element Id="PumaServerBase" PackageId="PumaVoce" ComponentId="PumaServerBase">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Application/ApplicationInfo"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="Application/Log"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RuntimeStatus" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Application/RuntimeStatus"/>
                     </AttributeInfo>
                     <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="VersionInfo"/>

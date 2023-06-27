@@ -4,7 +4,7 @@
         <VersionInfos>
             <Version Id="0" Number="5075" Description="ACF"/>
             <Version Id="1" Number="2183" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+            <Version Id="1023" Number="330758" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
@@ -16,7 +16,8 @@
         <Element ComponentName="HttpServerFramework" X="600" Y="50" Note=""/>
         <Element ComponentName="PagesData" X="225" Y="575" Note=""/>
         <Element ComponentName="ProductsController" X="600" Y="375" Note=""/>
-        <Element ComponentName="Repositories" X="750" Y="575" Note=""/>
+        <Element ComponentName="Repositories" X="725" Y="575" Note=""/>
+        <Element ComponentName="Settings" X="875" Y="775" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
         <EmbededRegistry Id="Repositories">
@@ -35,6 +36,16 @@
                 <Element ComponentName="RolesPage" X="200" Y="250" Note=""/>
                 <Element ComponentName="UserGroupsPage" X="950" Y="250" Note=""/>
                 <Element ComponentName="UsersPage" X="575" Y="250" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+        <EmbededRegistry Id="Settings">
+            <PositionMap>
+                <Element ComponentName="CompactXmlFilePersistence" X="600" Y="300" Note=""/>
+                <Element ComponentName="DatabaseAccessSettings" X="300" Y="625" Note=""/>
+                <Element ComponentName="PreferencesFilePath" X="600" Y="175" Note=""/>
+                <Element ComponentName="Settings" X="600" Y="425" Note=""/>
+                <Element ComponentName="SystemLocation" X="600" Y="75" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>
