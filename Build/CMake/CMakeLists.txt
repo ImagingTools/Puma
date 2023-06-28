@@ -14,13 +14,8 @@ set(AUX_INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/../../AuxInclude/${TARGETNAME}/Ge
 
 include_directories("${AUX_INCLUDE_DIR}/../")
 
-# Include
-#add_subdirectory("${INCLUDE_DIR}/pumagql/CMake" "${AUX_INCLUDE_DIR}/pumagql")
-
 # Impl
 add_subdirectory("${IMPL_DIR}/PumaServer/CMake" "${AUX_INCLUDE_DIR}/PumaServer")
-#add_subdirectory("${IMPL_DIR}/PumaGqlPck/CMake" "${AUX_INCLUDE_DIR}/PumaGqlPck")
-
 
 file(COPY ../Migrations DESTINATION ${AUX_INCLUDE_DIR}/../../../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME})
 
