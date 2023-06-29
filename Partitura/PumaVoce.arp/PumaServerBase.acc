@@ -4,7 +4,7 @@
         <VersionInfos>
             <Version Id="0" Number="5075" Description="ACF"/>
             <Version Id="1" Number="2183" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="330758" Description="Qt Framework"/>
+            <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -45,6 +45,28 @@
                         <Data IsEnabled="true" Value="Repositories/UserRepository"/>
                     </AttributeInfo>
                     <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="DatabaseConnectionController" PackageId="ImtDatabasePck" ComponentId="DatabaseServerConnectionController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>GetDatabaseStatus</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DatabaseServerConnectionChecker" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="DatabaseEngine/PgSqlDatabaseEngine"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -110,6 +132,7 @@
                                 <Value>AuthorizationController</Value>
                                 <Value>ApplicationController</Value>
                                 <Value>ProductsController</Value>
+                                <Value>DatabaseConnectionController</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
