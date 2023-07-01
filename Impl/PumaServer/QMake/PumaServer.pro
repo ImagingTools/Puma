@@ -26,7 +26,7 @@ win32-msvc*{
 	QMAKE_CXXFLAGS += /wd4264
 
 	# copying all Qt DLLs to destination directory
-	greaterThan(QT_MAJOR_VERSION, 4): QMAKE_POST_LINK = set path=$(QTDIR)\bin;%path% && $(QTDIR)\bin\windeployqt --qmldir=$$(PUMADIR)\..\Puma\Impl\PumaServer\Resources\qml\ --qmldir=$$PWD\..\Resources\qml\ $$DESTDIR
+	greaterThan(QT_MAJOR_VERSION, 4): QMAKE_POST_LINK = set path=$(QTDIR)\bin;%path% && $(QTDIR)\bin\windeployqt $$DESTDIR
 }
 
 !macx-ios*{
@@ -62,7 +62,7 @@ OTHER_FILES += \
     $$PWD/../Migrations
 
 win32 {
-    PWD_WIN = $${PWD}/../Migrations
+    PWD_WIN = $${PWD}/../../../Build/Migrations
     DESTDIR_WIN = $${DESTDIR}/Migrations
     PWD_WIN ~= s,/,\\,g
     DESTDIR_WIN ~= s,/,\\,g
