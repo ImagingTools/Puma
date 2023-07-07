@@ -2,18 +2,19 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5068" Description="ACF"/>
-            <Version Id="1" Number="2182" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5075" Description="ACF"/>
+            <Version Id="1" Number="2183" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="AuthorizationController" X="575" Y="250" Note=""/>
+        <Element ComponentName="AuthorizationController" X="125" Y="225" Note=""/>
         <Element ComponentName="Demultiplexer" X="575" Y="75" Note=""/>
-        <Element ComponentName="HashCalculator" X="225" Y="250" Note=""/>
-        <Element ComponentName="SessionController" X="1025" Y="250" Note=""/>
-        <Element ComponentName="UserSessionRepository" X="575" Y="400" Note=""/>
-        <Element ComponentName="UsersSessionsDatabaseDelegate" X="575" Y="525" Note=""/>
+        <Element ComponentName="HashCalculator" X="175" Y="500" Note=""/>
+        <Element ComponentName="SessionController" X="600" Y="225" Note=""/>
+        <Element ComponentName="SessionInfoProvider" X="1000" Y="225" Note=""/>
+        <Element ComponentName="UserSessionRepository" X="425" Y="500" Note=""/>
+        <Element ComponentName="UsersSessionsDatabaseDelegate" X="850" Y="500" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>
