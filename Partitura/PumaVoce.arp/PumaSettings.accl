@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5075" Description="ACF"/>
+            <Version Id="1" Number="2183" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="Backup" X="900" Y="350" Note=""/>
+        <Element ComponentName="Database" X="175" Y="350" Note=""/>
+        <Element ComponentName="DatabaseAccessSettings" X="175" Y="525" Note=""/>
+        <Element ComponentName="FileAutoPersistence" X="575" Y="50" Note=""/>
+        <Element ComponentName="FileNameParam" X="1075" Y="525" Note=""/>
+        <Element ComponentName="Preferences" X="575" Y="200" Note=""/>
+        <Element ComponentName="SchedulerParams" X="700" Y="525" Note=""/>
+        <Element ComponentName="Server" X="475" Y="350" Note=""/>
+        <Element ComponentName="ServerPort" X="450" Y="525" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>

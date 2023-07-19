@@ -16,9 +16,8 @@
         <Element ComponentName="GraphQLRoot" X="600" Y="200" Note=""/>
         <Element ComponentName="HttpServerFramework" X="600" Y="50" Note=""/>
         <Element ComponentName="PagesData" X="225" Y="575" Note=""/>
-        <Element ComponentName="ProductsController" X="600" Y="375" Note=""/>
+        <Element ComponentName="PumaSettings" X="900" Y="775" Note=""/>
         <Element ComponentName="Repositories" X="725" Y="575" Note=""/>
-        <Element ComponentName="Settings" X="875" Y="775" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
         <EmbededRegistry Id="Settings">
@@ -31,6 +30,15 @@
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>
+        <EmbededRegistry Id="PagesData">
+            <PositionMap>
+                <Element ComponentName="Demultiplexer" X="575" Y="50" Note=""/>
+                <Element ComponentName="RolesPage" X="200" Y="250" Note=""/>
+                <Element ComponentName="UserGroupsPage" X="950" Y="250" Note=""/>
+                <Element ComponentName="UsersPage" X="575" Y="250" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
         <EmbededRegistry Id="Repositories">
             <PositionMap>
                 <Element ComponentName="Role" X="500" Y="350" Note=""/>
@@ -38,15 +46,6 @@
                 <Element ComponentName="RoleDocumentSqlRepository" X="300" Y="100" Note=""/>
                 <Element ComponentName="UserGroupSqlRepository" X="800" Y="475" Note=""/>
                 <Element ComponentName="UserSqlRepository" X="775" Y="100" Note=""/>
-            </PositionMap>
-            <EmbeddedRegistries/>
-        </EmbededRegistry>
-        <EmbededRegistry Id="PagesData">
-            <PositionMap>
-                <Element ComponentName="Demultiplexer" X="575" Y="50" Note=""/>
-                <Element ComponentName="RolesPage" X="200" Y="250" Note=""/>
-                <Element ComponentName="UserGroupsPage" X="950" Y="250" Note=""/>
-                <Element ComponentName="UsersPage" X="575" Y="250" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>

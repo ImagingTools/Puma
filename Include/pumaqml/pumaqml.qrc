@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/qml">
+	<file alias="Puma/PumaServerConfigurator.qml">Qml/PumaServerConfigurator.qml</file>
+    </qresource>
+</RCC>

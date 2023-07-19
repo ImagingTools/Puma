@@ -6,9 +6,9 @@ include($(PUMADIR)/Config/QMake/Puma.pri)
 include($(IMTCOREDIR)/Config/QMake/Quazip.pri)
 include($(IMTCOREDIR)/Config/QMake/OpenSSL.pri)
 
-INCLUDEPATH += ../../../Include
-INCLUDEPATH += ../../../Impl
-INCLUDEPATH +=  $$AUXINCLUDEDIR
+#INCLUDEPATH += ../../../Include
+#INCLUDEPATH += ../../../Impl
+#INCLUDEPATH +=  $$AUXINCLUDEDIR
 
 RESOURCES += $$files($$_PRO_FILE_PWD_/../*.qrc, false)
 
@@ -44,40 +44,17 @@ ARXC_OUTDIR = $$OUT_PWD/$$AUXINCLUDEPATH/GeneratedFiles/$$TARGET
 
 # Conversion of resource templates:
 win*{
-	# File transformation
+    # File transformation
 	ACF_CONVERT_FILES = $$PWD/../VC/PumaServer.rc.xtracf
 	ACF_CONVERT_OUTDIR = $$AUXINCLUDEPATH/GeneratedFiles/$$TARGET
 	ACF_CONVERT_REGISTRY =  $$PWD/../VC/FileSubstitCopyApp.acc
 	ACF_CONVERT_CONFIG = $$PWD/../../../Config/BaseOnly.awc
 
-	RC_FILE = $$OUT_PWD/$$AUXINCLUDEPATH/GeneratedFiles/$$TARGET/PumaServer.rc
+    RC_FILE = $$OUT_PWD/$$AUXINCLUDEPATH/GeneratedFiles/$$TARGET/PumaServer.rc
 	RC_INCLUDEPATH = $$_PRO_FILE_PWD_
 }
 
 include($(ACFDIR)/Config/QMake/AcfQt.pri)
 include($(ACFDIR)/Config/QMake/AcfStd.pri)
 include($(ACFDIR)/Config/QMake/CustomBuild.pri)
-
-OTHER_FILES += \
-    $$PWD/../Migrations
-
-win32 {
-    PWD_WIN = $${PWD}/../../../Build/Migrations
-    DESTDIR_WIN = $${DESTDIR}/Migrations
-    PWD_WIN ~= s,/,\\,g
-    DESTDIR_WIN ~= s,/,\\,g
-    message(PWD_WIN = $${PWD_WIN})
-    message(DESTDIR_WIN = $${DESTDIR_WIN})
-    message(cmd = $$quote(cmd /c xcopy /S /I $${PWD_WIN} $${DESTDIR_WIN}))
-    copyfiles.commands = $$quote(cmd /c xcopy /S /I /Y $${PWD_WIN} $${DESTDIR_WIN})
-}
-macx {
-    copyfiles.commands = cp -r $$PWD/../Migrations/ $$OUT_PWD
-}
-linux {
-    copyfiles.commands = cp -r $$PWD/Migrations/ $$OUT_PWD
-}
-
-QMAKE_EXTRA_TARGETS += copyfiles
-POST_TARGETDEPS += copyfiles
 
