@@ -198,5 +198,6 @@
     </ExportedInterfaces>
     <ExportedComponents>
         <Component ExportedId="DatabaseAccessSettings" ComponentId="DatabaseAccessSettings"/>
+        <Component ExportedId="ServerPort" ComponentId="ServerPort"/>
     </ExportedComponents>
 </Acf>

@@ -170,6 +170,9 @@
                     <AttributeInfo Id="ServerPort" Type="Integer" ExportId="ServerPort">
                         <Data IsEnabled="true" Value="7788"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="ServerPortParam" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaSettings/ServerPort"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="StartServerOnCreate" Type="Boolean" ExportId="">
                         <Data IsEnabled="true" Value="true"/>
                     </AttributeInfo>

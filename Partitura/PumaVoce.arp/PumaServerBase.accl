@@ -20,6 +20,16 @@
         <Element ComponentName="Repositories" X="725" Y="575" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
+        <EmbededRegistry Id="Repositories">
+            <PositionMap>
+                <Element ComponentName="Role" X="500" Y="350" Note=""/>
+                <Element ComponentName="RoleCollectionAdapter" X="225" Y="475" Note=""/>
+                <Element ComponentName="RoleDocumentSqlRepository" X="300" Y="100" Note=""/>
+                <Element ComponentName="UserGroupSqlRepository" X="800" Y="475" Note=""/>
+                <Element ComponentName="UserSqlRepository" X="775" Y="100" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
         <EmbededRegistry Id="Settings">
             <PositionMap>
                 <Element ComponentName="CompactXmlFilePersistence" X="600" Y="300" Note=""/>
@@ -36,16 +46,6 @@
                 <Element ComponentName="RolesPage" X="200" Y="250" Note=""/>
                 <Element ComponentName="UserGroupsPage" X="950" Y="250" Note=""/>
                 <Element ComponentName="UsersPage" X="575" Y="250" Note=""/>
-            </PositionMap>
-            <EmbeddedRegistries/>
-        </EmbededRegistry>
-        <EmbededRegistry Id="Repositories">
-            <PositionMap>
-                <Element ComponentName="Role" X="500" Y="350" Note=""/>
-                <Element ComponentName="RoleCollectionAdapter" X="225" Y="475" Note=""/>
-                <Element ComponentName="RoleDocumentSqlRepository" X="300" Y="100" Note=""/>
-                <Element ComponentName="UserGroupSqlRepository" X="800" Y="475" Note=""/>
-                <Element ComponentName="UserSqlRepository" X="775" Y="100" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>
