@@ -10,5 +10,5 @@ SUBDIRS += PumaServer
 PumaServer.file = ../../Impl/PumaServer/QMake/PumaServer.pro
 
 SUBDIRS += PumaServerConfigurator
-PumaServerConfigurator.file = ../../Impl/PumaServer/QMake/PumaServerConfigurator.pro
+PumaServerConfigurator.file = ../../Impl/PumaServerConfigurator/QMake/PumaServerConfigurator.pro
 

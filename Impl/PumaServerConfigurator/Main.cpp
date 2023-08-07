@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
 	Q_INIT_RESOURCE(imtqml);
 	Q_INIT_RESOURCE(imtstyleqml);
 	Q_INIT_RESOURCE(pumaqml);
-	Q_INIT_RESOURCE(Webimtgui);
+	Q_INIT_RESOURCE(imtguiTheme);
 
 	qmlRegisterType<imtbase::CTreeItemModel>("Acf", 1, 0, "TreeItemModel");
 	qmlRegisterType<imtqml::CGqlModel>("Acf", 1, 0, "GqlModel");

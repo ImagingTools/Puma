@@ -2,6 +2,7 @@ TARGET = PumaServerConfigurator
 
 include($(ACFDIR)/Config/QMake/ApplicationConfig.pri)
 include($(ACFDIR)/Config/QMake/QtBaseConfig.pri)
+include($(IMTCOREDIR)/Config/QMake/ImtCore.pri)
 include($(IMTCOREDIR)/Config/QMake/OpenSSL.pri)
 
 HEADERS =
