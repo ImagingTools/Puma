@@ -23,8 +23,6 @@ include(${ACFDIR}/Config/CMake/CustomBuild.cmake)
 
 include(${ACFDIR}/Config/CMake/ApplicationConfig.cmake)
 include(${ACFDIR}/Config/CMake/AcfQt.cmake)
-include(${ACFDIR}/Config/CMake/AcfStd.cmake)
-include(${ACFDIR}/Config/CMake/AcfStdGui.cmake)
 include(${IMTCOREDIR}/Config/CMake/OpenSSL.cmake)
 include(${IMTCOREDIR}/Config/CMake/Quazip.cmake)
 include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
@@ -35,6 +33,9 @@ target_link_libraries(${PROJECT_NAME} imtlicgql imtgql imtauthgql imtauthdb imtc
 target_link_libraries(${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::WebSockets)
 target_link_libraries(${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::Sql)
 target_link_libraries(${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::Qml)
+
+include(${ACFDIR}/Config/CMake/AcfStdGui.cmake)
+include(${ACFDIR}/Config/CMake/AcfStd.cmake)
 
 if(WIN32)
 	list(APPEND listOptions "--qmldir=${IMTCOREDIR}/Include/imtqml/Resources/qml")
