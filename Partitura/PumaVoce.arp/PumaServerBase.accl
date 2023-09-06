@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5082" Description="ACF"/>
-            <Version Id="1" Number="2187" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5102" Description="ACF"/>
+            <Version Id="1" Number="2194" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -18,17 +18,9 @@
         <Element ComponentName="PagesData" X="225" Y="575" Note=""/>
         <Element ComponentName="PumaSettings" X="900" Y="775" Note=""/>
         <Element ComponentName="Repositories" X="725" Y="575" Note=""/>
+        <Element ComponentName="TestConnectionController" X="575" Y="375" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
-        <EmbededRegistry Id="PagesData">
-            <PositionMap>
-                <Element ComponentName="Demultiplexer" X="575" Y="50" Note=""/>
-                <Element ComponentName="RolesPage" X="200" Y="250" Note=""/>
-                <Element ComponentName="UserGroupsPage" X="950" Y="250" Note=""/>
-                <Element ComponentName="UsersPage" X="575" Y="250" Note=""/>
-            </PositionMap>
-            <EmbeddedRegistries/>
-        </EmbededRegistry>
         <EmbededRegistry Id="Repositories">
             <PositionMap>
                 <Element ComponentName="Role" X="500" Y="350" Note=""/>
@@ -46,6 +38,15 @@
                 <Element ComponentName="PreferencesFilePath" X="600" Y="175" Note=""/>
                 <Element ComponentName="Settings" X="600" Y="425" Note=""/>
                 <Element ComponentName="SystemLocation" X="600" Y="75" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+        <EmbededRegistry Id="PagesData">
+            <PositionMap>
+                <Element ComponentName="Demultiplexer" X="575" Y="50" Note=""/>
+                <Element ComponentName="RolesPage" X="200" Y="250" Note=""/>
+                <Element ComponentName="UserGroupsPage" X="950" Y="250" Note=""/>
+                <Element ComponentName="UsersPage" X="575" Y="250" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>
