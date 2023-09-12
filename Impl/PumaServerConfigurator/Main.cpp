@@ -11,6 +11,7 @@
 #include <GeneratedFiles/PumaServerConfigurator/CPumaServerConfigurator.h>
 #include <imtbase/CTreeItemModel.h>
 #include <imtqml/CGqlModel.h>
+#include <imtqml/CRemoteFileController.h>
 
 
 int main(int argc, char *argv[])
@@ -24,6 +25,7 @@ int main(int argc, char *argv[])
 
 	qmlRegisterType<imtbase::CTreeItemModel>("Acf", 1, 0, "TreeItemModel");
 	qmlRegisterType<imtqml::CGqlModel>("Acf", 1, 0, "GqlModel");
+	qmlRegisterType<imtqml::CRemoteFileController>("Acf", 1, 0, "RemoteFileController");
 
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 	qmlRegisterModule("QtGraphicalEffects", 1, 12);
