@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5075" Description="ACF"/>
-            <Version Id="1" Number="2183" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5102" Description="ACF"/>
+            <Version Id="1" Number="2194" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -21,6 +21,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="PathToQml" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="qrc:/qml/imtgui/AuxComponents/PathPicker.qml"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -42,16 +45,19 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
         <Element Id="DatabaseAccessSettingsRepresentation" PackageId="ImtCorePck" ComponentId="DatabaseAccessSettingsRepresentationController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="DatabaseNameSource" Type="Text" ExportId="">
+                    <AttributeInfo Id="DatabaseNameSource" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="qrc:/qml/imtgui/AuxComponents/SettingsTextInput.qml"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="HostSource" Type="Text" ExportId="">
+                    <AttributeInfo Id="HostSource" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="qrc:/qml/imtgui/AuxComponents/SettingsTextInput.qml"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ObjectId" Type="Id" ExportId="">
@@ -60,16 +66,19 @@
                     <AttributeInfo Id="ObjectName" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value="Database"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="PasswordSource" Type="Text" ExportId="">
+                    <AttributeInfo Id="PasswordSource" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="qrc:/qml/imtgui/AuxComponents/SettingsTextInput.qml"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="PathToQml" Type="Text" ExportId="">
+                    <AttributeInfo Id="PathToQml" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="qrc:/qml/imtgui/AuxComponents/DatabaseInput.qml"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="PortSource" Type="Text" ExportId="">
+                    <AttributeInfo Id="PortSource" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="qrc:/qml/imtgui/AuxComponents/SettingsIntegerInput.qml"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="UsernameSource" Type="Text" ExportId="">
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UsernameSource" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="qrc:/qml/imtgui/AuxComponents/SettingsTextInput.qml"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -91,6 +100,9 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
@@ -106,6 +118,9 @@
                     <AttributeInfo Id="PathToQml" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="qrc:/qml/imtgui/AuxComponents/SchedulerParams.qml"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
@@ -118,8 +133,11 @@
                     <AttributeInfo Id="ObjectName" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value="Server Port"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="PathToQml" Type="Text" ExportId="">
+                    <AttributeInfo Id="PathToQml" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="qrc:/qml/imtgui/AuxComponents/SettingsTextInput.qml"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -139,6 +157,9 @@
                                 <Value>ServerPortRepresentation</Value>
                             </Values>
                         </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -160,6 +181,9 @@
                                 <Value>BackupSettingsRepresentation</Value>
                             </Values>
                         </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
