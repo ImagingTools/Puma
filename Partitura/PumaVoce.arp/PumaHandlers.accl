@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5087" Description="ACF"/>
+            <Version Id="1" Number="2190" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="ApplicationController" X="225" Y="375" Note=""/>
+        <Element ComponentName="AuthorizationController" X="1025" Y="375" Note=""/>
+        <Element ComponentName="DatabaseConnectionController" X="500" Y="450" Note=""/>
+        <Element ComponentName="GqlContextController" X="725" Y="250" Note=""/>
+        <Element ComponentName="GraphQLRoot" X="600" Y="125" Note=""/>
+        <Element ComponentName="HttpRootHandler" X="600" Y="50" Note=""/>
+        <Element ComponentName="PagesData" X="225" Y="575" Note=""/>
+        <Element ComponentName="Repositories" X="725" Y="575" Note=""/>
+        <Element ComponentName="TestConnectionController" X="400" Y="300" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries>
+        <EmbededRegistry Id="Repositories">
+            <PositionMap>
+                <Element ComponentName="Role" X="500" Y="350" Note=""/>
+                <Element ComponentName="RoleCollectionAdapter" X="225" Y="475" Note=""/>
+                <Element ComponentName="RoleDocumentSqlRepository" X="300" Y="100" Note=""/>
+                <Element ComponentName="UserGroupSqlRepository" X="800" Y="475" Note=""/>
+                <Element ComponentName="UserSqlRepository" X="775" Y="100" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+        <EmbededRegistry Id="PagesData">
+            <PositionMap>
+                <Element ComponentName="Demultiplexer" X="575" Y="50" Note=""/>
+                <Element ComponentName="RolesPage" X="200" Y="250" Note=""/>
+                <Element ComponentName="UserGroupsPage" X="950" Y="250" Note=""/>
+                <Element ComponentName="UsersPage" X="575" Y="250" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+        <EmbededRegistry Id="Settings">
+            <PositionMap>
+                <Element ComponentName="CompactXmlFilePersistence" X="600" Y="300" Note=""/>
+                <Element ComponentName="DatabaseAccessSettings" X="300" Y="625" Note=""/>
+                <Element ComponentName="PreferencesFilePath" X="600" Y="175" Note=""/>
+                <Element ComponentName="Settings" X="600" Y="425" Note=""/>
+                <Element ComponentName="SystemLocation" X="600" Y="75" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+    </EmbeddedRegistries>
+</Acf>

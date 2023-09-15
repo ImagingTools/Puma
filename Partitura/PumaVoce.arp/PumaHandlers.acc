@@ -2,78 +2,209 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5091" Description="ACF"/>
-            <Version Id="1" Number="2192" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5087" Description="ACF"/>
+            <Version Id="1" Number="2190" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="DatabaseEngine" PackageId="ImtCoreVoce" ComponentId="DatabaseEngine">
+        <Element Id="ApplicationController" PackageId="ImtGqlPck" ComponentId="GraphQLDemultiplexer">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="DatabaseAccessSettings" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="PumaSettings/DatabaseAccessSettings"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="DbName" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="puma"/>
+                    <AttributeInfo Id="GqlRequestHandlers" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>PagesData</Value>
+                            </Values>
+                        </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="MigrationPath" Type="String" ExportId="">
-                        <Data IsEnabled="true" Value="Migrations"/>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="AuthorizationController" PackageId="PumaVoce" ComponentId="Authorization">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="Password" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="12345"/>
+                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="PgHostName" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="localhost"/>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="PgPort" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="5432"/>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Repositories/UserRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="HttpProtocolEngine" PackageId="ImtRestPck" ComponentId="HttpProtocolEngine">
+        <Element Id="DatabaseConnectionController" PackageId="ImtDatabasePck" ComponentId="DatabaseServerConnectionController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>PumaGetDatabaseStatus</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DatabaseServerConnectionChecker" Type="Reference" ExportId="DatabaseServerConnectionChecker">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="GqlContextController" PackageId="ImtGqlPck" ComponentId="GqlContextController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SessionCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="AuthorizationController/UserSessionRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Repositories/UserSqlRepository"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="GraphQLRoot" PackageId="ImtGqlPck" ComponentId="GraphQLServlet">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CommandId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Puma/graphql"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="GqlContextController" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="GqlContextController"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="GqlRequestHandler" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>AuthorizationController</Value>
+                                <Value>ApplicationController</Value>
+                                <Value>DatabaseConnectionController</Value>
+                                <Value>TestConnectionController</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="HttpRootHandler" PackageId="ImtRestPck" ComponentId="HttpRootServlet">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="AutoCompression" Type="Boolean" ExportId="AutoCompression">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="HttpCommandIds">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Puma/graphql</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CompressionLevel" Type="Integer" ExportId="CompressionLevel">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="">
                         <Data IsEnabled="true" Value="true"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="PumaHandlers" PackageId="PumaVoce" ComponentId="PumaHandlers">
-            <Data IsEnabled="true" Flags="2">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="DatabaseAccessSettings" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="PumaSettings/DatabaseAccessSettings"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="DatabaseEngine"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="DatabaseServerConnectionChecker" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="DatabaseEngine/PgSqlDatabaseEngine"/>
+                    <AttributeInfo Id="RequestHandlers" Type="Reference[]" ExportId="HttpRequestHandlers">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>GraphQLRoot</Value>
+                            </Values>
+                        </Data>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="PumaSettings" PackageId="PumaVoce" ComponentId="PumaSettings">
-            <Data IsEnabled="true" Flags="1">
+        <Element Id="PagesData" PackageId="" ComponentId="PagesData">
+            <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="RuntimeStatus" Type="Reference" ExportId="RuntimeStatus">
+                    <AttributeInfo Id="ProductProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ProductProvider"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RoleInfoProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Repositories/RoleCollectionAdapter"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RoleProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Repositories/RoleCollectionAdapter"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RoleRepository" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Repositories/RoleDocumentSqlRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Repositories/UserRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserGroupInfoProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Repositories/UserGroupInfoProvider"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserGroupProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Repositories/UserGroupInfoProvider"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserGroupRepository" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Repositories/UserGroupSqlRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserInfoProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Repositories/UserCollectionAdapter"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Repositories/UserCollectionAdapter"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserRepository" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Repositories/UserRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="Repositories" PackageId="" ComponentId="Repositories">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseAccessSettings" Type="Reference" ExportId="DatabaseAccessSettings">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
@@ -82,47 +213,21 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="TcpServer" PackageId="ImtRestPck" ComponentId="TcpServer">
-            <Data IsEnabled="true" Flags="1">
+        <Element Id="TestConnectionController" PackageId="ImtGqlPck" ComponentId="GqlController">
+            <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="">
-                        <Data IsEnabled="true" Value="true"/>
+                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>PumaTestConnection</Value>
+                            </Values>
+                        </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ProtocolEngine" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="HttpProtocolEngine"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="RequestHandler" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="WorkerManager"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ServerAddress" Type="Id" ExportId="ServerAddress">
-                        <Data IsEnabled="true" Value="http://localhost"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ServerPort" Type="Integer" ExportId="ServerPort">
-                        <Data IsEnabled="true" Value="7788"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ServerPortParam" Type="Reference" ExportId="ServerPortParam">
-                        <Data IsEnabled="true" Value="PumaSettings/ServerPort"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="StartServerOnCreate" Type="Boolean" ExportId="StartServerOnCreate">
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="WorkerManager" PackageId="ImtRestPck" ComponentId="WorkerManaqer">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="RequestHandler" Type="Factory" ExportId="">
-                        <Data IsEnabled="true" Value="PumaHandlers"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="RequestManager" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="TcpServer"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ThreadsLimit" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="100"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -467,10 +572,8 @@
             </Data>
         </EmbeddedRegistry>
     </EmbeddedRegistriesList>
-    <ExportedInterfaces/>
-    <ExportedComponents>
-        <Component ExportedId="AutoPersistence" ComponentId="PumaSettings/AutoPersistence"/>
-        <Component ExportedId="PgSqlDatabaseEngine" ComponentId="DatabaseEngine/PgSqlDatabaseEngine"/>
-        <Component ExportedId="TcpServer" ComponentId="TcpServer"/>
-    </ExportedComponents>
+    <ExportedInterfaces>
+        <Interface InterfaceId="imtrest::IRequestServlet" ComponentId="HttpRootHandler"/>
+    </ExportedInterfaces>
+    <ExportedComponents/>
 </Acf>
