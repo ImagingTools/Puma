@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5102" Description="ACF"/>
-            <Version Id="1" Number="2194" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5104" Description="ACF"/>
+            <Version Id="1" Number="2195" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -19,13 +19,13 @@
         <Element ComponentName="TestConnectionController" X="400" Y="300" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
-        <EmbededRegistry Id="Repositories">
+        <EmbededRegistry Id="Settings">
             <PositionMap>
-                <Element ComponentName="Role" X="500" Y="350" Note=""/>
-                <Element ComponentName="RoleCollectionAdapter" X="225" Y="475" Note=""/>
-                <Element ComponentName="RoleDocumentSqlRepository" X="300" Y="100" Note=""/>
-                <Element ComponentName="UserGroupSqlRepository" X="800" Y="475" Note=""/>
-                <Element ComponentName="UserSqlRepository" X="775" Y="100" Note=""/>
+                <Element ComponentName="CompactXmlFilePersistence" X="600" Y="300" Note=""/>
+                <Element ComponentName="DatabaseAccessSettings" X="300" Y="625" Note=""/>
+                <Element ComponentName="PreferencesFilePath" X="600" Y="175" Note=""/>
+                <Element ComponentName="Settings" X="600" Y="425" Note=""/>
+                <Element ComponentName="SystemLocation" X="600" Y="75" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>
@@ -38,13 +38,13 @@
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>
-        <EmbededRegistry Id="Settings">
+        <EmbededRegistry Id="Repositories">
             <PositionMap>
-                <Element ComponentName="CompactXmlFilePersistence" X="600" Y="300" Note=""/>
-                <Element ComponentName="DatabaseAccessSettings" X="300" Y="625" Note=""/>
-                <Element ComponentName="PreferencesFilePath" X="600" Y="175" Note=""/>
-                <Element ComponentName="Settings" X="600" Y="425" Note=""/>
-                <Element ComponentName="SystemLocation" X="600" Y="75" Note=""/>
+                <Element ComponentName="Role" X="500" Y="350" Note=""/>
+                <Element ComponentName="RoleCollectionAdapter" X="225" Y="475" Note=""/>
+                <Element ComponentName="RoleDocumentSqlRepository" X="300" Y="100" Note=""/>
+                <Element ComponentName="UserGroupSqlRepository" X="800" Y="475" Note=""/>
+                <Element ComponentName="UserSqlRepository" X="775" Y="100" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>

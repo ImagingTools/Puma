@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5091" Description="ACF"/>
-            <Version Id="1" Number="2192" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5104" Description="ACF"/>
+            <Version Id="1" Number="2195" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -26,7 +26,7 @@
                         <Data IsEnabled="true" Value="Migrations"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Password" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="12345"/>
+                        <Data IsEnabled="true" Value="root"/>
                     </AttributeInfo>
                     <AttributeInfo Id="PgHostName" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="localhost"/>
@@ -60,6 +60,12 @@
                     </AttributeInfo>
                     <AttributeInfo Id="DatabaseServerConnectionChecker" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="DatabaseEngine/PgSqlDatabaseEngine"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -103,7 +109,7 @@
                     <AttributeInfo Id="ServerPort" Type="Integer" ExportId="ServerPort">
                         <Data IsEnabled="true" Value="7788"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ServerPortParam" Type="Reference" ExportId="ServerPortParam">
+                    <AttributeInfo Id="ServerPortParam" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaSettings/ServerPort"/>
                     </AttributeInfo>
                     <AttributeInfo Id="StartServerOnCreate" Type="Boolean" ExportId="StartServerOnCreate">
