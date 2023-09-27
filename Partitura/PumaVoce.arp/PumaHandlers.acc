@@ -2,7 +2,7 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5104" Description="ACF"/>
+            <Version Id="0" Number="5105" Description="ACF"/>
             <Version Id="1" Number="2195" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
@@ -128,6 +128,7 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>Puma/graphql</Value>
+                                <Value>Puma/files*</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -144,8 +145,54 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>GraphQLRoot</Value>
+                                <Value>LogFileAccess</Value>
                             </Values>
                         </Data>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="LogFileAccess" PackageId="ImtRestPck" ComponentId="HttpFileControllerServlet">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="BinaryDataControllers" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>RestoringDatabaseController</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="BinaryDataProviders" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>LogFileDataProvider</Value>
+                                <Value>RestoringDatabaseController</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CommandId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Puma/files*"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="LogFileDataProvider" PackageId="ImtCorePck" ComponentId="BinaryDataProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="HomePath" Type="Reference" ExportId="LogPath">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -210,6 +257,27 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="RestoringDatabaseController" PackageId="ImtDatabasePck" ComponentId="RestoringDatabaseController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="BackupBeforeRestore" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="BackupSettings" Type="Reference" ExportId="BackupSettings">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Command-ID" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="GetBackupFile"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DatabaseLoginSettings" Type="Reference" ExportId="DatabaseAccessSettings">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="TestConnectionController" PackageId="ImtGqlPck" ComponentId="GqlController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -256,9 +324,6 @@
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
                                 <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="ProductProvider" Type="Reference" ExportId="ProductProvider">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="RoleRepository" Type="Reference" ExportId="RoleRepository">

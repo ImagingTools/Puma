@@ -2,33 +2,26 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5104" Description="ACF"/>
+            <Version Id="0" Number="5105" Description="ACF"/>
             <Version Id="1" Number="2195" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="ApplicationController" X="225" Y="375" Note=""/>
-        <Element ComponentName="AuthorizationController" X="1025" Y="375" Note=""/>
-        <Element ComponentName="DatabaseConnectionController" X="500" Y="450" Note=""/>
-        <Element ComponentName="GqlContextController" X="725" Y="250" Note=""/>
-        <Element ComponentName="GraphQLRoot" X="600" Y="125" Note=""/>
+        <Element ComponentName="ApplicationController" X="125" Y="350" Note=""/>
+        <Element ComponentName="AuthorizationController" X="1050" Y="350" Note=""/>
+        <Element ComponentName="DatabaseConnectionController" X="600" Y="575" Note=""/>
+        <Element ComponentName="GqlContextController" X="700" Y="350" Note=""/>
+        <Element ComponentName="GraphQLRoot" X="600" Y="175" Note=""/>
         <Element ComponentName="HttpRootHandler" X="600" Y="50" Note=""/>
-        <Element ComponentName="PagesData" X="225" Y="575" Note=""/>
-        <Element ComponentName="Repositories" X="725" Y="575" Note=""/>
-        <Element ComponentName="TestConnectionController" X="400" Y="300" Note=""/>
+        <Element ComponentName="LogFileAccess" X="625" Y="725" Note=""/>
+        <Element ComponentName="LogFileDataProvider" X="1025" Y="725" Note=""/>
+        <Element ComponentName="PagesData" X="175" Y="575" Note=""/>
+        <Element ComponentName="Repositories" X="1025" Y="575" Note=""/>
+        <Element ComponentName="RestoringDatabaseController" X="225" Y="725" Note=""/>
+        <Element ComponentName="TestConnectionController" X="375" Y="350" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
-        <EmbededRegistry Id="Settings">
-            <PositionMap>
-                <Element ComponentName="CompactXmlFilePersistence" X="600" Y="300" Note=""/>
-                <Element ComponentName="DatabaseAccessSettings" X="300" Y="625" Note=""/>
-                <Element ComponentName="PreferencesFilePath" X="600" Y="175" Note=""/>
-                <Element ComponentName="Settings" X="600" Y="425" Note=""/>
-                <Element ComponentName="SystemLocation" X="600" Y="75" Note=""/>
-            </PositionMap>
-            <EmbeddedRegistries/>
-        </EmbededRegistry>
         <EmbededRegistry Id="PagesData">
             <PositionMap>
                 <Element ComponentName="Demultiplexer" X="575" Y="50" Note=""/>
@@ -45,6 +38,16 @@
                 <Element ComponentName="RoleDocumentSqlRepository" X="300" Y="100" Note=""/>
                 <Element ComponentName="UserGroupSqlRepository" X="800" Y="475" Note=""/>
                 <Element ComponentName="UserSqlRepository" X="775" Y="100" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+        <EmbededRegistry Id="Settings">
+            <PositionMap>
+                <Element ComponentName="CompactXmlFilePersistence" X="600" Y="300" Note=""/>
+                <Element ComponentName="DatabaseAccessSettings" X="300" Y="625" Note=""/>
+                <Element ComponentName="PreferencesFilePath" X="600" Y="175" Note=""/>
+                <Element ComponentName="Settings" X="600" Y="425" Note=""/>
+                <Element ComponentName="SystemLocation" X="600" Y="75" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>
