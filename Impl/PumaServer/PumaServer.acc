@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5105" Description="ACF"/>
-            <Version Id="1" Number="2195" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5127" Description="ACF"/>
+            <Version Id="1" Number="2198" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -27,7 +27,7 @@
                             <Values>
                                 <Value>PumaServerBase/AutoPersistence</Value>
                                 <Value>PumaServerBase/PgSqlDatabaseEngine</Value>
-                                <Value>PumaServerBase/TcpServer</Value>
+                                <Value>PumaServerBase</Value>
                                 <Value>PumaServerBase/DatabaseAutomaticBackup</Value>
                             </Values>
                         </Data>
@@ -61,6 +61,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="Application/Log"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="LogPath" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Application/LogFilePath"/>
                     </AttributeInfo>
                     <AttributeInfo Id="RuntimeStatus" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="Application/RuntimeStatus"/>

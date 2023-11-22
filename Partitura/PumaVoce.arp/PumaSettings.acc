@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5105" Description="ACF"/>
-            <Version Id="1" Number="2195" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5127" Description="ACF"/>
+            <Version Id="1" Number="2198" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -85,10 +85,10 @@
                     <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="DefaultPath" Type="String" ExportId="DefaultPath">
+                    <AttributeInfo Id="DefaultPath" Type="String" ExportId="">
                         <Data IsEnabled="true" Value="PumaServerSettings.xml"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="LocationType" Type="Integer" ExportId="LocationType">
+                    <AttributeInfo Id="LocationType" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="105"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
@@ -161,6 +161,7 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>ServerPort</Value>
+                                <Value>WebSocketServerPort</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -168,6 +169,7 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>ServerPort</Value>
+                                <Value>WebSocketServerPort</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -182,6 +184,15 @@
                 <AttributeInfoMap>
                     <AttributeInfo Id="DefaultText" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value="7788"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="WebSocketServerPort" PackageId="BasePck" ComponentId="TextParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DefaultText" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="8788"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -201,5 +212,6 @@
         <Component ExportedId="Backup" ComponentId="Backup"/>
         <Component ExportedId="DatabaseAccessSettings" ComponentId="DatabaseAccessSettings"/>
         <Component ExportedId="ServerPort" ComponentId="ServerPort"/>
+        <Component ExportedId="WebSocketServerPort" ComponentId="WebSocketServerPort"/>
     </ExportedComponents>
 </Acf>

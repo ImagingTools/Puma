@@ -2,47 +2,26 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5105" Description="ACF"/>
-            <Version Id="1" Number="2195" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5127" Description="ACF"/>
+            <Version Id="1" Number="2198" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="DatabaseAutomaticBackup" X="725" Y="75" Note=""/>
-        <Element ComponentName="DatabaseEngine" X="275" Y="275" Note=""/>
-        <Element ComponentName="HttpProtocolEngine" X="900" Y="300" Note=""/>
-        <Element ComponentName="PumaHandlers" X="650" Y="200" Note=""/>
-        <Element ComponentName="PumaSettings" X="275" Y="175" Note=""/>
-        <Element ComponentName="TcpServer" X="625" Y="400" Note=""/>
-        <Element ComponentName="WorkerManager" X="650" Y="300" Note=""/>
+        <Element ComponentName="DatabaseAutomaticBackup" X="600" Y="100" Note=""/>
+        <Element ComponentName="DatabaseEngine" X="975" Y="300" Note=""/>
+        <Element ComponentName="HttpServerFramework" X="600" Y="500" Note=""/>
+        <Element ComponentName="PumaHandlers" X="600" Y="300" Note=""/>
+        <Element ComponentName="PumaLocalization" X="978" Y="456" Note=""/>
+        <Element ComponentName="PumaSettings" X="225" Y="300" Note=""/>
+        <Element ComponentName="Subscriptions" X="600" Y="650" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
-        <EmbededRegistry Id="Settings">
+        <EmbededRegistry Id="Subscriptions">
             <PositionMap>
-                <Element ComponentName="CompactXmlFilePersistence" X="600" Y="300" Note=""/>
-                <Element ComponentName="DatabaseAccessSettings" X="300" Y="625" Note=""/>
-                <Element ComponentName="PreferencesFilePath" X="600" Y="175" Note=""/>
-                <Element ComponentName="Settings" X="600" Y="425" Note=""/>
-                <Element ComponentName="SystemLocation" X="600" Y="75" Note=""/>
-            </PositionMap>
-            <EmbeddedRegistries/>
-        </EmbededRegistry>
-        <EmbededRegistry Id="PagesData">
-            <PositionMap>
-                <Element ComponentName="Demultiplexer" X="575" Y="50" Note=""/>
-                <Element ComponentName="RolesPage" X="200" Y="250" Note=""/>
-                <Element ComponentName="UserGroupsPage" X="950" Y="250" Note=""/>
-                <Element ComponentName="UsersPage" X="575" Y="250" Note=""/>
-            </PositionMap>
-            <EmbeddedRegistries/>
-        </EmbededRegistry>
-        <EmbededRegistry Id="Repositories">
-            <PositionMap>
-                <Element ComponentName="Role" X="500" Y="350" Note=""/>
-                <Element ComponentName="RoleCollectionAdapter" X="225" Y="475" Note=""/>
-                <Element ComponentName="RoleDocumentSqlRepository" X="300" Y="100" Note=""/>
-                <Element ComponentName="UserGroupSqlRepository" X="800" Y="475" Note=""/>
-                <Element ComponentName="UserSqlRepository" X="775" Y="100" Note=""/>
+                <Element ComponentName="GroupsSubscriberController" X="550" Y="300" Note=""/>
+                <Element ComponentName="RolesSubscriberController" X="550" Y="100" Note=""/>
+                <Element ComponentName="UsersSubscriberController" X="550" Y="200" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>
