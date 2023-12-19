@@ -10,7 +10,7 @@
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="LocalAuthorizableGQLServerFramework" PackageId="ImtHttpServerVoce" ComponentId="LocalAuthorizableGQLServerFramework">
+        <Element Id="LocalAuthorizableServerFramework" PackageId="ImtHttpServerVoce" ComponentId="LocalAuthorizableServerFramework">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="BinaryDataControllers" Type="Reference[]" ExportId="">
@@ -189,8 +189,8 @@
         </EmbeddedRegistry>
     </EmbeddedRegistriesList>
     <ExportedInterfaces>
-        <Interface InterfaceId="imtgql::IGqlRequestProvider" ComponentId="LocalAuthorizableGQLServerFramework"/>
-        <Interface InterfaceId="imtrest::IRequestServlet" ComponentId="LocalAuthorizableGQLServerFramework"/>
+        <Interface InterfaceId="imtgql::IGqlRequestProvider" ComponentId="LocalAuthorizableServerFramework"/>
+        <Interface InterfaceId="imtrest::IRequestServlet" ComponentId="LocalAuthorizableServerFramework"/>
     </ExportedInterfaces>
     <ExportedComponents/>
 </Acf>
