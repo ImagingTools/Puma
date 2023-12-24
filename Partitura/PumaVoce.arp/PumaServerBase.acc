@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5127" Description="ACF"/>
+            <Version Id="0" Number="5137" Description="ACF"/>
             <Version Id="1" Number="2198" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+            <Version Id="1023" Number="394753" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -37,6 +37,9 @@
                     <AttributeInfo Id="DbName" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="puma"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="DbType" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="QPSQL"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -51,6 +54,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="PgPort" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="5432"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserName" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="postgres"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -73,19 +79,10 @@
                     <AttributeInfo Id="RequestHandler" Type="Factory" ExportId="">
                         <Data IsEnabled="true" Value="PumaHandlers"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ServerAddress" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="http://localhost"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ServerPort" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="7788"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ServerPortParam" Type="Reference" ExportId="">
+                    <AttributeInfo Id="ServerPort" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaSettings/ServerPort"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="WebSocketServerPort" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="8788"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="WebSocketServerPortParam" Type="Reference" ExportId="">
+                    <AttributeInfo Id="WebSocketServerPort" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaSettings/WebSocketServerPort"/>
                     </AttributeInfo>
                 </AttributeInfoMap>

@@ -2,18 +2,18 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5127" Description="ACF"/>
+            <Version Id="0" Number="5137" Description="ACF"/>
             <Version Id="1" Number="2198" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+            <Version Id="1023" Number="394753" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
         <Element ComponentName="DatabaseAutomaticBackup" X="600" Y="100" Note=""/>
-        <Element ComponentName="DatabaseEngine" X="975" Y="300" Note=""/>
-        <Element ComponentName="HttpServerFramework" X="600" Y="500" Note=""/>
-        <Element ComponentName="PumaHandlers" X="600" Y="300" Note=""/>
-        <Element ComponentName="PumaLocalization" X="978" Y="456" Note=""/>
-        <Element ComponentName="PumaSettings" X="225" Y="300" Note=""/>
+        <Element ComponentName="DatabaseEngine" X="975" Y="250" Note=""/>
+        <Element ComponentName="HttpServerFramework" X="250" Y="500" Note=""/>
+        <Element ComponentName="PumaHandlers" X="600" Y="375" Note=""/>
+        <Element ComponentName="PumaLocalization" X="975" Y="500" Note=""/>
+        <Element ComponentName="PumaSettings" X="250" Y="250" Note=""/>
         <Element ComponentName="Subscriptions" X="600" Y="650" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>

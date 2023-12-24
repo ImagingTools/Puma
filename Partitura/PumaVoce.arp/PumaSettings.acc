@@ -2,13 +2,13 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5127" Description="ACF"/>
+            <Version Id="0" Number="5137" Description="ACF"/>
             <Version Id="1" Number="2198" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+            <Version Id="1023" Number="394753" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
-    <Description></Description>
-    <Keywords></Keywords>
+    <Description>Settings of the Puma-server</Description>
+    <Keywords>Puma.Server</Keywords>
     <ElementsList>
         <Element Id="Backup" PackageId="BasePck" ComponentId="ComposedParamsSet">
             <Data IsEnabled="true" Flags="0">
@@ -154,44 +154,13 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="Server" PackageId="BasePck" ComponentId="ComposedParamsSet">
+        <Element Id="Server" PackageId="ImtHttpServerVoce" ComponentId="ServerConnectionParams">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="Parameters" Type="Reference[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>ServerPort</Value>
-                                <Value>WebSocketServerPort</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ParametersId" Type="Id[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>ServerPort</Value>
-                                <Value>WebSocketServerPort</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TypeId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="Default"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="ServerPort" PackageId="BasePck" ComponentId="TextParam">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="DefaultText" Type="Text" ExportId="">
+                    <AttributeInfo Id="DefaultPort" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="7788"/>
                     </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="WebSocketServerPort" PackageId="BasePck" ComponentId="TextParam">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="DefaultText" Type="Text" ExportId="">
+                    <AttributeInfo Id="WebSocketDefaultPort" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="8788"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -211,7 +180,7 @@
         <Component ExportedId="AutoPersistence" ComponentId="FileAutoPersistence/AutoPersistence"/>
         <Component ExportedId="Backup" ComponentId="Backup"/>
         <Component ExportedId="DatabaseAccessSettings" ComponentId="DatabaseAccessSettings"/>
-        <Component ExportedId="ServerPort" ComponentId="ServerPort"/>
-        <Component ExportedId="WebSocketServerPort" ComponentId="WebSocketServerPort"/>
+        <Component ExportedId="ServerPort" ComponentId="Server/ServerPort"/>
+        <Component ExportedId="WebSocketServerPort" ComponentId="Server/WebSocketServerPort"/>
     </ExportedComponents>
 </Acf>
