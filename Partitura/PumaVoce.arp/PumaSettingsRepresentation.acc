@@ -2,7 +2,7 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5127" Description="ACF"/>
+            <Version Id="0" Number="5136" Description="ACF"/>
             <Version Id="1" Number="2198" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
@@ -23,7 +23,7 @@
                         <Data IsEnabled="true" Value="Backup Folder"/>
                     </AttributeInfo>
                     <AttributeInfo Id="PathToQml" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="qrc:/qml/imtgui/AuxComponents/PathPicker.qml"/>
+                        <Data IsEnabled="true" Value="qrc:/qml/imtgui/PathPicker.qml"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>
@@ -61,10 +61,10 @@
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="DatabaseNameSource" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="qrc:/qml/imtgui/AuxComponents/SettingsTextInput.qml"/>
+                        <Data IsEnabled="true" Value="qrc:/qml/imtgui/Settings/SettingsTextInput.qml"/>
                     </AttributeInfo>
                     <AttributeInfo Id="HostSource" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="qrc:/qml/imtgui/AuxComponents/SettingsTextInput.qml"/>
+                        <Data IsEnabled="true" Value="qrc:/qml/imtgui/Settings/SettingsTextInput.qml"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
@@ -76,19 +76,19 @@
                         <Data IsEnabled="true" Value="Database"/>
                     </AttributeInfo>
                     <AttributeInfo Id="PasswordSource" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="qrc:/qml/imtgui/AuxComponents/SettingsTextInput.qml"/>
+                        <Data IsEnabled="true" Value="qrc:/qml/imtgui/Settings/SettingsTextInput.qml"/>
                     </AttributeInfo>
                     <AttributeInfo Id="PathToQml" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="qrc:/qml/imtgui/AuxComponents/DatabaseInput.qml"/>
+                        <Data IsEnabled="true" Value="qrc:/qml/imtgui/Settings/DatabaseInput.qml"/>
                     </AttributeInfo>
                     <AttributeInfo Id="PortSource" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="qrc:/qml/imtgui/AuxComponents/SettingsIntegerInput.qml"/>
+                        <Data IsEnabled="true" Value="qrc:/qml/imtgui/Settings/SettingsIntegerInput.qml"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="UsernameSource" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="qrc:/qml/imtgui/AuxComponents/SettingsTextInput.qml"/>
+                        <Data IsEnabled="true" Value="qrc:/qml/imtgui/Settings/SettingsTextInput.qml"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -131,7 +131,7 @@
                         <Data IsEnabled="true" Value="Scheduler"/>
                     </AttributeInfo>
                     <AttributeInfo Id="PathToQml" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="qrc:/qml/imtgui/AuxComponents/SchedulerParams.qml"/>
+                        <Data IsEnabled="true" Value="qrc:/qml/imtgui/Application/SchedulerParams.qml"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>
@@ -152,7 +152,7 @@
                         <Data IsEnabled="true" Value="Server Port"/>
                     </AttributeInfo>
                     <AttributeInfo Id="PathToQml" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="qrc:/qml/imtgui/AuxComponents/SettingsTextInput.qml"/>
+                        <Data IsEnabled="true" Value="qrc:/qml/imtgui/Settings/SettingsTextInput.qml"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>
@@ -226,7 +226,7 @@
                         <Data IsEnabled="true" Value="WebSocket Server Port"/>
                     </AttributeInfo>
                     <AttributeInfo Id="PathToQml" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="qrc:/qml/imtgui/AuxComponents/SettingsTextInput.qml"/>
+                        <Data IsEnabled="true" Value="qrc:/qml/imtgui/Settings/SettingsTextInput.qml"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>
