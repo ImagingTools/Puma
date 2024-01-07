@@ -30,8 +30,10 @@ include(${IMTCOREDIR}/Config/CMake/OpenSSL.cmake)
 include(${IMTCOREDIR}/Config/CMake/Quazip.cmake)
 include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
 
-target_link_libraries(${PROJECT_NAME} imtbase imtgui imtstyle imtstyleqml imtqml imtgql imtcom imtdb imtfile)
+target_link_libraries(${PROJECT_NAME} imtbase imtgui imtstyle imtqml imtgql imtcom imtdb imtfile)
 target_link_libraries(${PROJECT_NAME} imtguigql imtapp)
+target_link_libraries(${PROJECT_NAME} imtcontrolsqml)
+target_link_libraries(${PROJECT_NAME} imtstylecontrolsqml)
 target_link_libraries(${PROJECT_NAME} pumaqml)
 target_link_libraries(${PROJECT_NAME} ImtCoreLoc)
 target_link_libraries(${PROJECT_NAME} iqtgui)
@@ -39,8 +41,7 @@ target_link_libraries(${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::QuickWidgets  Qt${Q
 target_link_libraries(${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::Sql)
 
 if(WIN32)
-	list(APPEND listOptions "--qmldir=${IMTCOREDIR}/Include/imtqml/Resources/qml")
-	list(APPEND listOptions "--qmldir=${IMTCOREDIR}/Include/imtgui/Qml/imtgui")
+	list(APPEND listOptions "--qmldir=${IMTCOREDIR}/Qml")
 	set(files  \"${AUX_INCLUDE_DIR}/../../../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME}/${PROJECT_NAME}.exe\")
 
 	windeploy(${PROJECT_NAME} "${listOptions}" "${files}")

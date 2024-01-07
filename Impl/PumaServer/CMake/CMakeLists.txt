@@ -38,8 +38,7 @@ include(${ACFDIR}/Config/CMake/AcfStdGui.cmake)
 include(${ACFDIR}/Config/CMake/AcfStd.cmake)
 
 if(WIN32)
-	list(APPEND listOptions "--qmldir=${IMTCOREDIR}/Include/imtqml/Resources/qml")
-	list(APPEND listOptions "--qmldir=${IMTCOREDIR}/Include/imtgui/Qml/imtgui")
+	list(APPEND listOptions "--qmldir=${IMTCOREDIR}/Qml")
 	set(files  \"${AUX_INCLUDE_DIR}/../../../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME}/${PROJECT_NAME}.exe\")
 
 	windeploy(${PROJECT_NAME} "${listOptions}" "${files}")

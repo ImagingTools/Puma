@@ -18,8 +18,8 @@ int main(int argc, char *argv[])
 {
 	Q_INIT_RESOURCE(PumaServerConfigurator);
 	Q_INIT_RESOURCE(imtgui);
-	Q_INIT_RESOURCE(imtqml);
-	Q_INIT_RESOURCE(imtstyleqml);
+	Q_INIT_RESOURCE(imtstylecontrolsqml);
+	Q_INIT_RESOURCE(imtcontrolsqml);
 	Q_INIT_RESOURCE(pumaqml);
 	Q_INIT_RESOURCE(imtguiTheme);
 
