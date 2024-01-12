@@ -18,10 +18,15 @@ int main(int argc, char *argv[])
 {
 	Q_INIT_RESOURCE(PumaServerConfigurator);
 	Q_INIT_RESOURCE(imtgui);
-	Q_INIT_RESOURCE(imtstylecontrolsqml);
-	Q_INIT_RESOURCE(imtcontrolsqml);
+	Q_INIT_RESOURCE(imtguiqml);
 	Q_INIT_RESOURCE(pumaqml);
 	Q_INIT_RESOURCE(imtguiTheme);
+
+	Q_INIT_RESOURCE(imtstylecontrolsqml);
+	Q_INIT_RESOURCE(imtcontrolsqml);
+	Q_INIT_RESOURCE(imtguigqlqml);
+	Q_INIT_RESOURCE(imtauthguiqml);
+	Q_INIT_RESOURCE(imtcolguiqml);
 
 	qmlRegisterType<imtbase::CTreeItemModel>("Acf", 1, 0, "TreeItemModel");
 	qmlRegisterType<imtqml::CGqlModel>("Acf", 1, 0, "GqlModel");
