@@ -2,7 +2,7 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5127" Description="ACF"/>
+            <Version Id="0" Number="5147" Description="ACF"/>
             <Version Id="1" Number="2198" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
@@ -421,7 +421,6 @@
                     <Component ExportedId="UserCollectionAdapter" ComponentId="UserSqlRepository/UserCollectionAdapter"/>
                     <Component ExportedId="UserGroupInfoProvider" ComponentId="UserGroupSqlRepository/UserGroupInfoProvider"/>
                     <Component ExportedId="UserGroupSqlRepository" ComponentId="UserGroupSqlRepository"/>
-                    <Component ExportedId="UserSettingsRepository" ComponentId="UserSettingsDatabaseDelegate/UserSettingsRepository"/>
                     <Component ExportedId="UserSqlRepository" ComponentId="UserSqlRepository"/>
                 </ExportedComponents>
             </Data>
@@ -434,7 +433,6 @@
         <Component ExportedId="RoleDocumentSqlRepository" ComponentId="Repositories/RoleDocumentSqlRepository"/>
         <Component ExportedId="UserGroupSqlRepository" ComponentId="Repositories/UserGroupSqlRepository"/>
         <Component ExportedId="UserSessionRepository" ComponentId="AuthorizationController/UserSessionRepository"/>
-        <Component ExportedId="UserSettingsRepository" ComponentId="Repositories/UserSettingsRepository"/>
         <Component ExportedId="UserSqlRepository" ComponentId="Repositories/UserSqlRepository"/>
     </ExportedComponents>
 </Acf>

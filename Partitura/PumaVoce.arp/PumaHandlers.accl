@@ -2,15 +2,15 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5127" Description="ACF"/>
+            <Version Id="0" Number="5147" Description="ACF"/>
             <Version Id="1" Number="2198" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="LocalAuthorizableGQLServerFramework" X="600" Y="200" Note=""/>
+        <Element ComponentName="LocalAuthorizableServerFramework" X="525" Y="150" Note=""/>
         <Element ComponentName="Observers" X="600" Y="625" Note=""/>
-        <Element ComponentName="RestoringDatabaseController" X="200" Y="200" Note=""/>
+        <Element ComponentName="RestoringDatabaseController" X="225" Y="450" Note=""/>
         <Element ComponentName="RootDataController" X="600" Y="450" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
