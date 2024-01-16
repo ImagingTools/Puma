@@ -23,7 +23,7 @@
                         <Data IsEnabled="true" Value="Backup Folder"/>
                     </AttributeInfo>
                     <AttributeInfo Id="PathToQml" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="qrc:/qml/imtgui/PathPicker.qml"/>
+					    <Data IsEnabled="true" Value="qrc:/qml/imtcontrols/Inputs/PathPicker.qml"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>
