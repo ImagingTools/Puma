@@ -58,10 +58,9 @@ function InitializeSetup(): boolean;
 var
   ResultCode: integer;
 begin
-  if DirExists(ExpandConstant('{pf64}\ImagingTools\ProLifeServer')) then
+  if DirExists(ExpandConstant('{pf64}\ImagingTools\PumaServer')) then
   begin
-    if Exec(ExpandConstant('{pf64}\ImagingTools\ProLifeServer\nginx\stopNginx.bat'), '', '', SW_SHOW,
-    DelTree(ExpandConstant('{pf64}\ImagingTools\ProLifeServer'), True, True, True);
+    DelTree(ExpandConstant('{pf64}\ImagingTools\PumaServer'), True, True, True);
   end;
   Result := True;
 end;
