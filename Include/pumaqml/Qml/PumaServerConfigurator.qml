@@ -43,7 +43,7 @@ Rectangle {
         anchors.bottom: buttons.top;
 
         onModelIsDirtyChanged: {
-            buttons.setButtonState(Enums.ButtonType.Apply, preferenceDialog.modelIsDirty);
+            buttons.setButtonState(Enums.apply, preferenceDialog.modelIsDirty);
         }
     }
 
@@ -56,12 +56,12 @@ Rectangle {
         anchors.bottomMargin: 10;
 
         Component.onCompleted: {
-            buttons.addButton({"Id":Enums.ButtonType.Apply, "Name": qsTr("Apply"), "Enabled": false});
+            buttons.addButton({"Id":Enums.apply, "Name": qsTr("Apply"), "Enabled": false});
             buttons.addButton({"Id":Enums.ButtonType.Close, "Name": qsTr("Close"), "Enabled": true});
         }
 
         onButtonClicked: {
-            if (buttonId == Enums.ButtonType.Apply){
+            if (buttonId == Enums.apply){
                 window.settingsUpdate();
                 preferenceDialog.modelIsDirty = false;
             }
@@ -98,19 +98,17 @@ Rectangle {
         id: saveDialog;
 
         MessageDialog {
-            buttonsModel: ListModel{
-                ListElement{Id: Enums.ButtonType.Yes; Name:qsTr("Yes"); Enabled: true}
-                ListElement{Id: Enums.ButtonType.No; Name:qsTr("No"); Enabled: true}
-                ListElement{Id: Enums.ButtonType.Cancel; Name:qsTr("Cancel"); Enabled: true}
+            Component.onCompleted: {
+                buttonsModel.append({Id: Enums.cancel, Name:qsTr("Cancel"), Enabled: true})
             }
 
             onFinished: {
-                if (buttonId == Enums.ButtonType.Yes){
+                if (buttonId == Enums.yes){
                     window.settingsUpdate();
 
                     Qt.quit();
                 }
-                else if (buttonId == Enums.ButtonType.No){
+                else if (buttonId == Enums.no){
                     Qt.quit();
                 }
             }
