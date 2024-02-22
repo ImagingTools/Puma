@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5048" Description="ACF"/>
-            <Version Id="1" Number="2178" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+            <Version Id="0" Number="5191" Description="ACF"/>
+            <Version Id="1" Number="2202" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="394753" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>ACF-Solutions strings localization</Description>
@@ -13,6 +13,12 @@
         <Element Id="ImtCoreLocalization" PackageId="ImtCoreVoce" ComponentId="ImtCoreLocalization">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="IgnoreLocale" Type="Boolean" ExportId="IgnoreLocale">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="InstallTranslator" Type="Boolean" ExportId="InstallTranslator">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="LanguageIds" Type="Id[]" ExportId="LanguageIds">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -25,9 +31,15 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-		<Element Id="PumaLocalization" PackageId="QtPck" ComponentId="TranslationManager">
+        <Element Id="PumaLocalization" PackageId="QtPck" ComponentId="TranslationManager">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="IgnoreLocale" Type="Boolean" ExportId="IgnoreLocale">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="InstallTranslator" Type="Boolean" ExportId="InstallTranslator">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="LanguageIds" Type="Id[]" ExportId="LanguageIds">
                         <Data IsEnabled="true">
                             <Values>
@@ -51,7 +63,7 @@
                         <Data IsEnabled="true" Value=":/Translations"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationFilePrefix" Type="Id" ExportId="">
-					    <Data IsEnabled="true" Value="Puma"/>
+                        <Data IsEnabled="true" Value="Puma"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -59,10 +71,10 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-	    <Interface InterfaceId="imod::IModel" ComponentId="PumaLocalization"/>
-		<Interface InterfaceId="iprm::IOptionsList" ComponentId="PumaLocalization"/>
-		<Interface InterfaceId="iqt::ITranslationManager" ComponentId="PumaLocalization"/>
-		<Interface InterfaceId="istd::IChangeable" ComponentId="PumaLocalization"/>
+        <Interface InterfaceId="imod::IModel" ComponentId="PumaLocalization"/>
+        <Interface InterfaceId="iprm::IOptionsList" ComponentId="PumaLocalization"/>
+        <Interface InterfaceId="iqt::ITranslationManager" ComponentId="PumaLocalization"/>
+        <Interface InterfaceId="istd::IChangeable" ComponentId="PumaLocalization"/>
     </ExportedInterfaces>
     <ExportedComponents/>
 </Acf>

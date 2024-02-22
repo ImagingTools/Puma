@@ -30,7 +30,7 @@ include(${IMTCOREDIR}/Config/CMake/OpenSSL.cmake)
 include(${IMTCOREDIR}/Config/CMake/Quazip.cmake)
 include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
 
-target_link_libraries(${PROJECT_NAME} imtbase imtgui imtqml imtgql imtcom imtdb imtfile imtguigql imtapp)
+target_link_libraries(${PROJECT_NAME} imtbase imtgui imtqml imtgql imtcom imtdb imtfile imtguigql imtapp imtservice)
 target_link_libraries(${PROJECT_NAME} imtstylecontrolsqml imtcontrolsqml imtguigqlqml imtauthguiqml imtcolguiqml imtguiqml)
 target_link_libraries(${PROJECT_NAME} pumaqml)
 target_link_libraries(${PROJECT_NAME} ImtCoreLoc)

@@ -2,13 +2,14 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5136" Description="ACF"/>
-            <Version Id="1" Number="2198" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+            <Version Id="0" Number="5191" Description="ACF"/>
+            <Version Id="1" Number="2202" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="394753" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
         <Element ComponentName="Backup" X="925" Y="350" Note=""/>
+        <Element ComponentName="ConnectionCollection" X="500" Y="500" Note=""/>
         <Element ComponentName="Database" X="125" Y="350" Note=""/>
         <Element ComponentName="DatabaseAccessSettings" X="125" Y="500" Note=""/>
         <Element ComponentName="FileAutoPersistence" X="500" Y="50" Note=""/>
