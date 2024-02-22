@@ -216,6 +216,7 @@
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
         <Interface InterfaceId="imod::IModel" ComponentId="Preferences"/>
+        <Interface InterfaceId="imtservice::IConnectionCollection" ComponentId="ConnectionCollection"/>
         <Interface InterfaceId="iprm::IParamsSet" ComponentId="Preferences"/>
         <Interface InterfaceId="iser::ISerializable" ComponentId="Preferences"/>
         <Interface InterfaceId="istd::IChangeable" ComponentId="Preferences"/>
