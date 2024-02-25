@@ -9,8 +9,8 @@ include($(IMTCOREDIR)/Config/QMake/OpenSSL.pri)
 RESOURCES += $$files($$_PRO_FILE_PWD_/../*.qrc, false)
 
 LIBS += -L../../../Lib/$$COMPILER_DIR -liauth -liservice -lAcfSlnLoc -lAcfLoc
-LIBS +=  -limtbase -limtdb -limtgui -limtqml -limtlog -limtloggui -limtstyle -limtrest -limtlic -lImtCoreLoc -limtcrypt -limtauth -limtauthgql -limtbase -limtgql -limtauthdb -limtcom -limtlicgql -limtguigql -limtapp -limtclientgql
-
+LIBS +=  -limtbase -limtdb -limtgui -limtqml -limtlog -limtloggui -limtstyle -limtrest -limtlic -lImtCoreLoc -limtcrypt -limtauth -limtauthgql -limtbase -limtgql -limtauthdb -limtcom
+LIBS +=  -limtlicgql -limtguigql -limtapp -limtclientgql -limtservice
 
 HEADERS =
 

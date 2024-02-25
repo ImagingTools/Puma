@@ -14,7 +14,7 @@ INCLUDEPATH +=  $$AUXINCLUDEDIR
 
 RESOURCES += $$files($$_PRO_FILE_PWD_/../*.qrc, false)
 
-LIBS += -limtbase -limtgui -limtstyle -limtqml -limtfile -limtgql -limtcom -limtdb -limtapp
+LIBS += -limtbase -limtgui -limtstyle -limtqml -limtfile -limtgql -limtcom -limtdb -limtapp -limtservice
 LIBS += -limtcontrolsqml -limtstylecontrolsqml -limtguigqlqml -limtcolguiqml -limtdocguiqml -limtauthguiqml -limtlicguiqml -limtguiqml
 LIBS += -lImtCoreLoc
 LIBS += -lpumaqml
