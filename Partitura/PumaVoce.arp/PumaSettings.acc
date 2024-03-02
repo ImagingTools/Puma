@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5191" Description="ACF"/>
-            <Version Id="1" Number="2202" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5200" Description="ACF"/>
+            <Version Id="1" Number="2203" Description="ACF-Solutions"/>
             <Version Id="1023" Number="394753" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -46,7 +46,7 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
-                    <AttributeInfo Id="ConnectionIds" Type="Id[]" ExportId="">
+                    <AttributeInfo Id="ConnectionServiceTypeNames" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>PumaUrlTcp</Value>
@@ -70,13 +70,16 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
-                    <AttributeInfo Id="ServiceNames" Type="Id[]" ExportId="">
+                    <AttributeInfo Id="ConnectionUsageIds" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>Puma</Value>
                                 <Value>Puma</Value>
                             </Values>
                         </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ServiceTypeName" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Puma"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
