@@ -46,11 +46,19 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
+                    <AttributeInfo Id="ConnectionNames" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>PumaUrl(Tcp)</Value>
+                                <Value>PumaUrl(Ws)</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
                     <AttributeInfo Id="ConnectionServiceTypeNames" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>PumaUrlTcp</Value>
-                                <Value>PumaUrlWs</Value>
+                                <Value>Puma</Value>
+                                <Value>Puma</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -73,8 +81,8 @@
                     <AttributeInfo Id="ConnectionUsageIds" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>Puma</Value>
-                                <Value>Puma</Value>
+                                <Value>PumaUrlTcp</Value>
+                                <Value>PumaUrlWs</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
