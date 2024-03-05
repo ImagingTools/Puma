@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5200" Description="ACF"/>
-            <Version Id="1" Number="2203" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="394753" Description="Qt Framework"/>
+            <Version Id="0" Number="5191" Description="ACF"/>
+            <Version Id="1" Number="2202" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -40,12 +40,6 @@
                     </AttributeInfo>
                     <AttributeInfo Id="ProductName" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value="Puma"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="SeriviceDescription" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="User Management System Server"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ServiceName" Type="String" ExportId="">
-                        <Data IsEnabled="true" Value="PumaServer"/>
                     </AttributeInfo>
                     <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="VersionInfo"/>
