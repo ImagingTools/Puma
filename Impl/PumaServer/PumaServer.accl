@@ -8,8 +8,9 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="Application" X="625" Y="125" Note=""/>
+        <Element ComponentName="Application" X="625" Y="175" Note=""/>
         <Element ComponentName="PumaServerBase" X="225" Y="400" Note=""/>
+        <Element ComponentName="SingletonDocApplication" X="625" Y="75" Note=""/>
         <Element ComponentName="VersionInfo" X="1000" Y="400" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>

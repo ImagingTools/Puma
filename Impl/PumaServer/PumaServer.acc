@@ -68,6 +68,21 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="SingletonDocApplication" PackageId="QtGuiPck" ComponentId="SingletonDocApplication">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Application" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Application"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Application/ApplicationInfo"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RuntimeStatus" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Application/RuntimeStatus"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="VersionInfo" PackageId="PumaVoce" ComponentId="VersionInfo">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -80,7 +95,8 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="ibase::IApplication" ComponentId="Application"/>
+        <Interface InterfaceId="ibase::IApplication" ComponentId="SingletonDocApplication"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="SingletonDocApplication"/>
     </ExportedInterfaces>
     <ExportedComponents/>
 </Acf>
