@@ -49,8 +49,8 @@
                     <AttributeInfo Id="ConnectionNames" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>PumaUrl(Tcp)</Value>
-                                <Value>PumaUrl(Ws)</Value>
+                                <Value>Puma main HTTP</Value>
+                                <Value>Puma main WebSocket</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -85,6 +85,9 @@
                                 <Value>PumaUrlWs</Value>
                             </Values>
                         </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ServiceTypeName" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="Puma"/>
