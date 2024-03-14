@@ -45,13 +45,8 @@ Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
 
 [Run]
-Filename: "{app}\PumaServerConfigurator.exe"
-Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Parameters: "-t"
-Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Parameters: "-u"
-Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Parameters: "-i"
-
-[UninstallRun]
-Filename: "{app}\{#MyAppExeName}"; Parameters: "-t -u"
+// Filename: "{app}\PumaServerConfigurator.exe"
+Filename: "{app}\{#MyAppExeName}"; Flags: nowait postinstall skipifsilent;
 
 [Code]
 function InitializeSetup(): boolean;
