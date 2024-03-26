@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5191" Description="ACF"/>
-            <Version Id="1" Number="2202" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="0" Number="5210" Description="ACF"/>
+            <Version Id="1" Number="2205" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="394754" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>Surface inspection plugin</Description>
@@ -57,6 +57,27 @@
                     </AttributeInfo>
                     <AttributeInfo Id="ReferencePath" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="SystemLocation"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="LogSql" PackageId="ImtDatabaseVoce" ComponentId="LogSql">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ApplicationInfo"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SqlLogFilePath" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="PumaServerLog.sqlite"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ObjectCollectionFactory" PackageId="ImtServicePck" ComponentId="ObjectCollectionFactory">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Factory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="LogSql"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -167,6 +188,7 @@
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
         <Interface InterfaceId="iser::IVersionInfo" ComponentId="VersionInfo"/>
+        <Interface InterfaceId="istd::TIFactory&lt;imtbase::IObjectCollection&gt;" ComponentId="ObjectCollectionFactory"/>
         <Interface InterfaceId="istd::TIFactory&lt;imtbase::IRepresentationController&gt;" ComponentId="RepresentationControllerFactory"/>
         <Interface InterfaceId="istd::TIFactory&lt;imtservice::IConnectionCollection&gt;" ComponentId="ConnectionCollectionFactory"/>
         <Interface InterfaceId="istd::TIFactory&lt;iprm::IParamsSet&gt;" ComponentId="ParamsSetFactory"/>
