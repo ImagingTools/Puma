@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5147" Description="ACF"/>
-            <Version Id="1" Number="2198" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+            <Version Id="0" Number="5211" Description="ACF"/>
+            <Version Id="1" Number="2205" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
@@ -21,7 +21,7 @@
                 <Element ComponentName="Demultiplexer" X="575" Y="100" Note=""/>
                 <Element ComponentName="RolesPage" X="175" Y="350" Note=""/>
                 <Element ComponentName="UserGroupsPage" X="1000" Y="350" Note=""/>
-                <Element ComponentName="UsersPage" X="600" Y="350" Note=""/>
+                <Element ComponentName="UsersPage" X="599" Y="349" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>
