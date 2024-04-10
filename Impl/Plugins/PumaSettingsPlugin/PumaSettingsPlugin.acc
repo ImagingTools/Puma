@@ -23,7 +23,7 @@
                         <Data IsEnabled="true" Value="ImagingTools GmbH"/>
                     </AttributeInfo>
                     <AttributeInfo Id="MainVersionId" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="1983"/>
+                        <Data IsEnabled="true" Value="1987"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ProductName" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value="Puma"/>

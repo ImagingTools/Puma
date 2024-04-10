@@ -38,6 +38,9 @@
                     <AttributeInfo Id="LogPath" Type="String" ExportId="">
                         <Data IsEnabled="true" Value="PumaServerLog.txt"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="MainVersionId" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="1987"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ProductName" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value="Puma"/>
                     </AttributeInfo>
