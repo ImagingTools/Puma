@@ -14,7 +14,7 @@ Rectangle {
     signal settingsUpdate();
 
     onSettingsUpdate: {
-        console.log("window onSettingsUpdate", localSettings.toJSON());
+        console.log("window onSettingsUpdate", localSettings.ToJson());
     }
 
     Component.onCompleted: {
