@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5147" Description="ACF"/>
-            <Version Id="1" Number="2198" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+            <Version Id="0" Number="5221" Description="ACF"/>
+            <Version Id="1" Number="2205" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="394754" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -55,6 +55,9 @@
                     <AttributeInfo Id="PgPort" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="5432"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaSettings/TracingConfiguration"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="UserName" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="postgres"/>
                     </AttributeInfo>
@@ -81,6 +84,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="ServerPort" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaSettings/ServerPort"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaSettings/TracingConfiguration"/>
                     </AttributeInfo>
                     <AttributeInfo Id="WebSocketServerPort" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaSettings/WebSocketServerPort"/>
