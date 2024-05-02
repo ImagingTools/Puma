@@ -16,9 +16,6 @@ if(APPLE)
 	set(CMAKE_MACOSX_BUNDLE "on")
 endif()
 
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS WebSockets)
-find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Sql Qml REQUIRED)
-
 include(${ACFDIR}/Config/CMake/CustomBuild.cmake)
 
 include(${ACFDIR}/Config/CMake/ApplicationConfig.cmake)
@@ -33,6 +30,7 @@ target_link_libraries(${PROJECT_NAME} imtlicgql imtgql imtauthgql imtauthdb imtc
 target_link_libraries(${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::WebSockets)
 target_link_libraries(${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::Sql)
 target_link_libraries(${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::Qml)
+target_link_libraries(${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::Widgets)
 
 include(${ACFDIR}/Config/CMake/AcfStdGui.cmake)
 include(${ACFDIR}/Config/CMake/AcfStd.cmake)
