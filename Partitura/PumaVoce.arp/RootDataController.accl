@@ -2,18 +2,16 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5211" Description="ACF"/>
-            <Version Id="1" Number="2205" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5222" Description="ACF"/>
+            <Version Id="1" Number="2207" Description="ACF-Solutions"/>
             <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
         <Element ComponentName="AuthorizationController" X="575" Y="375" Note=""/>
-        <Element ComponentName="DatabaseConnectionController" X="225" Y="200" Note=""/>
         <Element ComponentName="Demultiplexer" X="575" Y="100" Note=""/>
         <Element ComponentName="Pages" X="250" Y="625" Note=""/>
         <Element ComponentName="Repositories" X="850" Y="625" Note=""/>
-        <Element ComponentName="TestConnectionController" X="1000" Y="200" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
         <EmbededRegistry Id="Pages">
