@@ -27,6 +27,7 @@ int main(int argc, char *argv[])
 	Q_INIT_RESOURCE(imtguigqlqml);
 	Q_INIT_RESOURCE(imtauthguiqml);
 	Q_INIT_RESOURCE(imtcolguiqml);
+	Q_INIT_RESOURCE(imtdocguiqml);
 
 	qmlRegisterType<imtbase::CTreeItemModel>("Acf", 1, 0, "TreeItemModel");
 	qmlRegisterType<imtqml::CGqlModel>("Acf", 1, 0, "GqlModel");
