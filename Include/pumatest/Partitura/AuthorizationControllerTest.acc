@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5222" Description="ACF"/>
+            <Version Id="1" Number="2207" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description>Acula's data repository containing all resources need for the execution of the production workflow</Description>
+    <Keywords>Inspection Application Product Workflow</Keywords>
+    <ElementsList>
+        <Element Id="PumaHandlersTest" PackageId="PumaTestVoce" ComponentId="PumaHandlersTest">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="imtdb::IDatabaseEngine" ComponentId="PumaHandlersTest"/>
+        <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="PumaHandlersTest"/>
+        <Interface InterfaceId="imtgql::IGqlRequestProvider" ComponentId="PumaHandlersTest"/>
+        <Interface InterfaceId="imtrest::IRequestServlet" ComponentId="PumaHandlersTest"/>
+    </ExportedInterfaces>
+    <ExportedComponents/>
+</Acf>

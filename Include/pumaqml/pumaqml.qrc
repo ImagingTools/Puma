@@ -1,5 +1,7 @@
 <RCC>
     <qresource prefix="/qml">
+	<file alias="pumaqml/qmldir">Qml/qmldir</file>
 	<file alias="Puma/PumaServerConfigurator.qml">Qml/PumaServerConfigurator.qml</file>
+	<file alias="pumaqml/PumaConnectionSubscription.qml">Qml/PumaConnectionSubscription.qml</file>
     </qresource>
 </RCC>
