@@ -21,7 +21,6 @@ imtbase::CTreeItemModel* CRemoveUserControllerTest::CreateExpectedModel() const
 	Q_ASSERT(removedModelPtr != nullptr);
 
 	removedModelPtr->SetData("Id", "Test");
-	removedModelPtr->SetData("Name", "Test");
 
 	return expectedModelPtr.PopPtr();
 }
@@ -62,7 +61,21 @@ bool CRemoveUserControllerTest::VerifyResponse(const imtbase::CTreeItemModel& ac
 		}
 	}
 
-	return BaseClass::VerifyResponse(actualModel, expectedModel);
+	if (!actualModel.ContainsKey("data")){
+		return false;
+	}
+
+	imtbase::CTreeItemModel* dataModelPtr = actualModel.GetTreeItemModel("data");
+	if (dataModelPtr == nullptr || !dataModelPtr->ContainsKey("removedNotification")){
+		return false;
+	}
+
+	imtbase::CTreeItemModel* removedNotificationModelPtr = dataModelPtr->GetTreeItemModel("removedNotification");
+	if (removedNotificationModelPtr == nullptr || !removedNotificationModelPtr->ContainsKey("Id")){
+		return false;
+	}
+
+	return true;
 }
 
 

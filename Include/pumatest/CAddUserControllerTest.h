@@ -1,10 +1,20 @@
 #pragma once
 
 
+// Qt includes
+#include <QtSql/QSqlQuery>
+#include <QtSql/QSqlRecord>
+
+// ACF includes
+#include <iser/CJsonMemWriteArchive.h>
+#include <iser/CJsonMemReadArchive.h>
+
+
 // ImtCore includes
 #include <imtgql/CGqlRequest.h>
 #include <imtgql/CGqlHandlerTest.h>
 #include <imtdb/IDatabaseEngine.h>
+#include <imtauth/CUserInfo.h>
 
 
 class CAddUserControllerTest: public imtgql::CGqlHandlerTest

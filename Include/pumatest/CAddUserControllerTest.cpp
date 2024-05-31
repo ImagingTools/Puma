@@ -66,9 +66,14 @@ bool CAddUserControllerTest::VerifyResponse(const imtbase::CTreeItemModel& /*act
 				return false;
 			}
 
+			if (!sqlQuery.next()){
+				return false;
+			}
+
 			QSqlRecord record = sqlQuery.record();
 			if (record.contains("DocumentId")){
-				if (record.value("DocumentId").toByteArray() != "Test"){
+				QByteArray value = record.value("DocumentId").toByteArray();
+				if (value != QByteArray("Test")){
 					return false;
 				}
 			}

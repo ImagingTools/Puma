@@ -2,8 +2,6 @@
 
 
 // ACF includes
-#include <istd/TDelPtr.h>
-#include <ipackage/CComponentAccessor.h>
 #include <iser/CJsonMemWriteArchive.h>
 #include <iser/CJsonMemReadArchive.h>
 
