@@ -13,10 +13,6 @@ Rectangle {
     property alias localSettings: preferenceDialog.settingsModel;
     signal settingsUpdate();
 
-    onSettingsUpdate: {
-        console.log("window onSettingsUpdate", localSettings.ToJson());
-    }
-
     Component.onCompleted: {
         Style.setDecorators(decorators)
     }
@@ -67,7 +63,7 @@ Rectangle {
             }
             else if (buttonId == Enums.ButtonType.Close){
                 if (preferenceDialog.modelIsDirty){
-                    modalDialogManager.openDialog(saveDialog, {"message": qsTr("Save all changes ?")});
+                    ModalDialogManager.openDialog(saveDialog, {"message": qsTr("Save all changes ?")});
                 }
                 else{
                     Qt.quit();
@@ -75,24 +71,6 @@ Rectangle {
             }
         }
     }
-
-    ModalDialogManager {
-        id: modalDialogManager;
-
-        z: 30;
-
-        anchors.fill: parent;
-    }
-
-//    Connections {
-//        target: Qt.application;
-
-//        onAboutToQuit: {
-//            console.log("onAboutToQuit");
-
-//            buttons.buttonClicked("Close");
-//        }
-//    }
 
     Component {
         id: saveDialog;
