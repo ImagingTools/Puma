@@ -20,14 +20,14 @@ SubscriptionClient {
 
     onStateChanged: {
         if (state === "Ready"){
-            if (pumaSub.ContainsKey("data")){
-                let localModel = pumaSub.GetData("data")
+            if (pumaSub.containsKey("data")){
+                let localModel = pumaSub.getData("data")
 
-                if (localModel.ContainsKey("PumaWsConnection")){
-                    localModel = localModel.GetData("PumaWsConnection")
+                if (localModel.containsKey("PumaWsConnection")){
+                    localModel = localModel.getData("PumaWsConnection")
 
-                    if (localModel.ContainsKey("status")){
-                        let status = localModel.GetData("status")
+                    if (localModel.containsKey("status")){
+                        let status = localModel.getData("status")
                         if (status === "Disconnected"){
                             window.pumaConnected = false;
 
