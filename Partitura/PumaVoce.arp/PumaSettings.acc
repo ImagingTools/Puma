@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5221" Description="ACF"/>
-            <Version Id="1" Number="2205" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="394754" Description="Qt Framework"/>
+            <Version Id="0" Number="5222" Description="ACF"/>
+            <Version Id="1" Number="2207" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>Settings of the Puma-server</Description>
@@ -151,10 +151,10 @@
                     <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="DefaultPath" Type="String" ExportId="">
+                    <AttributeInfo Id="DefaultPath" Type="String" ExportId="DefaultPath">
                         <Data IsEnabled="true" Value="PumaServerSettings.xml"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="LocationType" Type="Integer" ExportId="">
+                    <AttributeInfo Id="LocationType" Type="Integer" ExportId="LocationType">
                         <Data IsEnabled="true" Value="105"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
@@ -223,6 +223,9 @@
                 <AttributeInfoMap>
                     <AttributeInfo Id="Interval" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="86400"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="StartTime" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="01-01-2020 04:00"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
