@@ -28,7 +28,7 @@
                 <Element ComponentName="GeneralSettingsFactory" X="775" Y="750" Note=""/>
                 <Element ComponentName="Role" X="500" Y="350" Note=""/>
                 <Element ComponentName="RoleCollectionAdapter" X="225" Y="475" Note=""/>
-                <Element ComponentName="RoleDocumentSqlRepository" X="300" Y="100" Note=""/>
+                <Element ComponentName="RoleDocumentSqlRepository" X="300" Y="101" Note=""/>
                 <Element ComponentName="UserGroupSqlRepository" X="800" Y="475" Note=""/>
                 <Element ComponentName="UserSettings" X="350" Y="750" Note=""/>
                 <Element ComponentName="UserSettingsDatabaseDelegate" X="550" Y="650" Note=""/>
