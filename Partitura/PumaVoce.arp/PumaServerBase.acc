@@ -96,9 +96,17 @@
         </Element>
         <Element Id="LdapUserCollectionController" PackageId="ImtAuthPck" ComponentId="LdapUserCollectionController">
             <Data IsEnabled="true" Flags="1">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="LdapUserCollectionJoiner" PackageId="ImtAuthPck" ComponentId="LdapUserCollectionJoiner">
+            <Data IsEnabled="true" Flags="1">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="UserCollection" Type="Reference" ExportId="">
+                    <AttributeInfo Id="InternalUserCollection" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="UserSqlRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="LdapUserCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="LdapUserCollectionController"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
