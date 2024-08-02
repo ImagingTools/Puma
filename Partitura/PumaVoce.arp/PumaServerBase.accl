@@ -11,8 +11,7 @@
         <Element ComponentName="DatabaseAutomaticBackup" X="600" Y="200" Note=""/>
         <Element ComponentName="DatabaseEngine" X="975" Y="325" Note=""/>
         <Element ComponentName="HttpServerFramework" X="250" Y="500" Note=""/>
-        <Element ComponentName="LdapUserCollectionController" X="625" Y="50" Note=""/>
-        <Element ComponentName="LdapUserCollectionJoiner" X="300" Y="100" Note=""/>
+        <Element ComponentName="LdapUsersController" X="600" Y="75" Note=""/>
         <Element ComponentName="PumaHandlers" X="600" Y="375" Note=""/>
         <Element ComponentName="PumaLocalization" X="975" Y="500" Note=""/>
         <Element ComponentName="PumaSettings" X="200" Y="300" Note=""/>

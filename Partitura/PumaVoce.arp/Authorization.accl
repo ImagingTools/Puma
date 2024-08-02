@@ -8,15 +8,15 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="AuthorizationController" X="150" Y="225" Note=""/>
-        <Element ComponentName="CredentialController" X="150" Y="375" Note=""/>
-        <Element ComponentName="Demultiplexer" X="575" Y="75" Note=""/>
-        <Element ComponentName="HashCalculator" X="150" Y="500" Note=""/>
-        <Element ComponentName="LdapCredentialController" X="200" Y="75" Note=""/>
-        <Element ComponentName="SessionController" X="600" Y="225" Note=""/>
-        <Element ComponentName="SessionInfoProvider" X="1000" Y="225" Note=""/>
-        <Element ComponentName="UserSessionRepository" X="425" Y="500" Note=""/>
-        <Element ComponentName="UsersSessionsDatabaseDelegate" X="850" Y="500" Note=""/>
+        <Element ComponentName="AuthorizationController" X="150" Y="325" Note=""/>
+        <Element ComponentName="CredentialController" X="150" Y="450" Note=""/>
+        <Element ComponentName="Demultiplexer" X="625" Y="100" Note=""/>
+        <Element ComponentName="HashCalculator" X="150" Y="550" Note=""/>
+        <Element ComponentName="LdapCredentialController" X="175" Y="75" Note=""/>
+        <Element ComponentName="SessionController" X="575" Y="250" Note=""/>
+        <Element ComponentName="SessionInfoProvider" X="1025" Y="300" Note=""/>
+        <Element ComponentName="UserSessionRepository" X="575" Y="550" Note=""/>
+        <Element ComponentName="UsersSessionsDatabaseDelegate" X="950" Y="550" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>
