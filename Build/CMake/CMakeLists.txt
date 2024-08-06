@@ -14,6 +14,10 @@ if(NOT DEFINED IMTCOREDIR)
 	set(IMTCOREDIR "$ENV{IMTCOREDIR}")
 endif()
 
+if(NOT DEFINED BUILDDIR)
+	set(BUILDDIR "${CMAKE_CURRENT_LIST_DIR}/../../..")
+endif()
+
 include(${IMTCOREDIR}/Config/CMake/ImtCoreEnv.cmake)
 
 set(INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Include")
