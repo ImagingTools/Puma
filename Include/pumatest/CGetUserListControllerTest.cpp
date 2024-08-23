@@ -27,19 +27,19 @@ imtgql::CGqlRequest* CGetUserListControllerTest::CreateGqlRequest() const
 	gqlRequestPtr->SetCommandId("UsersList");
 
 	istd::TDelPtr<imtgql::CGqlObject> inputObjectPtr;
-	inputObjectPtr.SetPtr(new imtgql::CGqlObject("input"));
+	inputObjectPtr.SetPtr(new imtgql::CGqlObject());
 
 	imtgql::CGqlObject* viewParamObjectPtr = inputObjectPtr->CreateFieldObject("viewParams");
 	viewParamObjectPtr->InsertField("Count", -1);
 	viewParamObjectPtr->InsertField("Offset", 0);
 
-	gqlRequestPtr->AddParam(*inputObjectPtr.PopPtr());
+	gqlRequestPtr->AddParam("input", *inputObjectPtr.PopPtr());
 
 	istd::TDelPtr<imtgql::CGqlObject> fieldObjectPtr;
-	fieldObjectPtr.SetPtr(new imtgql::CGqlObject("items"));
+	fieldObjectPtr.SetPtr(new imtgql::CGqlObject());
 	fieldObjectPtr->InsertField("Id");
 	fieldObjectPtr->InsertField("Name");
-	gqlRequestPtr->AddField(*fieldObjectPtr.PopPtr());
+	gqlRequestPtr->AddField("items", *fieldObjectPtr.PopPtr());
 
 	return gqlRequestPtr.PopPtr();
 }

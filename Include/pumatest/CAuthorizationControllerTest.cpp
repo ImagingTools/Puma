@@ -39,12 +39,12 @@ imtgql::CGqlRequest* CAuthorizationControllerTest::CreateGqlRequest() const
 	gqlRequestPtr->SetCommandId("UserToken");
 
 	istd::TDelPtr<imtgql::CGqlObject> inputObjectPtr;
-	inputObjectPtr.SetPtr(new imtgql::CGqlObject("input"));
+	inputObjectPtr.SetPtr(new imtgql::CGqlObject());
 
 	inputObjectPtr->InsertField("Login", "test");
 	inputObjectPtr->InsertField("Password", "1");
 
-	gqlRequestPtr->AddParam(*inputObjectPtr.PopPtr());
+	gqlRequestPtr->AddParam("input", *inputObjectPtr.PopPtr());
 
 	return gqlRequestPtr.PopPtr();
 }

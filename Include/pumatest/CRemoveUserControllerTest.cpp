@@ -35,14 +35,14 @@ imtgql::CGqlRequest* CRemoveUserControllerTest::CreateGqlRequest() const
 	gqlRequestPtr->SetCommandId("UsersRemove");
 
 	istd::TDelPtr<imtgql::CGqlObject> inputObjectPtr;
-	inputObjectPtr.SetPtr(new imtgql::CGqlObject("input"));
+	inputObjectPtr.SetPtr(new imtgql::CGqlObject());
 	inputObjectPtr->InsertField("Id", "Test");
-	gqlRequestPtr->AddParam(*inputObjectPtr.PopPtr());
+	gqlRequestPtr->AddParam("input", *inputObjectPtr.PopPtr());
 
 	istd::TDelPtr<imtgql::CGqlObject> fieldObjectPtr;
-	fieldObjectPtr.SetPtr(new imtgql::CGqlObject("removedNotification"));
+	fieldObjectPtr.SetPtr(new imtgql::CGqlObject());
 	fieldObjectPtr->InsertField("Id");
-	gqlRequestPtr->AddField(*fieldObjectPtr.PopPtr());
+	gqlRequestPtr->AddField("removedNotification", *fieldObjectPtr.PopPtr());
 
 	return gqlRequestPtr.PopPtr();
 }

@@ -36,7 +36,7 @@ imtgql::CGqlRequest* CAddUserControllerTest::CreateGqlRequest() const
 	gqlRequestPtr->SetCommandId("UserAdd");
 
 	istd::TDelPtr<imtgql::CGqlObject> inputObjectPtr;
-	inputObjectPtr.SetPtr(new imtgql::CGqlObject("input"));
+	inputObjectPtr.SetPtr(new imtgql::CGqlObject());
 
 	inputObjectPtr->InsertField("Id", "Test");
 
@@ -44,12 +44,12 @@ imtgql::CGqlRequest* CAddUserControllerTest::CreateGqlRequest() const
 
 	inputObjectPtr->InsertField("Item", QVariant(json));
 
-	gqlRequestPtr->AddParam(*inputObjectPtr.PopPtr());
+	gqlRequestPtr->AddParam("input", *inputObjectPtr.PopPtr());
 
 	istd::TDelPtr<imtgql::CGqlObject> fieldObjectPtr;
-	fieldObjectPtr.SetPtr(new imtgql::CGqlObject("addedNotification"));
+	fieldObjectPtr.SetPtr(new imtgql::CGqlObject());
 	fieldObjectPtr->InsertField("Id");
-	gqlRequestPtr->AddField(*fieldObjectPtr.PopPtr());
+	gqlRequestPtr->AddField("addedNotification", *fieldObjectPtr.PopPtr());
 
 	return gqlRequestPtr.PopPtr();
 }
