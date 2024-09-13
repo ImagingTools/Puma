@@ -10,7 +10,7 @@
     <PositionMap>
         <Element ComponentName="ApiClient" X="550" Y="300" Note=""/>
         <Element ComponentName="GraphQLClientEngine" X="550" Y="450" Note=""/>
-        <Element ComponentName="LoginStatusSubscriberController" X="924" Y="450" Note=""/>
+        <Element ComponentName="LoginStatusSubscriberController" X="925" Y="450" Note=""/>
         <Element ComponentName="RemoteRepositories" X="550" Y="575" Note=""/>
         <Element ComponentName="RemoteRepresentationController" X="575" Y="175" Note=""/>
         <Element ComponentName="Subscription" X="925" Y="300" Note=""/>
