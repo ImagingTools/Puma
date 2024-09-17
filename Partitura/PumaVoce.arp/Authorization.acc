@@ -2,15 +2,15 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5225" Description="ACF"/>
-            <Version Id="1" Number="2208" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5241" Description="ACF"/>
+            <Version Id="1" Number="2216" Description="ACF-Solutions"/>
             <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="AuthorizationController" PackageId="ImtAuthGqlPck" ComponentId="AuthorizationController">
+        <Element Id="AuthorizationController" PackageId="ImtAuthGqlPck" ComponentId="LdapAuthorizationController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
@@ -28,11 +28,20 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
+                    <AttributeInfo Id="LdapEnableableParam" Type="Reference" ExportId="LdapEnableableParam">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RoleCollection" Type="Reference" ExportId="RoleCollection">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SessionCollection" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="UserSessionRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SystemId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Ldap"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SystemIds" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">

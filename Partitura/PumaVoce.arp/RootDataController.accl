@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5222" Description="ACF"/>
-            <Version Id="1" Number="2207" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5241" Description="ACF"/>
+            <Version Id="1" Number="2216" Description="ACF-Solutions"/>
             <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -25,12 +25,8 @@
         </EmbededRegistry>
         <EmbededRegistry Id="Repositories">
             <PositionMap>
-                <Element ComponentName="GeneralSettingsFactory" X="775" Y="750" Note=""/>
-                <Element ComponentName="Role" X="500" Y="350" Note=""/>
-                <Element ComponentName="RoleCollectionAdapter" X="225" Y="475" Note=""/>
-                <Element ComponentName="RoleDocumentSqlRepository" X="300" Y="101" Note=""/>
-                <Element ComponentName="UserGroupSqlRepository" X="800" Y="475" Note=""/>
-                <Element ComponentName="UserSettings" X="350" Y="750" Note=""/>
+                <Element ComponentName="RoleDocumentSqlRepository" X="200" Y="100" Note=""/>
+                <Element ComponentName="UserGroupSqlRepository" X="775" Y="475" Note=""/>
                 <Element ComponentName="UserSettingsDatabaseDelegate" X="550" Y="650" Note=""/>
                 <Element ComponentName="UserSqlRepository" X="775" Y="100" Note=""/>
             </PositionMap>
