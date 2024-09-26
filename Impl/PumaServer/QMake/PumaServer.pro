@@ -9,12 +9,12 @@ include($(IMTCOREDIR)/Config/QMake/OpenSSL.pri)
 RESOURCES += $$files($$_PRO_FILE_PWD_/../*.qrc, false)
 
 LIBS += -L../../../Lib/$$COMPILER_DIR -liauth -liservice -lAcfSlnLoc -lAcfLoc
-LIBS +=  -limtbase -limtdb -limtgui -limtqml -limtlog -limtloggui -limtstyle -limtrest -limtlic -lImtCoreLoc -limtcrypt -limtauth -limtauthgql -limtbase -limtgql -limtauthdb -limtcom
+LIBS +=  -limtbase -limtdb -limtgui -limtqml -limtlog -limtloggui -limtstyle -limtrest -limtlic -lImtCoreLoc -limtcrypt -limtauth -limtauthgql -limtbase -limtgql -limtauthdb -limtcom -limtauthsdl
 LIBS +=  -limtlicgql -limtguigql -limtapp -limtclientgql -limtservice
 
 HEADERS =
 
-QT += xml network sql quick qml
+QT += xml network sql quick qml websockets
 
 
 # Set OS-specific build options:
@@ -41,12 +41,12 @@ ARXC_OUTDIR = $$OUT_PWD/$$AUXINCLUDEPATH/GeneratedFiles/$$TARGET
 # Conversion of resource templates:
 win*{
 # File transformation
-	ACF_CONVERT_FILES = $$PWD/../VC/PumaServer.rc.xtracf
+	# ACF_CONVERT_FILES = $$PWD/../VC/PumaServer.rc.xtracf
 	ACF_CONVERT_OUTDIR = $$AUXINCLUDEPATH/GeneratedFiles/$$TARGET
 	ACF_CONVERT_REGISTRY =  $$PWD/../VC/FileSubstitCopyApp.acc
 	ACF_CONVERT_CONFIG = $$PWD/../../../Config/BaseOnly.awc
 
-RC_FILE = $$OUT_PWD/$$AUXINCLUDEPATH/GeneratedFiles/$$TARGET/PumaServer.rc
+# RC_FILE = $$OUT_PWD/$$AUXINCLUDEPATH/GeneratedFiles/$$TARGET/PumaServer.rc
 	RC_INCLUDEPATH = $$_PRO_FILE_PWD_
 }
 

@@ -14,9 +14,9 @@ INCLUDEPATH +=  $$AUXINCLUDEDIR
 
 RESOURCES += $$files($$_PRO_FILE_PWD_/../*.qrc, false)
 
-LIBS += -limtbase -limtgui -limtstyle -limtqml -limtfile -limtgql -limtcom -limtdb -limtapp -limtservice
-LIBS += -limtcontrolsqml -limtstylecontrolsqml -limtguigqlqml -limtcolguiqml -limtdocguiqml -limtauthguiqml -limtlicguiqml -limtguiqml
-LIBS += -lImtCoreLoc
+LIBS += -limtbase -limtgui -limtstyle -limtqml -limtfile -limtgql -limtcom -limtdb -limtapp -limtservice -limtlicgui -limtauthgui
+LIBS += -limtcontrolsqml -limtstylecontrolsqml -limtguigqlqml -limtcolguiqml -limtdocguiqml -limtauthguiqml -limtlicguiqml -limtguiqml -limtappsdl -limtauthsdl
+LIBS += -lImtCoreLoc -lAcfLoc -lAcfSlnLoc
 LIBS += -lpumaqml
 
 # Set OS-specific build options:
