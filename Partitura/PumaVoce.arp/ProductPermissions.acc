@@ -24,7 +24,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="PermissionsProvider" PackageId="ImtLicensePck" ComponentId="PermissionsProvider">
+        <Element Id="PermissionsProvider" PackageId="ImtLicenseGqlPck" ComponentId="PermissionsProvider">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="FeaturePackage" Type="Reference" ExportId="">
