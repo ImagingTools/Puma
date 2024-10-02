@@ -20,7 +20,7 @@ include(${ACFDIR}/Config/CMake/CustomBuild.cmake)
 
 include(${ACFDIR}/Config/CMake/ApplicationConfig.cmake)
 
-target_link_libraries(${PROJECT_NAME} imtbase imtgui imtqml imtgql imtcom imtdb imtfile imtguigql imtapp imtservice imtguiqml imtauthsdl)
+target_link_libraries(${PROJECT_NAME} imtbase imtgui imtqml imtgql imtcom imtdb imtfile imtguigql imtapp imtservice imtguiqml imtauthsdl imtappsdl)
 target_link_libraries(${PROJECT_NAME} imtstylecontrolsqml imtcontrolsqml imtguigqlqml imtauthguiqml imtcolguiqml imtdocguiqml imtauthgui imtstyle imtlicgui)
 target_link_libraries(${PROJECT_NAME} pumaqml)
 target_link_libraries(${PROJECT_NAME} ImtCoreLoc AcfLoc AcfSlnLoc)
