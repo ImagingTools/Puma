@@ -45,7 +45,7 @@ Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
 
 [Run]
-// Filename: "{app}\PumaServerConfigurator.exe"
+Filename: "{app}\PumaServerConfigurator.exe"
 Filename: "{app}\{#MyAppExeName}"; Flags: nowait postinstall skipifsilent;
 
 [Code]

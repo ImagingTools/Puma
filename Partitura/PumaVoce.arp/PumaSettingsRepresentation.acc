@@ -152,7 +152,7 @@
                         <Data IsEnabled="true" Value="Server Port"/>
                     </AttributeInfo>
                     <AttributeInfo Id="PathToQml" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="qrc:/qml/imtgui/Settings/UrlParamEditor.qml"/>
+                        <Data IsEnabled="true" Value="qrc:/qml/imtgui/Params/UrlParamEditor.qml"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>
@@ -226,7 +226,7 @@
                         <Data IsEnabled="true" Value="WebSocket Server Port"/>
                     </AttributeInfo>
                     <AttributeInfo Id="PathToQml" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="qrc:/qml/imtgui/Settings/UrlParamEditor.qml"/>
+                        <Data IsEnabled="true" Value="qrc:/qml/imtgui/Params/UrlParamEditor.qml"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>
