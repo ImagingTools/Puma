@@ -54,7 +54,7 @@ public:
 
 				QByteArray insertQuery = QString("INSERT INTO \"Users\"(\"DocumentId\", \"Document\", \"RevisionNumber\", \"LastModified\", \"Checksum\", \"IsActive\") VALUES('%1', '%2', '%3', '%4', '%5', true);")
 							.arg("Test")
-							.arg(userJsonData)
+							.arg(qPrintable(userJsonData))
 							.arg(1)
 							.arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs))
 							.arg(0).toUtf8();
