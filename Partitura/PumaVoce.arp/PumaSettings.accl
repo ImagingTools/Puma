@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5241" Description="ACF"/>
-            <Version Id="1" Number="2216" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="0" Number="5225" Description="ACF"/>
+            <Version Id="1" Number="2174" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
@@ -14,7 +14,7 @@
         <Element ComponentName="DatabaseAccessSettings" X="125" Y="500" Note=""/>
         <Element ComponentName="FileAutoPersistence" X="500" Y="50" Note=""/>
         <Element ComponentName="FileNameParam" X="1100" Y="500" Note=""/>
-        <Element ComponentName="LdapEnabled" X="925" Y="150" Note=""/>
+        <Element ComponentName="LdapEnabled" X="920" Y="40" Note=""/>
         <Element ComponentName="LoggingParams" X="375" Y="350" Note=""/>
         <Element ComponentName="Preferences" X="500" Y="200" Note=""/>
         <Element ComponentName="SchedulerParams" X="850" Y="500" Note=""/>
