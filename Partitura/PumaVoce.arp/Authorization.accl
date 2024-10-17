@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5248" Description="ACF"/>
-            <Version Id="1" Number="2216" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5253" Description="ACF"/>
+            <Version Id="1" Number="2217" Description="ACF-Solutions"/>
             <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -13,7 +13,9 @@
         <Element ComponentName="Demultiplexer" X="625" Y="100" Note=""/>
         <Element ComponentName="HashCalculator" X="150" Y="550" Note=""/>
         <Element ComponentName="LdapCredentialController" X="175" Y="75" Note=""/>
+        <Element ComponentName="SerializableSessionCollectionController" X="575" Y="675" Note=""/>
         <Element ComponentName="SessionController" X="575" Y="250" Note=""/>
+        <Element ComponentName="SessionInfo" X="575" Y="775" Note=""/>
         <Element ComponentName="SessionInfoProvider" X="1025" Y="300" Note=""/>
         <Element ComponentName="UserSessionRepository" X="575" Y="550" Note=""/>
         <Element ComponentName="UsersSessionsDatabaseDelegate" X="950" Y="550" Note=""/>

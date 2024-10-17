@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5248" Description="ACF"/>
-            <Version Id="1" Number="2216" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5253" Description="ACF"/>
+            <Version Id="1" Number="2217" Description="ACF-Solutions"/>
             <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -80,6 +80,7 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>AuthorizationController</Value>
+                                <Value>SerializableSessionCollectionController</Value>
                                 <Value>SessionController</Value>
                                 <Value>SessionInfoProvider</Value>
                             </Values>
@@ -101,6 +102,27 @@
                 <AttributeInfoMap/>
             </Data>
         </Element>
+        <Element Id="SerializableSessionCollectionController" PackageId="ImtGqlPck" ComponentId="SerializableObjectCollectionController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CollectionId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Session"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="UserSessionRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="SessionInfo"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="SessionController" PackageId="ImtAuthGqlPck" ComponentId="SessionController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -118,6 +140,11 @@
                         <Data IsEnabled="true" Value="UserSessionRepository"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SessionInfo" PackageId="ImtAuthPck" ComponentId="SessionInfo">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap/>
             </Data>
         </Element>
         <Element Id="SessionInfoProvider" PackageId="ImtGqlPck" ComponentId="CollectionObjectProvider">

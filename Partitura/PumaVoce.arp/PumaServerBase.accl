@@ -2,20 +2,20 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5262" Description="ACF"/>
-            <Version Id="1" Number="2218" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="394754" Description="Qt Framework"/>
+            <Version Id="0" Number="5253" Description="ACF"/>
+            <Version Id="1" Number="2217" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="DatabaseAutomaticBackup" X="600" Y="101" Note=""/>
-        <Element ComponentName="DatabaseEngine" X="975" Y="300" Note=""/>
-        <Element ComponentName="HttpServerFramework" X="250" Y="500" Note=""/>
-        <Element ComponentName="PumaHandlers" X="600" Y="375" Note=""/>
-        <Element ComponentName="PumaLocalization" X="975" Y="500" Note=""/>
-        <Element ComponentName="PumaSettings" X="200" Y="300" Note=""/>
-        <Element ComponentName="Subscriptions" X="600" Y="650" Note=""/>
-        <Element ComponentName="WebSocketServerFramework" X="250" Y="675" Note=""/>
+        <Element ComponentName="DatabaseAutomaticBackup" X="200" Y="650" Note=""/>
+        <Element ComponentName="DatabaseEngine" X="475" Y="650" Note=""/>
+        <Element ComponentName="HttpServerFramework" X="625" Y="75" Note=""/>
+        <Element ComponentName="PumaHandlers" X="700" Y="525" Note=""/>
+        <Element ComponentName="PumaLocalization" X="925" Y="425" Note=""/>
+        <Element ComponentName="PumaSettings" X="125" Y="400" Note=""/>
+        <Element ComponentName="Subscriptions" X="400" Y="400" Note=""/>
+        <Element ComponentName="WebSocketServerFramework" X="625" Y="200" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
         <EmbededRegistry Id="Subscriptions">

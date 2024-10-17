@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5262" Description="ACF"/>
-            <Version Id="1" Number="2218" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="394754" Description="Qt Framework"/>
+            <Version Id="0" Number="5253" Description="ACF"/>
+            <Version Id="1" Number="2217" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -55,6 +55,9 @@
                     <AttributeInfo Id="PgPort" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="5432"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaSettings/TracingConfiguration"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="UserName" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="postgres"/>
                     </AttributeInfo>
@@ -64,15 +67,6 @@
         <Element Id="HttpServerFramework" PackageId="ImtHttpServerVoce" ComponentId="HttpServerFramework">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="GqlSubscriberControllers" Type="Reference[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>Subscriptions/GroupsSubscriberController</Value>
-                                <Value>Subscriptions/UsersSubscriberController</Value>
-                                <Value>Subscriptions/RolesSubscriberController</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -82,8 +76,8 @@
                     <AttributeInfo Id="ServerPort" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaSettings/ServerPort"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="WebSocketServerPort" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="PumaSettings/WebSocketServerPort"/>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaSettings/TracingConfiguration"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -173,9 +167,6 @@
                     <AttributeInfo Id="RequestManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="WebSocketServerFramework"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="PumaLocalization"/>
-                    </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
@@ -193,12 +184,6 @@
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="SslConfiguration" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ServerSettings/FileBasedSslConfiguration"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="SslConfigurationManager" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="SslConfigurationManager"/>
                     </AttributeInfo>
                     <AttributeInfo Id="WebSocketServerPort" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaSettings/WebSocketServerPort"/>
@@ -289,13 +274,11 @@
         </EmbeddedRegistry>
     </EmbeddedRegistriesList>
     <ExportedInterfaces>
-        <Interface InterfaceId="imtrest::IRequestManager" ComponentId="HttpServerFramework"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="HttpServerFramework"/>
     </ExportedInterfaces>
     <ExportedComponents>
         <Component ExportedId="AutoPersistence" ComponentId="PumaSettings/AutoPersistence"/>
         <Component ExportedId="DatabaseAutomaticBackup" ComponentId="DatabaseAutomaticBackup"/>
-        <Component ExportedId="HttpServerFramework" ComponentId="HttpServerFramework"/>
         <Component ExportedId="PgSqlDatabaseEngine" ComponentId="DatabaseEngine/PgSqlDatabaseEngine"/>
         <Component ExportedId="WebSocketServerFramework" ComponentId="WebSocketServerFramework"/>
     </ExportedComponents>
