@@ -7,7 +7,7 @@
 
 // ImtCore includes
 #include <imtgql/CGqlRequest.h>
-#include <imtgql/CGqlHandlerTest.h>
+#include <imtgql/Test/CGqlHandlerTest.h>
 #include <imtgql/IGqlRequestHandler.h>
 #include <imtdb/IDatabaseEngine.h>
 #include <imtauth/CUserInfo.h>
