@@ -11,7 +11,7 @@ RESOURCES += $$files($$_PRO_FILE_PWD_/../*.qrc, false)
 LIBS += -L$(ACFDIR)/Lib/$$COMPILER_DIR -lAcfLoc
 LIBS += -L$(ACFSLNDIR)/Lib/$$COMPILER_DIR -liauth -liservice -lAcfSlnLoc
 LIBS += -L$(IMTCOREDIR)/Lib/$$COMPILER_DIR -limtbase -limtdb -limtgui -limtqml -limtlog -limtloggui -limtstyle -limtrest -limtlic -lImtCoreLoc -limtcrypt -limtauth -limtauthgql -limtbase -limtgql -limtauthdb -limtcom -limtauthsdl
-LIBS += -L$(IMTCOREDIR)/Lib/$$COMPILER_DIR -limtlicgql -limtguigql -limtapp -limtclientgql -limtservice
+LIBS += -L$(IMTCOREDIR)/Lib/$$COMPILER_DIR -limtlicgql -limtguigql -limtapp -limtclientgql -limtservice -limtservergql -limtbasesdl
 
 HEADERS =
 
