@@ -17,13 +17,15 @@ HEADERS =
 
 QT += xml network sql quick qml websockets
 
+copyToDestDir($$PWD/../../../Build/Migrations, $$PWD/../../../Bin/$$COMPILER_DIR/Migrations)
+copyToDestDir($(IMTCOREDIR)/Install/Database/LogMigrations, $$PWD/../../../Bin/$$COMPILER_DIR/LogMigrations)
 
 # Set OS-specific build options:
 win32-msvc*{
 	QMAKE_CXXFLAGS += /wd4264
 
 	# copying all Qt DLLs to destination directory
-	greaterThan(QT_MAJOR_VERSION, 4): QMAKE_POST_LINK = set path=$(QTDIR)\bin;%path% && $(QTDIR)\bin\windeployqt $$DESTDIR
+	greaterThan(QT_MAJOR_VERSION, 4): QMAKE_POST_LINK += set path=$(QTDIR)\bin;%path% && $(QTDIR)\bin\windeployqt $$DESTDIR
 }
 
 !macx-ios*{
@@ -54,4 +56,3 @@ win*{
 include($(ACFDIR)/Config/QMake/AcfQt.pri)
 include($(ACFDIR)/Config/QMake/AcfStd.pri)
 include($(ACFDIR)/Config/QMake/CustomBuild.pri)
-

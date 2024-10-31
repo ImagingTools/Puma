@@ -15,5 +15,3 @@ PumaServerConfigurator.file = ../../Impl/PumaServerConfigurator/QMake/PumaServer
 # Plug-ins
 SUBDIRS += PumaSettingsPlugin
 PumaSettingsPlugin.file = ../../Impl/Plugins/PumaSettingsPlugin/QMake/PumaSettingsPlugin.pro
-
-
