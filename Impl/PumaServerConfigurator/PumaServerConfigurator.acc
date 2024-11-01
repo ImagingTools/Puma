@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5244" Description="ACF"/>
-            <Version Id="1" Number="2216" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5270" Description="ACF"/>
+            <Version Id="1" Number="2220" Description="ACF-Solutions"/>
             <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -13,11 +13,14 @@
         <Element Id="Application" PackageId="ImtQmlVoce" ComponentId="QmlClientFramework">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="ApplicationId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Puma"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ApplicationName" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value="PumaServerConfigurator"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ApplicationType" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="Client"/>
+                    <AttributeInfo Id="BaseUrlParam" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaSettings/ServerPort"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ComponentsToInitialize" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
@@ -26,23 +29,14 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
-                    <AttributeInfo Id="InstallTranslator" Type="Boolean" ExportId="">
-                        <Data IsEnabled="true" Value="true"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="LogDefaultPath" Type="String" ExportId="">
                         <Data IsEnabled="true" Value="PumaClientLog.txt"/>
                     </AttributeInfo>
                     <AttributeInfo Id="MainQmlPath" Type="String" ExportId="">
                         <Data IsEnabled="true" Value=":/qml/imtgui/Application/Configurator.qml"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="MainVersionId" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="2022"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="ProductName" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value="Puma"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ServerPrefix" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="http://localhost:7788/Puma"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Settings" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaSettings"/>
