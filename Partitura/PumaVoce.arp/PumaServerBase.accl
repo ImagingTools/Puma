@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5253" Description="ACF"/>
-            <Version Id="1" Number="2217" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5270" Description="ACF"/>
+            <Version Id="1" Number="2220" Description="ACF-Solutions"/>
             <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -15,7 +15,7 @@
         <Element ComponentName="PumaLocalization" X="925" Y="425" Note=""/>
         <Element ComponentName="PumaSettings" X="125" Y="400" Note=""/>
         <Element ComponentName="Subscriptions" X="400" Y="400" Note=""/>
-        <Element ComponentName="WebSocketServerFramework" X="625" Y="200" Note=""/>
+        <Element ComponentName="WebSocketServerFramework" X="625" Y="201" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
         <EmbededRegistry Id="Subscriptions">
