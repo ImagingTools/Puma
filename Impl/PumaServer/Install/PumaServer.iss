@@ -38,27 +38,12 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 [Files]
 Source: "{#BasePath}\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#BasePath}\*"; Excludes: "*.exe,*.manifest,*.arp";  DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "{#BasePath}\PumaServerConfigurator.exe"; DestDir: "{app}"; Flags: ignoreversion
+;Source: "{#BasePath}\PumaServerConfigurator.exe"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
 Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
 
 [Run]
-Filename: "{app}\PumaServerConfigurator.exe"
+;Filename: "{app}\PumaServerConfigurator.exe"
 Filename: "{app}\{#MyAppExeName}"; Flags: nowait postinstall skipifsilent;
-
-[Code]
-function InitializeSetup(): boolean;
-var
-  ResultCode: integer;
-begin
-  if DirExists(ExpandConstant('{pf64}\ImagingTools\PumaServer')) then
-  begin
-    DelTree(ExpandConstant('{pf64}\ImagingTools\PumaServer'), True, True, True);
-  end;
-  Result := True;
-end;
-
-
-
