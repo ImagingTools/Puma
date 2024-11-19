@@ -1,4 +1,4 @@
-TARGET = PumaServerConfigurator
+ TARGET = PumaServerConfigurator
 
 include($(ACFDIR)/Config/QMake/ApplicationConfig.pri)
 include($(ACFDIR)/Config/QMake/QtBaseConfig.pri)
@@ -14,7 +14,7 @@ INCLUDEPATH +=  $$AUXINCLUDEDIR
 
 RESOURCES += $$files($$_PRO_FILE_PWD_/../*.qrc, false)
 
-LIBS += -L$(IMTCOREDIR)/Lib/$$COMPILER_DIR -limtbase -limtgui -limtstyle -limtqml -limtfile -limtgql -limtcom -limtdb -limtapp -limtservice -limtlicgui -limtauthgui -lImtCoreLoc
+LIBS += -L$(IMTCOREDIR)/Lib/$$COMPILER_DIR -limtbase -limtgui -limtstyle -limtqml -limtfile -limtgql -limtcom -limtdb -limtapp -limtservice -limtlicgui -limtauthgui -limtrest -lImtCoreLoc
 LIBS += -L$(IMTCOREDIR)/Lib/$$COMPILER_DIR -limtcontrolsqml -limtstylecontrolsqml -limtguigqlqml -limtcolguiqml -limtdocguiqml -limtauthguiqml -limtlicguiqml -limtguiqml -limtappsdl -limtauthsdl -limtbasesdl
 LIBS += -L$(ACFDIR)/Lib/$$COMPILER_DIR -lAcfLoc -lAcfSlnLoc
 LIBS += -L../../../Lib/$$COMPILER_DIR -lpumaqml

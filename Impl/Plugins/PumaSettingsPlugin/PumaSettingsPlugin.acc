@@ -122,7 +122,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="RepresentationControllerFactory" PackageId="ImtCorePck" ComponentId="RepresentationControllerFactory">
+        <Element Id="RepresentationControllerFactory" PackageId="ImtRestPck" ComponentId="RepresentationControllerFactory">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Factory" Type="Factory" ExportId="">
@@ -198,7 +198,7 @@
     <ExportedInterfaces>
         <Interface InterfaceId="iser::IVersionInfo" ComponentId="VersionInfo"/>
         <Interface InterfaceId="istd::TIFactory&lt;imtbase::IObjectCollection&gt;" ComponentId="ObjectCollectionFactory"/>
-        <Interface InterfaceId="istd::TIFactory&lt;imtbase::IRepresentationController&gt;" ComponentId="RepresentationControllerFactory"/>
+        <Interface InterfaceId="istd::TIFactory&lt;imtrest::IRepresentationController&gt;" ComponentId="RepresentationControllerFactory"/>
         <Interface InterfaceId="istd::TIFactory&lt;imtservice::IConnectionCollection&gt;" ComponentId="ConnectionCollectionFactory"/>
         <Interface InterfaceId="istd::TIFactory&lt;iprm::IParamsSet&gt;" ComponentId="ParamsSetFactory"/>
     </ExportedInterfaces>
