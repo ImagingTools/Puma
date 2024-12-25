@@ -2,7 +2,7 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5302" Description="ACF"/>
+            <Version Id="0" Number="5323" Description="ACF"/>
             <Version Id="1" Number="2230" Description="ACF-Solutions"/>
             <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
@@ -48,10 +48,52 @@
                             <Values>
                                 <Value>AuthorizationController</Value>
                                 <Value>Pages</Value>
+                                <Value>DocumentRevisionController</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="DocumentRevisionController" PackageId="ImtGraphQlVoce" ComponentId="DocumentRevisionController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CollectionIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Roles</Value>
+                                <Value>Users</Value>
+                                <Value>Groups</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DocumentChangeGenerators" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Pages/RoleChangeGenerator</Value>
+                                <Value>Pages/UserGroupChangeGenerator</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectCollections" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Repositories/RoleRepository</Value>
+                                <Value>Repositories/UserSqlRepository</Value>
+                                <Value>Repositories/UserGroupSqlRepository</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -223,7 +265,11 @@
                 <ExportedInterfaces>
                     <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="Demultiplexer"/>
                 </ExportedInterfaces>
-                <ExportedComponents/>
+                <ExportedComponents>
+                    <Component ExportedId="RoleChangeGenerator" ComponentId="RolesPage/RoleChangeGenerator"/>
+                    <Component ExportedId="UserChangeGenerator" ComponentId="UsersPage/UserChangeGenerator"/>
+                    <Component ExportedId="UserGroupChangeGenerator" ComponentId="UserGroupsPage/UserGroupChangeGenerator"/>
+                </ExportedComponents>
             </Data>
         </EmbeddedRegistry>
         <EmbeddedRegistry Id="Repositories">

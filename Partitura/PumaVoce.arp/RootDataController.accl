@@ -2,14 +2,15 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5302" Description="ACF"/>
+            <Version Id="0" Number="5323" Description="ACF"/>
             <Version Id="1" Number="2230" Description="ACF-Solutions"/>
             <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="AuthorizationController" X="575" Y="375" Note=""/>
+        <Element ComponentName="AuthorizationController" X="475" Y="375" Note=""/>
         <Element ComponentName="Demultiplexer" X="575" Y="100" Note=""/>
+        <Element ComponentName="DocumentRevisionController" X="975" Y="375" Note=""/>
         <Element ComponentName="Pages" X="250" Y="625" Note=""/>
         <Element ComponentName="Repositories" X="850" Y="625" Note=""/>
     </PositionMap>
