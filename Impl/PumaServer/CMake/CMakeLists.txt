@@ -13,7 +13,7 @@ if(WIN32)
 endif()
 
 if(APPLE)
-	set(CMAKE_MACOSX_BUNDLE "on")
+	set(CMAKE_MACOSX_BUNDLE ON)
 endif()
 
 include(${ACFDIR}/Config/CMake/CustomBuild.cmake)
@@ -43,3 +43,19 @@ if(WIN32)
 	unset(listOptions)
 endif()
 
+# for OSX if make bundle, copy migrations into a bundle
+if (APPLE AND CMAKE_MACOSX_BUNDLE)
+	get_property(OUTPUT_DIRECTORY
+		TARGET ${PROJECT_NAME}
+		PROPERTY RUNTIME_OUTPUT_DIRECTORY)
+
+	get_filename_component(OUTPUT_DIRECTORY "${OUTPUT_DIRECTORY}" ABSOLUTE)
+	set(BUNDLE_MIGRATIONS_PATH "${OUTPUT_DIRECTORY}/${PROJECT_NAME}.app/Contents/MacOS")
+
+	file(MAKE_DIRECTORY "${BUNDLE_MIGRATIONS_PATH}")
+
+	message(VERBOSE "copying migrations inside OSX bundle. Path: '${BUNDLE_MIGRATIONS_PATH}' target: '${PROJECT_NAME}'")
+
+	file(COPY "${CMAKE_CURRENT_LIST_DIR}/../../../Build/Migrations" DESTINATION "${BUNDLE_MIGRATIONS_PATH}")
+	file(COPY "${IMTCOREDIR}/Install/Database/LogMigrations" DESTINATION "${BUNDLE_MIGRATIONS_PATH}")
+endif()
