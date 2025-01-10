@@ -74,6 +74,7 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>Pages/RoleChangeGenerator</Value>
+                                <Value>Pages/UserChangeGenerator</Value>
                                 <Value>Pages/UserGroupChangeGenerator</Value>
                             </Values>
                         </Data>
