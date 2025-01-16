@@ -130,6 +130,9 @@
                     <AttributeInfo Id="UserRepository" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="Repositories/UserSqlRepository"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="UserVerificationCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Repositories/UserVerificationCollection"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -255,6 +258,9 @@
                                 <AttributeInfo Id="UserRepository" Type="Reference" ExportId="UserRepository">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
+                                <AttributeInfo Id="UserVerificationCollection" Type="Reference" ExportId="UserVerificationCollection">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
                                 <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
@@ -363,6 +369,31 @@
                             </AttributeInfoMap>
                         </Data>
                     </Element>
+                    <Element Id="UserVerification" PackageId="ImtAuthPck" ComponentId="UserVerification">
+                        <Data IsEnabled="true" Flags="2">
+                            <AttributeInfoMap/>
+                        </Data>
+                    </Element>
+                    <Element Id="UserVerificationCollection" PackageId="ImtCorePck" ComponentId="ObjectCollection">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="ObjectFactories" Type="Factory[]" ExportId="">
+                                    <Data IsEnabled="true">
+                                        <Values>
+                                            <Value>UserVerification</Value>
+                                        </Values>
+                                    </Data>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TypeIds" Type="Id[]" ExportId="">
+                                    <Data IsEnabled="true">
+                                        <Values>
+                                            <Value>UserVerification</Value>
+                                        </Values>
+                                    </Data>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
                 </ElementsList>
                 <EmbeddedRegistriesList/>
                 <ExportedInterfaces/>
@@ -374,6 +405,7 @@
                     <Component ExportedId="UserGroupInfoProvider" ComponentId="UserGroupSqlRepository/UserGroupInfoProvider"/>
                     <Component ExportedId="UserGroupSqlRepository" ComponentId="UserGroupSqlRepository"/>
                     <Component ExportedId="UserSqlRepository" ComponentId="UserSqlRepository"/>
+                    <Component ExportedId="UserVerificationCollection" ComponentId="UserVerificationCollection"/>
                 </ExportedComponents>
             </Data>
         </EmbeddedRegistry>
