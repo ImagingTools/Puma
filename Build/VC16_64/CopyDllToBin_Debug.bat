@@ -1,1 +1,1 @@
-windeployqt ../../Bin/Debug_Qt5_VC16_x64/PumaServer.exe
+windeployqt ../../Bin/Debug_Qt6_VC17_x64/PumaServer.exe
