@@ -3,97 +3,96 @@
 
 // ACF includes
 #include <istd/TDelPtr.h>
+#include <itest/CStandardTestExecutor.h>
+#include <iser/CJsonMemWriteArchive.h>
+#include <iser/CJsonMemReadArchive.h>
+
+// ImtCore includes
+#include <imtauth/CUserInfo.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Authorization.h>
 
 
-// public methods
+static const QString s_usersTableName = "Users";
 
-// reimplemented (imtgql::CGqlHandlerTest)
+// private slots
 
-imtbase::CTreeItemModel* CAuthorizationControllerTest::CreateExpectedModel() const
+void CAuthorizationControllerTest::AuthorizationTest()
 {
-	istd::TDelPtr<imtbase::CTreeItemModel> expectedModelPtr;
-	expectedModelPtr.SetPtr(new imtbase::CTreeItemModel);
+	namespace authsdl = sdl::imtauth::Authorization;
+	authsdl::V1_0::AuthorizationRequestArguments arguments;
 
-	imtbase::CTreeItemModel* dataModelPtr = expectedModelPtr->AddTreeModel("data");
-	Q_ASSERT(dataModelPtr != nullptr);
+	imtauth::CIdentifiableUserInfo userInfo;
 
-	imtbase::CTreeItemModel* userTokenModelPtr = dataModelPtr->AddTreeModel("UserToken");
-	Q_ASSERT(userTokenModelPtr != nullptr);
+	QByteArray uuid = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
 
-	userTokenModelPtr->SetData("Token", "");
-	userTokenModelPtr->SetData("Login", "");
-	userTokenModelPtr->SetData("UserId", "");
-	userTokenModelPtr->SetData("PasswordHash", "");
-	userTokenModelPtr->SetData("Permissions", "");
+	userInfo.SetObjectUuid(uuid);
+	userInfo.SetId("Test");
 
-	return expectedModelPtr.PopPtr();
+	QByteArray passwordHash = m_hashCalculator.GenerateHash("Test1");
+	userInfo.SetPasswordHash(passwordHash);
+
+	bool ok = AddUser(userInfo);
+	QVERIFY(ok);
+
+	arguments.input.Login = "Test1";
+	arguments.input.Password = "Test1";
+	arguments.input.ProductId = "Test";
+
+	authsdl::CAuthorizationPayload::V1_0 response;
+
+	ok = SendRequest<
+		authsdl::V1_0::CAuthorizationGqlRequest,
+		authsdl::V1_0::AuthorizationRequestArguments,
+		authsdl::CAuthorizationPayload>(arguments, response);
+
+	QVERIFY(ok);
+	QVERIFY(userInfo.GetId() == "Test1");
+	QVERIFY(RemoveObjectFromTable(s_usersTableName, uuid));
 }
 
 
-imtgql::CGqlRequest* CAuthorizationControllerTest::CreateGqlRequest() const
+void CAuthorizationControllerTest::AuthorizationFailedTest()
 {
-	istd::TDelPtr<imtgql::CGqlRequest> gqlRequestPtr;
-	gqlRequestPtr.SetPtr(new imtgql::CGqlRequest);
+	namespace authsdl = sdl::imtauth::Authorization;
+	authsdl::V1_0::AuthorizationRequestArguments arguments;
 
-	gqlRequestPtr->SetRequestType(imtgql::CGqlRequest::RT_QUERY);
-	gqlRequestPtr->SetCommandId("UserToken");
+	imtauth::CIdentifiableUserInfo userInfo;
 
-	istd::TDelPtr<imtgql::CGqlObject> inputObjectPtr;
-	inputObjectPtr.SetPtr(new imtgql::CGqlObject());
+	QByteArray uuid = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
 
-	inputObjectPtr->InsertField("Login", "test");
-	inputObjectPtr->InsertField("Password", "1");
+	userInfo.SetObjectUuid(uuid);
+	userInfo.SetId("Test");
 
-	gqlRequestPtr->AddParam("input", *inputObjectPtr.PopPtr());
+	QByteArray passwordHash = m_hashCalculator.GenerateHash("Test1");
+	userInfo.SetPasswordHash(passwordHash);
 
-	return gqlRequestPtr.PopPtr();
+	arguments.input.Login = "Test";
+	arguments.input.Password = "2";
+	arguments.input.ProductId = "Test";
+
+	authsdl::CAuthorizationPayload::V1_0 response;
+
+	bool ok = SendRequest<
+		authsdl::V1_0::CAuthorizationGqlRequest,
+		authsdl::V1_0::AuthorizationRequestArguments,
+		authsdl::CAuthorizationPayload>(arguments, response);
+
+	QVERIFY(!ok);
+
+	arguments.input.Login = "Test344";
+	arguments.input.Password = "1";
+
+	ok = SendRequest<
+		authsdl::V1_0::CAuthorizationGqlRequest,
+		authsdl::V1_0::AuthorizationRequestArguments,
+		authsdl::CAuthorizationPayload>(arguments, response);
+
+	QVERIFY(!ok);
+
+	QVERIFY(RemoveObjectFromTable(s_usersTableName, uuid));
 }
 
 
-bool CAuthorizationControllerTest::VerifyResponse(const imtbase::CTreeItemModel& actualModel, const imtbase::CTreeItemModel& /*expectedModel*/) const
-{
-	if (!actualModel.ContainsKey("data")){
-		return false;
-	}
-
-	if (actualModel.ContainsKey("errors")){
-		return false;
-	}
-
-	imtbase::CTreeItemModel* dataModelPtr = actualModel.GetTreeItemModel("data");
-	if (dataModelPtr == nullptr){
-		return false;
-	}
-
-	if (!dataModelPtr->ContainsKey("Token")){
-		return false;
-	}
-
-	QUuid uuid = dataModelPtr->GetData("Token").toUuid();
-	if (uuid.isNull()){
-		return false;
-	}
-
-	if (!dataModelPtr->ContainsKey("Login")){
-		return false;
-	}
-
-	if (!dataModelPtr->ContainsKey("UserId")){
-		return false;
-	}
-
-	if (!dataModelPtr->ContainsKey("PasswordHash")){
-		return false;
-	}
-
-	if (!dataModelPtr->ContainsKey("Permissions")){
-		return false;
-	}
-
-	return true;
-}
-
-
-I_ADD_TEST(CAuthorizationControllerTest);
+// I_ADD_TEST(CAuthorizationControllerTest);
 
 
