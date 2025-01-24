@@ -16,6 +16,11 @@ namespace pumatest
 {
 
 
+static const QString s_usersTableName = "Users";
+static const QString s_rolesTableName = "Roles";
+static const QString s_groupsTableName = "UserGroups";
+
+
 // private slots
 
 void CTestBase::initTestCase()
@@ -144,6 +149,78 @@ bool CTestBase::AddRole(const imtauth::CIdentifiableRoleInfo& roleData) const
 bool CTestBase::AddGroup(const imtauth::CIdentifiableUserGroupInfo& groupData) const
 {
 	return InsertObjectToTable("UserGroups", const_cast<imtauth::CIdentifiableUserGroupInfo&>(groupData));
+}
+
+
+imtauth::IUserInfo* CTestBase::CreateUserInfo(
+			const QString& username,
+			const QString& password,
+			const QString& name,
+			const QString& email) const
+{
+	istd::TDelPtr<imtauth::CIdentifiableUserInfo> userInfoPtr;
+	userInfoPtr.SetCastedOrRemove(new imtauth::CIdentifiableUserInfo);
+
+	QByteArray uuid = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
+	userInfoPtr->SetObjectUuid(uuid);
+	userInfoPtr->SetId(username.toUtf8());
+
+	QByteArray passwordHash = m_hashCalculator.GenerateHash(username.toUtf8() + password.toUtf8());
+	userInfoPtr->SetPasswordHash(passwordHash);
+	userInfoPtr->SetMail(email);
+	userInfoPtr->SetName(name);
+
+	return userInfoPtr.PopPtr();
+}
+
+
+sdl::imtauth::Users::CUserData::V1_0* CTestBase::CreateUserDataFromUserInfo(
+			const imtauth::CIdentifiableUserInfo& userInfo,
+			 const QByteArray& productId) const
+{
+	istd::TDelPtr<sdl::imtauth::Users::CUserData::V1_0> userDataPtr;
+	userDataPtr.SetCastedOrRemove(new sdl::imtauth::Users::CUserData::V1_0);
+
+	userDataPtr->Id = userInfo.GetObjectUuid();
+	userDataPtr->Name = userInfo.GetName();
+	userDataPtr->Username = userInfo.GetId();
+	userDataPtr->Password = userInfo.GetPasswordHash();
+	userDataPtr->Email = userInfo.GetMail();
+	userDataPtr->ProductId = productId;
+
+	QByteArrayList groupList = userInfo.GetGroups();
+	groupList.removeAll("");
+
+	userDataPtr->Groups = groupList.join(';');
+
+	if (!productId.isEmpty()){
+		QByteArrayList roleList = userInfo.GetRoles(productId);
+		roleList.removeAll("");
+
+		userDataPtr->Roles = roleList.join(';');
+	}
+
+	QList<sdl::imtauth::Users::CSystemInfo::V1_0> list;
+	imtauth::IUserInfo::SystemInfoList systemInfoList = userInfo.GetSystemInfos();
+	for (const imtauth::IUserInfo::SystemInfo& systemInfo : systemInfoList){
+		sdl::imtauth::Users::CSystemInfo::V1_0 info;
+
+		info.Id = QByteArray(systemInfo.systemId);
+
+		if (systemInfo.systemId.isEmpty()){
+			info.Name = QString("Internal");
+		}
+		else{
+			info.Name = QString(systemInfo.systemName);
+		}
+
+		info.Enabled = bool(systemInfo.enabled);
+
+		list << info;
+	}
+	userDataPtr->SystemInfos = std::make_optional<QList<sdl::imtauth::Users::CSystemInfo::V1_0>>(list);
+
+	return userDataPtr.PopPtr();
 }
 
 

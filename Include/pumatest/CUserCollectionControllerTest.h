@@ -5,12 +5,11 @@
 #include <QtTest/QTest>
 
 // ImtCore includes
-#include <imtgql/Test/CGqlSdlRequestTest.h>
+#include <pumatest/CTestBase.h>
 #include <imtcrypt/CMD5HashCalculator.h>
-#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Authorization.h>
 
 
-class CUserCollectionControllerTest: public QObject, public imtgql::CGqlSdlRequestTest
+class CUserCollectionControllerTest: public pumatest::CTestBase
 {
 	Q_OBJECT
 private Q_SLOTS:
@@ -23,10 +22,6 @@ private Q_SLOTS:
 	void UpdateUserFailedTest();
 	void GetUserListTest();
 	void cleanupTestCase();
-
-private:
-	QByteArray AddUser(const QString& login, const QString& password) const;
-	bool RemoveUser(const QByteArray& userId) const;
 
 private:
 	imtcrypt::CMD5HashCalculator m_hashCalculator;

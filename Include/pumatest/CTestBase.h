@@ -17,7 +17,7 @@ namespace pumatest
 {
 
 
-class CTestBase: public QObject, public imtgql::CGqlSdlRequestTest
+class CTestBase: public imtgql::CGqlSdlRequestTest
 {
 	Q_OBJECT
 public slots:
@@ -32,6 +32,8 @@ protected:
 	bool AddUser(const imtauth::CIdentifiableUserInfo& userData) const;
 	bool AddRole(const imtauth::CIdentifiableRoleInfo& roleData) const;
 	bool AddGroup(const imtauth::CIdentifiableUserGroupInfo& groupData) const;
+	imtauth::IUserInfo* CreateUserInfo(const QString& username, const QString& password, const QString& name, const QString& email) const;
+	sdl::imtauth::Users::CUserData::V1_0* CreateUserDataFromUserInfo(const imtauth::CIdentifiableUserInfo& userInfo, const QByteArray& productId = QByteArray()) const;
 
 protected:
 	imtcrypt::CMD5HashCalculator m_hashCalculator;
