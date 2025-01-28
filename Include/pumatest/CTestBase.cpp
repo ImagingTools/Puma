@@ -9,7 +9,6 @@
 
 // ImtCore includes
 #include <imtauth/CUserInfo.h>
-#include <imtgql/Test/CGqlSdlRequestTest.h>
 
 
 namespace pumatest
@@ -26,10 +25,12 @@ static const QString s_groupsTableName = "UserGroups";
 void CTestBase::initTestCase()
 {
 	QString pumaDir = qEnvironmentVariable("PUMADIR");
-	m_registryFile = pumaDir + QString("/Partitura/PumaTestVoce.arp/PumaHandlersTest.acc");
+	m_registryFile = pumaDir + QString("/Partitura/PumaVoce.arp/PumaTestHandler.acc");
 	m_configFile = pumaDir + "/Config/PumaServer.awc";
 
 	ClearData();
+
+	SetData();
 }
 
 
@@ -40,6 +41,11 @@ void CTestBase::cleanupTestCase()
 
 
 // protected methods
+
+void CTestBase::SetData() const
+{
+}
+
 
 void CTestBase::ClearData()
 {
@@ -52,11 +58,12 @@ void CTestBase::ClearData()
 
 bool CTestBase::GetObjectFromTable(const QString& tableName, const QByteArray& userId, iser::ISerializable& object) const
 {
-	QString query = QString(R"(SELECT * FROM "%1" WHERE "IsActive" = true AND "DocumentId" = '%2')").arg(tableName).arg(qPrintable(userId));
+	QString query = QString(R"(SELECT * FROM "%1" WHERE "IsActive" = true AND "DocumentId" = '%2')").arg(tableName, qPrintable(userId));
 
 	QSqlError sqlError;
 	QSqlQuery sqlQuery = ExecuteQuery(query.toUtf8(), &sqlError);
 	if (sqlError.type() != QSqlError::NoError){
+		qDebug() << sqlError.text();
 		return false;
 	}
 
@@ -119,7 +126,12 @@ bool CTestBase::InsertObjectToTable(const QString& tableName, iser::ISerializabl
 	QSqlError sqlError;
 	ExecuteQuery(insertQuery, &sqlError);
 
-	return sqlError.type() != QSqlError::NoError;
+	bool ok = sqlError.type() == QSqlError::NoError;
+	if (!ok){
+		qDebug() << sqlError.text();
+	}
+
+	return ok;
 }
 
 
@@ -130,7 +142,7 @@ bool CTestBase::RemoveObjectFromTable(const QString& tableName, const QByteArray
 	QSqlError sqlError;
 	ExecuteQuery(query.toUtf8(), &sqlError);
 
-	return sqlError.type() != QSqlError::NoError;
+	return sqlError.type() == QSqlError::NoError;
 }
 
 
@@ -221,6 +233,49 @@ sdl::imtauth::Users::CUserData::V1_0* CTestBase::CreateUserDataFromUserInfo(
 	userDataPtr->SystemInfos = std::make_optional<QList<sdl::imtauth::Users::CSystemInfo::V1_0>>(list);
 
 	return userDataPtr.PopPtr();
+}
+
+
+imtauth::IRole* CTestBase::CreateRoleInfo(
+	const QString& roleId,
+	const QString& roleName,
+	const QString& productId,
+	QByteArrayList features) const
+{
+	istd::TDelPtr<imtauth::CIdentifiableRoleInfo> roleInfoPtr;
+	roleInfoPtr.SetCastedOrRemove(new imtauth::CIdentifiableRoleInfo);
+
+	roleInfoPtr->SetRoleId(roleId.toUtf8());
+	roleInfoPtr->SetRoleName(roleName);
+	roleInfoPtr->SetProductId(productId.toUtf8());
+	roleInfoPtr->SetLocalPermissions(features);
+
+	return roleInfoPtr.PopPtr();
+}
+
+
+sdl::imtauth::Roles::CRoleData::V1_0* CTestBase::CreateRoleDataFromUserInfo(const imtauth::CIdentifiableRoleInfo& roleInfo) const
+{
+	istd::TDelPtr<sdl::imtauth::Roles::CRoleData::V1_0> roleDataPtr;
+	roleDataPtr.SetCastedOrRemove(new sdl::imtauth::Roles::CRoleData::V1_0);
+
+	roleDataPtr->Id = roleInfo.GetObjectUuid();
+	roleDataPtr->RoleId = roleInfo.GetRoleId();
+	roleDataPtr->ProductId = roleInfo.GetProductId();
+	roleDataPtr->Name = roleInfo.GetRoleName();
+	roleDataPtr->Description = roleInfo.GetRoleDescription();
+
+	QByteArrayList parentRoles = roleInfo.GetIncludedRoles();
+	parentRoles.removeAll("");
+	roleDataPtr->ParentRoles = parentRoles.join(';');
+
+	QByteArrayList features = roleInfo.GetPermissions();
+	roleDataPtr->Permissions = features.join(';');
+
+	roleDataPtr->IsDefault = false;
+	roleDataPtr->IsGuest = false;
+
+	return roleDataPtr.PopPtr();
 }
 
 

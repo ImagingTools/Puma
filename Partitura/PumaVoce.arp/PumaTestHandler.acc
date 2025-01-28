@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5332" Description="ACF"/>
+            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description></Description>
+    <Keywords></Keywords>
+    <ElementsList>
+        <Element Id="DatabaseAccessSettings" PackageId="ImtDatabasePck" ComponentId="DatabaseAccessSettings">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DbName" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="pumatest"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="HostName" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="localhost"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Pasword" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="root"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Port" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="5432"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="DatabaseEngine" PackageId="ImtCoreVoce" ComponentId="DatabaseEngine">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseAccessSettings" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="DatabaseAccessSettings"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MigrationPath" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="../../Include/pumatest/Migrations"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="PumaHandlers" PackageId="PumaVoce" ComponentId="PumaHandlers">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseAccessSettings" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="DatabaseAccessSettings"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="DatabaseEngine"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="VersionInfo"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="VersionInfo" PackageId="PumaVoce" ComponentId="VersionInfo">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="imtdb::IDatabaseEngine" ComponentId="DatabaseEngine"/>
+        <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="PumaHandlers"/>
+    </ExportedInterfaces>
+    <ExportedComponents/>
+</Acf>

@@ -12,8 +12,7 @@
 class CUserCollectionControllerTest: public pumatest::CTestBase
 {
 	Q_OBJECT
-private Q_SLOTS:
-	void initTestCase();
+private slots:
 	void AddUserTest();
 	void AddUserFailedTest();
 	void RemoveUserTest();
@@ -21,7 +20,9 @@ private Q_SLOTS:
 	void UpdateUserTest();
 	void UpdateUserFailedTest();
 	void GetUserListTest();
-	void cleanupTestCase();
+
+protected:
+	virtual void SetData() const override;
 
 private:
 	imtcrypt::CMD5HashCalculator m_hashCalculator;

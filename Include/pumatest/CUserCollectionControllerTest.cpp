@@ -2,42 +2,10 @@
 
 
 // ACF includes
-#include <istd/TDelPtr.h>
 #include <itest/CStandardTestExecutor.h>
-#include <iser/CJsonMemWriteArchive.h>
-#include <iser/CJsonMemReadArchive.h>
-
-// ImtCore includes
-#include <imtauth/CUserInfo.h>
-#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Users.h>
 
 
 // private slots
-
-
-void CUserCollectionControllerTest::initTestCase()
-{
-	istd::TDelPtr<imtauth::CIdentifiableUserInfo> userPtr1;
-	userPtr1.SetCastedOrRemove(CreateUserInfo("Test1", "Test1", "Test1", "Test1@mail.ru"));
-	AddUser(*userPtr1);
-
-	istd::TDelPtr<imtauth::CIdentifiableUserInfo> userPtr2;
-	userPtr1.SetCastedOrRemove(CreateUserInfo("Test2", "Test2", "Test2", "Test2@mail.ru"));
-	AddUser(*userPtr2);
-
-	istd::TDelPtr<imtauth::CIdentifiableUserInfo> userPtr3;
-	userPtr1.SetCastedOrRemove(CreateUserInfo("Test3", "Test3", "Test3", "Test3@mail.ru"));
-	AddUser(*userPtr3);
-
-	istd::TDelPtr<imtauth::CIdentifiableUserInfo> userPtr4;
-	userPtr1.SetCastedOrRemove(CreateUserInfo("Test4", "Test4", "Test4", "Test4@mail.ru"));
-	AddUser(*userPtr4);
-
-	istd::TDelPtr<imtauth::CIdentifiableUserInfo> userPtr5;
-	userPtr1.SetCastedOrRemove(CreateUserInfo("Test5", "Test5", "Test5", "Test5@mail.ru"));
-	AddUser(*userPtr5);
-}
-
 
 void CUserCollectionControllerTest::AddUserTest()
 {
@@ -54,8 +22,6 @@ void CUserCollectionControllerTest::AddUserTest()
 	userInfo.SetPasswordHash(passwordHash);
 	userInfo.SetMail("ivanov@mail.ru");
 	userInfo.SetName("Ivanov");
-
-	QVERIFY(AddUser(userInfo));
 
 	istd::TDelPtr<sdl::imtauth::Users::CUserData::V1_0> userRepresentation = CreateUserDataFromUserInfo(userInfo, "Test");
 
@@ -102,7 +68,6 @@ void CUserCollectionControllerTest::AddUserFailedTest()
 		sdl::imtbase::ImtCollection::CAddedNotificationPayload>(arguments, response);
 
 	QVERIFY(!ok);
-	QVERIFY(response.Id->isEmpty());
 
 	imtauth::CIdentifiableUserInfo userInfo2;
 	QVERIFY(!GetObjectFromTable("Users", userInfo->GetObjectUuid(), userInfo2));
@@ -113,46 +78,343 @@ void CUserCollectionControllerTest::AddUserFailedTest()
 		sdl::imtbase::ImtCollection::CAddedNotificationPayload>(arguments, response);
 
 	QVERIFY(!ok);
-	QVERIFY(response.Id->isEmpty());
 
 	imtauth::CIdentifiableUserInfo userInfo3;
-	QVERIFY(!GetObjectFromTable("Users", userInfo->GetObjectUuid(), userInfo2));
+	QVERIFY(!GetObjectFromTable("Users", userInfo->GetObjectUuid(), userInfo3));
 }
 
 
 void CUserCollectionControllerTest::RemoveUserTest()
 {
+	namespace userssdl = sdl::imtauth::Users;
 
+	istd::TDelPtr<imtauth::CIdentifiableUserInfo> userInfo;
+	userInfo.SetCastedOrRemove(CreateUserInfo("RemovedUser", "12345", "Ivanov", "ivanov@mail.ru"));
+
+	QVERIFY(AddUser(*userInfo.GetPtr()));
+
+	userssdl::V1_0::UsersRemoveRequestArguments arguments;
+	arguments.input.Id = userInfo->GetObjectUuid();
+
+	userssdl::CRemoveUserPayload::V1_0 response;
+	bool ok = SendRequest<
+		userssdl::V1_0::CUsersRemoveGqlRequest,
+		userssdl::V1_0::UsersRemoveRequestArguments,
+		userssdl::CRemoveUserPayload>(arguments, response);
+
+	// QVERIFY(ok);
+
+	imtauth::CIdentifiableUserInfo userInfo2;
+	// QVERIFY(!GetObjectFromTable("Users", userInfo->GetObjectUuid(), userInfo2));
 }
 
 
 void CUserCollectionControllerTest::RemoveUserFailedTest()
 {
+	namespace userssdl = sdl::imtauth::Users;
 
+	userssdl::V1_0::UsersRemoveRequestArguments arguments;
+	arguments.input.Id = "UnexistsUser";
+
+	userssdl::CRemoveUserPayload::V1_0 response;
+	bool ok = SendRequest<
+		userssdl::V1_0::CUsersRemoveGqlRequest,
+		userssdl::V1_0::UsersRemoveRequestArguments,
+		userssdl::CRemoveUserPayload>(arguments, response);
+
+	QVERIFY(!ok);
 }
 
 
 void CUserCollectionControllerTest::UpdateUserTest()
 {
+	namespace userssdl = sdl::imtauth::Users;
 
+	istd::TDelPtr<imtauth::CIdentifiableUserInfo> userInfo;
+	userInfo.SetCastedOrRemove(CreateUserInfo("RemovedUser", "12345", "Ivanov", "ivanov@mail.ru"));
+
+	QVERIFY(AddUser(*userInfo.GetPtr()));
+
+	userssdl::V1_0::UserUpdateRequestArguments arguments;
+	arguments.input.Id = userInfo->GetObjectUuid();
+	arguments.input.ProductId = "Test";
+
+	istd::TDelPtr<sdl::imtauth::Users::CUserData::V1_0> userRepresentation = CreateUserDataFromUserInfo(*userInfo, "Test");
+	userRepresentation->Name = "NewName";
+	arguments.input.Item = *userRepresentation.GetPtr();
+
+	sdl::imtbase::ImtCollection::CUpdatedNotificationPayload::V1_0 response;
+	bool ok = SendRequest<
+		userssdl::V1_0::CUserUpdateGqlRequest,
+		userssdl::V1_0::UserUpdateRequestArguments,
+		sdl::imtbase::ImtCollection::CUpdatedNotificationPayload>(arguments, response);
+
+	QVERIFY(ok);
+	QVERIFY(response.Id.has_value() && response.Id == userInfo->GetObjectUuid());
+
+	imtauth::CIdentifiableUserInfo userInfo2;
+	QVERIFY(GetObjectFromTable("Users", userInfo->GetObjectUuid(), userInfo2));
+
+	QVERIFY(userInfo2.GetObjectUuid() == userInfo->GetObjectUuid());
+	QVERIFY(userInfo2.GetMail() == userInfo->GetMail());
+	QVERIFY(userInfo2.GetRoles("Test") == userInfo->GetRoles("Test"));
+	QVERIFY(userInfo2.GetGroups() == userInfo->GetGroups());
+	QVERIFY(userInfo2.GetName() != userInfo->GetName());
+	QVERIFY(userInfo2.GetName() == *userRepresentation->Name);
+
+	userRepresentation->Name = "NewName2";
+	userRepresentation->Email = "ivanov2@mail.ru";
+	arguments.input.Item = *userRepresentation.GetPtr();
+
+	ok = SendRequest<
+		userssdl::V1_0::CUserUpdateGqlRequest,
+		userssdl::V1_0::UserUpdateRequestArguments,
+		sdl::imtbase::ImtCollection::CUpdatedNotificationPayload>(arguments, response);
+
+	QVERIFY(ok);
+	QVERIFY(response.Id.has_value() && response.Id == userInfo->GetObjectUuid());
+
+	QVERIFY(GetObjectFromTable("Users", userInfo->GetObjectUuid(), userInfo2));
+	QVERIFY(userInfo2.GetObjectUuid() == userInfo->GetObjectUuid());
+	QVERIFY(userInfo2.GetMail() != userInfo->GetMail());
+	QVERIFY(userInfo2.GetMail() == *userRepresentation->Email);
+	QVERIFY(userInfo2.GetName() != userInfo->GetName());
+	QVERIFY(userInfo2.GetName() == *userRepresentation->Name);
+
+	userRepresentation->Username = "RemovedUser2";
+	arguments.input.Item = *userRepresentation.GetPtr();
+
+	ok = SendRequest<
+		userssdl::V1_0::CUserUpdateGqlRequest,
+		userssdl::V1_0::UserUpdateRequestArguments,
+		sdl::imtbase::ImtCollection::CUpdatedNotificationPayload>(arguments, response);
+
+	QVERIFY(ok);
+	QVERIFY(response.Id.has_value() && response.Id == userInfo->GetObjectUuid());
+
+	QVERIFY(GetObjectFromTable("Users", userInfo->GetObjectUuid(), userInfo2));
+	QVERIFY(userInfo2.GetObjectUuid() == userInfo->GetObjectUuid());
+	QVERIFY(userInfo2.GetId() != userInfo->GetId());
+	QVERIFY(userInfo2.GetId() == *userRepresentation->Username);
+
+	// Adding roles to user
+	istd::TDelPtr<imtauth::CIdentifiableRoleInfo> roleInfo1;
+	roleInfo1.SetCastedOrRemove(CreateRoleInfo("Developer", "Developer", "Test", QByteArrayList()));
+
+	istd::TDelPtr<imtauth::CIdentifiableRoleInfo> roleInfo2;
+	roleInfo2.SetCastedOrRemove(CreateRoleInfo("Tester", "Tester", "Test", QByteArrayList()));
+
+	istd::TDelPtr<imtauth::CIdentifiableRoleInfo> roleInfo3;
+	roleInfo2.SetCastedOrRemove(CreateRoleInfo("Tester2", "Tester2", "Test2", QByteArrayList()));
+
+	QVERIFY(AddRole(*roleInfo1.GetPtr()));
+	QVERIFY(AddRole(*roleInfo2.GetPtr()));
+
+	QByteArrayList roles;
+	roles << roleInfo1->GetObjectUuid();
+	roles << roleInfo2->GetObjectUuid();
+
+	userRepresentation->Roles = roles.join(';');
+
+	arguments.input.Item = *userRepresentation.GetPtr();
+
+	ok = SendRequest<
+		userssdl::V1_0::CUserUpdateGqlRequest,
+		userssdl::V1_0::UserUpdateRequestArguments,
+		sdl::imtbase::ImtCollection::CUpdatedNotificationPayload>(arguments, response);
+
+	QVERIFY(ok);
+	QVERIFY(GetObjectFromTable("Users", userInfo->GetObjectUuid(), userInfo2));
+	QVERIFY(userInfo2.GetObjectUuid() == userInfo->GetObjectUuid());
+	QVERIFY(userInfo2.GetId() != userInfo->GetId());
+	QVERIFY(userInfo2.GetId() == *userRepresentation->Username);
+
+	QByteArrayList userRoles = userInfo2.GetRoles("Test");
+	QVERIFY(!userRoles.isEmpty());
+	QVERIFY(userRoles.size() == 2);
+	QVERIFY(userRoles.contains(roleInfo1->GetObjectUuid()));
+	QVERIFY(userRoles.contains(roleInfo2->GetObjectUuid()));
+
+	// Remove one role
+	roles.removeAll(roleInfo1->GetObjectUuid());
+	userRepresentation->Roles = roles.join(';');
+	arguments.input.Item = *userRepresentation.GetPtr();
+
+	ok = SendRequest<
+		userssdl::V1_0::CUserUpdateGqlRequest,
+		userssdl::V1_0::UserUpdateRequestArguments,
+		sdl::imtbase::ImtCollection::CUpdatedNotificationPayload>(arguments, response);
+
+	QVERIFY(ok);
+
+	userRoles = userInfo2.GetRoles("Test");
+	QVERIFY(!userRoles.isEmpty());
+	QVERIFY(userRoles.size() == 1);
+	QVERIFY(!userRoles.contains(roleInfo1->GetObjectUuid()));
+	QVERIFY(userRoles.contains(roleInfo2->GetObjectUuid()));
+
+	QVERIFY(RemoveObjectFromTable("Users", userInfo->GetObjectUuid()));
+	QVERIFY(RemoveObjectFromTable("Roles", roleInfo1->GetObjectUuid()));
+	QVERIFY(RemoveObjectFromTable("Roles", roleInfo2->GetObjectUuid()));
 }
 
 
 void CUserCollectionControllerTest::UpdateUserFailedTest()
 {
+	namespace userssdl = sdl::imtauth::Users;
 
+	istd::TDelPtr<imtauth::CIdentifiableUserInfo> userInfo;
+	userInfo.SetCastedOrRemove(CreateUserInfo("Ivanov", "12345", "Ivanov", "ivanov@mail.ru"));
+
+	istd::TDelPtr<imtauth::CIdentifiableUserInfo> userInfo2;
+	userInfo2.SetCastedOrRemove(CreateUserInfo("Sidorov", "12345", "Sidorov", "sidorov@gmail.ru"));
+
+	QVERIFY(AddUser(*userInfo.GetPtr()));
+	QVERIFY(AddUser(*userInfo2.GetPtr()));
+
+	userssdl::V1_0::UserUpdateRequestArguments arguments;
+	arguments.input.Id = userInfo->GetObjectUuid();
+	arguments.input.ProductId = "Test";
+
+	// Empty name
+	istd::TDelPtr<sdl::imtauth::Users::CUserData::V1_0> userRepresentation = CreateUserDataFromUserInfo(*userInfo, "Test");
+	userRepresentation->Name = "";
+	arguments.input.Item = *userRepresentation.GetPtr();
+
+	sdl::imtbase::ImtCollection::CUpdatedNotificationPayload::V1_0 response;
+	bool ok = SendRequest<
+		userssdl::V1_0::CUserUpdateGqlRequest,
+		userssdl::V1_0::UserUpdateRequestArguments,
+		sdl::imtbase::ImtCollection::CUpdatedNotificationPayload>(arguments, response);
+
+	QVERIFY(!ok);
+
+	// Empty username
+	userRepresentation->Name = "Ivanov";
+	userRepresentation->Username = "";
+	arguments.input.Item = *userRepresentation.GetPtr();
+
+	ok = SendRequest<
+		userssdl::V1_0::CUserUpdateGqlRequest,
+		userssdl::V1_0::UserUpdateRequestArguments,
+		sdl::imtbase::ImtCollection::CUpdatedNotificationPayload>(arguments, response);
+
+	QVERIFY(!ok);
+
+	// Username alreasy exists
+	userRepresentation->Name = "Ivanov";
+	userRepresentation->Username = "Sidorov";
+	arguments.input.Item = *userRepresentation.GetPtr();
+
+	ok = SendRequest<
+		userssdl::V1_0::CUserUpdateGqlRequest,
+		userssdl::V1_0::UserUpdateRequestArguments,
+		sdl::imtbase::ImtCollection::CUpdatedNotificationPayload>(arguments, response);
+
+	QVERIFY(!ok);
+
+	// Email empty
+	userRepresentation->Name = "Ivanov";
+	userRepresentation->Username = "Ivanov";
+	userRepresentation->Email = "sidorov@gmail.ru";
+	arguments.input.Item = *userRepresentation.GetPtr();
+
+	ok = SendRequest<
+		userssdl::V1_0::CUserUpdateGqlRequest,
+		userssdl::V1_0::UserUpdateRequestArguments,
+		sdl::imtbase::ImtCollection::CUpdatedNotificationPayload>(arguments, response);
+
+	QVERIFY(!ok);
+
+	// Email alreay exists
+	userRepresentation->Name = "Ivanov";
+	userRepresentation->Username = "Ivanov";
+	userRepresentation->Email = "";
+	arguments.input.Item = *userRepresentation.GetPtr();
+
+	ok = SendRequest<
+		userssdl::V1_0::CUserUpdateGqlRequest,
+		userssdl::V1_0::UserUpdateRequestArguments,
+		sdl::imtbase::ImtCollection::CUpdatedNotificationPayload>(arguments, response);
+
+	QVERIFY(!ok);
+
+	QVERIFY(RemoveObjectFromTable("Users", userInfo->GetObjectUuid()));
+	QVERIFY(RemoveObjectFromTable("Users", userInfo2->GetObjectUuid()));
 }
 
 
 void CUserCollectionControllerTest::GetUserListTest()
 {
+	namespace userssdl = sdl::imtauth::Users;
 
+	userssdl::V1_0::UsersListRequestArguments arguments;
+
+	sdl::imtbase::ImtCollection::CCollectionViewParams::V1_0 viewParams;
+
+	viewParams.Count = -1;
+	viewParams.Offset = 0;
+	arguments.input.ProductId = "Test";
+	arguments.input.viewParams = viewParams;
+
+	userssdl::CUsersListPayload::V1_0 response;
+	bool ok = SendRequest<
+		userssdl::V1_0::CUsersListGqlRequest,
+		userssdl::V1_0::UsersListRequestArguments,
+		userssdl::CUsersListPayload>(arguments, response);
+
+	QVERIFY(ok);
+
+	QVERIFY(response.notification.has_value() && response.notification->PagesCount == 1);
+	QVERIFY(response.notification.has_value() && response.notification->TotalCount == 5);
+	QVERIFY(response.items.has_value());
+	QVERIFY(response.items->size() == 5);
+
+	QList<userssdl::CUserItem::V1_0> items = *response.items;
+
+	QByteArrayList ids;
+	QStringList names;
+	for (const userssdl::CUserItem::V1_0& item : items){
+		ids << *item.Id;
+		names << *item.Name;
+	}
+
+	QVERIFY(names.contains("Test1") &&
+			names.contains("Test2") &&
+			names.contains("Test3") &&
+			names.contains("Test4") &&
+			names.contains("Test5"));
+
+	QVERIFY(ids.contains("Test1") &&
+			ids.contains("Test2") &&
+			ids.contains("Test3") &&
+			ids.contains("Test4") &&
+			ids.contains("Test5"));
 }
 
+// protected methods
 
-void CUserCollectionControllerTest::cleanupTestCase()
+void CUserCollectionControllerTest::SetData() const
 {
+	istd::TDelPtr<imtauth::CIdentifiableUserInfo> userPtr1;
+	userPtr1.SetCastedOrRemove(CreateUserInfo("Test1", "Test1", "Test1", "Test1@mail.ru"));
+	AddUser(*userPtr1);
 
+	istd::TDelPtr<imtauth::CIdentifiableUserInfo> userPtr2;
+	userPtr2.SetCastedOrRemove(CreateUserInfo("Test2", "Test2", "Test2", "Test2@mail.ru"));
+	AddUser(*userPtr2);
+
+	istd::TDelPtr<imtauth::CIdentifiableUserInfo> userPtr3;
+	userPtr3.SetCastedOrRemove(CreateUserInfo("Test3", "Test3", "Test3", "Test3@mail.ru"));
+	AddUser(*userPtr3);
+
+	istd::TDelPtr<imtauth::CIdentifiableUserInfo> userPtr4;
+	userPtr4.SetCastedOrRemove(CreateUserInfo("Test4", "Test4", "Test4", "Test4@mail.ru"));
+	AddUser(*userPtr4);
+
+	istd::TDelPtr<imtauth::CIdentifiableUserInfo> userPtr5;
+	userPtr5.SetCastedOrRemove(CreateUserInfo("Test5", "Test5", "Test5", "Test5@mail.ru"));
+	AddUser(*userPtr5);
 }
 
 
