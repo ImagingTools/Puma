@@ -4,11 +4,12 @@
         <VersionInfos>
             <Version Id="0" Number="5332" Description="ACF"/>
             <Version Id="1" Number="2230" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+            <Version Id="1023" Number="394499" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
         <Element ComponentName="Backup" X="925" Y="350" Note=""/>
+        <Element ComponentName="CompanyDataLoaction" X="1050" Y="625" Note=""/>
         <Element ComponentName="ConnectionCollection" X="625" Y="500" Note=""/>
         <Element ComponentName="Database" X="125" Y="350" Note=""/>
         <Element ComponentName="DatabaseAccessSettings" X="125" Y="500" Note=""/>
