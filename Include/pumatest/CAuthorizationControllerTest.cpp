@@ -19,7 +19,7 @@ static const QString s_usersTableName = "Users";
 void CAuthorizationControllerTest::AuthorizationTest()
 {
 	namespace authsdl = sdl::imtauth::Authorization;
-	authsdl::V1_0::AuthorizationRequestArguments arguments;
+	authsdl::AuthorizationRequestArguments arguments;
 
 	imtauth::CIdentifiableUserInfo userInfo;
 
@@ -34,15 +34,15 @@ void CAuthorizationControllerTest::AuthorizationTest()
 	bool ok = AddUser(userInfo);
 	QVERIFY(ok);
 
-	arguments.input.Login = "Test1";
-	arguments.input.Password = "Test1";
-	arguments.input.ProductId = "Test";
+	arguments.input.Version_1_0->Login = "Test1";
+	arguments.input.Version_1_0->Password = "Test1";
+	arguments.input.Version_1_0->ProductId = "Test";
 
 	authsdl::CAuthorizationPayload::V1_0 response;
 
 	ok = SendRequest<
-		authsdl::V1_0::CAuthorizationGqlRequest,
-		authsdl::V1_0::AuthorizationRequestArguments,
+		authsdl::CAuthorizationGqlRequest,
+		authsdl::AuthorizationRequestArguments,
 		authsdl::CAuthorizationPayload>(arguments, response);
 
 	QVERIFY(ok);
@@ -54,7 +54,7 @@ void CAuthorizationControllerTest::AuthorizationTest()
 void CAuthorizationControllerTest::AuthorizationFailedTest()
 {
 	namespace authsdl = sdl::imtauth::Authorization;
-	authsdl::V1_0::AuthorizationRequestArguments arguments;
+	authsdl::AuthorizationRequestArguments arguments;
 
 	imtauth::CIdentifiableUserInfo userInfo;
 
@@ -66,25 +66,25 @@ void CAuthorizationControllerTest::AuthorizationFailedTest()
 	QByteArray passwordHash = m_hashCalculator.GenerateHash("Test1");
 	userInfo.SetPasswordHash(passwordHash);
 
-	arguments.input.Login = "Test";
-	arguments.input.Password = "2";
-	arguments.input.ProductId = "Test";
+	arguments.input.Version_1_0->Login = "Test";
+	arguments.input.Version_1_0->Password = "2";
+	arguments.input.Version_1_0->ProductId = "Test";
 
 	authsdl::CAuthorizationPayload::V1_0 response;
 
 	bool ok = SendRequest<
-		authsdl::V1_0::CAuthorizationGqlRequest,
-		authsdl::V1_0::AuthorizationRequestArguments,
+		authsdl::CAuthorizationGqlRequest,
+		authsdl::AuthorizationRequestArguments,
 		authsdl::CAuthorizationPayload>(arguments, response);
 
 	QVERIFY(!ok);
 
-	arguments.input.Login = "Test344";
-	arguments.input.Password = "1";
+	arguments.input.Version_1_0->Login = "Test344";
+	arguments.input.Version_1_0->Password = "1";
 
 	ok = SendRequest<
-		authsdl::V1_0::CAuthorizationGqlRequest,
-		authsdl::V1_0::AuthorizationRequestArguments,
+		authsdl::CAuthorizationGqlRequest,
+		authsdl::AuthorizationRequestArguments,
 		authsdl::CAuthorizationPayload>(arguments, response);
 
 	QVERIFY(!ok);

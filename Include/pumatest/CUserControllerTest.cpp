@@ -13,7 +13,7 @@ static const QString s_usersTableName = "Users";
 void CUserControllerTest::ChangePasswordTest()
 {
 	namespace userssdl = sdl::imtauth::Users;
-	userssdl::V1_0::ChangePasswordRequestArguments arguments;
+	userssdl::ChangePasswordRequestArguments arguments;
 
 	imtauth::CIdentifiableUserInfo userInfo;
 
@@ -28,15 +28,15 @@ void CUserControllerTest::ChangePasswordTest()
 	bool ok = AddUser(userInfo);
 	QVERIFY(ok);
 
-	arguments.input.Login = userInfo.GetId();
-	arguments.input.OldPassword = "1";
-	arguments.input.NewPassword = "2";
+	arguments.input.Version_1_0->Login = userInfo.GetId();
+	arguments.input.Version_1_0->OldPassword = "1";
+	arguments.input.Version_1_0->NewPassword = "2";
 
 	userssdl::CChangePasswordPayload::V1_0 response;
 
 	ok = SendRequest<
-				sdl::imtauth::Users::V1_0::CChangePasswordGqlRequest,
-				sdl::imtauth::Users::V1_0::ChangePasswordRequestArguments,
+				sdl::imtauth::Users::CChangePasswordGqlRequest,
+				sdl::imtauth::Users::ChangePasswordRequestArguments,
 				sdl::imtauth::Users::CChangePasswordPayload>(arguments, response);
 	QVERIFY(ok);
 
@@ -59,7 +59,7 @@ void CUserControllerTest::ChangePasswordTest()
 void CUserControllerTest::ChangePasswordFailedTest()
 {
 	namespace userssdl = sdl::imtauth::Users;
-	userssdl::V1_0::ChangePasswordRequestArguments arguments;
+	userssdl::ChangePasswordRequestArguments arguments;
 
 	imtauth::CIdentifiableUserInfo userInfo;
 
@@ -74,15 +74,15 @@ void CUserControllerTest::ChangePasswordFailedTest()
 	bool ok = AddUser(userInfo);
 	QVERIFY(ok);
 
-	arguments.input.Login = "Test";
-	arguments.input.OldPassword = "3";
-	arguments.input.NewPassword = "2";
+	arguments.input.Version_1_0->Login = "Test";
+	arguments.input.Version_1_0->OldPassword = "3";
+	arguments.input.Version_1_0->NewPassword = "2";
 
 	userssdl::CChangePasswordPayload::V1_0 response;
 
 	ok = SendRequest<
-		sdl::imtauth::Users::V1_0::CChangePasswordGqlRequest,
-		sdl::imtauth::Users::V1_0::ChangePasswordRequestArguments,
+		sdl::imtauth::Users::CChangePasswordGqlRequest,
+		sdl::imtauth::Users::ChangePasswordRequestArguments,
 		sdl::imtauth::Users::CChangePasswordPayload>(arguments, response);
 	QVERIFY(!ok);
 	QVERIFY(RemoveObjectFromTable(s_usersTableName, uuid));
@@ -91,7 +91,7 @@ void CUserControllerTest::ChangePasswordFailedTest()
 
 void CUserControllerTest::RegisterUserTest(){
 	namespace userssdl = sdl::imtauth::Users;
-	userssdl::V1_0::RegisterUserRequestArguments arguments;
+	userssdl::RegisterUserRequestArguments arguments;
 
 	imtauth::CIdentifiableUserInfo userInfo;
 
@@ -111,14 +111,14 @@ void CUserControllerTest::RegisterUserTest(){
 	userData.Name = userInfo.GetName();
 	userData.Email = userInfo.GetMail();
 
-	arguments.input.UserData = userData;
-	arguments.input.ProductId = "Test";
+	arguments.input.Version_1_0->UserData = userData;
+	arguments.input.Version_1_0->ProductId = "Test";
 
 	userssdl::CRegisterUserPayload::V1_0 response;
 
 	bool ok = SendRequest<
-		sdl::imtauth::Users::V1_0::CRegisterUserGqlRequest,
-		sdl::imtauth::Users::V1_0::RegisterUserRequestArguments,
+		sdl::imtauth::Users::CRegisterUserGqlRequest,
+		sdl::imtauth::Users::RegisterUserRequestArguments,
 		sdl::imtauth::Users::CRegisterUserPayload>(arguments, response);
 	QVERIFY(ok);
 	QVERIFY(response.Id == uuid);
@@ -136,7 +136,7 @@ void CUserControllerTest::RegisterUserTest(){
 void CUserControllerTest::RegisterUserFailedTest()
 {
 	namespace userssdl = sdl::imtauth::Users;
-	userssdl::V1_0::RegisterUserRequestArguments arguments;
+	userssdl::RegisterUserRequestArguments arguments;
 
 	imtauth::CIdentifiableUserInfo userInfo;
 
@@ -156,14 +156,14 @@ void CUserControllerTest::RegisterUserFailedTest()
 	userData.Name = userInfo.GetName();
 	userData.Email = userInfo.GetMail();
 
-	arguments.input.UserData = userData;
-	arguments.input.ProductId = "Test";
+	arguments.input.Version_1_0->UserData = userData;
+	arguments.input.Version_1_0->ProductId = "Test";
 
 	userssdl::CRegisterUserPayload::V1_0 response;
 
 	bool ok = SendRequest<
-		userssdl::V1_0::CRegisterUserGqlRequest,
-		userssdl::V1_0::RegisterUserRequestArguments,
+		userssdl::CRegisterUserGqlRequest,
+		userssdl::RegisterUserRequestArguments,
 		userssdl::CRegisterUserPayload>(arguments, response);
 
 	// Check empty login
@@ -171,11 +171,11 @@ void CUserControllerTest::RegisterUserFailedTest()
 
 	userData.Username = "Test";
 	userData.Password = "";
-	arguments.input.UserData = userData;
+	arguments.input.Version_1_0->UserData = userData;
 
 	ok = SendRequest<
-		userssdl::V1_0::CRegisterUserGqlRequest,
-		userssdl::V1_0::RegisterUserRequestArguments,
+		userssdl::CRegisterUserGqlRequest,
+		userssdl::RegisterUserRequestArguments,
 		userssdl::CRegisterUserPayload>(arguments, response);
 
 	// Check empty password
@@ -183,11 +183,11 @@ void CUserControllerTest::RegisterUserFailedTest()
 
 	userData.Password = "1";
 	userData.Name = "";
-	arguments.input.UserData = userData;
+	arguments.input.Version_1_0->UserData = userData;
 
 	ok = SendRequest<
-		userssdl::V1_0::CRegisterUserGqlRequest,
-		userssdl::V1_0::RegisterUserRequestArguments,
+		userssdl::CRegisterUserGqlRequest,
+		userssdl::RegisterUserRequestArguments,
 		userssdl::CRegisterUserPayload>(arguments, response);
 
 	// Check empty name
@@ -201,11 +201,11 @@ void CUserControllerTest::RegisterUserFailedTest()
 	userData.Name = userInfo.GetName();
 	userData.Email = userInfo.GetMail();
 
-	arguments.input.UserData = userData;
+	arguments.input.Version_1_0->UserData = userData;
 
 	ok = SendRequest<
-		userssdl::V1_0::CRegisterUserGqlRequest,
-		userssdl::V1_0::RegisterUserRequestArguments,
+		userssdl::CRegisterUserGqlRequest,
+		userssdl::RegisterUserRequestArguments,
 		userssdl::CRegisterUserPayload>(arguments, response);
 
 	// Already register user
@@ -218,7 +218,7 @@ void CUserControllerTest::RegisterUserFailedTest()
 void CUserControllerTest::CheckEmailTest()
 {
 	namespace userssdl = sdl::imtauth::Users;
-	userssdl::V1_0::CheckEmailRequestArguments arguments;
+	userssdl::CheckEmailRequestArguments arguments;
 
 	imtauth::CIdentifiableUserInfo userInfo;
 
@@ -231,13 +231,13 @@ void CUserControllerTest::CheckEmailTest()
 
 	QVERIFY(AddUser(userInfo));
 
-	arguments.input.Email = userInfo.GetMail();
+	arguments.input.Version_1_0->Email = userInfo.GetMail();
 
 	userssdl::CCheckEmailPayload::V1_0 response;
 
 	bool ok = SendRequest<
-		userssdl::V1_0::CCheckEmailGqlRequest,
-		userssdl::V1_0::CheckEmailRequestArguments,
+		userssdl::CCheckEmailGqlRequest,
+		userssdl::CheckEmailRequestArguments,
 		userssdl::CCheckEmailPayload>(arguments, response);
 
 	QVERIFY(ok);
@@ -253,7 +253,7 @@ void CUserControllerTest::CheckEmailTest()
 void CUserControllerTest::CheckEmailFailedTest()
 {
 	namespace userssdl = sdl::imtauth::Users;
-	userssdl::V1_0::CheckEmailRequestArguments arguments;
+	userssdl::CheckEmailRequestArguments arguments;
 
 	imtauth::CIdentifiableUserInfo userInfo;
 
@@ -266,24 +266,24 @@ void CUserControllerTest::CheckEmailFailedTest()
 
 	QVERIFY(AddUser(userInfo));
 
-	arguments.input.Email = "";
+	arguments.input.Version_1_0->Email = "";
 
 	userssdl::CCheckEmailPayload::V1_0 response;
 
 	bool ok = SendRequest<
-		userssdl::V1_0::CCheckEmailGqlRequest,
-		userssdl::V1_0::CheckEmailRequestArguments,
+		userssdl::CCheckEmailGqlRequest,
+		userssdl::CheckEmailRequestArguments,
 		userssdl::CCheckEmailPayload>(arguments, response);
 
 	QVERIFY(ok);
 	QVERIFY(!*response.Success);
 	QVERIFY(!response.Message->isEmpty());
 
-	arguments.input.Email = "test2@mail.ru";
+	arguments.input.Version_1_0->Email = "test2@mail.ru";
 
 	ok = SendRequest<
-		userssdl::V1_0::CCheckEmailGqlRequest,
-		userssdl::V1_0::CheckEmailRequestArguments,
+		userssdl::CCheckEmailGqlRequest,
+		userssdl::CheckEmailRequestArguments,
 		userssdl::CCheckEmailPayload>(arguments, response);
 
 	QVERIFY(ok);
@@ -297,7 +297,7 @@ void CUserControllerTest::CheckEmailFailedTest()
 void CUserControllerTest::CreateSuperuserTest()
 {
 	namespace userssdl = sdl::imtauth::Users;
-	userssdl::V1_0::CreateSuperuserRequestArguments arguments;
+	userssdl::CreateSuperuserRequestArguments arguments;
 
 	imtauth::CIdentifiableUserInfo userInfo;
 
@@ -307,15 +307,15 @@ void CUserControllerTest::CreateSuperuserTest()
 	userInfo.SetMail("su@mail.ru");
 	userInfo.SetName("superuser");
 
-	arguments.input.Name = userInfo.GetName();
-	arguments.input.Mail = userInfo.GetMail();
-	arguments.input.Password = "1";
+	arguments.input.Version_1_0->Name = userInfo.GetName();
+	arguments.input.Version_1_0->Mail = userInfo.GetMail();
+	arguments.input.Version_1_0->Password = "1";
 
 	userssdl::CCreateSuperuserPayload::V1_0 response;
 
 	bool ok = SendRequest<
-		userssdl::V1_0::CCreateSuperuserGqlRequest,
-		userssdl::V1_0::CreateSuperuserRequestArguments,
+		userssdl::CCreateSuperuserGqlRequest,
+		userssdl::CreateSuperuserRequestArguments,
 		userssdl::CCreateSuperuserPayload>(arguments, response);
 
 	QVERIFY(ok);
@@ -337,7 +337,7 @@ void CUserControllerTest::CreateSuperuserTest()
 void CUserControllerTest::CreateSuperuserFailedTest()
 {
 	namespace userssdl = sdl::imtauth::Users;
-	userssdl::V1_0::CreateSuperuserRequestArguments arguments;
+	userssdl::CreateSuperuserRequestArguments arguments;
 
 	imtauth::CIdentifiableUserInfo userInfo;
 
@@ -349,15 +349,15 @@ void CUserControllerTest::CreateSuperuserFailedTest()
 
 	QVERIFY(AddUser(userInfo));
 
-	arguments.input.Name = userInfo.GetName();
-	arguments.input.Mail = "su@mail.ru";
-	arguments.input.Password = "1";
+	arguments.input.Version_1_0->Name = userInfo.GetName();
+	arguments.input.Version_1_0->Mail = "su@mail.ru";
+	arguments.input.Version_1_0->Password = "1";
 
 	userssdl::CCreateSuperuserPayload::V1_0 response;
 
 	bool ok = SendRequest<
-		userssdl::V1_0::CCreateSuperuserGqlRequest,
-		userssdl::V1_0::CreateSuperuserRequestArguments,
+		userssdl::CCreateSuperuserGqlRequest,
+		userssdl::CreateSuperuserRequestArguments,
 		userssdl::CCreateSuperuserPayload>(arguments, response);
 
 	// Empty already exists
@@ -367,13 +367,13 @@ void CUserControllerTest::CreateSuperuserFailedTest()
 
 	QVERIFY(RemoveObjectFromTable(s_usersTableName, "su"));
 
-	arguments.input.Name = userInfo.GetName();
-	arguments.input.Mail = "";
-	arguments.input.Password = "1";
+	arguments.input.Version_1_0->Name = userInfo.GetName();
+	arguments.input.Version_1_0->Mail = "";
+	arguments.input.Version_1_0->Password = "1";
 
 	ok = SendRequest<
-		userssdl::V1_0::CCreateSuperuserGqlRequest,
-		userssdl::V1_0::CreateSuperuserRequestArguments,
+		userssdl::CCreateSuperuserGqlRequest,
+		userssdl::CreateSuperuserRequestArguments,
 		userssdl::CCreateSuperuserPayload>(arguments, response);
 
 	// Empty email for su
@@ -381,12 +381,12 @@ void CUserControllerTest::CreateSuperuserFailedTest()
 	QVERIFY(response.Success.has_value() && !*response.Success);
 	QVERIFY(response.Message.has_value() && !response.Message->isEmpty());
 
-	arguments.input.Mail = "su@mail.ru";
-	arguments.input.Password = "";
+	arguments.input.Version_1_0->Mail = "su@mail.ru";
+	arguments.input.Version_1_0->Password = "";
 
 	ok = SendRequest<
-		userssdl::V1_0::CCreateSuperuserGqlRequest,
-		userssdl::V1_0::CreateSuperuserRequestArguments,
+		userssdl::CCreateSuperuserGqlRequest,
+		userssdl::CreateSuperuserRequestArguments,
 		userssdl::CCreateSuperuserPayload>(arguments, response);
 
 	// Empty password for su
@@ -394,13 +394,13 @@ void CUserControllerTest::CreateSuperuserFailedTest()
 	QVERIFY(response.Success.has_value() && !*response.Success);
 	QVERIFY(response.Message.has_value() && !response.Message->isEmpty());
 
-	arguments.input.Name = userInfo.GetName();
-	arguments.input.Mail = userInfo.GetMail();
-	arguments.input.Password = "1";
+	arguments.input.Version_1_0->Name = userInfo.GetName();
+	arguments.input.Version_1_0->Mail = userInfo.GetMail();
+	arguments.input.Version_1_0->Password = "1";
 
 	ok = SendRequest<
-		userssdl::V1_0::CCreateSuperuserGqlRequest,
-		userssdl::V1_0::CreateSuperuserRequestArguments,
+		userssdl::CCreateSuperuserGqlRequest,
+		userssdl::CreateSuperuserRequestArguments,
 		userssdl::CCreateSuperuserPayload>(arguments, response);
 
 	QVERIFY(ok);
@@ -413,7 +413,7 @@ void CUserControllerTest::CreateSuperuserFailedTest()
 void CUserControllerTest::CheckSuperuserTest()
 {
 	namespace userssdl = sdl::imtauth::Users;
-	userssdl::V1_0::CheckSuperuserExistsRequestArguments arguments;
+	userssdl::CheckSuperuserExistsRequestArguments arguments;
 
 	imtauth::CIdentifiableUserInfo userInfo;
 
@@ -428,8 +428,8 @@ void CUserControllerTest::CheckSuperuserTest()
 	userssdl::CCheckSuperuserPayload::V1_0 response;
 
 	bool ok = SendRequest<
-		userssdl::V1_0::CCheckSuperuserExistsGqlRequest,
-		userssdl::V1_0::CheckSuperuserExistsRequestArguments,
+		userssdl::CCheckSuperuserExistsGqlRequest,
+		userssdl::CheckSuperuserExistsRequestArguments,
 		userssdl::CCheckSuperuserPayload>(arguments, response);
 
 	QVERIFY(ok);
@@ -445,8 +445,8 @@ void CUserControllerTest::CheckSuperuserTest()
 	QVERIFY(RemoveObjectFromTable(s_usersTableName, "su"));
 
 	ok = SendRequest<
-		userssdl::V1_0::CCheckSuperuserExistsGqlRequest,
-		userssdl::V1_0::CheckSuperuserExistsRequestArguments,
+		userssdl::CCheckSuperuserExistsGqlRequest,
+		userssdl::CheckSuperuserExistsRequestArguments,
 		userssdl::CCheckSuperuserPayload>(arguments, response);
 
 	QVERIFY(ok);
