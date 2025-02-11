@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5323" Description="ACF"/>
+            <Version Id="0" Number="5332" Description="ACF"/>
             <Version Id="1" Number="2230" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -112,6 +112,9 @@
                     <AttributeInfo Id="GraphQlCommandId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="Puma/graphql"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="JwtSessionController" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="RootDataController/JwtSessionController"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -122,7 +125,7 @@
                         <Data IsEnabled="true" Value="Puma/Views/html/index.html?item=Pages/StartPage.qml"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SessionCollection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="RootDataController/UserSessionRepository"/>
+                        <Data IsEnabled="true" Value="RootDataController/JwtSessionController"/>
                     </AttributeInfo>
                     <AttributeInfo Id="UserCollection" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="RootDataController/UserSqlRepository"/>

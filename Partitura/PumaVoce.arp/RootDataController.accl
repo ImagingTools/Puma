@@ -2,28 +2,19 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5323" Description="ACF"/>
+            <Version Id="0" Number="5332" Description="ACF"/>
             <Version Id="1" Number="2230" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="AuthorizationController" X="475" Y="375" Note=""/>
+        <Element ComponentName="AuthorizationController" X="475" Y="376" Note=""/>
         <Element ComponentName="Demultiplexer" X="575" Y="100" Note=""/>
         <Element ComponentName="DocumentRevisionController" X="975" Y="375" Note=""/>
         <Element ComponentName="Pages" X="250" Y="625" Note=""/>
         <Element ComponentName="Repositories" X="850" Y="625" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
-        <EmbededRegistry Id="Pages">
-            <PositionMap>
-                <Element ComponentName="Demultiplexer" X="575" Y="100" Note=""/>
-                <Element ComponentName="RolesPage" X="175" Y="350" Note=""/>
-                <Element ComponentName="UserGroupsPage" X="1000" Y="350" Note=""/>
-                <Element ComponentName="UsersPage" X="600" Y="350" Note=""/>
-            </PositionMap>
-            <EmbeddedRegistries/>
-        </EmbededRegistry>
         <EmbededRegistry Id="Repositories">
             <PositionMap>
                 <Element ComponentName="RoleDocumentSqlRepository" X="200" Y="100" Note=""/>
@@ -32,6 +23,15 @@
                 <Element ComponentName="UserSqlRepository" X="775" Y="100" Note=""/>
                 <Element ComponentName="UserVerification" X="175" Y="650" Note=""/>
                 <Element ComponentName="UserVerificationCollection" X="175" Y="500" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+        <EmbededRegistry Id="Pages">
+            <PositionMap>
+                <Element ComponentName="Demultiplexer" X="575" Y="100" Note=""/>
+                <Element ComponentName="RolesPage" X="175" Y="350" Note=""/>
+                <Element ComponentName="UserGroupsPage" X="1000" Y="350" Note=""/>
+                <Element ComponentName="UsersPage" X="600" Y="350" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>

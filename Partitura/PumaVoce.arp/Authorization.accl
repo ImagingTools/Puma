@@ -2,23 +2,21 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5323" Description="ACF"/>
+            <Version Id="0" Number="5332" Description="ACF"/>
             <Version Id="1" Number="2230" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
         <Element ComponentName="AuthorizationController" X="150" Y="325" Note=""/>
         <Element ComponentName="CredentialController" X="150" Y="450" Note=""/>
         <Element ComponentName="Demultiplexer" X="625" Y="100" Note=""/>
+        <Element ComponentName="GqlJwtSessionController" X="1000" Y="100" Note=""/>
         <Element ComponentName="HashCalculator" X="150" Y="550" Note=""/>
+        <Element ComponentName="JwtSessionController" X="600" Y="550" Note=""/>
         <Element ComponentName="LdapCredentialController" X="175" Y="75" Note=""/>
-        <Element ComponentName="SerializableSessionCollectionController" X="575" Y="675" Note=""/>
-        <Element ComponentName="SessionController" X="575" Y="250" Note=""/>
-        <Element ComponentName="SessionInfo" X="575" Y="775" Note=""/>
-        <Element ComponentName="SessionInfoProvider" X="1025" Y="300" Note=""/>
-        <Element ComponentName="UserSessionRepository" X="575" Y="550" Note=""/>
-        <Element ComponentName="UsersSessionsDatabaseDelegate" X="950" Y="550" Note=""/>
+        <Element ComponentName="SerializableSessionCollectionController" X="650" Y="325" Note=""/>
+        <Element ComponentName="SessionInfo" X="975" Y="550" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>
