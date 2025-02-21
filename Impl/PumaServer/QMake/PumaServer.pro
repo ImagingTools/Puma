@@ -15,6 +15,8 @@ LIBS += -L$(IMTCOREDIR)/Lib/$$COMPILER_DIR -limtlicgql -limtguigql -limtapp -lim
 
 HEADERS =
 
+CONFIG += console
+
 QT += xml network sql quick qml websockets
 
 copyToDestDir($$PWD/../../../Build/Migrations, $$PWD/../../../Bin/$$COMPILER_DIR/Migrations)
