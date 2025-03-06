@@ -5,12 +5,12 @@ include(${ACFDIR}/Config/CMake/ApplicationConfig.cmake)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Test Sql Widgets Xml Core)
 
 target_link_libraries(
-    ${PROJECT_NAME}
-    Qt${QT_VERSION_MAJOR}::Test
-    Qt${QT_VERSION_MAJOR}::Sql
-    Qt${QT_VERSION_MAJOR}::Xml
-    Qt${QT_VERSION_MAJOR}::Core
-    Qt${QT_VERSION_MAJOR}::Widgets)
+	${PROJECT_NAME}
+	Qt${QT_VERSION_MAJOR}::Test
+	Qt${QT_VERSION_MAJOR}::Sql
+	Qt${QT_VERSION_MAJOR}::Xml
+	Qt${QT_VERSION_MAJOR}::Core
+	Qt${QT_VERSION_MAJOR}::Widgets)
 
 target_link_libraries(${PROJECT_NAME} itest ipackage imtbase imtauth imtcrypt imtservergql imtdb imtgql imtgqltest imtauthgql ifile iser imtbasesdl imtauthsdl imtcol)
 
