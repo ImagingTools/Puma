@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 3.26)
 
 if(NOT DEFINED PUMADIR)
-    set(PUMADIR "$ENV{PUMADIR}")
+	set(PUMADIR "$ENV{PUMADIR}")
 endif()
 
 if(PUMADIR STREQUAL "")
-    set(PUMADIR ${IMTCOREDIR}/../Puma)
+	set(PUMADIR ${IMTCOREDIR}/../Puma)
 endif()
 
 message("PUMADIR ${PUMADIR}")
