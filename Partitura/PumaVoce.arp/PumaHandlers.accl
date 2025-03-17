@@ -8,7 +8,6 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="Observers" X="600" Y="625" Note=""/>
         <Element ComponentName="RestoringDatabaseController" X="225" Y="450" Note=""/>
         <Element ComponentName="RootDataController" X="600" Y="450" Note=""/>
         <Element ComponentName="StandardGraphQlHandlers" X="575" Y="175" Note=""/>
