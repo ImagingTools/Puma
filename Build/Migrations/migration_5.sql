@@ -7,7 +7,7 @@ SELECT
     'Role',
     "Document"->>'RoleName',
     "Document"->>'RoleDescription',
-    "Document",
+    jsonb_set("Document", '{Uuid}', to_jsonb("DocumentId"::text)),
     COALESCE("LastModified", now()), -- Если NULL, ставим текущее время
     jsonb_build_object(
         'OwnerId', COALESCE("OwnerId", ''),
@@ -37,15 +37,18 @@ INSERT INTO public."Users" (
 SELECT 
     gen_random_uuid(), -- Генерируем новый UUID вместо SERIAL
     CASE 
-        WHEN "DocumentId" = 'su' THEN '00000000-0000-0000-0000-000000000000'::UUID -- Заменяем 'su' на дефолтный UUID
-        WHEN "DocumentId" ~ '^[0-9a-fA-F-]{36}$' THEN "DocumentId"::UUID -- Оставляем валидные UUID
-        ELSE gen_random_uuid() -- Заменяем на случайный UUID для всех других случаев
+        WHEN "DocumentId" = 'su' THEN '00000000-0000-0000-0000-000000000000'::UUID
+        WHEN "DocumentId" ~ '^[0-9a-fA-F-]{36}$' THEN "DocumentId"::UUID
+        ELSE gen_random_uuid()
     END,
 	'User',
 	"Document"->>'Name',
 	"Document"->>'Description',
-    "Document",
-    COALESCE("LastModified", now()), -- Если NULL, ставим текущее время
+	CASE 
+        WHEN "DocumentId" = 'su' THEN jsonb_set("Document", '{Uuid}', to_jsonb('00000000-0000-0000-0000-000000000000'::text))
+        ELSE jsonb_set("Document", '{Uuid}', to_jsonb("DocumentId"::text))
+    END,
+    COALESCE("LastModified", now()),
     jsonb_build_object(
         'OwnerId', COALESCE("OwnerId", ''),
         'OwnerName', COALESCE("OwnerName", ''),
@@ -63,12 +66,12 @@ SELECT
         'UserName', COALESCE("Document"->>'Name', ''),
         'UserDescription', COALESCE("Document"->>'Description', ''),
 	'Mail', COALESCE("Document"->>'Mail', ''),
+	'PasswordHash', COALESCE("Document"->>'PasswordHash', ''),
 	'SystemId', COALESCE("Document"->'SystemInfos'->0->>'SystemId', ''),
 	'SystemName', COALESCE("Document"->'SystemInfos'->0->>'SystemName', '')
     )
 FROM public."Users_new";
 DROP TABLE public."Users_new";
-
 
 INSERT INTO public."UserGroups" (
     "Id", "DocumentId", "TypeId", "Name", "Description", "Document", "TimeStamp", "RevisionInfo", "State", "DataMetaInfo"
@@ -79,7 +82,7 @@ SELECT
 	'Group',
 	"Document"->>'Name',
 	"Document"->>'Description',
-    "Document",
+    jsonb_set("Document", '{Uuid}', to_jsonb("DocumentId"::text)),
     COALESCE("LastModified", now()), -- Если NULL, ставим текущее время
     jsonb_build_object(
         'OwnerId', COALESCE("OwnerId", ''),
