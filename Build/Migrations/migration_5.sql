@@ -35,19 +35,12 @@ INSERT INTO public."Users" (
     "Id", "DocumentId", "TypeId", "Name", "Description", "Document", "TimeStamp", "RevisionInfo", "State", "DataMetaInfo"
 )
 SELECT 
-    gen_random_uuid(), -- Генерируем новый UUID вместо SERIAL
-    CASE 
-        WHEN "DocumentId" = 'su' THEN '00000000-0000-0000-0000-000000000000'::UUID
-        WHEN "DocumentId" ~ '^[0-9a-fA-F-]{36}$' THEN "DocumentId"::UUID
-        ELSE gen_random_uuid()
-    END,
-	'User',
-	"Document"->>'Name',
-	"Document"->>'Description',
-	CASE 
-        WHEN "DocumentId" = 'su' THEN jsonb_set("Document", '{Uuid}', to_jsonb('00000000-0000-0000-0000-000000000000'::text))
-        ELSE jsonb_set("Document", '{Uuid}', to_jsonb("DocumentId"::text))
-    END,
+    gen_random_uuid(),
+    resolved_uuid,
+    'User',
+    "Document"->>'Name',
+    "Document"->>'Description',
+    jsonb_set("Document", '{Uuid}', to_jsonb(resolved_uuid::text)),
     COALESCE("LastModified", now()),
     jsonb_build_object(
         'OwnerId', COALESCE("OwnerId", ''),
@@ -65,13 +58,22 @@ SELECT
         'UserId', COALESCE("Document"->>'Id', ''),
         'UserName', COALESCE("Document"->>'Name', ''),
         'UserDescription', COALESCE("Document"->>'Description', ''),
-	'Mail', COALESCE("Document"->>'Mail', ''),
-	'PasswordHash', COALESCE("Document"->>'PasswordHash', ''),
-	'SystemId', COALESCE("Document"->'SystemInfos'->0->>'SystemId', ''),
-	'SystemName', COALESCE("Document"->'SystemInfos'->0->>'SystemName', '')
+        'Mail', COALESCE("Document"->>'Mail', ''),
+        'PasswordHash', COALESCE("Document"->>'PasswordHash', ''),
+        'SystemId', COALESCE("Document"->'SystemInfos'->0->>'SystemId', ''),
+        'SystemName', COALESCE("Document"->'SystemInfos'->0->>'SystemName', '')
     )
-FROM public."Users_new";
+FROM (
+    SELECT 
+        *,
+        CASE 
+            WHEN "DocumentId" ~ '^[0-9a-fA-F-]{36}$' THEN "DocumentId"::UUID 
+            ELSE gen_random_uuid()
+        END AS resolved_uuid
+    FROM public."Users_new"
+) AS subquery;
 DROP TABLE public."Users_new";
+
 
 INSERT INTO public."UserGroups" (
     "Id", "DocumentId", "TypeId", "Name", "Description", "Document", "TimeStamp", "RevisionInfo", "State", "DataMetaInfo"
