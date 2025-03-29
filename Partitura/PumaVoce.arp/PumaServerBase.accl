@@ -8,7 +8,7 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="DatabaseEngine" X="349" Y="600" Note=""/>
+        <Element ComponentName="DatabaseEngine" X="350" Y="600" Note=""/>
         <Element ComponentName="HttpServerFramework" X="625" Y="75" Note=""/>
         <Element ComponentName="Migrations" X="1025" Y="200" Note=""/>
         <Element ComponentName="PumaHandlers" X="650" Y="475" Note=""/>
@@ -19,17 +19,6 @@
         <Element ComponentName="WebSocketServerFramework" X="625" Y="200" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
-        <EmbededRegistry Id="Repositories">
-            <PositionMap>
-                <Element ComponentName="RoleDocumentSqlRepository" X="200" Y="100" Note=""/>
-                <Element ComponentName="UserGroupSqlRepository" X="775" Y="475" Note=""/>
-                <Element ComponentName="UserSettingsDatabaseDelegate" X="550" Y="650" Note=""/>
-                <Element ComponentName="UserSqlRepository" X="775" Y="100" Note=""/>
-                <Element ComponentName="UserVerification" X="175" Y="650" Note=""/>
-                <Element ComponentName="UserVerificationCollection" X="175" Y="500" Note=""/>
-            </PositionMap>
-            <EmbeddedRegistries/>
-        </EmbededRegistry>
         <EmbededRegistry Id="Migrations">
             <PositionMap>
                 <Element ComponentName="CompositeMigrationController" X="625" Y="75" Note=""/>
@@ -47,6 +36,17 @@
                 <Element ComponentName="RoleCollectionChangeNotifier" X="200" Y="275" Note=""/>
                 <Element ComponentName="SlaveSubscriberController" X="550" Y="75" Note=""/>
                 <Element ComponentName="UserCollectionChangeNotifier" X="550" Y="275" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+        <EmbededRegistry Id="Repositories">
+            <PositionMap>
+                <Element ComponentName="RoleDocumentSqlRepository" X="200" Y="100" Note=""/>
+                <Element ComponentName="UserGroupSqlRepository" X="775" Y="475" Note=""/>
+                <Element ComponentName="UserSettingsDatabaseDelegate" X="550" Y="650" Note=""/>
+                <Element ComponentName="UserSqlRepository" X="775" Y="100" Note=""/>
+                <Element ComponentName="UserVerification" X="175" Y="650" Note=""/>
+                <Element ComponentName="UserVerificationCollection" X="175" Y="500" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>
