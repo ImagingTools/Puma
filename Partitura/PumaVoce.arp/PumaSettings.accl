@@ -14,6 +14,7 @@
         <Element ComponentName="Database" X="125" Y="350" Note=""/>
         <Element ComponentName="DatabaseAccessSettings" X="125" Y="500" Note=""/>
         <Element ComponentName="FileAutoPersistence" X="500" Y="50" Note=""/>
+        <Element ComponentName="FileBasedSslConfiguration" X="175" Y="175" Note=""/>
         <Element ComponentName="FileNameParam" X="1100" Y="500" Note=""/>
         <Element ComponentName="LdapEnabled" X="920" Y="40" Note=""/>
         <Element ComponentName="LoggingParams" X="375" Y="350" Note=""/>

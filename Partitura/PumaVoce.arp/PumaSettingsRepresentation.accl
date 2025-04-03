@@ -13,9 +13,10 @@
         <Element ComponentName="DatabaseAccessSettingsRepresentation" X="575" Y="450" Note=""/>
         <Element ComponentName="DatabaseSettingsRepresentation" X="575" Y="275" Note=""/>
         <Element ComponentName="SchedulerParams" X="1000" Y="450" Note=""/>
-        <Element ComponentName="ServerPortRepresentation" X="150" Y="425" Note=""/>
+        <Element ComponentName="ServerPortRepresentation" X="200" Y="425" Note=""/>
         <Element ComponentName="ServerSettingsRepresentation" X="175" Y="275" Note=""/>
         <Element ComponentName="SettingsRepresentation" X="600" Y="75" Note=""/>
+        <Element ComponentName="SslConfigurationRepresentation" X="1000" Y="50" Note=""/>
         <Element ComponentName="WebSocketServerPortRepresentation" X="200" Y="550" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>

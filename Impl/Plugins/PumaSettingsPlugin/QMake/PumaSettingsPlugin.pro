@@ -12,5 +12,5 @@ OBJECTS_DIR = ../$$AUXINCLUDEPATH/GeneratedFiles/$$CONFIGURATION_NAME/"$$TARGET"
 QT += sql
 
 LIBS += -L$(ACFDIR)/Lib/$$COMPILER_DIR -lifile -listd -lidoc
-LIBS += -L$(IMTCOREDIR)/Lib/$$COMPILER_DIR -limtauth -limtbase -limtbasesdl -limtgql -limtapp -limtdb -limtcol -limtfile -limtservice -limtrest
+LIBS += -L$(IMTCOREDIR)/Lib/$$COMPILER_DIR -limtauth -limtbase -limtbasesdl -limtgql -limtapp -limtdb -limtcol -limtfile -limtservice -limtrest -limtserverapp
 

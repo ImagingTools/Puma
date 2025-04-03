@@ -122,7 +122,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="RepresentationControllerFactory" PackageId="ImtRestPck" ComponentId="RepresentationControllerFactory">
+        <Element Id="RepresentationControllerFactory" PackageId="ImtServerAppPck" ComponentId="RepresentationControllerFactory">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Factory" Type="Factory" ExportId="">

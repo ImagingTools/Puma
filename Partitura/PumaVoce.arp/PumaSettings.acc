@@ -184,6 +184,15 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="FileBasedSslConfiguration" PackageId="ImtComVoce" ComponentId="FileBasedSslConfiguration">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="EnableSsl" Type="Boolean" ExportId="EnableSsl">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="FileNameParam" PackageId="FilePck" ComponentId="FileNameParam">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -225,6 +234,7 @@
                                 <Value>LoggingParams</Value>
                                 <Value>LdapEnabled</Value>
                                 <Value>SmtpServerParams</Value>
+                                <Value>FileBasedSslConfiguration</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -237,6 +247,7 @@
                                 <Value>Log</Value>
                                 <Value>LdapEnabled</Value>
                                 <Value>SmtpParams</Value>
+                                <Value>SslConfiguration</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -290,6 +301,7 @@
         <Component ExportedId="AutoPersistence" ComponentId="FileAutoPersistence/AutoPersistence"/>
         <Component ExportedId="Backup" ComponentId="Backup"/>
         <Component ExportedId="DatabaseAccessSettings" ComponentId="DatabaseAccessSettings"/>
+        <Component ExportedId="FileBasedSslConfiguration" ComponentId="FileBasedSslConfiguration"/>
         <Component ExportedId="LdapEnabled" ComponentId="LdapEnabled"/>
         <Component ExportedId="ServerPort" ComponentId="Server/ServerPort"/>
         <Component ExportedId="TracingConfiguration" ComponentId="LoggingParams/TracingConfiguration"/>
