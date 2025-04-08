@@ -28,9 +28,9 @@ void CUserControllerTest::ChangePasswordTest()
 	bool ok = AddUser(userInfo);
 	QVERIFY(ok);
 
-	arguments.input.Version_1_0->Login = userInfo.GetId();
-	arguments.input.Version_1_0->OldPassword = "1";
-	arguments.input.Version_1_0->NewPassword = "2";
+	arguments.input.Version_1_0->login = userInfo.GetId();
+	arguments.input.Version_1_0->oldPassword = "1";
+	arguments.input.Version_1_0->newPassword = "2";
 
 	userssdl::CChangePasswordPayload::V1_0 response;
 
@@ -40,7 +40,7 @@ void CUserControllerTest::ChangePasswordTest()
 				sdl::imtauth::Users::CChangePasswordPayload>(arguments, response);
 	QVERIFY(ok);
 
-	QVERIFY(*response.Success);
+	QVERIFY(*response.success);
 
 	QByteArray newPasswordHash = m_hashCalculator.GenerateHash("Test2");
 
@@ -74,9 +74,9 @@ void CUserControllerTest::ChangePasswordFailedTest()
 	bool ok = AddUser(userInfo);
 	QVERIFY(ok);
 
-	arguments.input.Version_1_0->Login = "Test";
-	arguments.input.Version_1_0->OldPassword = "3";
-	arguments.input.Version_1_0->NewPassword = "2";
+	arguments.input.Version_1_0->login = "Test";
+	arguments.input.Version_1_0->oldPassword = "3";
+	arguments.input.Version_1_0->newPassword = "2";
 
 	userssdl::CChangePasswordPayload::V1_0 response;
 
@@ -105,14 +105,14 @@ void CUserControllerTest::RegisterUserTest(){
 	userInfo.SetName("Ivanov");
 
 	userssdl::CUserData::V1_0 userData;
-	userData.Id = uuid;
-	userData.Username = userInfo.GetId();
-	userData.Password = "12345";
-	userData.Name = userInfo.GetName();
-	userData.Email = userInfo.GetMail();
+	userData.id = uuid;
+	userData.username = userInfo.GetId();
+	userData.password = "12345";
+	userData.name = userInfo.GetName();
+	userData.email = userInfo.GetMail();
 
-	arguments.input.Version_1_0->UserData = userData;
-	arguments.input.Version_1_0->ProductId = "Test";
+	arguments.input.Version_1_0->userData = userData;
+	arguments.input.Version_1_0->productId = "Test";
 
 	userssdl::CRegisterUserPayload::V1_0 response;
 
@@ -121,7 +121,7 @@ void CUserControllerTest::RegisterUserTest(){
 		sdl::imtauth::Users::RegisterUserRequestArguments,
 		sdl::imtauth::Users::CRegisterUserPayload>(arguments, response);
 	QVERIFY(ok);
-	QVERIFY(response.Id == uuid);
+	QVERIFY(response.id == uuid);
 
 	imtauth::CIdentifiableUserInfo userInfo2;
 	QVERIFY(GetObjectFromTable(s_usersTableName, uuid, userInfo2));
@@ -150,14 +150,14 @@ void CUserControllerTest::RegisterUserFailedTest()
 	userInfo.SetName("Test");
 
 	userssdl::CUserData::V1_0 userData;
-	userData.Id = uuid;
-	userData.Username = "";
-	userData.Password = "1";
-	userData.Name = userInfo.GetName();
-	userData.Email = userInfo.GetMail();
+	userData.id = uuid;
+	userData.username = "";
+	userData.password = "1";
+	userData.name = userInfo.GetName();
+	userData.email = userInfo.GetMail();
 
-	arguments.input.Version_1_0->UserData = userData;
-	arguments.input.Version_1_0->ProductId = "Test";
+	arguments.input.Version_1_0->userData = userData;
+	arguments.input.Version_1_0->productId = "Test";
 
 	userssdl::CRegisterUserPayload::V1_0 response;
 
@@ -169,9 +169,9 @@ void CUserControllerTest::RegisterUserFailedTest()
 	// Check empty login
 	QVERIFY(!ok);
 
-	userData.Username = "Test";
-	userData.Password = "";
-	arguments.input.Version_1_0->UserData = userData;
+	userData.username = "Test";
+	userData.password = "";
+	arguments.input.Version_1_0->userData = userData;
 
 	ok = SendRequest<
 		userssdl::CRegisterUserGqlRequest,
@@ -181,9 +181,9 @@ void CUserControllerTest::RegisterUserFailedTest()
 	// Check empty password
 	QVERIFY(!ok);
 
-	userData.Password = "1";
-	userData.Name = "";
-	arguments.input.Version_1_0->UserData = userData;
+	userData.password = "1";
+	userData.name = "";
+	arguments.input.Version_1_0->userData = userData;
 
 	ok = SendRequest<
 		userssdl::CRegisterUserGqlRequest,
@@ -195,13 +195,13 @@ void CUserControllerTest::RegisterUserFailedTest()
 
 	QVERIFY(AddUser(userInfo));
 
-	userData.Id = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
-	userData.Username = "Test";
-	userData.Password = "1";
-	userData.Name = userInfo.GetName();
-	userData.Email = userInfo.GetMail();
+	userData.id = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
+	userData.username = "Test";
+	userData.password = "1";
+	userData.name = userInfo.GetName();
+	userData.email = userInfo.GetMail();
 
-	arguments.input.Version_1_0->UserData = userData;
+	arguments.input.Version_1_0->userData = userData;
 
 	ok = SendRequest<
 		userssdl::CRegisterUserGqlRequest,
@@ -231,7 +231,7 @@ void CUserControllerTest::CheckEmailTest()
 
 	QVERIFY(AddUser(userInfo));
 
-	arguments.input.Version_1_0->Email = userInfo.GetMail();
+	arguments.input.Version_1_0->email = userInfo.GetMail();
 
 	userssdl::CCheckEmailPayload::V1_0 response;
 
@@ -242,9 +242,9 @@ void CUserControllerTest::CheckEmailTest()
 
 	QVERIFY(ok);
 
-	QVERIFY(*response.Success);
-	QVERIFY(*response.UserName == userInfo.GetName());
-	QVERIFY(*response.Login == userInfo.GetId());
+	QVERIFY(*response.success);
+	QVERIFY(*response.userName == userInfo.GetName());
+	QVERIFY(*response.login == userInfo.GetId());
 
 	QVERIFY(RemoveObjectFromTable(s_usersTableName, uuid));
 }
@@ -266,7 +266,7 @@ void CUserControllerTest::CheckEmailFailedTest()
 
 	QVERIFY(AddUser(userInfo));
 
-	arguments.input.Version_1_0->Email = "";
+	arguments.input.Version_1_0->email = "";
 
 	userssdl::CCheckEmailPayload::V1_0 response;
 
@@ -276,10 +276,10 @@ void CUserControllerTest::CheckEmailFailedTest()
 		userssdl::CCheckEmailPayload>(arguments, response);
 
 	QVERIFY(ok);
-	QVERIFY(!*response.Success);
-	QVERIFY(!response.Message->isEmpty());
+	QVERIFY(!*response.success);
+	QVERIFY(!response.message->isEmpty());
 
-	arguments.input.Version_1_0->Email = "test2@mail.ru";
+	arguments.input.Version_1_0->email = "test2@mail.ru";
 
 	ok = SendRequest<
 		userssdl::CCheckEmailGqlRequest,
@@ -287,8 +287,8 @@ void CUserControllerTest::CheckEmailFailedTest()
 		userssdl::CCheckEmailPayload>(arguments, response);
 
 	QVERIFY(ok);
-	QVERIFY(!*response.Success);
-	QVERIFY(!response.Message->isEmpty());
+	QVERIFY(!*response.success);
+	QVERIFY(!response.message->isEmpty());
 
 	QVERIFY(RemoveObjectFromTable(s_usersTableName, uuid));
 }
@@ -307,9 +307,9 @@ void CUserControllerTest::CreateSuperuserTest()
 	userInfo.SetMail("su@mail.ru");
 	userInfo.SetName("superuser");
 
-	arguments.input.Version_1_0->Name = userInfo.GetName();
-	arguments.input.Version_1_0->Mail = userInfo.GetMail();
-	arguments.input.Version_1_0->Password = "1";
+	arguments.input.Version_1_0->name = userInfo.GetName();
+	arguments.input.Version_1_0->mail = userInfo.GetMail();
+	arguments.input.Version_1_0->password = "1";
 
 	userssdl::CCreateSuperuserPayload::V1_0 response;
 
@@ -319,7 +319,7 @@ void CUserControllerTest::CreateSuperuserTest()
 		userssdl::CCreateSuperuserPayload>(arguments, response);
 
 	QVERIFY(ok);
-	QVERIFY(response.Success.has_value() && *response.Success);
+	QVERIFY(response.success.has_value() && *response.success);
 
 	QByteArray passwordHash = m_hashCalculator.GenerateHash("su1");
 
@@ -349,9 +349,9 @@ void CUserControllerTest::CreateSuperuserFailedTest()
 
 	QVERIFY(AddUser(userInfo));
 
-	arguments.input.Version_1_0->Name = userInfo.GetName();
-	arguments.input.Version_1_0->Mail = "su@mail.ru";
-	arguments.input.Version_1_0->Password = "1";
+	arguments.input.Version_1_0->name = userInfo.GetName();
+	arguments.input.Version_1_0->mail = "su@mail.ru";
+	arguments.input.Version_1_0->password = "1";
 
 	userssdl::CCreateSuperuserPayload::V1_0 response;
 
@@ -362,14 +362,14 @@ void CUserControllerTest::CreateSuperuserFailedTest()
 
 	// Empty already exists
 	QVERIFY(ok);
-	QVERIFY(response.Success.has_value() && !*response.Success);
-	QVERIFY(response.Message.has_value() && !response.Message->isEmpty());
+	QVERIFY(response.success.has_value() && !*response.success);
+	QVERIFY(response.message.has_value() && !response.message->isEmpty());
 
 	QVERIFY(RemoveObjectFromTable(s_usersTableName, "su"));
 
-	arguments.input.Version_1_0->Name = userInfo.GetName();
-	arguments.input.Version_1_0->Mail = "";
-	arguments.input.Version_1_0->Password = "1";
+	arguments.input.Version_1_0->name = userInfo.GetName();
+	arguments.input.Version_1_0->mail = "";
+	arguments.input.Version_1_0->password = "1";
 
 	ok = SendRequest<
 		userssdl::CCreateSuperuserGqlRequest,
@@ -378,11 +378,11 @@ void CUserControllerTest::CreateSuperuserFailedTest()
 
 	// Empty email for su
 	QVERIFY(ok);
-	QVERIFY(response.Success.has_value() && !*response.Success);
-	QVERIFY(response.Message.has_value() && !response.Message->isEmpty());
+	QVERIFY(response.success.has_value() && !*response.success);
+	QVERIFY(response.message.has_value() && !response.message->isEmpty());
 
-	arguments.input.Version_1_0->Mail = "su@mail.ru";
-	arguments.input.Version_1_0->Password = "";
+	arguments.input.Version_1_0->mail = "su@mail.ru";
+	arguments.input.Version_1_0->password = "";
 
 	ok = SendRequest<
 		userssdl::CCreateSuperuserGqlRequest,
@@ -391,12 +391,12 @@ void CUserControllerTest::CreateSuperuserFailedTest()
 
 	// Empty password for su
 	QVERIFY(ok);
-	QVERIFY(response.Success.has_value() && !*response.Success);
-	QVERIFY(response.Message.has_value() && !response.Message->isEmpty());
+	QVERIFY(response.success.has_value() && !*response.success);
+	QVERIFY(response.message.has_value() && !response.message->isEmpty());
 
-	arguments.input.Version_1_0->Name = userInfo.GetName();
-	arguments.input.Version_1_0->Mail = userInfo.GetMail();
-	arguments.input.Version_1_0->Password = "1";
+	arguments.input.Version_1_0->name = userInfo.GetName();
+	arguments.input.Version_1_0->mail = userInfo.GetMail();
+	arguments.input.Version_1_0->password = "1";
 
 	ok = SendRequest<
 		userssdl::CCreateSuperuserGqlRequest,
@@ -404,7 +404,7 @@ void CUserControllerTest::CreateSuperuserFailedTest()
 		userssdl::CCreateSuperuserPayload>(arguments, response);
 
 	QVERIFY(ok);
-	QVERIFY(response.Success.has_value() && *response.Success);
+	QVERIFY(response.success.has_value() && *response.success);
 
 	QVERIFY(RemoveObjectFromTable(s_usersTableName, "su"));
 }
@@ -433,9 +433,9 @@ void CUserControllerTest::CheckSuperuserTest()
 		userssdl::CCheckSuperuserPayload>(arguments, response);
 
 	QVERIFY(ok);
-	QVERIFY(response.Exists.has_value() && *response.Exists);
-	QVERIFY(response.Message.has_value() && response.Message->isEmpty());
-	QVERIFY(response.ErrorType.has_value() && response.ErrorType->isEmpty());
+	QVERIFY(response.exists.has_value() && *response.exists);
+	QVERIFY(response.message.has_value() && response.message->isEmpty());
+	QVERIFY(response.errorType.has_value() && response.errorType->isEmpty());
 
 	imtauth::CIdentifiableUserInfo userInfo2;
 	QVERIFY(GetObjectFromTable(s_usersTableName, "su", userInfo2));
@@ -450,8 +450,8 @@ void CUserControllerTest::CheckSuperuserTest()
 		userssdl::CCheckSuperuserPayload>(arguments, response);
 
 	QVERIFY(ok);
-	QVERIFY(response.Exists.has_value() && !*response.Exists);
-	QVERIFY(response.ErrorType.has_value() && !response.ErrorType->isEmpty());
+	QVERIFY(response.exists.has_value() && !*response.exists);
+	QVERIFY(response.errorType.has_value() && !response.errorType->isEmpty());
 
 	imtauth::CIdentifiableUserInfo userInfo3;
 	QVERIFY(!GetObjectFromTable(s_usersTableName, "su", userInfo3));

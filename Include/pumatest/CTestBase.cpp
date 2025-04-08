@@ -16,7 +16,7 @@ namespace pumatest
 
 
 static const QString s_usersTableName = "Users";
-static const QString s_rolesTableName = "Roles";
+static const QString s_rolesTableName = "roles";
 static const QString s_groupsTableName = "UserGroups";
 
 
@@ -51,7 +51,7 @@ void CTestBase::ClearData()
 {
 	QSqlError sqlError;
 	ExecuteQuery(QByteArray("DELETE FROM \"Users\";"), &sqlError);
-	ExecuteQuery(QByteArray("DELETE FROM \"Roles\";"), &sqlError);
+	ExecuteQuery(QByteArray("DELETE FROM \"roles\";"), &sqlError);
 	ExecuteQuery(QByteArray("DELETE FROM \"UserGroups\";"), &sqlError);
 }
 
@@ -154,7 +154,7 @@ bool CTestBase::AddUser(const imtauth::CIdentifiableUserInfo& userData) const
 
 bool CTestBase::AddRole(const imtauth::CIdentifiableRoleInfo& roleData) const
 {
-	return InsertObjectToTable("Roles", const_cast<imtauth::CIdentifiableRoleInfo&>(roleData));
+	return InsertObjectToTable("roles", const_cast<imtauth::CIdentifiableRoleInfo&>(roleData));
 }
 
 
@@ -193,23 +193,23 @@ sdl::imtauth::Users::CUserData::V1_0* CTestBase::CreateUserDataFromUserInfo(
 	istd::TDelPtr<sdl::imtauth::Users::CUserData::V1_0> userDataPtr;
 	userDataPtr.SetCastedOrRemove(new sdl::imtauth::Users::CUserData::V1_0);
 
-	userDataPtr->Id = userInfo.GetObjectUuid();
-	userDataPtr->Name = userInfo.GetName();
-	userDataPtr->Username = userInfo.GetId();
-	userDataPtr->Password = userInfo.GetPasswordHash();
-	userDataPtr->Email = userInfo.GetMail();
-	userDataPtr->ProductId = productId;
+	userDataPtr->id = userInfo.GetObjectUuid();
+	userDataPtr->name = userInfo.GetName();
+	userDataPtr->username = userInfo.GetId();
+	userDataPtr->password = userInfo.GetPasswordHash();
+	userDataPtr->email = userInfo.GetMail();
+	userDataPtr->productId = productId;
 
 	QByteArrayList groupList = userInfo.GetGroups();
 	groupList.removeAll("");
 
-	userDataPtr->Groups = groupList.join(';');
+	userDataPtr->groups = groupList.join(';');
 
 	if (!productId.isEmpty()){
 		QByteArrayList roleList = userInfo.GetRoles(productId);
 		roleList.removeAll("");
 
-		userDataPtr->Roles = roleList.join(';');
+		userDataPtr->roles = roleList.join(';');
 	}
 
 	QList<sdl::imtauth::Users::CSystemInfo::V1_0> list;
@@ -217,20 +217,20 @@ sdl::imtauth::Users::CUserData::V1_0* CTestBase::CreateUserDataFromUserInfo(
 	for (const imtauth::IUserInfo::SystemInfo& systemInfo : systemInfoList){
 		sdl::imtauth::Users::CSystemInfo::V1_0 info;
 
-		info.Id = QByteArray(systemInfo.systemId);
+		info.id = QByteArray(systemInfo.systemId);
 
 		if (systemInfo.systemId.isEmpty()){
-			info.Name = QString("Internal");
+			info.name = QString("Internal");
 		}
 		else{
-			info.Name = QString(systemInfo.systemName);
+			info.name = QString(systemInfo.systemName);
 		}
 
-		info.Enabled = bool(systemInfo.enabled);
+		info.enabled = bool(systemInfo.enabled);
 
 		list << info;
 	}
-	userDataPtr->SystemInfos = std::make_optional<QList<sdl::imtauth::Users::CSystemInfo::V1_0>>(list);
+	userDataPtr->systemInfos = std::make_optional<QList<sdl::imtauth::Users::CSystemInfo::V1_0>>(list);
 
 	return userDataPtr.PopPtr();
 }
@@ -259,21 +259,21 @@ sdl::imtauth::Roles::CRoleData::V1_0* CTestBase::CreateRoleDataFromUserInfo(cons
 	istd::TDelPtr<sdl::imtauth::Roles::CRoleData::V1_0> roleDataPtr;
 	roleDataPtr.SetCastedOrRemove(new sdl::imtauth::Roles::CRoleData::V1_0);
 
-	roleDataPtr->Id = roleInfo.GetObjectUuid();
-	roleDataPtr->RoleId = roleInfo.GetRoleId();
-	roleDataPtr->ProductId = roleInfo.GetProductId();
-	roleDataPtr->Name = roleInfo.GetRoleName();
-	roleDataPtr->Description = roleInfo.GetRoleDescription();
+	roleDataPtr->id = roleInfo.GetObjectUuid();
+	roleDataPtr->roleId = roleInfo.GetRoleId();
+	roleDataPtr->productId = roleInfo.GetProductId();
+	roleDataPtr->name = roleInfo.GetRoleName();
+	roleDataPtr->description = roleInfo.GetRoleDescription();
 
 	QByteArrayList parentRoles = roleInfo.GetIncludedRoles();
 	parentRoles.removeAll("");
-	roleDataPtr->ParentRoles = parentRoles.join(';');
+	roleDataPtr->parentRoles = parentRoles.join(';');
 
 	QByteArrayList features = roleInfo.GetPermissions();
-	roleDataPtr->Permissions = features.join(';');
+	roleDataPtr->permissions = features.join(';');
 
-	roleDataPtr->IsDefault = false;
-	roleDataPtr->IsGuest = false;
+	roleDataPtr->isDefault = false;
+	roleDataPtr->isGuest = false;
 
 	return roleDataPtr.PopPtr();
 }

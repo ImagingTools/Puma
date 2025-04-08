@@ -34,9 +34,9 @@ void CAuthorizationControllerTest::AuthorizationTest()
 	bool ok = AddUser(userInfo);
 	QVERIFY(ok);
 
-	arguments.input.Version_1_0->Login = "Test1";
-	arguments.input.Version_1_0->Password = "Test1";
-	arguments.input.Version_1_0->ProductId = "Test";
+	arguments.input.Version_1_0->login = "Test1";
+	arguments.input.Version_1_0->password = "Test1";
+	arguments.input.Version_1_0->productId = "Test";
 
 	authsdl::CAuthorizationPayload::V1_0 response;
 
@@ -66,9 +66,9 @@ void CAuthorizationControllerTest::AuthorizationFailedTest()
 	QByteArray passwordHash = m_hashCalculator.GenerateHash("Test1");
 	userInfo.SetPasswordHash(passwordHash);
 
-	arguments.input.Version_1_0->Login = "Test";
-	arguments.input.Version_1_0->Password = "2";
-	arguments.input.Version_1_0->ProductId = "Test";
+	arguments.input.Version_1_0->login = "Test";
+	arguments.input.Version_1_0->password = "2";
+	arguments.input.Version_1_0->productId = "Test";
 
 	authsdl::CAuthorizationPayload::V1_0 response;
 
@@ -79,8 +79,8 @@ void CAuthorizationControllerTest::AuthorizationFailedTest()
 
 	QVERIFY(!ok);
 
-	arguments.input.Version_1_0->Login = "Test344";
-	arguments.input.Version_1_0->Password = "1";
+	arguments.input.Version_1_0->login = "Test344";
+	arguments.input.Version_1_0->password = "1";
 
 	ok = SendRequest<
 		authsdl::CAuthorizationGqlRequest,

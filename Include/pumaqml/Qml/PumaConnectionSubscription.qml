@@ -16,7 +16,7 @@ SubscriptionClient {
         if (subscriptionManager){
             var query = Gql.GqlRequest("subscription", pumaSub.subscriptionRequestId);
             var queryFields = Gql.GqlObject("notification");
-            queryFields.InsertField("Id");
+            queryFields.InsertField("id");
             query.AddField(queryFields);
 
             subscriptionManager.registerSubscription(query, pumaSub)
