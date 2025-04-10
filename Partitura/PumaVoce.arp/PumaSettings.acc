@@ -17,7 +17,7 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>SchedulerParams</Value>
-                                <Value>FileNameParam</Value>
+                                <Value>RelativeFileNameParam</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -35,13 +35,13 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="CompanyDataLoaction" PackageId="FilePck" ComponentId="SystemLocation">
+        <Element Id="CompanyDataLocation" PackageId="FilePck" ComponentId="SystemLocation">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="LocationType" Type="Integer" ExportId="LocationType">
+                    <AttributeInfo Id="LocationType" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="104"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -163,11 +163,11 @@
                     <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="DefaultPath" Type="String" ExportId="DefaultPath">
-                        <Data IsEnabled="true" Value="PumaServerSettings.xml"/>
+                    <AttributeInfo Id="DefaultPath" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="Puma/Puma Server/PumaServerSettings.xml"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="LocationType" Type="Integer" ExportId="LocationType">
-                        <Data IsEnabled="true" Value="105"/>
+                    <AttributeInfo Id="LocationType" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="104"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
@@ -189,21 +189,6 @@
                 <AttributeInfoMap>
                     <AttributeInfo Id="EnableSsl" Type="Boolean" ExportId="EnableSsl">
                         <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="FileNameParam" PackageId="FilePck" ComponentId="FileNameParam">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="DefaultPath" Type="String" ExportId="">
-                        <Data IsEnabled="true" Value="Backups"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="InitialPath" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="CompanyDataLoaction"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="PathType" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="2"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -253,6 +238,21 @@
                     </AttributeInfo>
                     <AttributeInfo Id="TypeId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="Default"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="RelativeFileNameParam" PackageId="FilePck" ComponentId="RelativeFileNameParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DefaultPath" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="Backups"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PathType" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="2"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ReferencePath" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="CompanyDataLocation"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>

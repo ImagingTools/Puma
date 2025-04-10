@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5297" Description="ACF"/>
-            <Version Id="1" Number="2229" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="0" Number="5332" Description="ACF"/>
+            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>Surface inspection plugin</Description>
@@ -70,8 +70,11 @@
                     <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ApplicationInfo"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="PathLocationType" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="104"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="SqlLogFilePath" Type="String" ExportId="">
-                        <Data IsEnabled="true" Value="PumaServerLog.sqlite"/>
+                        <Data IsEnabled="true" Value="Puma/Puma Server/PumaServerLog.sqlite"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -137,12 +140,6 @@
                     <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
                         <Data IsEnabled="true" Value="ApplicationInfo"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="DefaultPath" Type="String" ExportId="">
-                        <Data IsEnabled="true" Value="PumaServerSettings.xml"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="LocationType" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="105"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="TextFileLog"/>
                     </AttributeInfo>
@@ -198,7 +195,7 @@
     <ExportedInterfaces>
         <Interface InterfaceId="iser::IVersionInfo" ComponentId="VersionInfo"/>
         <Interface InterfaceId="istd::TIFactory&lt;imtbase::IObjectCollection&gt;" ComponentId="ObjectCollectionFactory"/>
-        <Interface InterfaceId="istd::TIFactory&lt;imtrest::IRepresentationController&gt;" ComponentId="RepresentationControllerFactory"/>
+        <Interface InterfaceId="istd::TIFactory&lt;imtserverapp::IJsonRepresentationController&gt;" ComponentId="RepresentationControllerFactory"/>
         <Interface InterfaceId="istd::TIFactory&lt;imtservice::IConnectionCollection&gt;" ComponentId="ConnectionCollectionFactory"/>
         <Interface InterfaceId="istd::TIFactory&lt;iprm::IParamsSet&gt;" ComponentId="ParamsSetFactory"/>
     </ExportedInterfaces>

@@ -17,7 +17,7 @@
                         <Data IsEnabled="true" Value="Puma"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ApplicationName" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="Puma Server"/>
+                        <Data IsEnabled="true" Value="Puma"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ApplicationType" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value="Server"/>
@@ -36,10 +36,10 @@
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="LogLocationType" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="105"/>
+                        <Data IsEnabled="true" Value="104"/>
                     </AttributeInfo>
                     <AttributeInfo Id="LogPath" Type="String" ExportId="">
-                        <Data IsEnabled="true" Value="PumaServerLog.txt"/>
+                        <Data IsEnabled="true" Value="Puma/Puma Server/PumaServerLog.txt"/>
                     </AttributeInfo>
                     <AttributeInfo Id="MainVersionId" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="1987"/>
@@ -48,7 +48,7 @@
                         <Data IsEnabled="true" Value="Puma"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SqlLogFilePath" Type="String" ExportId="">
-                        <Data IsEnabled="true" Value="PumaServerLog.sqlite"/>
+                        <Data IsEnabled="true" Value="Puma/Puma Server/PumaServerLog.sqlite"/>
                     </AttributeInfo>
                     <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="VersionInfo"/>
