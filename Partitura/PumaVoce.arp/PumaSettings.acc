@@ -193,6 +193,29 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="Ldap" PackageId="BasePck" ComponentId="ComposedParamsSet">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Parameters" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>LdapEnabled</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ParametersId" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>LdapEnabled</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Default"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="LdapEnabled" PackageId="BasePck" ComponentId="EnableableParam">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -217,7 +240,7 @@
                                 <Value>Server</Value>
                                 <Value>Backup</Value>
                                 <Value>LoggingParams</Value>
-                                <Value>LdapEnabled</Value>
+                                <Value>Ldap</Value>
                                 <Value>SmtpServerParams</Value>
                                 <Value>FileBasedSslConfiguration</Value>
                             </Values>
@@ -230,8 +253,8 @@
                                 <Value>Server</Value>
                                 <Value>Backup</Value>
                                 <Value>Log</Value>
-                                <Value>LdapEnabled</Value>
-                                <Value>SmtpParams</Value>
+                                <Value>Ldap</Value>
+                                <Value>SmtpServer</Value>
                                 <Value>SslConfiguration</Value>
                             </Values>
                         </Data>
@@ -304,6 +327,10 @@
         <Component ExportedId="FileBasedSslConfiguration" ComponentId="FileBasedSslConfiguration"/>
         <Component ExportedId="LdapEnabled" ComponentId="LdapEnabled"/>
         <Component ExportedId="ServerPort" ComponentId="Server/ServerPort"/>
+        <Component ExportedId="SmtpPasswordParam" ComponentId="SmtpServerParams/SmtpPasswordParam"/>
+        <Component ExportedId="SmtpPortParam" ComponentId="SmtpServerParams/SmtpPortParam"/>
+        <Component ExportedId="SmtpServerAddressParam" ComponentId="SmtpServerParams/SmtpServerAddressParam"/>
+        <Component ExportedId="SmtpUsernameParam" ComponentId="SmtpServerParams/SmtpUsernameParam"/>
         <Component ExportedId="TracingConfiguration" ComponentId="LoggingParams/TracingConfiguration"/>
         <Component ExportedId="WebSocketServerPort" ComponentId="Server/WebSocketServerPort"/>
     </ExportedComponents>

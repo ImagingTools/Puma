@@ -106,6 +106,9 @@
         <Element Id="PumaHandlers" PackageId="PumaVoce" ComponentId="PumaHandlers">
             <Data IsEnabled="true" Flags="2">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="BackupSettings" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaSettings/Backup"/>
                     </AttributeInfo>
@@ -144,6 +147,12 @@
                     </AttributeInfo>
                     <AttributeInfo Id="RuntimeStatus" Type="Reference" ExportId="RuntimeStatus">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SmtpClient" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SmtpClient"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SmtpFromParam" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaSettings/SmtpUsernameParam"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaSettings/TracingConfiguration"/>
@@ -223,6 +232,36 @@
                     </AttributeInfo>
                     <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SmtpClient" PackageId="ImtMailPck" ComponentId="SmtpClient">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="HostParam" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaSettings/SmtpServerAddressParam"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PasswordParam" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaSettings/SmtpPasswordParam"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PortParam" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaSettings/SmtpPortParam"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Timeout" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="1000"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="User" Type="Id" ExportId="User">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserParam" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaSettings/SmtpUsernameParam"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>

@@ -15,6 +15,7 @@
         <Element ComponentName="PumaLocalization" X="975" Y="375" Note=""/>
         <Element ComponentName="PumaSettings" X="125" Y="375" Note=""/>
         <Element ComponentName="Repositories" X="925" Y="675" Note=""/>
+        <Element ComponentName="SmtpClient" X="750" Y="325" Note=""/>
         <Element ComponentName="SslConfigurationManager" X="250" Y="175" Note=""/>
         <Element ComponentName="Subscriptions" X="400" Y="375" Note=""/>
         <Element ComponentName="WebSocketServerFramework" X="625" Y="200" Note=""/>
@@ -29,17 +30,6 @@
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>
-        <EmbededRegistry Id="Repositories">
-            <PositionMap>
-                <Element ComponentName="RoleDocumentSqlRepository" X="200" Y="100" Note=""/>
-                <Element ComponentName="UserGroupSqlRepository" X="775" Y="475" Note=""/>
-                <Element ComponentName="UserSettingsDatabaseDelegate" X="550" Y="650" Note=""/>
-                <Element ComponentName="UserSqlRepository" X="775" Y="100" Note=""/>
-                <Element ComponentName="UserVerification" X="175" Y="650" Note=""/>
-                <Element ComponentName="UserVerificationCollection" X="175" Y="500" Note=""/>
-            </PositionMap>
-            <EmbeddedRegistries/>
-        </EmbededRegistry>
         <EmbededRegistry Id="Migrations">
             <PositionMap>
                 <Element ComponentName="CompositeMigrationController" X="625" Y="75" Note=""/>
@@ -48,6 +38,17 @@
                 <Element ComponentName="MigrationFilePath" X="800" Y="475" Note=""/>
                 <Element ComponentName="ObjectCollectionMigrationController" X="225" Y="250" Note=""/>
                 <Element ComponentName="SystemLocation" X="800" Y="625" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+        <EmbededRegistry Id="Repositories">
+            <PositionMap>
+                <Element ComponentName="RoleDocumentSqlRepository" X="200" Y="100" Note=""/>
+                <Element ComponentName="UserGroupSqlRepository" X="775" Y="475" Note=""/>
+                <Element ComponentName="UserSettingsDatabaseDelegate" X="550" Y="650" Note=""/>
+                <Element ComponentName="UserSqlRepository" X="775" Y="100" Note=""/>
+                <Element ComponentName="UserVerification" X="175" Y="650" Note=""/>
+                <Element ComponentName="UserVerificationCollection" X="175" Y="500" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>
