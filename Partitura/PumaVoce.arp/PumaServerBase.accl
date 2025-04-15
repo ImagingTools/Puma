@@ -37,6 +37,7 @@
                 <Element ComponentName="MigrationController_1" X="975" Y="250" Note=""/>
                 <Element ComponentName="MigrationFilePath" X="800" Y="475" Note=""/>
                 <Element ComponentName="ObjectCollectionMigrationController" X="225" Y="250" Note=""/>
+                <Element ComponentName="ObjectCollectionMigrationController6" X="250" Y="475" Note=""/>
                 <Element ComponentName="SystemLocation" X="800" Y="625" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
@@ -44,6 +45,7 @@
         <EmbededRegistry Id="Repositories">
             <PositionMap>
                 <Element ComponentName="RoleDocumentSqlRepository" X="200" Y="100" Note=""/>
+                <Element ComponentName="UserConnectionRepository" X="975" Y="650" Note=""/>
                 <Element ComponentName="UserGroupSqlRepository" X="775" Y="475" Note=""/>
                 <Element ComponentName="UserSettingsDatabaseDelegate" X="550" Y="650" Note=""/>
                 <Element ComponentName="UserSqlRepository" X="775" Y="100" Note=""/>
