@@ -21,7 +21,7 @@ include(${ACFDIR}/Config/CMake/CustomBuild.cmake)
 include(${ACFDIR}/Config/CMake/ApplicationConfig.cmake)
 
 target_link_libraries(${PROJECT_NAME} imtbase imtrest imtgui imtqml imtgql imtcom imtdb imtfile imtguigql imtapp imtservice imtguiqml imtauthsdl imtappsdl imtbasesdl imtcolorsdl imtgql imtserverapp)
-target_link_libraries(${PROJECT_NAME} imtstylecontrolsqml imtcontrolsqml imtguigqlqml imtauthguiqml imtcolguiqml imtdocguiqml imtauthgui imtstyle imtlicgui)
+target_link_libraries(${PROJECT_NAME} imtstylecontrolsqml imtcontrolsqml imtguigqlqml imtauthguiqml imtcolguiqml imtdocguiqml imtlicguiqml imtauthgui imtstyle imtlicgui)
 target_link_libraries(${PROJECT_NAME} pumaqml)
 target_link_libraries(${PROJECT_NAME} ImtCoreLoc AcfLoc AcfSlnLoc)
 target_link_libraries(${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::QuickWidgets Qt${QT_VERSION_MAJOR}::WebSockets)
