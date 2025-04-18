@@ -9,6 +9,7 @@
     </AcfHeader>
     <PositionMap>
         <Element ComponentName="Application" X="550" Y="500" Note=""/>
+        <Element ComponentName="ImtCoreQmlInitializer" X="375" Y="650" Note=""/>
         <Element ComponentName="PumaSettings" X="1000" Y="275" Note=""/>
         <Element ComponentName="PumaSettingsRepresentation" X="1000" Y="650" Note=""/>
         <Element ComponentName="VersionInfo" X="575" Y="275" Note=""/>
