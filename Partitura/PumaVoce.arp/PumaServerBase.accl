@@ -21,12 +21,15 @@
         <Element ComponentName="WebSocketServerFramework" X="625" Y="200" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
-        <EmbededRegistry Id="Subscriptions">
+        <EmbededRegistry Id="Repositories">
             <PositionMap>
-                <Element ComponentName="GroupCollectionChangeNotifier" X="950" Y="275" Note=""/>
-                <Element ComponentName="RoleCollectionChangeNotifier" X="200" Y="275" Note=""/>
-                <Element ComponentName="SlaveSubscriberController" X="550" Y="75" Note=""/>
-                <Element ComponentName="UserCollectionChangeNotifier" X="550" Y="275" Note=""/>
+                <Element ComponentName="RoleDocumentSqlRepository" X="200" Y="100" Note=""/>
+                <Element ComponentName="UserConnectionRepository" X="975" Y="650" Note=""/>
+                <Element ComponentName="UserGroupSqlRepository" X="775" Y="475" Note=""/>
+                <Element ComponentName="UserSettingsDatabaseDelegate" X="550" Y="650" Note=""/>
+                <Element ComponentName="UserSqlRepository" X="775" Y="100" Note=""/>
+                <Element ComponentName="UserVerification" X="175" Y="650" Note=""/>
+                <Element ComponentName="UserVerificationCollection" X="175" Y="500" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>
@@ -42,15 +45,12 @@
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>
-        <EmbededRegistry Id="Repositories">
+        <EmbededRegistry Id="Subscriptions">
             <PositionMap>
-                <Element ComponentName="RoleDocumentSqlRepository" X="200" Y="100" Note=""/>
-                <Element ComponentName="UserConnectionRepository" X="975" Y="650" Note=""/>
-                <Element ComponentName="UserGroupSqlRepository" X="775" Y="475" Note=""/>
-                <Element ComponentName="UserSettingsDatabaseDelegate" X="550" Y="650" Note=""/>
-                <Element ComponentName="UserSqlRepository" X="775" Y="100" Note=""/>
-                <Element ComponentName="UserVerification" X="175" Y="650" Note=""/>
-                <Element ComponentName="UserVerificationCollection" X="175" Y="500" Note=""/>
+                <Element ComponentName="GroupCollectionChangeNotifier" X="950" Y="275" Note=""/>
+                <Element ComponentName="RoleCollectionChangeNotifier" X="200" Y="275" Note=""/>
+                <Element ComponentName="SlaveSubscriberController" X="550" Y="75" Note=""/>
+                <Element ComponentName="UserCollectionChangeNotifier" X="550" Y="275" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>

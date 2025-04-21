@@ -91,7 +91,7 @@
                     <AttributeInfo Id="SqlDatabaseObjectDelegates" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>Repositories/RoleDatabaseDocumentDelegate</Value>
+                                <Value>Repositories/RoleDatabaseDelegate</Value>
                                 <Value>Repositories/UserDatabaseDocumentDelegate</Value>
                                 <Value>Repositories/GroupDatabaseDocumentDelegate</Value>
                             </Values>
@@ -100,7 +100,7 @@
                     <AttributeInfo Id="SqlDatabaseObjectDelegates6" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>Repositories/UserConnectionRepository</Value>
+                                <Value>Repositories/UserConnectionDatabaseDelegate</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -650,9 +650,11 @@
                 <ExportedComponents>
                     <Component ExportedId="GroupDatabaseDocumentDelegate" ComponentId="UserGroupSqlRepository/SqlDatabaseDocumentDelegate"/>
                     <Component ExportedId="RoleCollectionAdapter" ComponentId="RoleDocumentSqlRepository/RoleCollectionAdapter"/>
+                    <Component ExportedId="RoleDatabaseDelegate" ComponentId="RoleDocumentSqlRepository/RoleDatabaseDelegate"/>
                     <Component ExportedId="RoleDatabaseDocumentDelegate" ComponentId="RoleDocumentSqlRepository/SqlDatabaseDocumentDelegate"/>
-                    <Component ExportedId="RoleRepository" ComponentId="RoleDocumentSqlRepository/RoleRepository"/>
+                    <Component ExportedId="RoleRepository" ComponentId="RoleDocumentSqlRepository"/>
                     <Component ExportedId="UserCollectionAdapter" ComponentId="UserSqlRepository/UserCollectionAdapter"/>
+                    <Component ExportedId="UserConnectionDatabaseDelegate" ComponentId="UserConnectionRepository/UserConnectionDatabaseDelegate"/>
                     <Component ExportedId="UserConnectionRepository" ComponentId="UserConnectionRepository"/>
                     <Component ExportedId="UserDatabaseDocumentDelegate" ComponentId="UserSqlRepository/SqlDatabaseDocumentDelegate"/>
                     <Component ExportedId="UserGroupInfoProvider" ComponentId="UserGroupSqlRepository/UserGroupInfoProvider"/>
