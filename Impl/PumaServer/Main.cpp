@@ -13,6 +13,7 @@ int main(int argc, char *argv[])
 {
 	Q_INIT_RESOURCE(imtresthtml);
 	Q_INIT_RESOURCE(imtdb);
+	Q_INIT_RESOURCE(imtbase);
 
 	CPumaServer instance;
 

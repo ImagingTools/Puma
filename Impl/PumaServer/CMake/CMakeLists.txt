@@ -57,5 +57,4 @@ if (APPLE AND CMAKE_MACOSX_BUNDLE)
 	message(VERBOSE "copying migrations inside OSX bundle. Path: '${BUNDLE_MIGRATIONS_PATH}' target: '${PROJECT_NAME}'")
 
 	file(COPY "${CMAKE_CURRENT_LIST_DIR}/../../../Build/Migrations" DESTINATION "${BUNDLE_MIGRATIONS_PATH}")
-	file(COPY "${IMTCOREDIR}/Install/Database/LogMigrations" DESTINATION "${BUNDLE_MIGRATIONS_PATH}")
 endif()
