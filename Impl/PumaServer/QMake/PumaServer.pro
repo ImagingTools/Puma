@@ -27,6 +27,14 @@ win32-msvc*{
 
 	# copying all Qt DLLs to destination directory
 	greaterThan(QT_MAJOR_VERSION, 4): QMAKE_POST_LINK += set path=$(QTDIR)\bin;%path% && $(QTDIR)\bin\windeployqt $$DESTDIR
+
+	OPENSSL_PATH = $$PWD/../../../../ImtCore/3rdParty/openssl/1.1/lib/x64
+	DEST_PATH = $$PWD/../../../Bin/$${CONFIG}_$${TARGET}
+
+	QMAKE_POST_LINK += mkdir $$quote($$DEST_PATH) &&
+
+	QMAKE_POST_LINK += copy /Y $$quote($$OPENSSL_PATH/libcrypto-1_1-x64.dll) $$quote($$DEST_PATH) &&
+	QMAKE_POST_LINK += copy /Y $$quote($$OPENSSL_PATH/libssl-1_1-x64.dll) $$quote($$DEST_PATH)
 }
 
 !macx-ios*{
