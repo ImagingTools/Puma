@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5332" Description="ACF"/>
-            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+            <Version Id="0" Number="5387" Description="ACF"/>
+            <Version Id="1" Number="2249" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395265" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>Settings of the Puma-server</Description>
@@ -56,23 +56,20 @@
                     <AttributeInfo Id="ConnectionDescriptions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>Server tcp port to be listened</Value>
-                                <Value>Server websocket port to be listened</Value>
+                                <Value>Server connectivity</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="ConnectionNames" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>Puma main HTTP</Value>
-                                <Value>Puma main WebSocket</Value>
+                                <Value>Puma</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="ConnectionServiceTypeNames" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>Puma</Value>
                                 <Value>Puma</Value>
                             </Values>
                         </Data>
@@ -81,28 +78,25 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>0</Value>
-                                <Value>0</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ConnectionUrlListCompPtr" Type="Reference[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>Server/ServerPort</Value>
-                                <Value>Server/WebSocketServerPort</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="ConnectionUsageIds" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>PumaUrlTcp</Value>
-                                <Value>PumaUrlWs</Value>
+                                <Value>Puma</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ServerInterfaces" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Server/ServerConnectionInterface</Value>
+                            </Values>
+                        </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="ServiceTypeName" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="Puma"/>
@@ -295,10 +289,10 @@
         <Element Id="Server" PackageId="ImtHttpServerVoce" ComponentId="ServerConnectionParams">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="DefaultPort" Type="Integer" ExportId="">
+                    <AttributeInfo Id="DefaultHttpPort" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="7788"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="WebSocketDefaultPort" Type="Integer" ExportId="">
+                    <AttributeInfo Id="DefaultWebSocketPort" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="8788"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -326,6 +320,7 @@
         <Component ExportedId="DatabaseAccessSettings" ComponentId="DatabaseAccessSettings"/>
         <Component ExportedId="FileBasedSslConfiguration" ComponentId="FileBasedSslConfiguration"/>
         <Component ExportedId="LdapEnabled" ComponentId="LdapEnabled"/>
+        <Component ExportedId="ServerConnectionInterface" ComponentId="Server/ServerConnectionInterface"/>
         <Component ExportedId="ServerPort" ComponentId="Server/ServerPort"/>
         <Component ExportedId="SmtpPasswordParam" ComponentId="SmtpServerParams/SmtpPasswordParam"/>
         <Component ExportedId="SmtpPortParam" ComponentId="SmtpServerParams/SmtpPortParam"/>

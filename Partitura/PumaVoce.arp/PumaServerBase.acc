@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5332" Description="ACF"/>
-            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+            <Version Id="0" Number="5387" Description="ACF"/>
+            <Version Id="1" Number="2249" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395265" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -61,8 +61,8 @@
                     <AttributeInfo Id="RuntimeStatus" Type="Reference" ExportId="RuntimeStatus">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ServerPort" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="PumaSettings/ServerPort"/>
+                    <AttributeInfo Id="ServerInterface" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaSettings/ServerConnectionInterface"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SslConfiguration" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaSettings/FileBasedSslConfiguration"/>
@@ -331,17 +331,14 @@
                     <AttributeInfo Id="SslConfiguration" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaSettings/FileBasedSslConfiguration"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="SslConfigurationManager" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="SslConfigurationManager"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="ThreadsLimit" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="1"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaSettings/TracingConfiguration"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="WebSocketServerPort" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="PumaSettings/WebSocketServerPort"/>
+                    <AttributeInfo Id="WebServerConnectionInterface" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaSettings/ServerConnectionInterface"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>

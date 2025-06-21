@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5332" Description="ACF"/>
-            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+            <Version Id="0" Number="5387" Description="ACF"/>
+            <Version Id="1" Number="2249" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395265" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
@@ -33,6 +33,15 @@
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>
+        <EmbededRegistry Id="Subscriptions">
+            <PositionMap>
+                <Element ComponentName="GroupCollectionChangeNotifier" X="950" Y="275" Note=""/>
+                <Element ComponentName="RoleCollectionChangeNotifier" X="200" Y="275" Note=""/>
+                <Element ComponentName="SlaveSubscriberController" X="550" Y="75" Note=""/>
+                <Element ComponentName="UserCollectionChangeNotifier" X="550" Y="275" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
         <EmbededRegistry Id="Migrations">
             <PositionMap>
                 <Element ComponentName="CompositeMigrationController" X="625" Y="75" Note=""/>
@@ -42,15 +51,6 @@
                 <Element ComponentName="ObjectCollectionMigrationController" X="225" Y="250" Note=""/>
                 <Element ComponentName="ObjectCollectionMigrationController6" X="250" Y="475" Note=""/>
                 <Element ComponentName="SystemLocation" X="800" Y="625" Note=""/>
-            </PositionMap>
-            <EmbeddedRegistries/>
-        </EmbededRegistry>
-        <EmbededRegistry Id="Subscriptions">
-            <PositionMap>
-                <Element ComponentName="GroupCollectionChangeNotifier" X="950" Y="275" Note=""/>
-                <Element ComponentName="RoleCollectionChangeNotifier" X="200" Y="275" Note=""/>
-                <Element ComponentName="SlaveSubscriberController" X="550" Y="75" Note=""/>
-                <Element ComponentName="UserCollectionChangeNotifier" X="550" Y="275" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>

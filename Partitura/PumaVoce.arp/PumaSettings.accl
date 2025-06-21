@@ -2,26 +2,26 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5332" Description="ACF"/>
-            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+            <Version Id="0" Number="5387" Description="ACF"/>
+            <Version Id="1" Number="2249" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395265" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
         <Element ComponentName="Backup" X="925" Y="350" Note=""/>
         <Element ComponentName="CompanyDataLocation" X="1075" Y="650" Note=""/>
-        <Element ComponentName="ConnectionCollection" X="625" Y="500" Note=""/>
+        <Element ComponentName="ConnectionCollection" X="540" Y="500" Note=""/>
         <Element ComponentName="Database" X="125" Y="375" Note=""/>
         <Element ComponentName="DatabaseAccessSettings" X="125" Y="500" Note=""/>
         <Element ComponentName="FileAutoPersistence" X="500" Y="50" Note=""/>
         <Element ComponentName="FileBasedSslConfiguration" X="175" Y="175" Note=""/>
         <Element ComponentName="Ldap" X="775" Y="75" Note=""/>
         <Element ComponentName="LdapEnabled" X="1000" Y="50" Note=""/>
-        <Element ComponentName="LoggingParams" X="375" Y="350" Note=""/>
+        <Element ComponentName="LoggingParams" X="380" Y="340" Note=""/>
         <Element ComponentName="Preferences" X="500" Y="200" Note=""/>
         <Element ComponentName="RelativeFileNameParam" X="1075" Y="500" Note=""/>
         <Element ComponentName="SchedulerParams" X="850" Y="500" Note=""/>
-        <Element ComponentName="Server" X="650" Y="350" Note=""/>
+        <Element ComponentName="Server" X="660" Y="340" Note=""/>
         <Element ComponentName="SmtpServerParams" X="975" Y="200" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
