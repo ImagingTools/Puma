@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5332" Description="ACF"/>
-            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5395" Description="ACF"/>
+            <Version Id="1" Number="2250" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -18,9 +18,6 @@
                     </AttributeInfo>
                     <AttributeInfo Id="ApplicationName" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value="PumaServerConfigurator"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="BaseUrlParam" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="PumaSettings/ServerPort"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ComponentsToInitialize" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
@@ -46,6 +43,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="ProductName" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value="Puma"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ServerConnectionParam" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaSettings/ServerConnectionInterface"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Settings" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaSettings"/>
@@ -75,12 +75,6 @@
                 <AttributeInfoMap>
                     <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="Application/ApplicationInfo"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="DefaultPath" Type="String" ExportId="">
-                        <Data IsEnabled="true" Value="Puma/Puma Server/PumaServerSettings.xml"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="LocationType" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="104"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="Application/TextFileLog"/>

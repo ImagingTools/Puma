@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5332" Description="ACF"/>
-            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5395" Description="ACF"/>
+            <Version Id="1" Number="2250" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -15,12 +15,11 @@
         <Element ComponentName="EnableableParamRepresentationController" X="575" Y="750" Note=""/>
         <Element ComponentName="LdapRepresentation" X="550" Y="600" Note=""/>
         <Element ComponentName="SchedulerParams" X="1000" Y="450" Note=""/>
-        <Element ComponentName="ServerPortRepresentation" X="200" Y="425" Note=""/>
+        <Element ComponentName="ServerConnectionParamRepresentationController" X="200" Y="450" Note=""/>
         <Element ComponentName="ServerSettingsRepresentation" X="175" Y="275" Note=""/>
         <Element ComponentName="SettingsRepresentation" X="600" Y="75" Note=""/>
         <Element ComponentName="SmtpParamsRepresentation" X="200" Y="75" Note=""/>
         <Element ComponentName="SslConfigurationRepresentation" X="1000" Y="50" Note=""/>
-        <Element ComponentName="WebSocketServerPortRepresentation" X="200" Y="550" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>
