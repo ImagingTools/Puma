@@ -2,7 +2,7 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5395" Description="ACF"/>
+            <Version Id="0" Number="5398" Description="ACF"/>
             <Version Id="1" Number="2250" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
@@ -63,11 +63,11 @@
                     <AttributeInfo Id="ConnectionNames" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>Puma</Value>
+                                <Value>Puma Connection Interface</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
-                    <AttributeInfo Id="ConnectionServiceTypeNames" Type="Id[]" ExportId="">
+                    <AttributeInfo Id="ConnectionServiceTypeIds" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>Puma</Value>
@@ -81,13 +81,6 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
-                    <AttributeInfo Id="ConnectionUsageIds" Type="Id[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>Puma</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -98,7 +91,7 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
-                    <AttributeInfo Id="ServiceTypeName" Type="Id" ExportId="">
+                    <AttributeInfo Id="ServiceTypeId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="Puma"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="">
