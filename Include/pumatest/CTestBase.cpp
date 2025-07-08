@@ -230,7 +230,7 @@ sdl::imtauth::Users::CUserData::V1_0* CTestBase::CreateUserDataFromUserInfo(
 
 		list << info;
 	}
-	userDataPtr->systemInfos = std::make_optional<QList<sdl::imtauth::Users::CSystemInfo::V1_0>>(list);
+	userDataPtr->systemInfos = std::move(list);
 
 	return userDataPtr.PopPtr();
 }
