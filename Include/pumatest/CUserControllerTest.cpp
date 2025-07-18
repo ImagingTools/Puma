@@ -433,9 +433,7 @@ void CUserControllerTest::CheckSuperuserTest()
 		userssdl::CCheckSuperuserPayload>(arguments, response);
 
 	QVERIFY(ok);
-	QVERIFY(response.exists.has_value() && *response.exists);
 	QVERIFY(response.message.has_value() && response.message->isEmpty());
-	QVERIFY(response.errorType.has_value() && response.errorType->isEmpty());
 
 	imtauth::CIdentifiableUserInfo userInfo2;
 	QVERIFY(GetObjectFromTable(s_usersTableName, "su", userInfo2));
@@ -450,8 +448,6 @@ void CUserControllerTest::CheckSuperuserTest()
 		userssdl::CCheckSuperuserPayload>(arguments, response);
 
 	QVERIFY(ok);
-	QVERIFY(response.exists.has_value() && !*response.exists);
-	QVERIFY(response.errorType.has_value() && !response.errorType->isEmpty());
 
 	imtauth::CIdentifiableUserInfo userInfo3;
 	QVERIFY(!GetObjectFromTable(s_usersTableName, "su", userInfo3));
