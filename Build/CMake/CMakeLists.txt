@@ -28,6 +28,7 @@ set(IMPL_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Impl")
 set(AUX_INCLUDE_DIR "${BUILDDIR}/Puma/AuxInclude/${TARGETNAME}/GeneratedFiles")
 
 include_directories("${AUX_INCLUDE_DIR}/../")
+include_directories("${AUX_INCLUDE_DIR}/")
 
 # Include
 add_subdirectory("${INCLUDE_DIR}/pumaqml/CMake" "${AUX_INCLUDE_DIR}/pumaqml")
