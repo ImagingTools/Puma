@@ -370,11 +370,11 @@ void CUserCollectionControllerTest::GetUserListTest()
 	QVERIFY(response.items.has_value());
 	QVERIFY(response.items->size() == 5);
 
-	QList<userssdl::CUserItem::V1_0> items = *response.items;
+	QList<sdl::imtauth::Users::CUserItemData::V1_0> items = *response.items;
 
 	QByteArrayList ids;
 	QStringList names;
-	for (const userssdl::CUserItem::V1_0& item : items){
+	for (const sdl::imtauth::Users::CUserItemData::V1_0& item : items){
 		ids << *item.id;
 		names << *item.name;
 	}
