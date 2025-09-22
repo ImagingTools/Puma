@@ -212,7 +212,7 @@ sdl::imtauth::Users::CUserData::V1_0* CTestBase::CreateUserDataFromUserInfo(
 		userDataPtr->roles = roleList.join(';');
 	}
 
-	QList<sdl::imtauth::Users::CSystemInfo::V1_0> list;
+	QList<istd::TSharedNullable<sdl::imtauth::Users::CSystemInfo::V1_0>> list;
 	imtauth::IUserInfo::SystemInfoList systemInfoList = userInfo.GetSystemInfos();
 	for (const imtauth::IUserInfo::SystemInfo& systemInfo : systemInfoList){
 		sdl::imtauth::Users::CSystemInfo::V1_0 info;
