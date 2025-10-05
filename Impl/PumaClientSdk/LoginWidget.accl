@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5423" Description="ACF"/>
+            <Version Id="1" Number="2252" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="ApplicationInfo" X="950" Y="350" Note=""/>
+        <Element ComponentName="ClientRequestRemoteSuperuserProvider" X="375" Y="575" Note=""/>
+        <Element ComponentName="ProductIdParam" X="225" Y="350" Note=""/>
+        <Element ComponentName="PumaLoginStatusSubscriber" X="1025" Y="775" Note=""/>
+        <Element ComponentName="RemoteStandardLoginGui" X="550" Y="275" Note=""/>
+        <Element ComponentName="RemoteSuperuserController" X="700" Y="500" Note=""/>
+        <Element ComponentName="Rights" X="150" Y="725" Note=""/>
+        <Element ComponentName="ServerConnectionInterfaceParam" X="975" Y="600" Note=""/>
+        <Element ComponentName="Subscription" X="650" Y="700" Note=""/>
+        <Element ComponentName="VersionInfo" X="950" Y="200" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>

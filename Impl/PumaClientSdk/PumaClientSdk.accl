@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5423" Description="ACF"/>
+            <Version Id="1" Number="2252" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="ApplicationInfo" X="650" Y="650" Note=""/>
+        <Element ComponentName="IdentifiableProductInfo" X="1000" Y="225" Note=""/>
+        <Element ComponentName="PumaClientEngine" X="625" Y="350" Note=""/>
+        <Element ComponentName="ServerConnectionInterface" X="575" Y="150" Note=""/>
+        <Element ComponentName="SimpleLoginWrap" X="375" Y="500" Note=""/>
+        <Element ComponentName="SuperuserProvider" X="225" Y="250" Note=""/>
+        <Element ComponentName="UserInfo" X="175" Y="700" Note=""/>
+        <Element ComponentName="VersionInfo" X="900" Y="650" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>

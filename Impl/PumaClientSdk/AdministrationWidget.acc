@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5423" Description="ACF"/>
+            <Version Id="1" Number="2252" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description></Description>
+    <Keywords></Keywords>
+    <ElementsList>
+        <Element Id="AdministrationObserverQml" PackageId="ImtAuthGuiPck" ComponentId="AdministrationObserverQml">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="QuickItemCreated" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="QuickObject/QuickItemCreated"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="QuickObject" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="QuickObject"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="WebSocketUrlParam" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ServerConnectionInterfaceParam"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ApplicationInfo" PackageId="BasePck" ComponentId="ApplicationInfo">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="VersionInfo"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="GuiQuickWrap" PackageId="ImtQmlPck" ComponentId="GuiQuickWrap">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DefaultStatusIcon" Type="String" ExportId="AdministrationDefaultStatusIcon">
+                        <Data IsEnabled="true" Value=":/Icons/Key"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="QuickObject" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="QuickObject"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ProductIdParam" PackageId="BasePck" ComponentId="IdParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="QuickObject" PackageId="ImtQmlPck" ComponentId="QuickObject">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ApplicationInfo"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="QmlFilePath" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="qrc:/qml/imtauthgui/AdministrationUi.qml"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ServerConnectionParam" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ServerConnectionInterfaceParam"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ServerConnectionInterfaceParam" PackageId="ImtComPck" ComponentId="ServerConnectionInterfaceParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="VersionInfo" PackageId="AcfVoce" ComponentId="VersionInfo">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="ibase::IApplicationInfo" ComponentId="ApplicationInfo"/>
+        <Interface InterfaceId="imtcom::IServerConnectionInterface" ComponentId="ServerConnectionInterfaceParam"/>
+        <Interface InterfaceId="iprm::IIdParam" ComponentId="ProductIdParam"/>
+        <Interface InterfaceId="iqtgui::IGuiObject" ComponentId="GuiQuickWrap"/>
+    </ExportedInterfaces>
+    <ExportedComponents/>
+</Acf>
