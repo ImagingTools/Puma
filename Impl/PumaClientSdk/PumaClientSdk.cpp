@@ -1,6 +1,9 @@
 #include <PumaClientSdk/PumaClientSdk.h>
 
 
+// Qt includes
+#include <QDebug>
+
 // ACF includes
 #include <ibase/IApplicationInfo.h>
 #include <iauth/ILogin.h>
@@ -26,32 +29,35 @@ public:
 	{
 	}
 
-
 	bool Login(const QString& login, const QString& password, Login& out)
 	{
-		iauth::ILogin* loginPtr = m_sdk.GetInterface<iauth::ILogin>("SimpleLoginWrap");
-		if (loginPtr == nullptr){
+		iauth::ILogin* loginPtr = m_sdk.GetInterface<iauth::ILogin>();
+		if (loginPtr == nullptr) {
+			qWarning() << "[Login] Failed: iauth::ILogin interface not found";
 			return false;
 		}
 
 		bool ok = loginPtr->Login(login, password);
-		if (!ok){
+		if (!ok) {
+			qWarning() << "[Login] Failed: iauth::ILogin::Login() returned false";
 			return false;
 		}
 
 		iauth::CUser* userPtr = loginPtr->GetLoggedUser();
-		if (userPtr == nullptr){
+		if (userPtr == nullptr) {
+			qWarning() << "[Login] Failed: GetLoggedUser() returned nullptr";
 			return false;
 		}
 
-		imtauth::IAccessTokenProvider* tokenProviderPtr = m_sdk.GetInterface<imtauth::IAccessTokenProvider>("SimpleLoginWrap");
-		if (tokenProviderPtr == nullptr){
+		imtauth::IAccessTokenProvider* tokenProviderPtr = m_sdk.GetInterface<imtauth::IAccessTokenProvider>();
+		if (tokenProviderPtr == nullptr) {
+			qWarning() << "[Login] Failed: imtauth::IAccessTokenProvider interface not found";
 			return false;
 		}
 
-		
-		ibase::IApplicationInfo* applicationInfoPtr = m_sdk.GetInterface<ibase::IApplicationInfo>("ApplicationInfo");
-		if (applicationInfoPtr == nullptr){
+		ibase::IApplicationInfo* applicationInfoPtr = m_sdk.GetInterface<ibase::IApplicationInfo>();
+		if (applicationInfoPtr == nullptr) {
+			qWarning() << "[Login] Failed: ibase::IApplicationInfo interface not found";
 			return false;
 		}
 
@@ -62,46 +68,50 @@ public:
 		return true;
 	}
 
-
 	bool Logout()
 	{
-		iauth::ILogin* loginPtr = m_sdk.GetInterface<iauth::ILogin>("SimpleLoginWrap");
-		if (loginPtr == nullptr){
+		iauth::ILogin* loginPtr = m_sdk.GetInterface<iauth::ILogin>();
+		if (loginPtr == nullptr) {
+			qWarning() << "[Logout] Failed: iauth::ILogin interface not found";
 			return false;
 		}
 
 		return loginPtr->Logout();
 	}
 
-
 	bool HasPermission(const QByteArray& permissionId)
 	{
-		iauth::IRightsProvider* rightsProviderPtr = m_sdk.GetInterface<iauth::IRightsProvider>("SimpleLoginWrap");
-		if (rightsProviderPtr == nullptr){
+		iauth::IRightsProvider* rightsProviderPtr = m_sdk.GetInterface<iauth::IRightsProvider>();
+		if (rightsProviderPtr == nullptr) {
+			qWarning() << "[HasPermission] Failed: iauth::IRightsProvider interface not found";
 			return false;
 		}
 
 		return rightsProviderPtr->HasRight(permissionId);
 	}
 
-
 	QByteArray GetToken() const
 	{
-		imtauth::IAccessTokenProvider* accessTokenProviderPtr = m_sdk.GetInterface<imtauth::IAccessTokenProvider>("SimpleLoginWrap");
-		if (accessTokenProviderPtr != nullptr){
+		imtauth::IAccessTokenProvider* accessTokenProviderPtr = m_sdk.GetInterface<imtauth::IAccessTokenProvider>();
+		if (accessTokenProviderPtr != nullptr) {
 			QByteArray userId;
-			return accessTokenProviderPtr->GetToken(userId);
+			QByteArray token = accessTokenProviderPtr->GetToken(userId);
+			return token;
 		}
 
 		return QByteArray();
 	}
 
-
 	void SetProductId(const QByteArray& productId)
 	{
-		imtbase::IApplicationInfoController* applicationInfoControllerPtr = m_sdk.GetInterface<imtbase::IApplicationInfoController>("ApplicationInfoController");
-		if (applicationInfoControllerPtr != nullptr){
-			applicationInfoControllerPtr->SetApplicationAttribute(imtbase::IApplicationInfoController::ApplicationAttribute::AA_APPLICATION_ID, productId);
+		imtbase::IApplicationInfoController* applicationInfoControllerPtr = m_sdk.GetInterface<imtbase::IApplicationInfoController>();
+		if (applicationInfoControllerPtr != nullptr) {
+			applicationInfoControllerPtr->SetApplicationAttribute(
+						imtbase::IApplicationInfoController::ApplicationAttribute::AA_APPLICATION_ID,
+						productId);
+		}
+		else{
+			qWarning() << "[SetProductId] Failed: IApplicationInfoController not found";
 		}
 	}
 
@@ -113,7 +123,7 @@ private:
 // public methods
 
 CAuthorizationController::CAuthorizationController()
-	:m_implPtr(nullptr)
+	: m_implPtr(nullptr)
 {
 	m_implPtr = new CAuthorizationControllerImpl;
 }
@@ -121,9 +131,7 @@ CAuthorizationController::CAuthorizationController()
 
 CAuthorizationController::~CAuthorizationController()
 {
-	if (m_implPtr != nullptr){
-		delete m_implPtr;
-	}
+	delete m_implPtr;
 }
 
 
@@ -176,5 +184,3 @@ void CAuthorizationController::SetProductId(const QByteArray& productId)
 
 
 } // namespace PumaClientSdk
-
-

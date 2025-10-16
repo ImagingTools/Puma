@@ -13,7 +13,7 @@ include(${ACFDIR}/Config/CMake/CustomBuild.cmake)
 set(ARXC_FILES "${PROJECT_SOURCE_DIR}/../LoginWidget.acc")
 include(${ACFDIR}/Config/CMake/CustomBuild.cmake)
 
-set(TARGET_EXT ".plugin")
+set(TARGET_EXT ".dll")
 
 include(${ACFDIR}/Config/CMake/SharedLibraryConfig.cmake)
 

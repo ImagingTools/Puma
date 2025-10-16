@@ -12,15 +12,12 @@
         <Element ComponentName="ClientRequestRemoteSuperuserProvider" X="375" Y="575" Note=""/>
         <Element ComponentName="IdentifiableProductInfo" X="150" Y="125" Note=""/>
         <Element ComponentName="PumaClientEngine" X="275" Y="225" Note=""/>
-        <Element ComponentName="PumaLoginStatusSubscriber" X="1025" Y="775" Note=""/>
         <Element ComponentName="RemoteStandardLoginGui" X="525" Y="350" Note=""/>
         <Element ComponentName="RemoteSuperuserController" X="700" Y="500" Note=""/>
         <Element ComponentName="ServerConnectionInterfaceParam" X="975" Y="600" Note=""/>
         <Element ComponentName="SimpleLogin" X="820" Y="350" Note=""/>
-        <Element ComponentName="Subscription" X="650" Y="700" Note=""/>
+        <Element ComponentName="Subscription" X="675" Y="700" Note=""/>
         <Element ComponentName="VersionInfo" X="975" Y="200" Note=""/>
-        <Element ComponentName="WebSocketClient" X="675" Y="150" Note=""/>
-        <Element ComponentName="WebSocketProtocolEngine" X="700" Y="225" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>
