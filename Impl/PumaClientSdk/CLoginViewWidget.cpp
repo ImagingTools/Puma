@@ -3,16 +3,16 @@
 
 // Qt includes
 #include <QtWidgets/QVBoxLayout>
-#include <QtQuickWidgets/QQuickWidget>
 
 // ACF includes
-#include <ipackage/CComponentAccessor.h>
 #include <iqtgui/IGuiObject.h>
-#include <iprm/IIdParam.h>
+#include <iauth/ILogin.h>
 
 // ImtCore includes
-#include <imtqml/IQuickObject.h>
+#include <imtbase/IApplicationInfoController.h>
 #include <imtcom/IServerConnectionInterface.h>
+#include <imtauth/IUserPermissionsController.h>
+#include <imtauth/IAccessTokenController.h>
 
 // Local includes
 #include <GeneratedFiles/PumaClientSdk/CLoginWidget.h>
@@ -38,6 +38,60 @@ public:
 		}
 
 		return nullptr;
+	}
+
+
+	bool SetConnectionParam(const QString& host, int httpPort, int wsPort)
+	{
+		imtcom::IServerConnectionInterface* serverConnectionParamPtr = m_sdk.GetInterface<imtcom::IServerConnectionInterface>("ServerConnectionInterfaceParam");
+		if (serverConnectionParamPtr != nullptr){
+			serverConnectionParamPtr->SetHost(host);
+			serverConnectionParamPtr->SetPort(imtcom::IServerConnectionInterface::PT_HTTP, httpPort);
+			serverConnectionParamPtr->SetPort(imtcom::IServerConnectionInterface::PT_WEBSOCKET, wsPort);
+
+			return true;
+		}
+
+		return false;
+	}
+
+
+	bool SetLoginParam(Login param)
+	{
+		iauth::ILogin* loginPtr = m_sdk.GetInterface<iauth::ILogin>("SimpleLogin");
+		if (loginPtr == nullptr){
+			return false;
+		}
+
+		loginPtr->Login(param.userName, "");
+
+		imtauth::IUserPermissionsController* permissionsController = m_sdk.GetInterface<imtauth::IUserPermissionsController>("SimpleLogin");
+		if (permissionsController == nullptr){
+			return false;
+		}
+
+		permissionsController->SetPermissions("", param.permissions);
+
+		imtauth::IAccessTokenController* accessTokenControllerPtr = m_sdk.GetInterface<imtauth::IAccessTokenController>("SimpleLogin");
+		if (accessTokenControllerPtr == nullptr){
+			return false;
+		}
+
+		accessTokenControllerPtr->SetToken("", param.accessToken);
+
+		ibase::IApplicationInfo* applicationInfoPtr = m_sdk.GetInterface<ibase::IApplicationInfo>("ApplicationInfo");
+		if (applicationInfoPtr == nullptr){
+			return false;
+		}
+
+		imtbase::IApplicationInfoController* applicationInfoControllerPtr = m_sdk.GetInterface<imtbase::IApplicationInfoController>("ApplicationInfoController");
+		if (applicationInfoControllerPtr == nullptr){
+			return false;
+		}
+
+		applicationInfoControllerPtr->SetApplicationAttribute(imtbase::IApplicationInfoController::ApplicationAttribute::AA_APPLICATION_ID, param.productId);
+
+		return true;
 	}
 
 private:
@@ -66,6 +120,26 @@ CLoginViewWidget::~CLoginViewWidget()
 	if (m_implPtr != nullptr){
 		delete m_implPtr;
 	}
+}
+
+
+bool CLoginViewWidget::SetConnectionParam(const QString& host, int httpPort, int wsPort)
+{
+	if (m_implPtr != nullptr){
+		return m_implPtr->SetConnectionParam(host, httpPort, wsPort);
+	}
+
+	return false;
+}
+
+
+bool CLoginViewWidget::SetLoginParam(Login param)
+{
+	if (m_implPtr != nullptr){
+		return m_implPtr->SetLoginParam(param);
+	}
+
+	return false;
 }
 
 

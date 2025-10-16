@@ -26,7 +26,7 @@ file(GLOB SOURCES
 
 target_sources(PumaClientSdk PRIVATE ${SOURCES})
 
-target_link_libraries(${PROJECT_NAME} imeas iproc iqtgui iauth icomp idoc i2d)
+target_link_libraries(${PROJECT_NAME} imeas iproc iqtgui iauth icomp idoc i2d icomm)
 target_link_libraries(${PROJECT_NAME} imtbase imtbasesdl imtauthsdl imtgql imtcom imtservergql imtserverapp imtauthgql imtclientgql imtlic imtcol)
 target_link_libraries(${PROJECT_NAME} imtauthgui imtqml)
 

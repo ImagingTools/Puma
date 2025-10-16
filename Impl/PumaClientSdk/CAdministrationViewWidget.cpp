@@ -3,16 +3,16 @@
 
 // Qt includes
 #include <QtWidgets/QVBoxLayout>
-#include <QtQuickWidgets/QQuickWidget>
 
 // ACF includes
-#include <ipackage/CComponentAccessor.h>
 #include <iqtgui/IGuiObject.h>
-#include <iprm/IIdParam.h>
+#include <iauth/ILogin.h>
 
 // ImtCore includes
-#include <imtqml/IQuickObject.h>
+#include <imtbase/IApplicationInfoController.h>
 #include <imtcom/IServerConnectionInterface.h>
+#include <imtauth/IUserPermissionsController.h>
+#include <imtauth/IAccessTokenController.h>
 
 // Local includes
 #include <GeneratedFiles/PumaClientSdk/CAdministrationWidget.h>
@@ -56,15 +56,37 @@ public:
 	}
 
 
-	bool SetProductId(const QByteArray& productId)
+	bool SetLoginParam(Login param)
 	{
-		iprm::IIdParam* guiObjectPtr = m_sdk.GetInterface<iprm::IIdParam>("ProductIdParam");
-		if (guiObjectPtr != nullptr){
-			guiObjectPtr->SetId(productId);
-			return true;
+		iauth::ILogin* loginPtr = m_sdk.GetInterface<iauth::ILogin>("SimpleLogin");
+		if (loginPtr == nullptr){
+			return false;
 		}
 
-		return false;
+		loginPtr->Login(param.userName, "");
+
+		imtauth::IUserPermissionsController* permissionsController = m_sdk.GetInterface<imtauth::IUserPermissionsController>("SimpleLogin");
+		if (permissionsController == nullptr){
+			return false;
+		}
+
+		permissionsController->SetPermissions("", param.permissions);
+
+		imtauth::IAccessTokenController* accessTokenControllerPtr = m_sdk.GetInterface<imtauth::IAccessTokenController>("SimpleLogin");
+		if (accessTokenControllerPtr == nullptr){
+			return false;
+		}
+
+		accessTokenControllerPtr->SetToken("", param.accessToken);
+
+		imtbase::IApplicationInfoController* applicationInfoControllerPtr = m_sdk.GetInterface<imtbase::IApplicationInfoController>("ApplicationInfoController");
+		if (applicationInfoControllerPtr == nullptr){
+			return false;
+		}
+
+		applicationInfoControllerPtr->SetApplicationAttribute(imtbase::IApplicationInfoController::ApplicationAttribute::AA_APPLICATION_ID, param.productId);
+
+		return true;
 	}
 
 private:
@@ -96,16 +118,6 @@ CAdministrationViewWidget::~CAdministrationViewWidget()
 }
 
 
-QWidget* CAdministrationViewWidget::GetWidget() const
-{
-	if (m_implPtr != nullptr){
-		return m_implPtr->GetWidget();
-	}
-
-	return nullptr;
-}
-
-
 bool CAdministrationViewWidget::SetConnectionParam(const QString& host, int httpPort, int wsPort)
 {
 	if (m_implPtr != nullptr){
@@ -116,10 +128,10 @@ bool CAdministrationViewWidget::SetConnectionParam(const QString& host, int http
 }
 
 
-bool CAdministrationViewWidget::SetProductId(const QByteArray& productId)
+bool CAdministrationViewWidget::SetLoginParam(Login param)
 {
 	if (m_implPtr != nullptr){
-		return m_implPtr->SetProductId(productId);
+		return m_implPtr->SetLoginParam(param);
 	}
 
 	return false;

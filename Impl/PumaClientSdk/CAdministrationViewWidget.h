@@ -4,6 +4,9 @@
 // Qt includes
 #include <QtWidgets/QWidget>
 
+// PumaClientSdk includes
+#include <PumaClientSdk/PumaClientSdk.h>
+
 
 namespace PumaClientSdk
 {
@@ -18,9 +21,8 @@ public:
 	CAdministrationViewWidget();
 	~CAdministrationViewWidget();
 
-	QWidget* GetWidget() const;
 	bool SetConnectionParam(const QString& host, int httpPort, int wsPort);
-	bool SetProductId(const QByteArray& productId);
+	bool SetLoginParam(Login param);
 
 private:
 	CAdministrationViewWidgetImpl* m_implPtr;

@@ -12,6 +12,7 @@
 // Qt includes
 #include <QtCore/QString>
 #include <QtCore/QByteArray>
+#include <QtCore/QByteArrayList>
 
 
 namespace PumaClientSdk
@@ -19,6 +20,15 @@ namespace PumaClientSdk
 
 
 class CAuthorizationControllerImpl;
+
+
+struct Login
+{
+	QByteArray accessToken;
+	QString userName;
+	QByteArray productId;
+	QByteArrayList permissions;
+};
 
 
 /**
@@ -31,7 +41,7 @@ public:
 
 	virtual ~CAuthorizationController();
 
-	virtual bool Login(const QString& login, const QString& password);
+	virtual bool Login(const QString& login, const QString& password, Login& out);
 	virtual bool Logout();
 	virtual bool HasPermission(const QByteArray& permissionId);
 	virtual QByteArray GetToken() const;

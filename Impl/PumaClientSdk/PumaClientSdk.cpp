@@ -7,6 +7,7 @@
 #include <iauth/IRightsProvider.h>
 
 // ImtCore includes
+#include <imtbase/IApplicationInfoController.h>
 #include <imtauth/IAccessTokenProvider.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Authorization.h>
 
@@ -26,14 +27,39 @@ public:
 	}
 
 
-	bool Login(const QString& login, const QString& password)
+	bool Login(const QString& login, const QString& password, Login& out)
 	{
 		iauth::ILogin* loginPtr = m_sdk.GetInterface<iauth::ILogin>("SimpleLoginWrap");
 		if (loginPtr == nullptr){
 			return false;
 		}
 
-		return loginPtr->Login(login, password);
+		bool ok = loginPtr->Login(login, password);
+		if (!ok){
+			return false;
+		}
+
+		iauth::CUser* userPtr = loginPtr->GetLoggedUser();
+		if (userPtr == nullptr){
+			return false;
+		}
+
+		imtauth::IAccessTokenProvider* tokenProviderPtr = m_sdk.GetInterface<imtauth::IAccessTokenProvider>("SimpleLoginWrap");
+		if (tokenProviderPtr == nullptr){
+			return false;
+		}
+
+		
+		ibase::IApplicationInfo* applicationInfoPtr = m_sdk.GetInterface<ibase::IApplicationInfo>("ApplicationInfo");
+		if (applicationInfoPtr == nullptr){
+			return false;
+		}
+
+		out.productId = applicationInfoPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
+		out.userName = userPtr->GetUserName();
+		out.accessToken = tokenProviderPtr->GetToken(QByteArray());
+
+		return true;
 	}
 
 
@@ -73,9 +99,9 @@ public:
 
 	void SetProductId(const QByteArray& productId)
 	{
-		ibase::IApplicationInfo* applicationInfoPtr = m_sdk.GetInterface<ibase::IApplicationInfo>("ApplicationInfo");
-		if (applicationInfoPtr != nullptr){
-			// ???
+		imtbase::IApplicationInfoController* applicationInfoControllerPtr = m_sdk.GetInterface<imtbase::IApplicationInfoController>("ApplicationInfoController");
+		if (applicationInfoControllerPtr != nullptr){
+			applicationInfoControllerPtr->SetApplicationAttribute(imtbase::IApplicationInfoController::ApplicationAttribute::AA_APPLICATION_ID, productId);
 		}
 	}
 
@@ -101,10 +127,10 @@ CAuthorizationController::~CAuthorizationController()
 }
 
 
-bool CAuthorizationController::Login(const QString& login, const QString& password)
+bool CAuthorizationController::Login(const QString& login, const QString& password, struct Login& out)
 {
 	if (m_implPtr != nullptr){
-		return m_implPtr->Login(login, password);
+		return m_implPtr->Login(login, password, out);
 	}
 
 	return false;

@@ -2,15 +2,15 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5423" Description="ACF"/>
-            <Version Id="1" Number="2252" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5430" Description="ACF"/>
+            <Version Id="1" Number="2253" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="ApplicationInfo" PackageId="BasePck" ComponentId="ApplicationInfo">
+        <Element Id="ApplicationInfoController" PackageId="ImtCorePck" ComponentId="ApplicationInfoController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="">
@@ -22,15 +22,36 @@
         <Element Id="ClientRequestRemoteSuperuserProvider" PackageId="ImtAuthGqlPck" ComponentId="ClientRequestRemoteSuperuserProvider">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaClientEngine"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="SuperuserId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="su"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="ProductIdParam" PackageId="BasePck" ComponentId="IdParam">
+        <Element Id="IdentifiableProductInfo" PackageId="ImtLicensePck" ComponentId="IdentifiableProductInfo">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="PumaClientEngine" PackageId="ImtGraphQlVoce" ComponentId="PumaGQLClientEngine">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ProductInfo" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="IdentifiableProductInfo"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RequestManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="WebSocketClient"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ServerConnectionInterface" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ServerConnectionInterfaceParam"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="VersionInfo"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
             </Data>
         </Element>
         <Element Id="PumaLoginStatusSubscriber" PackageId="ImtClientGqlPck" ComponentId="ConnectionStatusSubscriber">
@@ -58,6 +79,12 @@
         <Element Id="RemoteStandardLoginGui" PackageId="ImtAuthGuiPck" ComponentId="RemoteStandardLoginGui">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="ConnectionStatusProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Subscription/ConnectionStatusProvider"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Login" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SimpleLogin"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="PumaConnectionStatusProvider" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaLoginStatusSubscriber"/>
                     </AttributeInfo>
@@ -73,25 +100,21 @@
         <Element Id="RemoteSuperuserController" PackageId="ImtAuthGqlPck" ComponentId="RemoteSuperuserController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ApplicationInfo"/>
+                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaClientEngine"/>
                     </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="Rights" PackageId="ImtAuthVoce" ComponentId="LoginClient">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
                     <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ApplicationInfo"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="SuperuserProvider" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ClientRequestRemoteSuperuserProvider"/>
+                        <Data IsEnabled="true" Value="ApplicationInfoController"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
         <Element Id="ServerConnectionInterfaceParam" PackageId="ImtComPck" ComponentId="ServerConnectionInterfaceParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="SimpleLogin" PackageId="ImtAuthGqlPck" ComponentId="SimpleLogin">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap/>
             </Data>
@@ -110,12 +133,35 @@
                 <AttributeInfoMap/>
             </Data>
         </Element>
+        <Element Id="WebSocketClient" PackageId="ImtClientGqlPck" ComponentId="WebSocketClient">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ProtocolEngine" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="WebSocketProtocolEngine"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ServerConnectionInterface" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ServerConnectionInterfaceParam"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="WebSocketProtocolEngine" PackageId="ImtRestPck" ComponentId="WebSocketProtocolEngine">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="ibase::IApplicationInfo" ComponentId="ApplicationInfo"/>
+        <Interface InterfaceId="iauth::ILogin" ComponentId="SimpleLogin"/>
+        <Interface InterfaceId="iauth::IRightsProvider" ComponentId="SimpleLogin"/>
+        <Interface InterfaceId="ibase::IApplicationInfo" ComponentId="ApplicationInfoController"/>
+        <Interface InterfaceId="imtauth::IAccessTokenController" ComponentId="SimpleLogin"/>
+        <Interface InterfaceId="imtauth::IAccessTokenProvider" ComponentId="SimpleLogin"/>
+        <Interface InterfaceId="imtauth::IUserPermissionsController" ComponentId="SimpleLogin"/>
+        <Interface InterfaceId="imtbase::IApplicationInfoController" ComponentId="ApplicationInfoController"/>
         <Interface InterfaceId="imtcom::IServerConnectionInterface" ComponentId="ServerConnectionInterfaceParam"/>
-        <Interface InterfaceId="iprm::IIdParam" ComponentId="ProductIdParam"/>
+        <Interface InterfaceId="imtlic::IProductInfo" ComponentId="IdentifiableProductInfo"/>
         <Interface InterfaceId="iqtgui::IGuiObject" ComponentId="RemoteStandardLoginGui"/>
     </ExportedInterfaces>
     <ExportedComponents/>

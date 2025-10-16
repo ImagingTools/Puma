@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5423" Description="ACF"/>
-            <Version Id="1" Number="2252" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5430" Description="ACF"/>
+            <Version Id="1" Number="2253" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -13,6 +13,9 @@
         <Element Id="AdministrationObserverQml" PackageId="ImtAuthGuiPck" ComponentId="AdministrationObserverQml">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="Login" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SimpleLogin"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="QuickItemCreated" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="QuickObject/QuickItemCreated"/>
                     </AttributeInfo>
@@ -25,7 +28,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="ApplicationInfo" PackageId="BasePck" ComponentId="ApplicationInfo">
+        <Element Id="ApplicationInfoController" PackageId="ImtCorePck" ComponentId="ApplicationInfoController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="">
@@ -46,16 +49,11 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="ProductIdParam" PackageId="BasePck" ComponentId="IdParam">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap/>
-            </Data>
-        </Element>
         <Element Id="QuickObject" PackageId="ImtQmlPck" ComponentId="QuickObject">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ApplicationInfo"/>
+                        <Data IsEnabled="true" Value="ApplicationInfoController"/>
                     </AttributeInfo>
                     <AttributeInfo Id="QmlFilePath" Type="String" ExportId="">
                         <Data IsEnabled="true" Value="qrc:/qml/imtauthgui/AdministrationUi.qml"/>
@@ -71,6 +69,11 @@
                 <AttributeInfoMap/>
             </Data>
         </Element>
+        <Element Id="SimpleLogin" PackageId="ImtAuthGqlPck" ComponentId="SimpleLogin">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
         <Element Id="VersionInfo" PackageId="AcfVoce" ComponentId="VersionInfo">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap/>
@@ -79,9 +82,14 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="ibase::IApplicationInfo" ComponentId="ApplicationInfo"/>
+        <Interface InterfaceId="iauth::ILogin" ComponentId="SimpleLogin"/>
+        <Interface InterfaceId="iauth::IRightsProvider" ComponentId="SimpleLogin"/>
+        <Interface InterfaceId="ibase::IApplicationInfo" ComponentId="ApplicationInfoController"/>
+        <Interface InterfaceId="imtauth::IAccessTokenController" ComponentId="SimpleLogin"/>
+        <Interface InterfaceId="imtauth::IAccessTokenProvider" ComponentId="SimpleLogin"/>
+        <Interface InterfaceId="imtauth::IUserPermissionsController" ComponentId="SimpleLogin"/>
+        <Interface InterfaceId="imtbase::IApplicationInfoController" ComponentId="ApplicationInfoController"/>
         <Interface InterfaceId="imtcom::IServerConnectionInterface" ComponentId="ServerConnectionInterfaceParam"/>
-        <Interface InterfaceId="iprm::IIdParam" ComponentId="ProductIdParam"/>
         <Interface InterfaceId="iqtgui::IGuiObject" ComponentId="GuiQuickWrap"/>
     </ExportedInterfaces>
     <ExportedComponents/>
