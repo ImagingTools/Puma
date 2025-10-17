@@ -26,8 +26,10 @@ file(GLOB SOURCES
 
 target_sources(PumaClientSdk PRIVATE ${SOURCES})
 
+target_link_libraries(${PROJECT_NAME} AcfSlnLoc AcfLoc ImtCoreLoc)
 target_link_libraries(${PROJECT_NAME} imeas iproc iqtgui iauth icomp idoc i2d icomm)
-target_link_libraries(${PROJECT_NAME} imtbase imtbasesdl imtauthsdl imtgql imtcom imtservergql imtserverapp imtauthgql imtclientgql imtlic imtcol)
+target_link_libraries(${PROJECT_NAME} imtbase imtbasesdl imtauthsdl imtgql imtcom imtservergql imtserverapp imtauthgql imtclientgql imtlic imtcol imtdb)
+target_link_libraries(${PROJECT_NAME} imtstyle imtcontrolsqml imtguiqml imtauthguiqml imtguigqlqml imtstylecontrolsqml imtlicguiqml imtdocguiqml imtcolguiqml imtlicgui imtgui imtcolorsdl)
 target_link_libraries(${PROJECT_NAME} imtauthgui imtqml)
 
 ADD_DEFINITIONS(-DUNICODE)

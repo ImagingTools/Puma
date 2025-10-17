@@ -9,6 +9,7 @@
 #include <iauth/ILogin.h>
 
 // ImtCore includes
+#include <imtbase/Init.h>
 #include <imtbase/IApplicationInfoController.h>
 #include <imtcom/IServerConnectionInterface.h>
 #include <imtauth/IUserPermissionsController.h>
@@ -27,6 +28,7 @@ class CAdministrationViewWidgetImpl
 public:
 	CAdministrationViewWidgetImpl()
 	{
+		m_sdk.EnsureAutoInitComponentsCreated();
 	}
 
 
@@ -102,6 +104,9 @@ private:
 CAdministrationViewWidget::CAdministrationViewWidget()
 	:m_implPtr(nullptr)
 {
+	DefaultImtCoreQmlInitializer initializer;
+	initializer.Init();
+
 	m_implPtr = new CAdministrationViewWidgetImpl;
 	QWidget* widgetPtr = m_implPtr->GetWidget(this);
 	if (widgetPtr != nullptr){

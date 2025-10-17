@@ -11,7 +11,7 @@
     <Keywords></Keywords>
     <ElementsList>
         <Element Id="AdministrationObserverQml" PackageId="ImtAuthGuiPck" ComponentId="AdministrationObserverQml">
-            <Data IsEnabled="true" Flags="0">
+            <Data IsEnabled="true" Flags="1">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Login" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="SimpleLogin"/>
@@ -66,11 +66,33 @@
         </Element>
         <Element Id="ServerConnectionInterfaceParam" PackageId="ImtComPck" ComponentId="ServerConnectionInterfaceParam">
             <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap/>
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DefaultHttpPort" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="7788"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DefaultWebSocketPort" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="8788"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
             </Data>
         </Element>
         <Element Id="SimpleLogin" PackageId="ImtAuthGqlPck" ComponentId="SimpleLogin">
             <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="StaticQmlBaseTypeRegistrator" PackageId="ImtQmlPck" ComponentId="StaticQmlBaseTypeRegistrator">
+            <Data IsEnabled="true" Flags="1">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="StaticQmlModuleRegistrator" PackageId="ImtQmlPck" ComponentId="StaticQmlModuleRegistrator">
+            <Data IsEnabled="true" Flags="1">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="StaticQmlTypeRegistrator" PackageId="ImtQmlPck" ComponentId="StaticQmlTypeRegistrator">
+            <Data IsEnabled="true" Flags="1">
                 <AttributeInfoMap/>
             </Data>
         </Element>

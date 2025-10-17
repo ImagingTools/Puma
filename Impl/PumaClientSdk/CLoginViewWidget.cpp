@@ -9,6 +9,7 @@
 #include <iauth/ILogin.h>
 
 // ImtCore includes
+#include <imtbase/Init.h>
 #include <imtbase/IApplicationInfoController.h>
 #include <imtcom/IServerConnectionInterface.h>
 #include <imtauth/IUserPermissionsController.h>
@@ -27,6 +28,7 @@ class CLoginViewWidgetImpl
 public:
 	CLoginViewWidgetImpl()
 	{
+		m_sdk.EnsureAutoInitComponentsCreated();
 	}
 
 
@@ -107,6 +109,9 @@ private:
 CLoginViewWidget::CLoginViewWidget()
 	:m_implPtr(nullptr)
 {
+	DefaultImtCoreQmlInitializer initializer;
+	initializer.Init();
+
 	m_implPtr = new CLoginViewWidgetImpl;
 	QWidget* widgetPtr = m_implPtr->GetWidget(this);
 	if (widgetPtr != nullptr){

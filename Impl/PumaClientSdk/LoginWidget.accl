@@ -16,6 +16,9 @@
         <Element ComponentName="RemoteSuperuserController" X="700" Y="500" Note=""/>
         <Element ComponentName="ServerConnectionInterfaceParam" X="975" Y="600" Note=""/>
         <Element ComponentName="SimpleLogin" X="820" Y="350" Note=""/>
+        <Element ComponentName="StaticQmlBaseTypeRegistrator" X="1000" Y="75" Note=""/>
+        <Element ComponentName="StaticQmlModuleRegistrator" X="450" Y="75" Note=""/>
+        <Element ComponentName="StaticQmlTypeRegistrator" X="725" Y="75" Note=""/>
         <Element ComponentName="Subscription" X="675" Y="700" Note=""/>
         <Element ComponentName="VersionInfo" X="975" Y="200" Note=""/>
     </PositionMap>

@@ -101,6 +101,21 @@
                 <AttributeInfoMap/>
             </Data>
         </Element>
+        <Element Id="StaticQmlBaseTypeRegistrator" PackageId="ImtQmlPck" ComponentId="StaticQmlBaseTypeRegistrator">
+            <Data IsEnabled="true" Flags="1">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="StaticQmlModuleRegistrator" PackageId="ImtQmlPck" ComponentId="StaticQmlModuleRegistrator">
+            <Data IsEnabled="true" Flags="1">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="StaticQmlTypeRegistrator" PackageId="ImtQmlPck" ComponentId="StaticQmlTypeRegistrator">
+            <Data IsEnabled="true" Flags="1">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
         <Element Id="Subscription" PackageId="ImtClientVoce" ComponentId="SubscriptionManager">
             <Data IsEnabled="true" Flags="1">
                 <AttributeInfoMap>
