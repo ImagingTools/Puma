@@ -6,8 +6,7 @@ set(ARXC_OUTDIR "${AUX_INCLUDE_DIR}")
 set(ARX_ENABLE_GENERATE_DEPENDENCIES_LIST ON)
 
 include(${ACFDIR}/Config/CMake/CustomBuild.cmake)
-set(TARGET_EXT ".dll")
-include(${ACFDIR}/Config/CMake/SharedLibraryConfig.cmake)
+include(${ACFDIR}/Config/CMake/StaticConfig.cmake)
 include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 
 target_sources(${PROJECT_NAME} PRIVATE ${SOURCES})

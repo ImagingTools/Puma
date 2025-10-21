@@ -28,7 +28,7 @@ target_link_libraries(${PROJECT_NAME}  Qt${QT_VERSION_MAJOR}::QuickWidgets  Qt${
 # target_include_directories(${PROJECT_NAME} PRIVATE "${PROJECT_SOURCE_DIR}/../3rdParty/AuthClientSdk/include")
 # target_include_directories(${PROJECT_NAME} PRIVATE "${PROJECT_SOURCE_DIR}/../3rdParty/AuthServerSdk/include")
 
-# target_link_libraries(PumaClient ${PROJECT_SOURCE_DIR}/../3rdParty/AuthClientSdk/lib/AuthClientSdk.lib)
+target_link_libraries(${PROJECT_NAME} AuthClientSdk AuthServerSdk)
 # target_link_libraries(PumaClient ${PROJECT_SOURCE_DIR}/../3rdParty/AuthServerSdk/lib/AuthServerSdk.lib)
 
 if(QT_VERSION_MAJOR EQUAL 6)

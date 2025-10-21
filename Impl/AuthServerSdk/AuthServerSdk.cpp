@@ -2,7 +2,6 @@
 
 
 // Qt includes
-#include <QDebug>
 #include <QtCore/QFile>
 
 // ACF includes

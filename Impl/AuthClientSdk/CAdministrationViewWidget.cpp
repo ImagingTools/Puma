@@ -6,15 +6,12 @@
 
 // ACF includes
 #include <iqtgui/IGuiObject.h>
-#include <iauth/ILogin.h>
 #include <istd/CChangeGroup.h>
 
 // ImtCore includes
 #include <imtbase/Init.h>
 #include <imtbase/IApplicationInfoController.h>
 #include <imtcom/IServerConnectionInterface.h>
-#include <imtauth/IUserPermissionsController.h>
-#include <imtauth/IAccessTokenController.h>
 #include <imtqml/IQuickObject.h>
 
 // Local includes

@@ -1,14 +1,6 @@
 #pragma once
 
 
-#if defined _MSC_VER || defined __MINGW32__ || defined __MINGW64__
-#define AUTH_SERVER_SDK_EXPORT __declspec(dllexport)
-#elif defined __GNUC__
-#define AUTH_SERVER_SDK_EXPORT __attribute__((visibility("default")))
-#else
-#define AUTH_SERVER_SDK_EXPORT
-#endif
-
 // Qt includes
 #include <QtCore/QString>
 #include <QtCore/QByteArray>
@@ -24,7 +16,7 @@ class CAuthorizableServerImpl;
 /**
 *	\ingroup AuthServerSdk
 */
-class AUTH_SERVER_SDK_EXPORT CAuthorizableServer
+class CAuthorizableServer
 {
 public:
 	CAuthorizableServer();
@@ -45,7 +37,7 @@ private:
 
 
 /**
-\defgroup AuthServerSdk PUMA SDK
+\defgroup AuthServerSdk Autorizable Server SDK
 
 \mainpage
 \section Introduction
