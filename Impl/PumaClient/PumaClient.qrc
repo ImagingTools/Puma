@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/Icons">
+    </qresource>
+    <qresource prefix="/Features">
+	<file alias="TestFeatures">TestFeatures.xml</file>
+    </qresource>
+</RCC>
