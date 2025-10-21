@@ -1,4 +1,4 @@
-#include <PumaClientSdk/CLoginViewWidget.h>
+#include <AuthClientSdk/CAdministrationViewWidget.h>
 
 
 // Qt includes
@@ -7,6 +7,7 @@
 // ACF includes
 #include <iqtgui/IGuiObject.h>
 #include <iauth/ILogin.h>
+#include <istd/CChangeGroup.h>
 
 // ImtCore includes
 #include <imtbase/Init.h>
@@ -14,19 +15,20 @@
 #include <imtcom/IServerConnectionInterface.h>
 #include <imtauth/IUserPermissionsController.h>
 #include <imtauth/IAccessTokenController.h>
+#include <imtqml/IQuickObject.h>
 
 // Local includes
-#include <GeneratedFiles/PumaClientSdk/CLoginWidget.h>
+#include <GeneratedFiles/AuthClientSdk/CAdministrationWidget.h>
 
 
-namespace PumaClientSdk
+namespace AuthClientSdk
 {
 
 
-class CLoginViewWidgetImpl
+class CAdministrationViewWidgetImpl
 {
 public:
-	CLoginViewWidgetImpl()
+	CAdministrationViewWidgetImpl()
 	{
 		m_sdk.EnsureAutoInitComponentsCreated();
 	}
@@ -36,10 +38,11 @@ public:
 	{
 		iqtgui::IGuiObject* guiObjectPtr = m_sdk.GetInterface<iqtgui::IGuiObject>();
 		if (guiObjectPtr != nullptr){
-			bool ok = guiObjectPtr->CreateGui(parentPtr);
-			if (ok){
-				return guiObjectPtr->GetWidget();
+			if (!guiObjectPtr->IsGuiCreated()){
+				guiObjectPtr->CreateGui(parentPtr);
 			}
+
+			return guiObjectPtr->GetWidget();
 		}
 
 		return nullptr;
@@ -50,6 +53,8 @@ public:
 	{
 		imtcom::IServerConnectionInterface* serverConnectionParamPtr = m_sdk.GetInterface<imtcom::IServerConnectionInterface>();
 		if (serverConnectionParamPtr != nullptr){
+			istd::CChangeGroup changeGroup(serverConnectionParamPtr);
+
 			serverConnectionParamPtr->SetHost(host);
 			serverConnectionParamPtr->SetPort(imtcom::IServerConnectionInterface::PT_HTTP, httpPort);
 			serverConnectionParamPtr->SetPort(imtcom::IServerConnectionInterface::PT_WEBSOCKET, wsPort);
@@ -63,32 +68,6 @@ public:
 
 	bool SetLoginParam(Login param)
 	{
-		iauth::ILogin* loginPtr = m_sdk.GetInterface<iauth::ILogin>();
-		if (loginPtr == nullptr){
-			return false;
-		}
-
-		loginPtr->Login(param.userName, "");
-
-		imtauth::IUserPermissionsController* permissionsController = m_sdk.GetInterface<imtauth::IUserPermissionsController>();
-		if (permissionsController == nullptr){
-			return false;
-		}
-
-		permissionsController->SetPermissions("", param.permissions);
-
-		imtauth::IAccessTokenController* accessTokenControllerPtr = m_sdk.GetInterface<imtauth::IAccessTokenController>();
-		if (accessTokenControllerPtr == nullptr){
-			return false;
-		}
-
-		accessTokenControllerPtr->SetToken("", param.accessToken);
-
-		ibase::IApplicationInfo* applicationInfoPtr = m_sdk.GetInterface<ibase::IApplicationInfo>();
-		if (applicationInfoPtr == nullptr){
-			return false;
-		}
-
 		imtbase::IApplicationInfoController* applicationInfoControllerPtr = m_sdk.GetInterface<imtbase::IApplicationInfoController>();
 		if (applicationInfoControllerPtr == nullptr){
 			return false;
@@ -96,23 +75,40 @@ public:
 
 		applicationInfoControllerPtr->SetApplicationAttribute(imtbase::IApplicationInfoController::ApplicationAttribute::AA_APPLICATION_ID, param.productId);
 
+		imtqml::IQuickObject* quickObjectPtr = m_sdk.GetInterface<imtqml::IQuickObject>();
+		if (quickObjectPtr == nullptr){
+			return false;
+		}
+
+		QQuickItem* quickItem = quickObjectPtr->GetQuickItem();
+		if (quickObjectPtr == nullptr){
+			return false;
+		}
+
+		quickItem->setProperty("productId", param.productId);
+		QMetaObject::invokeMethod(	quickItem,
+									"setLoginData",
+									Q_ARG(QVariant, QVariant::fromValue(param.accessToken)),
+									Q_ARG(QVariant, QVariant::fromValue(param.userName)),
+									Q_ARG(QVariant, QVariant::fromValue(param.permissions)));
+
 		return true;
 	}
 
 private:
-	mutable CLoginWidget m_sdk;
+	mutable CAdministrationWidget m_sdk;
 };
 
 
 // public methods
 
-CLoginViewWidget::CLoginViewWidget()
+CAdministrationViewWidget::CAdministrationViewWidget()
 	:m_implPtr(nullptr)
 {
 	DefaultImtCoreQmlInitializer initializer;
 	initializer.Init();
 
-	m_implPtr = new CLoginViewWidgetImpl;
+	m_implPtr = new CAdministrationViewWidgetImpl;
 	QWidget* widgetPtr = m_implPtr->GetWidget(this);
 	if (widgetPtr != nullptr){
 		QVBoxLayout* layout = new QVBoxLayout(this);
@@ -123,7 +119,7 @@ CLoginViewWidget::CLoginViewWidget()
 }
 
 
-CLoginViewWidget::~CLoginViewWidget()
+CAdministrationViewWidget::~CAdministrationViewWidget()
 {
 	if (m_implPtr != nullptr){
 		delete m_implPtr;
@@ -131,7 +127,7 @@ CLoginViewWidget::~CLoginViewWidget()
 }
 
 
-bool CLoginViewWidget::SetConnectionParam(const QString& host, int httpPort, int wsPort)
+bool CAdministrationViewWidget::SetConnectionParam(const QString& host, int httpPort, int wsPort)
 {
 	if (m_implPtr != nullptr){
 		return m_implPtr->SetConnectionParam(host, httpPort, wsPort);
@@ -141,7 +137,7 @@ bool CLoginViewWidget::SetConnectionParam(const QString& host, int httpPort, int
 }
 
 
-bool CLoginViewWidget::SetLoginParam(Login param)
+bool CAdministrationViewWidget::SetLoginParam(Login param)
 {
 	if (m_implPtr != nullptr){
 		return m_implPtr->SetLoginParam(param);
@@ -151,6 +147,6 @@ bool CLoginViewWidget::SetLoginParam(Login param)
 }
 
 
-} // namespace PumaClientSdk
+} // namespace AuthClientSdk
 
 

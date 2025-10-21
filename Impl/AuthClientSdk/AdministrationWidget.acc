@@ -52,7 +52,7 @@
         <Element Id="QuickObject" PackageId="ImtQmlPck" ComponentId="QuickObject">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
+                    <AttributeInfo Id="ApplicationInfoController" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ApplicationInfoController"/>
                     </AttributeInfo>
                     <AttributeInfo Id="QmlFilePath" Type="String" ExportId="">
@@ -112,6 +112,7 @@
         <Interface InterfaceId="imtauth::IUserPermissionsController" ComponentId="SimpleLogin"/>
         <Interface InterfaceId="imtbase::IApplicationInfoController" ComponentId="ApplicationInfoController"/>
         <Interface InterfaceId="imtcom::IServerConnectionInterface" ComponentId="ServerConnectionInterfaceParam"/>
+        <Interface InterfaceId="imtqml::IQuickObject" ComponentId="QuickObject"/>
         <Interface InterfaceId="iqtgui::IGuiObject" ComponentId="GuiQuickWrap"/>
     </ExportedInterfaces>
     <ExportedComponents/>

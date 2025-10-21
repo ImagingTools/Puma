@@ -1,4 +1,4 @@
-#include <PumaClientSdk/CAdministrationViewWidget.h>
+#include <AuthClientSdk/CLoginViewWidget.h>
 
 
 // Qt includes
@@ -16,17 +16,17 @@
 #include <imtauth/IAccessTokenController.h>
 
 // Local includes
-#include <GeneratedFiles/PumaClientSdk/CAdministrationWidget.h>
+#include <GeneratedFiles/AuthClientSdk/CLoginWidget.h>
 
 
-namespace PumaClientSdk
+namespace AuthClientSdk
 {
 
 
-class CAdministrationViewWidgetImpl
+class CLoginViewWidgetImpl
 {
 public:
-	CAdministrationViewWidgetImpl()
+	CLoginViewWidgetImpl()
 	{
 		m_sdk.EnsureAutoInitComponentsCreated();
 	}
@@ -84,6 +84,11 @@ public:
 
 		accessTokenControllerPtr->SetToken("", param.accessToken);
 
+		ibase::IApplicationInfo* applicationInfoPtr = m_sdk.GetInterface<ibase::IApplicationInfo>();
+		if (applicationInfoPtr == nullptr){
+			return false;
+		}
+
 		imtbase::IApplicationInfoController* applicationInfoControllerPtr = m_sdk.GetInterface<imtbase::IApplicationInfoController>();
 		if (applicationInfoControllerPtr == nullptr){
 			return false;
@@ -95,19 +100,19 @@ public:
 	}
 
 private:
-	mutable CAdministrationWidget m_sdk;
+	mutable CLoginWidget m_sdk;
 };
 
 
 // public methods
 
-CAdministrationViewWidget::CAdministrationViewWidget()
+CLoginViewWidget::CLoginViewWidget()
 	:m_implPtr(nullptr)
 {
 	DefaultImtCoreQmlInitializer initializer;
 	initializer.Init();
 
-	m_implPtr = new CAdministrationViewWidgetImpl;
+	m_implPtr = new CLoginViewWidgetImpl;
 	QWidget* widgetPtr = m_implPtr->GetWidget(this);
 	if (widgetPtr != nullptr){
 		QVBoxLayout* layout = new QVBoxLayout(this);
@@ -118,7 +123,7 @@ CAdministrationViewWidget::CAdministrationViewWidget()
 }
 
 
-CAdministrationViewWidget::~CAdministrationViewWidget()
+CLoginViewWidget::~CLoginViewWidget()
 {
 	if (m_implPtr != nullptr){
 		delete m_implPtr;
@@ -126,7 +131,7 @@ CAdministrationViewWidget::~CAdministrationViewWidget()
 }
 
 
-bool CAdministrationViewWidget::SetConnectionParam(const QString& host, int httpPort, int wsPort)
+bool CLoginViewWidget::SetConnectionParam(const QString& host, int httpPort, int wsPort)
 {
 	if (m_implPtr != nullptr){
 		return m_implPtr->SetConnectionParam(host, httpPort, wsPort);
@@ -136,7 +141,7 @@ bool CAdministrationViewWidget::SetConnectionParam(const QString& host, int http
 }
 
 
-bool CAdministrationViewWidget::SetLoginParam(Login param)
+bool CLoginViewWidget::SetLoginParam(Login param)
 {
 	if (m_implPtr != nullptr){
 		return m_implPtr->SetLoginParam(param);
@@ -146,6 +151,6 @@ bool CAdministrationViewWidget::SetLoginParam(Login param)
 }
 
 
-} // namespace PumaClientSdk
+} // namespace AuthClientSdk
 
 

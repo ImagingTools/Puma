@@ -1,4 +1,4 @@
-TARGET = PumaClientSdk
+TARGET = AuthClientSdk
 
 include($(ACFDIR)/Config/QMake/SharedLibraryConfig.pri)
 include($$PWD/../../../Config/QMake/Puma.pri)
@@ -13,7 +13,7 @@ LIBS += -limtbase -limtlic -limtcrypt
 
 # Set configuration of custom builds:
 # ARX Compiler:
-ARXC_FILES += $$PWD/../PumaClientSdk.acc
+ARXC_FILES += $$PWD/../AuthClientSdk.acc
 ARXC_CONFIG = $$PWD/../../../Config/PumaServer.awc
 ARXC_OUTDIR = $$OUT_PWD/$$AUXINCLUDEPATH/GeneratedFiles/$$TARGET
 

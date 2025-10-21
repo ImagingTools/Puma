@@ -1,4 +1,4 @@
-#include <PumaClientSdk/PumaClientSdk.h>
+#include <AuthClientSdk/AuthClientSdk.h>
 
 
 // Qt includes
@@ -12,13 +12,14 @@
 // ImtCore includes
 #include <imtbase/IApplicationInfoController.h>
 #include <imtauth/IAccessTokenProvider.h>
+#include <imtauth/IUserPermissionsController.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Authorization.h>
 
 // Local includes
-#include <GeneratedFiles/PumaClientSdk/CPumaClientSdk.h>
+#include <GeneratedFiles/AuthClientSdk/CAuthClientSdk.h>
 
 
-namespace PumaClientSdk
+namespace AuthClientSdk
 {
 
 
@@ -61,9 +62,16 @@ public:
 			return false;
 		}
 
+		imtauth::IUserPermissionsController* userPermissionsControllerPtr = m_sdk.GetInterface<imtauth::IUserPermissionsController>();
+		if (userPermissionsControllerPtr == nullptr) {
+			qWarning() << "[Login] Failed: imtauth::IUserPermissionsController interface not found";
+			return false;
+		}
+
 		out.productId = applicationInfoPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
 		out.userName = userPtr->GetUserName();
 		out.accessToken = tokenProviderPtr->GetToken(QByteArray());
+		out.permissions = userPermissionsControllerPtr->GetPermissions(QByteArray());
 
 		return true;
 	}
@@ -116,7 +124,7 @@ public:
 	}
 
 private:
-	mutable CPumaClientSdk m_sdk;
+	mutable CAuthClientSdk m_sdk;
 };
 
 
@@ -183,4 +191,4 @@ void CAuthorizationController::SetProductId(const QByteArray& productId)
 }
 
 
-} // namespace PumaClientSdk
+} // namespace AuthClientSdk

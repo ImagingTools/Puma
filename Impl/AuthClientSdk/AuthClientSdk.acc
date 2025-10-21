@@ -103,7 +103,7 @@
                         <Data IsEnabled="true" Value="80024"/>
                     </AttributeInfo>
                     <AttributeInfo Id="VersionIdDesc" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="Lisa SDK"/>
+                        <Data IsEnabled="true" Value="Auth Client SDK"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -132,6 +132,7 @@
         <Interface InterfaceId="iauth::IRightsProvider" ComponentId="SimpleLoginWrap"/>
         <Interface InterfaceId="ibase::IApplicationInfo" ComponentId="ApplicationInfoController"/>
         <Interface InterfaceId="imtauth::IAccessTokenProvider" ComponentId="SimpleLoginWrap"/>
+        <Interface InterfaceId="imtauth::IUserPermissionsController" ComponentId="SimpleLoginWrap"/>
         <Interface InterfaceId="imtbase::IApplicationInfoController" ComponentId="ApplicationInfoController"/>
         <Interface InterfaceId="imtcom::IServerConnectionInterface" ComponentId="ServerConnectionInterface"/>
         <Interface InterfaceId="imtlic::IProductInfo" ComponentId="IdentifiableProductInfo"/>

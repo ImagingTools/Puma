@@ -1,21 +1,13 @@
 #pragma once
 
 
-#if defined _MSC_VER || defined __MINGW32__ || defined __MINGW64__
-#define PUMA_CLIENT_SDK_EXPORT __declspec(dllexport)
-#elif defined __GNUC__
-#define PUMA_CLIENT_SDK_EXPORT __attribute__((visibility("default")))
-#else
-#define PUMA_CLIENT_SDK_EXPORT
-#endif
-
 // Qt includes
 #include <QtCore/QString>
 #include <QtCore/QByteArray>
 #include <QtCore/QByteArrayList>
 
 
-namespace PumaClientSdk
+namespace AuthClientSdk
 {
 
 
@@ -32,9 +24,9 @@ struct Login
 
 
 /**
-*	\ingroup PumaClientSdk
+*	\ingroup AuthClientSdk
 */
-class PUMA_CLIENT_SDK_EXPORT CAuthorizationController
+class CAuthorizationController
 {
 public:
 	CAuthorizationController();
@@ -52,13 +44,6 @@ private:
 };
 
 
-} // namespace PumaClientSdk
+} // namespace AuthClientSdk
 
-
-/**
-\defgroup PumaClientSdk PUMA SDK
-
-\mainpage
-\section Introduction
-*/
 

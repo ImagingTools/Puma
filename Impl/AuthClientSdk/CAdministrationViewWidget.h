@@ -13,31 +13,31 @@
 // Qt includes
 #include <QtWidgets/QWidget>
 
-// PumaClientSdk includes
-#include <PumaClientSdk/PumaClientSdk.h>
+// AuthClientSdk includes
+#include <AuthClientSdk/AuthClientSdk.h>
 
 
-namespace PumaClientSdk
+namespace AuthClientSdk
 {
 
 
-class CLoginViewWidgetImpl;
+class CAdministrationViewWidgetImpl;
 
 
-class PUMA_CLIENT_SDK_EXPORT CLoginViewWidget: public QWidget
+class PUMA_CLIENT_SDK_EXPORT CAdministrationViewWidget: public QWidget
 {
 public:
-	CLoginViewWidget();
-	~CLoginViewWidget();
+	CAdministrationViewWidget();
+	~CAdministrationViewWidget();
 
 	bool SetConnectionParam(const QString& host, int httpPort, int wsPort);
 	bool SetLoginParam(Login param);
 
 private:
-	CLoginViewWidgetImpl* m_implPtr;
+	CAdministrationViewWidgetImpl* m_implPtr;
 };
 
 
-} // namespace PumaClientSdk
+} // namespace AuthClientSdk
 
 
