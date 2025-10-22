@@ -13,6 +13,15 @@ SUBDIRS += PumaServerConfigurator
 PumaServerConfigurator.file = ../../Impl/PumaServerConfigurator/QMake/PumaServerConfigurator.pro
 PumaServerConfigurator.depends = PumaServer
 
+SUBDIRS += PumaClient
+PumaClient.file = ../../Impl/PumaClient/QMake/PumaClient.pro
+
+SUBDIRS += AuthServerSdk
+AuthServerSdk.file = ../../Impl/AuthServerSdk/QMake/AuthServerSdk.pro
+
+SUBDIRS += AuthClientSdk
+AuthClientSdk.file = ../../Impl/AuthClientSdk/QMake/AuthClientSdk.pro
+
 # Plug-ins
 SUBDIRS += PumaSettingsPlugin
 PumaSettingsPlugin.file = ../../Impl/Plugins/PumaSettingsPlugin/QMake/PumaSettingsPlugin.pro
