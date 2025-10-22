@@ -15,7 +15,6 @@ endif()
 
 include(${ACFDIR}/Config/CMake/CustomBuild.cmake)
 include(${ACFDIR}/Config/CMake/ApplicationConfig.cmake)
-include(${IACFDIR}/Config/CMake/Qwt.cmake)
 include(${ACFDIR}/Config/CMake/AcfStdGui.cmake)
 include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
 
@@ -25,15 +24,7 @@ target_link_libraries(${PROJECT_NAME} imtlicgui imtauthgui imtclientgql imtgql i
 target_link_libraries(${PROJECT_NAME} imtqml imtdocguiqml imtauthguiqml imtlicguiqml imtcolguiqml imtguigqlqml imtguiqml imtcontrolsqml imtstylecontrolsqml imtcom imtauthsdl imtappsdl imtservergql imtbasesdl imtcol imtzip)
 target_link_libraries(${PROJECT_NAME}  Qt${QT_VERSION_MAJOR}::QuickWidgets  Qt${QT_VERSION_MAJOR}::WebSockets)
 
-# target_include_directories(${PROJECT_NAME} PRIVATE "${PROJECT_SOURCE_DIR}/../3rdParty/AuthClientSdk/include")
-# target_include_directories(${PROJECT_NAME} PRIVATE "${PROJECT_SOURCE_DIR}/../3rdParty/AuthServerSdk/include")
-
 target_link_libraries(${PROJECT_NAME} AuthClientSdk AuthServerSdk)
-# target_link_libraries(PumaClient ${PROJECT_SOURCE_DIR}/../3rdParty/AuthServerSdk/lib/AuthServerSdk.lib)
-
-if(QT_VERSION_MAJOR EQUAL 6)
-	# target_link_libraries(${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::OpenGLWidgets)
-endif()
 
 if(WIN32)
 	list(APPEND listOptions "--qmldir=${IMTCOREDIR}/Qml")

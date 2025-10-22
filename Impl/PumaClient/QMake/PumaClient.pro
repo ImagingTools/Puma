@@ -2,12 +2,6 @@ TARGET = PumaClient
 
 include($(ACFDIR)/Config/QMake/ApplicationConfig.pri)
 include($(ACFDIR)/Config/QMake/QtBaseConfig.pri)
-include($(IMTCOREDIR)/Config/QMake/OpenSSL.pri)
-
-HEADERS =
-QT += xml network sql quick qml websockets quickwidgets
-
-greaterThan(QT_MAJOR_VERSION, 5): QT += openglwidgets
 
 INCLUDEPATH += ../../../Include
 INCLUDEPATH += ../../../Impl
@@ -20,7 +14,6 @@ LIBS += -L$(IMTCOREDIR)/Lib/$$COMPILER_DIR -limtbase -limtdev -limtdb -limtgui -
 LIBS += -limtguiqml -limtdocguiqml -limtauthguiqml -limtlicguiqml -limtcolguiqml -limtguigqlqml -limtcontrolsqml -limtstylecontrolsqml
 LIBS += -limtauthsdl -limtappsdl -limtlicsdl -limtbasesdl -limtcolorsdl
 
-LIBS += -L../../../Lib/$$COMPILER_DIR -limthype -limthypegui
 
 # Set OS-specific build options:
 win32-msvc*{
@@ -32,7 +25,7 @@ win32-msvc*{
 
 # Set configuration of custom builds:
 # ARX Compiler:
-ARXC_CONFIG = $$PWD/../../../Config/PumaClient.awc
+ARXC_CONFIG = $$PWD/../../../Config/PumaServer.awc
 ARXC_FILES += $$PWD/../PumaClient.acc
 ARXC_OUTDIR = $$OUT_PWD/$$AUXINCLUDEPATH/GeneratedFiles/$$TARGET
 
