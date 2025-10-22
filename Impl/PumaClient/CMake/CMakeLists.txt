@@ -45,5 +45,5 @@ endif()
 
 include(${IACFDIR}/Config/CMake/zlib.cmake)
 if(UNIX)
-    target_link_libraries(${PROJECT_NAME} PRIVATE z)
+    target_link_libraries(${PROJECT_NAME} z)
 endif()
