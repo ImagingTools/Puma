@@ -78,7 +78,7 @@ public:
 		}
 
 		QQuickItem* quickItem = quickObjectPtr->GetQuickItem();
-		if (quickObjectPtr == nullptr){
+		if (quickItem == nullptr){
 			return false;
 		}
 
