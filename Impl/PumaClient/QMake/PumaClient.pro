@@ -16,6 +16,11 @@ LIBS += -L$(ACFSLNDIR)/Lib/$$COMPILER_DIR
 LIBS += -lAuthClientSdk
 LIBS += -lAuthServerSdk
 
+LIBS += -L$(ACFSLNDIR)/Lib/$$COMPILER_DIR -liauth -liservice -lAcfSlnLoc
+LIBS += -L$(IMTCOREDIR)/Lib/$$COMPILER_DIR -limtbase -limtmail -limtdb -limtgui -limtqml -limtlog -limtloggui -limtstyle -limtrest -limtlic -lImtCoreLoc -limtcrypt -limtauth -limtauthgql -limtbase -limtgql -limtauthdb -limtcom -limtauthsdl -limtcol -limtbasesdl -limtlicgql -limtguigql -limtapp -limtclientgql -limtservice -limtservergql -limtserverapp
+
+QT += xml network sql quick qml websockets
+
 # Set OS-specific build options:
 win32-msvc*{
 	QMAKE_CXXFLAGS += /wd4264
@@ -33,13 +38,13 @@ ARXC_OUTDIR = $$OUT_PWD/$$AUXINCLUDEPATH/GeneratedFiles/$$TARGET
 # Conversion of resource templates:
 win*{
 	# File transformation
-	ACF_CONVERT_FILES = $$PWD/../VC/PumaClient.rc.xtracf
+	# ACF_CONVERT_FILES = $$PWD/../VC/PumaClient.rc.xtracf
 	ACF_CONVERT_OUTDIR = $$AUXINCLUDEPATH/GeneratedFiles/$$TARGET
 	ACF_CONVERT_REGISTRY =  $$PWD/../VC/FileSubstitCopyApp.acc
 	ACF_CONVERT_CONFIG = $$PWD/../../../Config/BaseOnly.awc
 
-	RC_FILE = $$OUT_PWD/$$AUXINCLUDEPATH/GeneratedFiles/$$TARGET/PumaClient.rc
-	RC_INCLUDEPATH = $$_PRO_FILE_PWD_
+	# RC_FILE = $$OUT_PWD/$$AUXINCLUDEPATH/GeneratedFiles/$$TARGET/PumaClient.rc
+	# RC_INCLUDEPATH = $$_PRO_FILE_PWD_
 }
 
 include($(ACFDIR)/Config/QMake/AcfQt.pri)
