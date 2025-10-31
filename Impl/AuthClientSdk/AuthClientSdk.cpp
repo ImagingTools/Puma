@@ -13,6 +13,8 @@
 #include <imtbase/IApplicationInfoController.h>
 #include <imtauth/IAccessTokenProvider.h>
 #include <imtauth/IUserPermissionsController.h>
+#include <imtauth/ISuperuserController.h>
+#include <imtauth/ISuperuserProvider.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Authorization.h>
 
 // Local includes
@@ -123,6 +125,34 @@ public:
 		}
 	}
 
+	SuperuserStatus SuperuserExists(QString& errorMessage)
+	{
+		imtauth::ISuperuserProvider* superuserProviderPtr = m_sdk.GetInterface<imtauth::ISuperuserProvider>();
+		if (superuserProviderPtr != nullptr) {
+			imtauth::ISuperuserProvider::ExistsStatus status = superuserProviderPtr->SuperuserExists(errorMessage);
+			switch (status){
+			case imtauth::ISuperuserProvider::ES_EXISTS:
+				return Exists;
+			case imtauth::ISuperuserProvider::ES_NOT_EXISTS:
+				return NotExists;
+			case imtauth::ISuperuserProvider::ES_UNKNOWN:
+				return Unknown;
+			}
+		}
+
+		return Unknown;
+	}
+
+	bool CreateSuperuser(const QByteArray& password)
+	{
+		imtauth::ISuperuserController* superuserControllerPtr = m_sdk.GetInterface<imtauth::ISuperuserController>();
+		if (superuserControllerPtr != nullptr) {
+			return superuserControllerPtr->SetSuperuserPassword(password);
+		}
+
+		return false;
+	}
+
 private:
 	mutable CAuthClientSdk m_sdk;
 };
@@ -188,6 +218,26 @@ void CAuthorizationController::SetProductId(const QByteArray& productId)
 	if (m_implPtr != nullptr){
 		m_implPtr->SetProductId(productId);
 	}
+}
+
+
+SuperuserStatus CAuthorizationController::SuperuserExists(QString& errorMessage)
+{
+	if (m_implPtr != nullptr){
+		return m_implPtr->SuperuserExists(errorMessage);
+	}
+
+	return SuperuserStatus::Unknown;
+}
+
+
+bool CAuthorizationController::CreateSuperuser(const QByteArray& password)
+{
+	if (m_implPtr != nullptr){
+		return m_implPtr->CreateSuperuser(password);
+	}
+
+	return false;
 }
 
 

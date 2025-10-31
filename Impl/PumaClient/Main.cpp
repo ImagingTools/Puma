@@ -16,18 +16,26 @@ int main(int argc, char *argv[])
 
 	QApplication app(argc, argv);
 
-	AuthServerSdk::CAuthorizableServer server;
-	server.SetDatabaseSettings("localhost", 5432, "test", "postgres", "root");
-	server.SetPumaConnectionParam("localhost", 7788, 8788);
-	server.SetProductId("Test");
-	server.SetFeaturesFilePath(":/Features/TestFeatures");
+	// AuthServerSdk::CAuthorizableServer server;
+	// server.SetDatabaseSettings("localhost", 5432, "test", "postgres", "root");
+	// server.SetPumaConnectionParam("localhost", 7788, 8788);
+	// server.SetProductId("ProLife");
+	// server.SetFeaturesFilePath(":/Features/TestFeatures");
 
-	server.Start(7777, 8888);
+	// server.Start(7777, 8888);
 
 	AuthClientSdk::CAuthorizationController authorizationController;
 
 	AuthClientSdk::Login loginData;
-	authorizationController.SetProductId("Test");
+	authorizationController.SetProductId("ProLife");
+
+	QString errorMessage;
+	AuthClientSdk::SuperuserStatus suExists = authorizationController.SuperuserExists(errorMessage);
+	qDebug() << "SU exists" << suExists;
+
+	if (suExists == AuthClientSdk::NotExists){
+		authorizationController.CreateSuperuser("1");
+	}
 
 	bool ok = authorizationController.Login("su", "1", loginData);
 	if (ok){
@@ -38,7 +46,7 @@ int main(int argc, char *argv[])
 	}
 
 	AuthClientSdk::CAdministrationViewWidget loginWidget;
-	loginWidget.SetConnectionParam("localhost", 7777, 8888);
+	loginWidget.SetConnectionParam("localhost", 7778, 8778);
 	loginWidget.SetLoginParam(loginData);
 	loginWidget.setWindowTitle("Login Widget");
 	loginWidget.resize(1000, 1000);

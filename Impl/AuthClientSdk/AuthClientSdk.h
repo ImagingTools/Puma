@@ -23,6 +23,13 @@ struct Login
 };
 
 
+enum SuperuserStatus {
+	Unknown,
+	Exists,
+	NotExists
+};
+
+
 /**
 *	\ingroup AuthClientSdk
 */
@@ -38,6 +45,8 @@ public:
 	virtual bool HasPermission(const QByteArray& permissionId);
 	virtual QByteArray GetToken() const;
 	virtual void SetProductId(const QByteArray& productId);
+	virtual SuperuserStatus SuperuserExists(QString& errorMessage);
+	virtual bool CreateSuperuser(const QByteArray& password);
 
 private:
 	CAuthorizationControllerImpl* m_implPtr;

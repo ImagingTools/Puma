@@ -11,6 +11,7 @@
         <Element ComponentName="ApplicationInfoController" X="625" Y="775" Note=""/>
         <Element ComponentName="IdentifiableProductInfo" X="175" Y="275" Note=""/>
         <Element ComponentName="PumaClientEngine" X="650" Y="125" Note=""/>
+        <Element ComponentName="RemoteSuperuserController" X="1025" Y="625" Note=""/>
         <Element ComponentName="ServerConnectionInterface" X="1025" Y="250" Note=""/>
         <Element ComponentName="SimpleLoginWrap" X="500" Y="600" Note=""/>
         <Element ComponentName="SuperuserProvider" X="800" Y="525" Note=""/>

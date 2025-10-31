@@ -42,6 +42,18 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="RemoteSuperuserController" PackageId="ImtAuthGqlPck" ComponentId="RemoteSuperuserController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaClientEngine"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ApplicationInfoController"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="ServerConnectionInterface" PackageId="ImtComPck" ComponentId="ServerConnectionInterfaceParam">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -132,6 +144,8 @@
         <Interface InterfaceId="iauth::IRightsProvider" ComponentId="SimpleLoginWrap"/>
         <Interface InterfaceId="ibase::IApplicationInfo" ComponentId="ApplicationInfoController"/>
         <Interface InterfaceId="imtauth::IAccessTokenProvider" ComponentId="SimpleLoginWrap"/>
+        <Interface InterfaceId="imtauth::ISuperuserController" ComponentId="RemoteSuperuserController"/>
+        <Interface InterfaceId="imtauth::ISuperuserProvider" ComponentId="SuperuserProvider"/>
         <Interface InterfaceId="imtauth::IUserPermissionsController" ComponentId="SimpleLoginWrap"/>
         <Interface InterfaceId="imtbase::IApplicationInfoController" ComponentId="ApplicationInfoController"/>
         <Interface InterfaceId="imtcom::IServerConnectionInterface" ComponentId="ServerConnectionInterface"/>
