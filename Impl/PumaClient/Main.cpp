@@ -37,6 +37,9 @@ int main(int argc, char *argv[])
 		authorizationController.CreateSuperuser("1");
 	}
 
+	QByteArrayList userIds = authorizationController.GetUserIds();
+	QByteArray userId = authorizationController.CreateUser("Ivan", "Ivan", "1", "ivan@mail.ru");
+
 	bool ok = authorizationController.Login("su", "1", loginData);
 	if (ok){
 		qDebug() << "Login successfuly" << loginData.accessToken;
@@ -44,6 +47,8 @@ int main(int argc, char *argv[])
 	else{
 		qDebug() << "Login failed";
 	}
+
+	QByteArrayList userIds2 = authorizationController.GetUserIds();
 
 	AuthClientSdk::CAdministrationViewWidget loginWidget;
 	loginWidget.SetConnectionParam("localhost", 7778, 8778);

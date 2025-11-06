@@ -15,6 +15,9 @@
 #include <imtauth/IUserPermissionsController.h>
 #include <imtauth/ISuperuserController.h>
 #include <imtauth/ISuperuserProvider.h>
+#include <imtauth/IUserManager.h>
+#include <imtauth/IRoleManager.h>
+#include <imtauth/IUserGroupManager.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Authorization.h>
 
 // Local includes
@@ -146,14 +149,292 @@ public:
 	bool CreateSuperuser(const QByteArray& password)
 	{
 		imtauth::ISuperuserController* superuserControllerPtr = m_sdk.GetInterface<imtauth::ISuperuserController>();
-		if (superuserControllerPtr != nullptr) {
+		if (superuserControllerPtr != nullptr){
 			return superuserControllerPtr->SetSuperuserPassword(password);
 		}
 
 		return false;
 	}
 
+	QByteArrayList GetUserIds() const
+	{
+		imtauth::IUserManager* userManagerPtr = m_sdk.GetInterface<imtauth::IUserManager>();
+		if (userManagerPtr != nullptr){
+			return userManagerPtr->GetUserIds();
+		}
+
+		return QByteArrayList();
+	}
+
+	bool GetUser(const QByteArray& userId, User& userData) const
+	{
+		imtauth::IUserManager* userManagerPtr = m_sdk.GetInterface<imtauth::IUserManager>();
+		if (userManagerPtr != nullptr){
+			imtauth::IUserInfoUniquePtr userInfoPtr = userManagerPtr->GetUser(userId);
+			if (!userInfoPtr.IsValid()){
+				return false;
+			}
+
+			QByteArray productId = GetProductId();
+
+			userData.name = userInfoPtr->GetName();
+			userData.login = userInfoPtr->GetId();
+			userData.roleIds = userInfoPtr->GetRoles(productId);
+			userData.groupIds = userInfoPtr->GetGroups();
+	
+			return true;
+		}
+
+		return false;
+	}
+
+	bool RemoveUser(const QByteArray& userId)
+	{
+		imtauth::IUserManager* userManagerPtr = m_sdk.GetInterface<imtauth::IUserManager>();
+		if (userManagerPtr != nullptr){
+			return userManagerPtr->RemoveUser(userId);
+		}
+
+		return false;
+	}
+
+	QByteArray CreateUser(const QString& userName, const QByteArray& login, const QByteArray& password, const QString& email)
+	{
+		imtauth::IUserManager* userManagerPtr = m_sdk.GetInterface<imtauth::IUserManager>();
+		if (userManagerPtr != nullptr){
+			return userManagerPtr->CreateUser(userName, login, password, email);
+		}
+
+		return QByteArray();
+	}
+
+	bool ChangeUserPassword(const QByteArray& login, const QByteArray& oldPassword, const QByteArray& newPassword)
+	{
+		imtauth::IUserManager* userManagerPtr = m_sdk.GetInterface<imtauth::IUserManager>();
+		if (userManagerPtr != nullptr){
+			return userManagerPtr->ChangeUserPassword(login, oldPassword, newPassword);
+		}
+
+		return false;
+	}
+
+	bool AddRolesToUser(const QByteArray& userId, const QByteArrayList& roleIds)
+	{
+		imtauth::IUserManager* userManagerPtr = m_sdk.GetInterface<imtauth::IUserManager>();
+		if (userManagerPtr != nullptr){
+			return userManagerPtr->AddRolesToUser(userId, roleIds);
+		}
+
+		return false;
+	}
+
+	bool RemoveRolesFromUser(const QByteArray& userId, const QByteArrayList& roleIds)
+	{
+		imtauth::IUserManager* userManagerPtr = m_sdk.GetInterface<imtauth::IUserManager>();
+		if (userManagerPtr != nullptr){
+			return userManagerPtr->RemoveRolesFromUser(userId, roleIds);
+		}
+
+		return false;
+	}
+
+	QByteArrayList GetUserPermissions(const QByteArray& userId) const
+	{
+		imtauth::IUserManager* userManagerPtr = m_sdk.GetInterface<imtauth::IUserManager>();
+		if (userManagerPtr != nullptr){
+			return userManagerPtr->GetUserPermissions(userId);
+		}
+
+		return QByteArrayList();
+	}
+
+	QByteArrayList GetRoleIds() const
+	{
+		imtauth::IRoleManager* roleManagerPtr = m_sdk.GetInterface<imtauth::IRoleManager>();
+		if (roleManagerPtr != nullptr){
+			return roleManagerPtr->GetRoleIds();
+		}
+
+		return QByteArrayList();
+	}
+
+
+	bool GetRole(const QByteArray& roleId, Role& roleData) const
+	{
+		imtauth::IRoleManager* roleManagerPtr = m_sdk.GetInterface<imtauth::IRoleManager>();
+		if (roleManagerPtr != nullptr){
+			imtauth::IRoleUniquePtr roleInfoPtr = roleManagerPtr->GetRole(roleId);
+			if (!roleInfoPtr.IsValid()){
+				return false;
+			}
+
+			roleData.name = roleInfoPtr->GetRoleName();
+			roleData.description = roleInfoPtr->GetRoleDescription();
+			roleData.permissionIds = roleInfoPtr->GetPermissions();
+		}
+
+		return false;
+	}
+
+	
+	QByteArray CreateRole(
+				const QString& roleName,
+				const QString& roleDescription,
+				const QByteArrayList& permissions)
+	{
+		imtauth::IRoleManager* roleManagerPtr = m_sdk.GetInterface<imtauth::IRoleManager>();
+		if (roleManagerPtr != nullptr){
+			QByteArray productId = GetProductId();
+			return roleManagerPtr->CreateRole(productId, roleName, roleDescription, permissions);
+		}
+
+		return QByteArray();
+	}
+
+
+	bool RemoveRole(const QByteArray& roleId)
+	{
+		imtauth::IRoleManager* roleManagerPtr = m_sdk.GetInterface<imtauth::IRoleManager>();
+		if (roleManagerPtr != nullptr){
+			return roleManagerPtr->RemoveRole(roleId);
+		}
+
+		return false;
+	}
+
+
+	QByteArrayList GetRolePermissions(const QByteArray& roleId) const
+	{
+		imtauth::IRoleManager* roleManagerPtr = m_sdk.GetInterface<imtauth::IRoleManager>();
+		if (roleManagerPtr != nullptr){
+			return roleManagerPtr->GetRolePermissions(roleId);
+		}
+
+		return QByteArrayList();
+	}
+
+
+	bool AddPermissionsToRole(const QByteArray& roleId, const QByteArrayList& permissions)
+	{
+		imtauth::IRoleManager* roleManagerPtr = m_sdk.GetInterface<imtauth::IRoleManager>();
+		if (roleManagerPtr != nullptr){
+			return roleManagerPtr->AddPermissionsToRole(roleId, permissions);
+		}
+
+		return false;
+	}
+
+
+	bool RemovePermissionsFromRole(const QByteArray& roleId, const QByteArrayList& permissions)
+	{
+		imtauth::IRoleManager* roleManagerPtr = m_sdk.GetInterface<imtauth::IRoleManager>();
+		if (roleManagerPtr != nullptr){
+			return roleManagerPtr->RemovePermissionsFromRole(roleId, permissions);
+		}
+
+		return false;
+	}
+
+
+	QByteArrayList GetGroupIds() const
+	{
+		imtauth::IUserGroupManager* groupManagerPtr = m_sdk.GetInterface<imtauth::IUserGroupManager>();
+		if (groupManagerPtr != nullptr){
+			return groupManagerPtr->GetGroupIds();
+		}
+
+		return QByteArrayList();
+	}
+
+
+	QByteArray CreateGroup(const QString& groupName, const QString& description)
+	{
+		imtauth::IUserGroupManager* groupManagerPtr = m_sdk.GetInterface<imtauth::IUserGroupManager>();
+		if (groupManagerPtr != nullptr){
+			return groupManagerPtr->CreateGroup(groupName, description);
+		}
+
+		return QByteArray();
+	}
+
+
+	bool GetGroup(const QByteArray& groupId, Group& groupData) const
+	{
+		imtauth::IUserGroupManager* groupManagerPtr = m_sdk.GetInterface<imtauth::IUserGroupManager>();
+		if (groupManagerPtr != nullptr){
+			imtauth::IUserGroupInfoSharedPtr groupPtr = groupManagerPtr->GetGroup(groupId);
+			if (!groupPtr.IsValid()){
+				return false;
+			}
+
+			QByteArray productId = GetProductId();
+
+			groupData.name = groupPtr->GetName();
+			groupData.description = groupPtr->GetDescription();
+			groupData.roleIds = groupPtr->GetRoles(productId);
+			groupData.userIds = groupPtr->GetUsers();
+
+			return true;
+		}
+
+		return false;
+	}
+
+
+	bool AddUsersToGroup(const QByteArray& groupId, const QByteArrayList& userIds)
+	{
+		imtauth::IUserGroupManager* groupManagerPtr = m_sdk.GetInterface<imtauth::IUserGroupManager>();
+		if (groupManagerPtr != nullptr){
+			return groupManagerPtr->AddUsersToGroup(groupId, userIds);
+		}
+
+		return false;
+	}
+
+
+	bool RemoveUsersFromGroup(const QByteArray& groupId, const QByteArrayList& userIds)
+	{
+		imtauth::IUserGroupManager* groupManagerPtr = m_sdk.GetInterface<imtauth::IUserGroupManager>();
+		if (groupManagerPtr != nullptr){
+			return groupManagerPtr->RemoveUsersFromGroup(groupId, userIds);
+		}
+
+		return false;
+	}
+
+
+	bool AddRolesToGroup(const QByteArray& groupId, const QByteArrayList& roleIds)
+	{
+		imtauth::IUserGroupManager* groupManagerPtr = m_sdk.GetInterface<imtauth::IUserGroupManager>();
+		if (groupManagerPtr != nullptr){
+			return groupManagerPtr->AddRolesToGroup(groupId, roleIds);
+		}
+
+		return false;
+	}
+
+
+	bool RemoveRolesFromGroup(const QByteArray& groupId, const QByteArrayList& roleIds)
+	{
+		imtauth::IUserGroupManager* groupManagerPtr = m_sdk.GetInterface<imtauth::IUserGroupManager>();
+		if (groupManagerPtr != nullptr){
+			return groupManagerPtr->RemoveRolesFromGroup(groupId, roleIds);
+		}
+
+		return false;
+	}
+
 private:
+	QByteArray GetProductId() const
+	{
+		ibase::IApplicationInfo* applicationInfoPtr = m_sdk.GetInterface<ibase::IApplicationInfo>();
+		if (applicationInfoPtr == nullptr) {
+			return QByteArray();
+		}
+
+		return applicationInfoPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
+	}
+
 	mutable CAuthClientSdk m_sdk;
 };
 
@@ -235,6 +516,229 @@ bool CAuthorizationController::CreateSuperuser(const QByteArray& password)
 {
 	if (m_implPtr != nullptr){
 		return m_implPtr->CreateSuperuser(password);
+	}
+
+	return false;
+}
+
+
+QByteArrayList CAuthorizationController::GetUserIds() const
+{
+	if (m_implPtr != nullptr){
+		return m_implPtr->GetUserIds();
+	}
+
+	return QByteArrayList();
+}
+
+
+bool CAuthorizationController::GetUser(const QByteArray& userId, User& userData) const
+{
+	if (m_implPtr != nullptr){
+		return m_implPtr->GetUser(userId, userData);
+	}
+
+	return false;
+}
+
+
+bool CAuthorizationController::RemoveUser(const QByteArray& userId)
+{
+	if (m_implPtr != nullptr){
+		return m_implPtr->RemoveUser(userId);
+	}
+
+	return false;
+}
+
+
+QByteArray CAuthorizationController::CreateUser(const QString& userName, const QByteArray& login, const QByteArray& password, const QString& email)
+{
+	if (m_implPtr != nullptr){
+		return m_implPtr->CreateUser(userName, login, password, email);
+	}
+
+	return QByteArray();
+}
+
+
+bool CAuthorizationController::ChangeUserPassword(const QByteArray& login, const QByteArray& oldPassword, const QByteArray& newPassword)
+{
+	if (m_implPtr != nullptr){
+		return m_implPtr->ChangeUserPassword(login, oldPassword, newPassword);
+	}
+
+	return false;
+}
+
+
+bool CAuthorizationController::AddRolesToUser(const QByteArray& userId, const QByteArrayList& roleIds)
+{
+	if (m_implPtr != nullptr){
+		return m_implPtr->AddRolesToUser(userId, roleIds);
+	}
+
+	return false;
+}
+
+
+bool CAuthorizationController::RemoveRolesFromUser(const QByteArray& userId, const QByteArrayList& roleIds)
+{
+	if (m_implPtr != nullptr){
+		return m_implPtr->RemoveRolesFromUser(userId, roleIds);
+	}
+
+	return false;
+}
+
+
+QByteArrayList CAuthorizationController::GetUserPermissions(const QByteArray& userId) const
+{
+	if (m_implPtr != nullptr){
+		return m_implPtr->GetUserPermissions(userId);
+	}
+
+	return QByteArrayList();
+}
+
+
+QByteArrayList CAuthorizationController::GetRoleIds() const
+{
+	if (m_implPtr != nullptr){
+		return m_implPtr->GetRoleIds();
+	}
+
+	return QByteArrayList();
+}
+
+
+bool CAuthorizationController::GetRole(const QByteArray& roleId, Role& roleData) const
+{
+	if (m_implPtr != nullptr){
+		return m_implPtr->GetRole(roleId, roleData);
+	}
+
+	return false;
+}
+
+
+QByteArray CAuthorizationController::CreateRole(
+			const QString& roleName,
+			const QString& roleDescription,
+			const QByteArrayList& permissions)
+{
+	if (m_implPtr != nullptr){
+		return m_implPtr->CreateRole(roleName, roleDescription, permissions);
+	}
+
+	return QByteArray();
+}
+
+
+bool CAuthorizationController::RemoveRole(const QByteArray& roleId)
+{
+	if (m_implPtr != nullptr){
+		return m_implPtr->RemoveRole(roleId);
+	}
+
+	return false;
+}
+
+
+QByteArrayList CAuthorizationController::GetRolePermissions(const QByteArray& roleId) const
+{
+	if (m_implPtr != nullptr){
+		return m_implPtr->GetRolePermissions(roleId);
+	}
+
+	return QByteArrayList();
+}
+
+
+bool CAuthorizationController::AddPermissionsToRole(const QByteArray& roleId, const QByteArrayList& permissions)
+{
+	if (m_implPtr != nullptr){
+		return m_implPtr->AddPermissionsToRole(roleId, permissions);
+	}
+
+	return false;
+}
+
+
+bool CAuthorizationController::RemovePermissionsFromRole(const QByteArray& roleId, const QByteArrayList& permissions)
+{
+	if (m_implPtr != nullptr){
+		return m_implPtr->RemovePermissionsFromRole(roleId, permissions);
+	}
+
+	return false;
+}
+
+
+QByteArrayList CAuthorizationController::GetGroupIds() const
+{
+	if (m_implPtr != nullptr){
+		return m_implPtr->GetGroupIds();
+	}
+
+	return QByteArrayList();
+}
+
+
+QByteArray CAuthorizationController::CreateGroup(const QString& groupName, const QString& description)
+{
+	if (m_implPtr != nullptr){
+		return m_implPtr->CreateGroup(groupName, description);
+	}
+
+	return QByteArray();
+}
+
+
+bool CAuthorizationController::GetGroup(const QByteArray& groupId, Group& groupData) const
+{
+	if (m_implPtr != nullptr){
+		return m_implPtr->GetGroup(groupId, groupData);
+	}
+
+	return false;
+}
+
+
+bool CAuthorizationController::AddUsersToGroup(const QByteArray& groupId, const QByteArrayList& userIds)
+{
+	if (m_implPtr != nullptr){
+		return m_implPtr->AddUsersToGroup(groupId, userIds);
+	}
+
+	return false;
+}
+
+
+bool CAuthorizationController::RemoveUsersFromGroup(const QByteArray& groupId, const QByteArrayList& userIds)
+{
+	if (m_implPtr != nullptr){
+		return m_implPtr->RemoveUsersFromGroup(groupId, userIds);
+	}
+
+	return false;
+}
+
+
+bool CAuthorizationController::AddRolesToGroup(const QByteArray& groupId, const QByteArrayList& roleIds)
+{
+	if (m_implPtr != nullptr){
+		return m_implPtr->AddRolesToGroup(groupId, roleIds);
+	}
+
+	return false;
+}
+
+
+bool CAuthorizationController::RemoveRolesFromGroup(const QByteArray& groupId, const QByteArrayList& roleIds)
+{
+	if (m_implPtr != nullptr){
+		return m_implPtr->RemoveRolesFromGroup(groupId, roleIds);
 	}
 
 	return false;

@@ -8,17 +8,22 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="ApplicationInfoController" X="625" Y="775" Note=""/>
-        <Element ComponentName="IdentifiableProductInfo" X="175" Y="275" Note=""/>
-        <Element ComponentName="PumaClientEngine" X="650" Y="125" Note=""/>
-        <Element ComponentName="RemoteSuperuserController" X="1025" Y="625" Note=""/>
-        <Element ComponentName="ServerConnectionInterface" X="1025" Y="250" Note=""/>
-        <Element ComponentName="SimpleLoginWrap" X="500" Y="600" Note=""/>
-        <Element ComponentName="SuperuserProvider" X="800" Y="525" Note=""/>
-        <Element ComponentName="UserInfo" X="800" Y="625" Note=""/>
-        <Element ComponentName="VersionInfo" X="625" Y="350" Note=""/>
-        <Element ComponentName="WebSocketClient" X="275" Y="500" Note=""/>
-        <Element ComponentName="WebSocketProtocolEngine" X="200" Y="625" Note=""/>
+        <Element ComponentName="ApplicationInfoController" X="625" Y="450" Note=""/>
+        <Element ComponentName="ClientRequestGroupManager" X="200" Y="550" Note=""/>
+        <Element ComponentName="ClientRequestRoleManager" X="625" Y="550" Note=""/>
+        <Element ComponentName="ClientRequestUserManager" X="1025" Y="650" Note=""/>
+        <Element ComponentName="IdentifiableProductInfo" X="175" Y="75" Note=""/>
+        <Element ComponentName="PumaClientEngine" X="625" Y="75" Note=""/>
+        <Element ComponentName="RemoteSuperuserController" X="1025" Y="350" Note=""/>
+        <Element ComponentName="Role" X="600" Y="675" Note=""/>
+        <Element ComponentName="ServerConnectionInterface" X="1025" Y="75" Note=""/>
+        <Element ComponentName="SimpleLoginWrap" X="275" Y="375" Note=""/>
+        <Element ComponentName="SuperuserProvider" X="625" Y="375" Note=""/>
+        <Element ComponentName="UserGroupInfo" X="200" Y="650" Note=""/>
+        <Element ComponentName="UserInfo" X="1025" Y="450" Note=""/>
+        <Element ComponentName="VersionInfo" X="850" Y="200" Note=""/>
+        <Element ComponentName="WebSocketClient" X="275" Y="275" Note=""/>
+        <Element ComponentName="WebSocketProtocolEngine" X="150" Y="175" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

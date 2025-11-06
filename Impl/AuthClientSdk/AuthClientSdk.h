@@ -22,6 +22,30 @@ struct Login
 	QByteArrayList permissions;
 };
 
+struct User 
+{
+	QString name;
+	QString email;
+	QByteArray login;
+	QByteArrayList roleIds;
+	QByteArrayList groupIds;
+};
+
+struct Role 
+{
+	QString name;
+	QString description;
+	QByteArrayList permissionIds;
+};
+
+struct Group 
+{
+	QString name;
+	QString description;
+	QByteArrayList userIds;
+	QByteArrayList roleIds;
+};
+
 
 enum SuperuserStatus {
 	Unknown,
@@ -47,6 +71,33 @@ public:
 	virtual void SetProductId(const QByteArray& productId);
 	virtual SuperuserStatus SuperuserExists(QString& errorMessage);
 	virtual bool CreateSuperuser(const QByteArray& password);
+	virtual QByteArrayList GetUserIds() const;
+	virtual bool GetUser(const QByteArray& userId, User& userData) const;
+	virtual bool RemoveUser(const QByteArray& userId);
+	virtual QByteArray CreateUser(const QString& userName, const QByteArray& login, const QByteArray& password, const QString& email);
+	virtual bool ChangeUserPassword(const QByteArray& login, const QByteArray& oldPassword, const QByteArray& newPassword);
+	virtual bool AddRolesToUser(const QByteArray& userId, const QByteArrayList& roleIds);
+	virtual bool RemoveRolesFromUser(const QByteArray& userId, const QByteArrayList& roleIds);
+	virtual QByteArrayList GetUserPermissions(const QByteArray& userId) const;
+
+	virtual QByteArrayList GetRoleIds() const;
+	virtual bool GetRole(const QByteArray& roleId, Role& roleData) const;
+	virtual QByteArray CreateRole(
+				const QString& roleName,
+				const QString& roleDescription = QString(),
+				const QByteArrayList& permissions = QByteArrayList());
+	virtual bool RemoveRole(const QByteArray& roleId);
+	virtual QByteArrayList GetRolePermissions(const QByteArray& roleId) const;
+	virtual bool AddPermissionsToRole(const QByteArray& roleId, const QByteArrayList& permissions);
+	virtual bool RemovePermissionsFromRole(const QByteArray& roleId, const QByteArrayList& permissions);
+
+	virtual QByteArrayList GetGroupIds() const;
+	virtual QByteArray CreateGroup(const QString& groupName, const QString& description);
+	virtual bool GetGroup(const QByteArray& groupId, Group& groupData) const;
+	virtual bool AddUsersToGroup(const QByteArray& groupId, const QByteArrayList& userIds);
+	virtual bool RemoveUsersFromGroup(const QByteArray& groupId, const QByteArrayList& userIds);
+	virtual bool AddRolesToGroup(const QByteArray& groupId, const QByteArrayList& roleIds);
+	virtual bool RemoveRolesFromGroup(const QByteArray& groupId, const QByteArrayList& roleIds);
 
 private:
 	CAuthorizationControllerImpl* m_implPtr;

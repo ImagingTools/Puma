@@ -19,6 +19,60 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="ClientRequestGroupManager" PackageId="ImtAuthGqlPck" ComponentId="ClientRequestGroupManager">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="AccessTokenProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SimpleLoginWrap"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaClientEngine"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ApplicationInfoController"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserGroupFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="UserGroupInfo"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ClientRequestRoleManager" PackageId="ImtAuthGqlPck" ComponentId="ClientRequestRoleManager">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="AccessTokenProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SimpleLoginWrap"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaClientEngine"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ApplicationInfoController"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RoleFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="Role"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ClientRequestUserManager" PackageId="ImtAuthGqlPck" ComponentId="ClientRequestUserManager">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="AccessTokenProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SimpleLoginWrap"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaClientEngine"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ApplicationInfoController"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="UserInfo"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="IdentifiableProductInfo" PackageId="ImtLicensePck" ComponentId="IdentifiableProductInfo">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap/>
@@ -52,6 +106,11 @@
                         <Data IsEnabled="true" Value="ApplicationInfoController"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="Role" PackageId="ImtAuthPck" ComponentId="Role">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap/>
             </Data>
         </Element>
         <Element Id="ServerConnectionInterface" PackageId="ImtComPck" ComponentId="ServerConnectionInterfaceParam">
@@ -99,6 +158,11 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="UserGroupInfo" PackageId="ImtAuthPck" ComponentId="UserGroupInfo">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
         <Element Id="UserInfo" PackageId="ImtAuthPck" ComponentId="UserInfo">
             <Data IsEnabled="true" Flags="2">
                 <AttributeInfoMap>
@@ -144,8 +208,11 @@
         <Interface InterfaceId="iauth::IRightsProvider" ComponentId="SimpleLoginWrap"/>
         <Interface InterfaceId="ibase::IApplicationInfo" ComponentId="ApplicationInfoController"/>
         <Interface InterfaceId="imtauth::IAccessTokenProvider" ComponentId="SimpleLoginWrap"/>
+        <Interface InterfaceId="imtauth::IRoleManager" ComponentId="ClientRequestRoleManager"/>
         <Interface InterfaceId="imtauth::ISuperuserController" ComponentId="RemoteSuperuserController"/>
         <Interface InterfaceId="imtauth::ISuperuserProvider" ComponentId="SuperuserProvider"/>
+        <Interface InterfaceId="imtauth::IUserGroupManager" ComponentId="ClientRequestGroupManager"/>
+        <Interface InterfaceId="imtauth::IUserManager" ComponentId="ClientRequestUserManager"/>
         <Interface InterfaceId="imtauth::IUserPermissionsController" ComponentId="SimpleLoginWrap"/>
         <Interface InterfaceId="imtbase::IApplicationInfoController" ComponentId="ApplicationInfoController"/>
         <Interface InterfaceId="imtcom::IServerConnectionInterface" ComponentId="ServerConnectionInterface"/>

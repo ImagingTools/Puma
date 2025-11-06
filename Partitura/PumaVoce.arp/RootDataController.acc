@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5352" Description="ACF"/>
-            <Version Id="1" Number="2237" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5430" Description="ACF"/>
+            <Version Id="1" Number="2253" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -433,9 +433,5 @@
     </ExportedInterfaces>
     <ExportedComponents>
         <Component ExportedId="JwtSessionController" ComponentId="AuthorizationController/JwtSessionController"/>
-        <Component ExportedId="RoleDocumentSqlRepository" ComponentId="Repositories/RoleDocumentSqlRepository"/>
-        <Component ExportedId="UserGroupSqlRepository" ComponentId="Repositories/UserGroupSqlRepository"/>
-        <Component ExportedId="UserSessionRepository" ComponentId="AuthorizationController/UserSessionRepository"/>
-        <Component ExportedId="UserSqlRepository" ComponentId="Repositories/UserSqlRepository"/>
     </ExportedComponents>
 </Acf>

@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5352" Description="ACF"/>
-            <Version Id="1" Number="2237" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5430" Description="ACF"/>
+            <Version Id="1" Number="2253" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -14,15 +14,6 @@
         <Element ComponentName="Pages" X="250" Y="625" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
-        <EmbededRegistry Id="Pages">
-            <PositionMap>
-                <Element ComponentName="Demultiplexer" X="575" Y="100" Note=""/>
-                <Element ComponentName="RolesPage" X="175" Y="350" Note=""/>
-                <Element ComponentName="UserGroupsPage" X="1000" Y="350" Note=""/>
-                <Element ComponentName="UsersPage" X="600" Y="350" Note=""/>
-            </PositionMap>
-            <EmbeddedRegistries/>
-        </EmbededRegistry>
         <EmbededRegistry Id="Repositories">
             <PositionMap>
                 <Element ComponentName="RoleDocumentSqlRepository" X="200" Y="100" Note=""/>
@@ -31,6 +22,15 @@
                 <Element ComponentName="UserSqlRepository" X="775" Y="100" Note=""/>
                 <Element ComponentName="UserVerification" X="175" Y="650" Note=""/>
                 <Element ComponentName="UserVerificationCollection" X="175" Y="500" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+        <EmbededRegistry Id="Pages">
+            <PositionMap>
+                <Element ComponentName="Demultiplexer" X="575" Y="100" Note=""/>
+                <Element ComponentName="RolesPage" X="175" Y="350" Note=""/>
+                <Element ComponentName="UserGroupsPage" X="1000" Y="350" Note=""/>
+                <Element ComponentName="UsersPage" X="600" Y="350" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>
