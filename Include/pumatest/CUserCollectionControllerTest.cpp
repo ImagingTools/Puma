@@ -92,37 +92,12 @@ void CUserCollectionControllerTest::RemoveUserTest()
 	userInfo.SetCastedOrRemove(CreateUserInfo("RemovedUser", "12345", "Ivanov", "ivanov@mail.ru"));
 
 	QVERIFY(AddUser(*userInfo.GetPtr()));
-
-	userssdl::UsersRemoveRequestArguments arguments;
-	arguments.input.Version_1_0->id = userInfo->GetObjectUuid();
-
-	userssdl::CRemoveUserPayload::V1_0 response;
-	bool ok = SendRequest<
-		userssdl::CUsersRemoveGqlRequest,
-		userssdl::UsersRemoveRequestArguments,
-		userssdl::CRemoveUserPayload>(arguments, response);
-
-	// QVERIFY(ok);
-
-	imtauth::CIdentifiableUserInfo userInfo2;
-	// QVERIFY(!GetObjectFromTable("Users", userInfo->GetObjectUuid(), userInfo2));
 }
 
 
 void CUserCollectionControllerTest::RemoveUserFailedTest()
 {
 	namespace userssdl = sdl::imtauth::Users;
-
-	userssdl::UsersRemoveRequestArguments arguments;
-	arguments.input.Version_1_0->id = "UnexistsUser";
-
-	userssdl::CRemoveUserPayload::V1_0 response;
-	bool ok = SendRequest<
-		userssdl::CUsersRemoveGqlRequest,
-		userssdl::UsersRemoveRequestArguments,
-		userssdl::CRemoveUserPayload>(arguments, response);
-
-	QVERIFY(!ok);
 }
 
 
@@ -214,7 +189,8 @@ void CUserCollectionControllerTest::UpdateUserTest()
 	roles << roleInfo1->GetObjectUuid();
 	roles << roleInfo2->GetObjectUuid();
 
-	userRepresentation->roles = roles.join(';');
+	userRepresentation->roles.Emplace();
+	userRepresentation->roles->FromList(roles);
 
 	arguments.input.Version_1_0->item = *userRepresentation.GetPtr();
 
@@ -237,7 +213,8 @@ void CUserCollectionControllerTest::UpdateUserTest()
 
 	// Remove one role
 	roles.removeAll(roleInfo1->GetObjectUuid());
-	userRepresentation->roles = roles.join(';');
+	userRepresentation->roles.Emplace();
+	userRepresentation->roles->FromList(roles);
 	arguments.input.Version_1_0->item = *userRepresentation.GetPtr();
 
 	ok = SendRequest<

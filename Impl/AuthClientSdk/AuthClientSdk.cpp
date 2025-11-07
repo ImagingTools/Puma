@@ -18,7 +18,6 @@
 #include <imtauth/IUserManager.h>
 #include <imtauth/IRoleManager.h>
 #include <imtauth/IUserGroupManager.h>
-#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Authorization.h>
 
 // Local includes
 #include <GeneratedFiles/AuthClientSdk/CAuthClientSdk.h>
@@ -73,6 +72,8 @@ public:
 			return false;
 		}
 
+		out.Clear();
+
 		out.productId = applicationInfoPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
 		out.userName = userPtr->GetUserName();
 		out.accessToken = tokenProviderPtr->GetToken(QByteArray());
@@ -107,10 +108,10 @@ public:
 	{
 		imtauth::IAccessTokenProvider* accessTokenProviderPtr = m_sdk.GetInterface<imtauth::IAccessTokenProvider>();
 		if (accessTokenProviderPtr != nullptr) {
-			QByteArray userId;
-			QByteArray token = accessTokenProviderPtr->GetToken(userId);
-			return token;
+			return accessTokenProviderPtr->GetToken("");
 		}
+
+		qWarning() << "[GetToken] Failed: imtauth::IAccessTokenProvider interface not found";
 
 		return QByteArray();
 	}
@@ -143,6 +144,8 @@ public:
 			}
 		}
 
+		qWarning() << "[SuperuserExists] Failed: imtauth::ISuperuserProvider interface not found";
+
 		return Unknown;
 	}
 
@@ -153,6 +156,8 @@ public:
 			return superuserControllerPtr->SetSuperuserPassword(password);
 		}
 
+		qWarning() << "[CreateSuperuser] Failed: imtauth::ISuperuserController interface not found";
+
 		return false;
 	}
 
@@ -162,6 +167,8 @@ public:
 		if (userManagerPtr != nullptr){
 			return userManagerPtr->GetUserIds();
 		}
+
+		qWarning() << "[GetUserIds] Failed: imtauth::IUserManager interface not found";
 
 		return QByteArrayList();
 	}
@@ -185,6 +192,8 @@ public:
 			return true;
 		}
 
+		qWarning() << "[GetUser] Failed: imtauth::IUserManager interface not found";
+
 		return false;
 	}
 
@@ -194,6 +203,8 @@ public:
 		if (userManagerPtr != nullptr){
 			return userManagerPtr->RemoveUser(userId);
 		}
+
+		qWarning() << "[RemoveUser] Failed: imtauth::IUserManager interface not found";
 
 		return false;
 	}
@@ -205,6 +216,8 @@ public:
 			return userManagerPtr->CreateUser(userName, login, password, email);
 		}
 
+		qWarning() << "[CreateUser] Failed: imtauth::IUserManager interface not found";
+
 		return QByteArray();
 	}
 
@@ -214,6 +227,8 @@ public:
 		if (userManagerPtr != nullptr){
 			return userManagerPtr->ChangeUserPassword(login, oldPassword, newPassword);
 		}
+
+		qWarning() << "[ChangeUserPassword] Failed: imtauth::IUserManager interface not found";
 
 		return false;
 	}
@@ -225,6 +240,8 @@ public:
 			return userManagerPtr->AddRolesToUser(userId, roleIds);
 		}
 
+		qWarning() << "[AddRolesToUser] Failed: imtauth::IUserManager interface not found";
+
 		return false;
 	}
 
@@ -234,6 +251,8 @@ public:
 		if (userManagerPtr != nullptr){
 			return userManagerPtr->RemoveRolesFromUser(userId, roleIds);
 		}
+
+		qWarning() << "[RemoveRolesFromUser] Failed: imtauth::IUserManager interface not found";
 
 		return false;
 	}
@@ -245,6 +264,8 @@ public:
 			return userManagerPtr->GetUserPermissions(userId);
 		}
 
+		qWarning() << "[GetUserPermissions] Failed: imtauth::IUserManager interface not found";
+
 		return QByteArrayList();
 	}
 
@@ -254,6 +275,8 @@ public:
 		if (roleManagerPtr != nullptr){
 			return roleManagerPtr->GetRoleIds();
 		}
+
+		qWarning() << "[GetRoleIds] Failed: imtauth::IRoleManager interface not found";
 
 		return QByteArrayList();
 	}
@@ -273,6 +296,8 @@ public:
 			roleData.permissionIds = roleInfoPtr->GetPermissions();
 		}
 
+		qWarning() << "[GetRole] Failed: imtauth::IRoleManager interface not found";
+
 		return false;
 	}
 
@@ -288,6 +313,8 @@ public:
 			return roleManagerPtr->CreateRole(productId, roleName, roleDescription, permissions);
 		}
 
+		qWarning() << "[CreateRole] Failed: imtauth::IRoleManager interface not found";
+
 		return QByteArray();
 	}
 
@@ -298,6 +325,8 @@ public:
 		if (roleManagerPtr != nullptr){
 			return roleManagerPtr->RemoveRole(roleId);
 		}
+
+		qWarning() << "[RemoveRole] Failed: imtauth::IRoleManager interface not found";
 
 		return false;
 	}
@@ -310,6 +339,8 @@ public:
 			return roleManagerPtr->GetRolePermissions(roleId);
 		}
 
+		qWarning() << "[GetRolePermissions] Failed: imtauth::IRoleManager interface not found";
+
 		return QByteArrayList();
 	}
 
@@ -320,6 +351,8 @@ public:
 		if (roleManagerPtr != nullptr){
 			return roleManagerPtr->AddPermissionsToRole(roleId, permissions);
 		}
+
+		qWarning() << "[AddPermissionsToRole] Failed: imtauth::IRoleManager interface not found";
 
 		return false;
 	}
@@ -332,6 +365,8 @@ public:
 			return roleManagerPtr->RemovePermissionsFromRole(roleId, permissions);
 		}
 
+		qWarning() << "[RemovePermissionsFromRole] Failed: imtauth::IRoleManager interface not found";
+
 		return false;
 	}
 
@@ -342,6 +377,8 @@ public:
 		if (groupManagerPtr != nullptr){
 			return groupManagerPtr->GetGroupIds();
 		}
+
+		qWarning() << "[GetGroupIds] Failed: imtauth::IUserGroupManager interface not found";
 
 		return QByteArrayList();
 	}
@@ -354,7 +391,22 @@ public:
 			return groupManagerPtr->CreateGroup(groupName, description);
 		}
 
+		qWarning() << "[CreateGroup] Failed: imtauth::IUserGroupManager interface not found";
+
 		return QByteArray();
+	}
+
+
+	bool RemoveGroup(const QByteArray& groupId)
+	{
+		imtauth::IUserGroupManager* groupManagerPtr = m_sdk.GetInterface<imtauth::IUserGroupManager>();
+		if (groupManagerPtr != nullptr){
+			return groupManagerPtr->RemoveGroup(groupId);
+		}
+
+		qWarning() << "[RemoveGroup] Failed: imtauth::IUserGroupManager interface not found";
+
+		return false;
 	}
 
 
@@ -377,6 +429,8 @@ public:
 			return true;
 		}
 
+		qWarning() << "[GetGroup] Failed: imtauth::IUserGroupManager interface not found";
+
 		return false;
 	}
 
@@ -387,6 +441,8 @@ public:
 		if (groupManagerPtr != nullptr){
 			return groupManagerPtr->AddUsersToGroup(groupId, userIds);
 		}
+
+		qWarning() << "[AddUsersToGroup] Failed: imtauth::IUserGroupManager interface not found";
 
 		return false;
 	}
@@ -399,6 +455,8 @@ public:
 			return groupManagerPtr->RemoveUsersFromGroup(groupId, userIds);
 		}
 
+		qWarning() << "[RemoveUsersFromGroup] Failed: imtauth::IUserGroupManager interface not found";
+
 		return false;
 	}
 
@@ -410,6 +468,8 @@ public:
 			return groupManagerPtr->AddRolesToGroup(groupId, roleIds);
 		}
 
+		qWarning() << "[AddRolesToGroup] Failed: imtauth::IUserGroupManager interface not found";
+
 		return false;
 	}
 
@@ -420,6 +480,8 @@ public:
 		if (groupManagerPtr != nullptr){
 			return groupManagerPtr->RemoveRolesFromGroup(groupId, roleIds);
 		}
+
+		qWarning() << "[RemoveRolesFromGroup] Failed: imtauth::IUserGroupManager interface not found";
 
 		return false;
 	}
@@ -692,6 +754,16 @@ QByteArray CAuthorizationController::CreateGroup(const QString& groupName, const
 	}
 
 	return QByteArray();
+}
+
+
+bool CAuthorizationController::RemoveGroup(const QByteArray& groupId)
+{
+	if (m_implPtr != nullptr){
+		return m_implPtr->RemoveGroup(groupId);
+	}
+
+	return false;
 }
 
 

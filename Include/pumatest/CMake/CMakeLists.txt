@@ -13,6 +13,7 @@ target_link_libraries(
 	Qt${QT_VERSION_MAJOR}::Widgets)
 
 target_link_libraries(${PROJECT_NAME} itest ipackage imtbase imtauth imtcrypt imtservergql imtdb imtgql imtgqltest imtauthgql ifile iser imtbasesdl imtauthsdl imtcol)
+target_link_libraries(${PROJECT_NAME} AuthClientSdk AuthServerSdk)
 
 include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 include(${ACFDIR}/Config/CMake/AcfStdGui.cmake)

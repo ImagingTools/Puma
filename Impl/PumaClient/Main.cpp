@@ -15,7 +15,6 @@ int main(int argc, char *argv[])
 	Q_INIT_RESOURCE(PumaClient);
 
 	QApplication app(argc, argv);
-
 	// AuthServerSdk::CAuthorizableServer server;
 	// server.SetDatabaseSettings("localhost", 5432, "test", "postgres", "root");
 	// server.SetPumaConnectionParam("localhost", 7788, 8788);

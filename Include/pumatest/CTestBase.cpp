@@ -203,34 +203,14 @@ sdl::imtauth::Users::CUserData::V1_0* CTestBase::CreateUserDataFromUserInfo(
 	QByteArrayList groupList = userInfo.GetGroups();
 	groupList.removeAll("");
 
-	userDataPtr->groups = groupList.join(';');
+	userDataPtr->groups.Emplace().FromList(groupList);
 
 	if (!productId.isEmpty()){
 		QByteArrayList roleList = userInfo.GetRoles(productId);
 		roleList.removeAll("");
 
-		userDataPtr->roles = roleList.join(';');
+		userDataPtr->roles.Emplace().FromList(roleList);
 	}
-
-	QList<istd::TSharedNullable<sdl::imtauth::Users::CSystemInfo::V1_0>> list;
-	imtauth::IUserInfo::SystemInfoList systemInfoList = userInfo.GetSystemInfos();
-	for (const imtauth::IUserInfo::SystemInfo& systemInfo : systemInfoList){
-		sdl::imtauth::Users::CSystemInfo::V1_0 info;
-
-		info.id = QByteArray(systemInfo.systemId);
-
-		if (systemInfo.systemId.isEmpty()){
-			info.name = QString("Internal");
-		}
-		else{
-			info.name = QString(systemInfo.systemName);
-		}
-
-		info.enabled = bool(systemInfo.enabled);
-
-		list << info;
-	}
-	userDataPtr->systemInfos = std::move(list);
 
 	return userDataPtr.PopPtr();
 }
@@ -267,7 +247,7 @@ sdl::imtauth::Roles::CRoleData::V1_0* CTestBase::CreateRoleDataFromUserInfo(cons
 
 	QByteArrayList parentRoles = roleInfo.GetIncludedRoles();
 	parentRoles.removeAll("");
-	roleDataPtr->parentRoles = parentRoles.join(';');
+	roleDataPtr->parentRoles.Emplace().FromList(parentRoles);
 
 	QByteArrayList features = roleInfo.GetPermissions();
 	roleDataPtr->permissions = features.join(';');

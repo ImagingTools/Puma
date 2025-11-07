@@ -20,6 +20,13 @@ struct Login
 	QString userName;
 	QByteArray productId;
 	QByteArrayList permissions;
+
+	void Clear(){
+		accessToken.clear();
+		userName.clear();
+		productId.clear();
+		permissions.clear();
+	}
 };
 
 struct User 
@@ -93,6 +100,7 @@ public:
 
 	virtual QByteArrayList GetGroupIds() const;
 	virtual QByteArray CreateGroup(const QString& groupName, const QString& description);
+	virtual bool RemoveGroup(const QByteArray& groupId);
 	virtual bool GetGroup(const QByteArray& groupId, Group& groupData) const;
 	virtual bool AddUsersToGroup(const QByteArray& groupId, const QByteArrayList& userIds);
 	virtual bool RemoveUsersFromGroup(const QByteArray& groupId, const QByteArrayList& userIds);
