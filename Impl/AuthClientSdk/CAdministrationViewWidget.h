@@ -15,7 +15,7 @@ namespace AuthClientSdk
 class CAdministrationViewWidgetImpl;
 
 
-class CAdministrationViewWidget: public QWidget
+class AUTH_CLIENT_SDK_EXPORT CAdministrationViewWidget: public QWidget
 {
 public:
 	CAdministrationViewWidget();

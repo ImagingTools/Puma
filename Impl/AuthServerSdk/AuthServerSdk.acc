@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5423" Description="ACF"/>
-            <Version Id="1" Number="2252" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395266" Description="Qt Framework"/>
+            <Version Id="0" Number="5416" Description="ACF"/>
+            <Version Id="1" Number="2251" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395265" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -111,7 +111,14 @@
         </Element>
         <Element Id="ServerConnectionInterfaceParam" PackageId="ImtComPck" ComponentId="ServerConnectionInterfaceParam">
             <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap/>
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DefaultHttpPort" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="9100"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DefaultWebSocketPort" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="9101"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
             </Data>
         </Element>
         <Element Id="ServerController" PackageId="ImtComPck" ComponentId="ServerController">

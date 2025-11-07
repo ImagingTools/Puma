@@ -83,11 +83,12 @@ public:
 		}
 
 		quickItem->setProperty("productId", param.productId);
-		QMetaObject::invokeMethod(	quickItem,
-									"setLoginData",
-									Q_ARG(QVariant, QVariant::fromValue(param.accessToken)),
-									Q_ARG(QVariant, QVariant::fromValue(param.userName)),
-									Q_ARG(QVariant, QVariant::fromValue(param.permissions)));
+		QMetaObject::invokeMethod(
+					quickItem,
+					"setLoginData",
+					Q_ARG(QVariant, QVariant::fromValue(param.accessToken)),
+					Q_ARG(QVariant, QVariant::fromValue(param.userName)),
+					Q_ARG(QVariant, QVariant::fromValue(param.permissions)));
 
 		return true;
 	}

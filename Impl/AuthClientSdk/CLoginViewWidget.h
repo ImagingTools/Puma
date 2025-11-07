@@ -15,7 +15,7 @@ namespace AuthClientSdk
 class CLoginViewWidgetImpl;
 
 
-class CLoginViewWidget: public QWidget
+class AUTH_CLIENT_SDK_EXPORT CLoginViewWidget: public QWidget
 {
 public:
 	CLoginViewWidget();
