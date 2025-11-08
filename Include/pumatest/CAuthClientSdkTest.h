@@ -27,10 +27,6 @@ private slots:
 	void cleanupTestCase();
 
 private:
-	bool CreateUser(const QByteArray& login, const QString& roleId, const QByteArrayList& permissions, AuthClientSdk::User& userData);
-	bool RemoveUser(const QByteArray& login);
-
-private:
 	AuthClientSdk::CAuthorizationController m_authorizationController;
 };
 

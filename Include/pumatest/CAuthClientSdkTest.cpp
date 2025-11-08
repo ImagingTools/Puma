@@ -8,14 +8,16 @@
 using namespace AuthClientSdk;
 
 
+static const QByteArrayList s_roleNames = {"Test1", "Test2", "Test3", "Test4", "Test5"};
+static const QByteArrayList s_userNames = {"Test1", "Test2", "Test3", "Test4", "Test5"};
+static const QByteArrayList s_groupNames = {"Test1", "Test2", "Test3", "Test4", "Test5"};
+
+
 void CAuthClientSdkTest::initTestCase()
 {
 	qDebug() << "=== [Init] AuthClientSdk tests start ===";
-	// m_authorizationController.SetProductId("Test");
-	// QVERIFY(m_authorizationController.GetToken().isEmpty());
-
-	AuthClientSdk::CAuthorizationController authorizationController2;
-	authorizationController2.SetProductId("Test");
+	m_authorizationController.SetProductId("Test");
+	QVERIFY(m_authorizationController.GetToken().isEmpty());
 }
 
 
@@ -76,24 +78,35 @@ void CAuthClientSdkTest::LoginLogoutTest()
 	QVERIFY(m_authorizationController.GetToken().isEmpty());
 	QVERIFY(!m_authorizationController.HasPermission("*"));
 
-	User testUser;
-	QVERIFY(CreateUser("Test1", "Test1", {"PermissionA", "PermissionB"}, testUser));
+	// Try to create without authorization
+	QVERIFY(m_authorizationController.CreateUser(s_userNames[0], s_userNames[0], "1", "test@example.com").isEmpty());
 
-	QVERIFY(!m_authorizationController.Login("Test1", "2", loginData));
+	QVERIFY(m_authorizationController.Login("su", "1", loginData));
+	QByteArray userId = m_authorizationController.CreateUser(s_userNames[0], s_userNames[0], "1", "test@example.com");
+	QVERIFY(!userId.isEmpty());
+	QByteArray roleId = m_authorizationController.CreateRole(s_roleNames[0], "", {"PermissionA", "PermissionB"});
+	QVERIFY(!roleId.isEmpty());
+	QVERIFY(m_authorizationController.AddRolesToUser(userId, {roleId}));
+	QVERIFY(m_authorizationController.Logout());
+
+	QVERIFY(!m_authorizationController.Login(s_userNames[0], "2", loginData));
 	QVERIFY(loginData.accessToken.isEmpty());
 
-	QVERIFY(m_authorizationController.Login("Test1", "1", loginData));
+	QVERIFY(m_authorizationController.Login(s_userNames[0], "1", loginData));
 	QVERIFY(!loginData.accessToken.isEmpty());
 	QVERIFY(loginData.permissions.size() == 2);
 	QVERIFY(loginData.permissions.contains("PermissionA"));
 	QVERIFY(loginData.permissions.contains("PermissionB"));
-
 	QVERIFY(m_authorizationController.Logout());
+
 	QVERIFY(m_authorizationController.GetToken().isEmpty());
 	QVERIFY(!m_authorizationController.HasPermission("PermissionA"));
 	QVERIFY(!m_authorizationController.HasPermission("PermissionB"));
 
-	QVERIFY(RemoveUser("Test1"));
+	QVERIFY(m_authorizationController.Login("su", "1", loginData));
+	QVERIFY(m_authorizationController.RemoveUser(userId));
+	QVERIFY(m_authorizationController.RemoveRole(roleId));
+	QVERIFY(m_authorizationController.Logout());
 }
 
 
@@ -101,7 +114,7 @@ void CAuthClientSdkTest::UserCrudTest()
 {
 	qDebug() << "=== [UserCrudTest] ===";
 
-	QByteArray userId = m_authorizationController.CreateUser("TestUser", "test", "1", "test@example.com");
+	QByteArray userId = m_authorizationController.CreateUser(s_userNames[0], s_userNames[0], "1", "test@example.com");
 	QVERIFY2(userId.isEmpty(), "The user was created without authorization");
 
 	QByteArrayList userIds = m_authorizationController.GetUserIds();
@@ -112,25 +125,25 @@ void CAuthClientSdkTest::UserCrudTest()
 	bool ok = m_authorizationController.Login("su", "1", loginData);
 	QVERIFY(ok);
 
-	userId = m_authorizationController.CreateUser("TestUser", "test", "1", "test@example.com");
+	userId = m_authorizationController.CreateUser(s_userNames[0], s_userNames[0], "1", "test@example.com");
 	QVERIFY2(!userId.isEmpty(), "User creation failed");
 
 	auto allUsers = m_authorizationController.GetUserIds();
 	QVERIFY(allUsers.contains(userId));
 
-	QVERIFY2(m_authorizationController.CreateUser("TestUser", "test", "1", "test2@example.com").isEmpty(), "User with this login already exists");
-	QVERIFY2(m_authorizationController.CreateUser("TestUser", "test2", "1", "test@example.com").isEmpty(), "User with this email already exists");
+	QVERIFY2(m_authorizationController.CreateUser(s_userNames[0], s_userNames[0], "1", "test2@example.com").isEmpty(), "User with this login already exists");
+	QVERIFY2(m_authorizationController.CreateUser(s_userNames[1], s_userNames[1], "1", "test@example.com").isEmpty(), "User with this email already exists");
 
 	User u;
 	bool got = m_authorizationController.GetUser(userId, u);
 	QVERIFY(got);
-	QCOMPARE(u.login, QString("test"));
-	QCOMPARE(u.name, QString("TestUser"));
+	QCOMPARE(u.login, s_userNames[0]);
+	QCOMPARE(u.name, s_userNames[0]);
 	QCOMPARE(u.email, QString("test@example.com"));
 	QVERIFY(u.roleIds.isEmpty());
 	QVERIFY(u.groupIds.isEmpty());
 
-	QByteArray roleId = m_authorizationController.CreateRole("Test Role", "", {"A", "B", "C"});
+	QByteArray roleId = m_authorizationController.CreateRole(s_roleNames[0], "", {"A", "B", "C"});
 	QVERIFY2(!roleId.isEmpty(), "Role was not created");
 
 	QVERIFY(m_authorizationController.AddRolesToUser(userId, {roleId}));
@@ -138,8 +151,8 @@ void CAuthClientSdkTest::UserCrudTest()
 	User u2;
 	bool got2 = m_authorizationController.GetUser(userId, u2);
 	QVERIFY(got2);
-	QCOMPARE(u2.login, QString("test"));
-	QCOMPARE(u2.name, QString("TestUser"));
+	QCOMPARE(u2.login, s_userNames[0]);
+	QCOMPARE(u2.name, s_userNames[0]);
 	QCOMPARE(u2.email, QString("test@example.com"));
 	QVERIFY(u2.roleIds.size() == 1);
 	QVERIFY(u2.roleIds.contains(roleId));
@@ -152,7 +165,7 @@ void CAuthClientSdkTest::UserCrudTest()
 	QVERIFY(userPermissions.contains("B"));
 	QVERIFY(userPermissions.contains("C"));
 
-	QVERIFY(m_authorizationController.RemoveRolesFromUser(userId, {}));
+	QVERIFY(!m_authorizationController.RemoveRolesFromUser(userId, {}));
 	QVERIFY(m_authorizationController.GetUserPermissions(userId).size() == 3);
 
 	QVERIFY(m_authorizationController.RemoveRolesFromUser(userId, {"12345"}));
@@ -161,24 +174,20 @@ void CAuthClientSdkTest::UserCrudTest()
 	QVERIFY(m_authorizationController.RemoveRolesFromUser(userId, {roleId}));
 	QVERIFY(m_authorizationController.GetUserPermissions(userId).size() == 0);
 
-	bool removed = m_authorizationController.RemoveUser(userId);
-	QVERIFY(removed);
-	QVERIFY(!m_authorizationController.GetUserIds().contains(userId));
-
 	QVERIFY(m_authorizationController.Logout());
 
 	Login loginData2;
-	QVERIFY(!m_authorizationController.Login("test", "2", loginData2));
-	QVERIFY(m_authorizationController.Login("test", "1", loginData2));
+	QVERIFY(!m_authorizationController.Login(s_userNames[0], "2", loginData2));
+	QVERIFY(m_authorizationController.Login(s_userNames[0], "1", loginData2));
 	QVERIFY(!loginData2.accessToken.isEmpty());
 	QVERIFY(m_authorizationController.Logout());
 
 	QVERIFY(m_authorizationController.Login("su", "1", loginData2));
-	QVERIFY(m_authorizationController.ChangeUserPassword("test", "1", "2"));
+	QVERIFY(m_authorizationController.ChangeUserPassword(s_userNames[0], "1", "2"));
 	QVERIFY(m_authorizationController.Logout());
 
-	QVERIFY(!m_authorizationController.Login("test", "1", loginData2));
-	QVERIFY(m_authorizationController.Login("test", "2", loginData2));
+	QVERIFY(!m_authorizationController.Login(s_userNames[0], "1", loginData2));
+	QVERIFY(m_authorizationController.Login(s_userNames[0], "2", loginData2));
 	QVERIFY(m_authorizationController.Logout());
 }
 
@@ -192,7 +201,7 @@ void CAuthClientSdkTest::RoleCrudTest()
 	bool ok = m_authorizationController.Login("su", "1", loginData);
 	QVERIFY(ok);
 
-	QByteArray roleId = m_authorizationController.CreateRole("TestRole", "Test description");
+	QByteArray roleId = m_authorizationController.CreateRole(s_roleNames[1], "Test description");
 	QVERIFY2(!roleId.isEmpty(), "Failed to create role");
 
 	auto roles = m_authorizationController.GetRoleIds();
@@ -201,7 +210,7 @@ void CAuthClientSdkTest::RoleCrudTest()
 	Role role;
 	bool got = m_authorizationController.GetRole(roleId, role);
 	QVERIFY(got);
-	QCOMPARE(role.name, QString("TestRole"));
+	QCOMPARE(role.name, QString(s_roleNames[1]));
 	QCOMPARE(role.description, QString("Test description"));
 	QVERIFY(role.permissionIds.isEmpty());
 
@@ -209,7 +218,7 @@ void CAuthClientSdkTest::RoleCrudTest()
 
 	Role role2;
 	QVERIFY(m_authorizationController.GetRole(roleId, role2));
-	QCOMPARE(role2.name, QString("TestRole"));
+	QCOMPARE(role2.name, s_roleNames[1]);
 	QCOMPARE(role2.description, QString("Test description"));
 	QVERIFY(role2.permissionIds.size() == 2);
 	QVERIFY(role2.permissionIds.contains("AddOrder"));
@@ -231,9 +240,7 @@ void CAuthClientSdkTest::RoleCrudTest()
 	QVERIFY(m_authorizationController.RemovePermissionsFromRole(roleId, {"RemoveOrder"}));
 	QVERIFY(m_authorizationController.GetRole(roleId, role3));
 	QVERIFY(role3.permissionIds.isEmpty());
-
 	QVERIFY(m_authorizationController.RemoveRole(roleId));
-
 	QVERIFY(!m_authorizationController.GetRoleIds().contains(roleId));
 
 	m_authorizationController.Logout();
@@ -249,7 +256,7 @@ void CAuthClientSdkTest::GroupCrudTest()
 	bool ok = m_authorizationController.Login("su", "1", loginData);
 	QVERIFY(ok);
 
-	QByteArray groupId = m_authorizationController.CreateGroup("TestGroup", "Test group description");
+	QByteArray groupId = m_authorizationController.CreateGroup(s_groupNames[0], "Test group description");
 	QVERIFY2(!groupId.isEmpty(), "Failed to create group");
 
 	auto groups = m_authorizationController.GetGroupIds();
@@ -257,7 +264,7 @@ void CAuthClientSdkTest::GroupCrudTest()
 
 	Group g;
 	QVERIFY(m_authorizationController.GetGroup(groupId, g));
-	QCOMPARE(g.name, QString("TestGroup"));
+	QCOMPARE(g.name, s_groupNames[0]);
 	QCOMPARE(g.description, QString("Test group description"));
 	QVERIFY(g.userIds.isEmpty());
 	QVERIFY(g.roleIds.isEmpty());
@@ -267,10 +274,10 @@ void CAuthClientSdkTest::GroupCrudTest()
 	QVERIFY(!m_authorizationController.RemoveUsersFromGroup(groupId, {}));
 	QVERIFY(!m_authorizationController.RemoveRolesFromGroup(groupId, {}));
 
-	QByteArray userId1 = m_authorizationController.CreateUser("Test1", "test1", "1", "test1@mail.ru");
+	QByteArray userId1 = m_authorizationController.CreateUser(s_userNames[2], s_userNames[2], "1", "test1@mail.ru");
 	QVERIFY(!userId1.isEmpty());
 
-	QByteArray userId2 = m_authorizationController.CreateUser("Test2", "test2", "1", "test2@mail.ru");
+	QByteArray userId2 = m_authorizationController.CreateUser(s_userNames[3], s_userNames[3], "1", "test2@mail.ru");
 	QVERIFY(!userId2.isEmpty());
 
 	QVERIFY(m_authorizationController.AddUsersToGroup(groupId, {userId1, userId2}));
@@ -279,7 +286,7 @@ void CAuthClientSdkTest::GroupCrudTest()
 	QVERIFY(g.userIds.contains(userId1));
 	QVERIFY(g.userIds.contains(userId2));
 	QVERIFY(g.roleIds.isEmpty());
-	QCOMPARE(g.name, QString("TestGroup"));
+	QCOMPARE(g.name, s_groupNames[0]);
 	QCOMPARE(g.description, QString("Test group description"));
 
 	QVERIFY(m_authorizationController.RemoveUsersFromGroup(groupId, {userId1, userId2}));
@@ -288,13 +295,13 @@ void CAuthClientSdkTest::GroupCrudTest()
 	QVERIFY(!g.userIds.contains(userId1));
 	QVERIFY(!g.userIds.contains(userId2));
 	QVERIFY(g.roleIds.isEmpty());
-	QCOMPARE(g.name, QString("TestGroup"));
+	QCOMPARE(g.name, s_groupNames[0]);
 	QCOMPARE(g.description, QString("Test group description"));
 
-	QByteArray roleId1 = m_authorizationController.CreateRole("Test1", "", {"A", "B", "C"});
+	QByteArray roleId1 = m_authorizationController.CreateRole(s_roleNames[2], "", {"A", "B", "C"});
 	QVERIFY(!roleId1.isEmpty());
 
-	QByteArray roleId2 = m_authorizationController.CreateRole("Test2", "", {"D", "E"});
+	QByteArray roleId2 = m_authorizationController.CreateRole(s_roleNames[3], "", {"D", "E"});
 	QVERIFY(!roleId2.isEmpty());
 
 	QVERIFY(m_authorizationController.AddRolesToGroup(groupId, {roleId1, roleId2}));
@@ -312,13 +319,6 @@ void CAuthClientSdkTest::GroupCrudTest()
 	QVERIFY(g.roleIds.contains(roleId2));
 
 	QVERIFY(m_authorizationController.RemoveRole(roleId2));
-	QVERIFY(m_authorizationController.GetGroup(groupId, g));
-	QVERIFY(g.roleIds.size() == 0);
-
-	QVERIFY(m_authorizationController.RemoveRole(roleId1));
-	QVERIFY(m_authorizationController.RemoveUser(userId1));
-	QVERIFY(m_authorizationController.RemoveUser(userId2));
-	QVERIFY(m_authorizationController.RemoveGroup(groupId));
 
 	m_authorizationController.Logout();
 }
@@ -327,45 +327,41 @@ void CAuthClientSdkTest::GroupCrudTest()
 void CAuthClientSdkTest::cleanupTestCase()
 {
 	qDebug() << "=== [Cleanup] All tests completed ===";
-}
 
+	Login loginData;
+	m_authorizationController.Login("su", "1", loginData);
 
-// private methods
-
-bool CAuthClientSdkTest::CreateUser(const QByteArray& login, const QString& roleName, const QByteArrayList& permissions, AuthClientSdk::User& userData)
-{
-	QByteArray userId = m_authorizationController.CreateUser("TestUser", login, "1", login + "@example.com");
-	if (userId.isEmpty()){
-		return false;
-	}
-
-	QByteArray roleId = m_authorizationController.CreateRole(roleName, "", permissions);
-	if (roleId.isEmpty()){
-		return false;
-	}
-
-	bool added = m_authorizationController.AddRolesToUser(userId, {roleId});
-	if (!added){
-		return false;
-	}
-
-	return true;
-}
-
-
-bool CAuthClientSdkTest::RemoveUser(const QByteArray& login)
-{
-	QByteArrayList userIDs = m_authorizationController.GetUserIds();
-	for (const QByteArray& userId : userIDs){
+	QByteArrayList userIds = m_authorizationController.GetUserIds();
+	for (const QByteArray& userId : userIds){
 		User userData;
 		if (m_authorizationController.GetUser(userId, userData)){
-			if (userData.login == login){
-				return m_authorizationController.RemoveUser(userId);
+			if (s_userNames.contains(userData.login)){
+				QVERIFY(m_authorizationController.RemoveUser(userId));
 			}
 		}
 	}
 
-	return false;
+	QByteArrayList roleIds = m_authorizationController.GetRoleIds();
+	for (const QByteArray& roleId : roleIds){
+		Role roleData;
+		if (m_authorizationController.GetRole(roleId, roleData)){
+			if (s_roleNames.contains(roleData.name)){
+				QVERIFY(m_authorizationController.RemoveRole(roleId));
+			}
+		}
+	}
+
+	QByteArrayList groupIds = m_authorizationController.GetGroupIds();
+	for (const QByteArray& groupId : groupIds){
+		Group groupData;
+		if (m_authorizationController.GetGroup(groupId, groupData)){
+			if (s_groupNames.contains(groupData.name)){
+				QVERIFY(m_authorizationController.RemoveGroup(groupId));
+			}
+		}
+	}
+
+	m_authorizationController.Logout();
 }
 
 

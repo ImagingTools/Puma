@@ -36,6 +36,8 @@ public:
 
 	bool Login(const QString& login, const QString& password, Login& out)
 	{
+		out.Clear();
+
 		iauth::ILogin* loginPtr = m_sdk.GetInterface<iauth::ILogin>();
 		if (loginPtr == nullptr) {
 			qWarning() << "[Login] Failed: iauth::ILogin interface not found";
@@ -71,8 +73,6 @@ public:
 			qWarning() << "[Login] Failed: imtauth::IUserPermissionsController interface not found";
 			return false;
 		}
-
-		out.Clear();
 
 		out.productId = applicationInfoPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
 		out.userName = userPtr->GetUserName();
@@ -185,6 +185,7 @@ public:
 			QByteArray productId = GetProductId();
 
 			userData.name = userInfoPtr->GetName();
+			userData.email = userInfoPtr->GetMail();
 			userData.login = userInfoPtr->GetId();
 			userData.roleIds = userInfoPtr->GetRoles(productId);
 			userData.groupIds = userInfoPtr->GetGroups();
@@ -294,6 +295,8 @@ public:
 			roleData.name = roleInfoPtr->GetRoleName();
 			roleData.description = roleInfoPtr->GetRoleDescription();
 			roleData.permissionIds = roleInfoPtr->GetPermissions();
+
+			return true;
 		}
 
 		qWarning() << "[GetRole] Failed: imtauth::IRoleManager interface not found";

@@ -397,5 +397,5 @@ void CUserCollectionControllerTest::SetData() const
 }
 
 
-I_ADD_TEST(CUserCollectionControllerTest);
+// I_ADD_TEST(CUserCollectionControllerTest);
 

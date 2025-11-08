@@ -4,7 +4,8 @@ set(ARXC_CONFIG "${PROJECT_SOURCE_DIR}/../../../Config/PumaServer.awc")
 set(ARXC_OUTDIR "${AUX_INCLUDE_DIR}")
 set(ARX_ENABLE_GENERATE_DEPENDENCIES_LIST OFF)
 
-include(${ACFDIR}/Config/CMake/StaticConfig.cmake)
+set(TARGET_EXT ".dll")
+include(${ACFDIR}/Config/CMake/SharedLibraryConfig.cmake)
 
 set(ACC_FILES
     "${PROJECT_SOURCE_DIR}/../AuthClientSdk.acc"
