@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5416" Description="ACF"/>
-            <Version Id="1" Number="2251" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395265" Description="Qt Framework"/>
+            <Version Id="0" Number="5430" Description="ACF"/>
+            <Version Id="1" Number="2253" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -33,9 +33,6 @@
                     </AttributeInfo>
                     <AttributeInfo Id="ServerConnectionInterface" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ServerConnectionInterfaceParam"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="SessionCollection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="AuthorizableServerFramework/UserSessionRemoteRepository"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SlaveGqlHandlers" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
@@ -68,9 +65,6 @@
                     <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ApplicationInfoController"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="DatabaseAccessSettings" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="PumaDatabaseAccessSettings"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -102,11 +96,6 @@
                         <Data IsEnabled="true" Value="8788"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="PumaDatabaseAccessSettings" PackageId="ImtDatabasePck" ComponentId="DatabaseAccessSettings">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap/>
             </Data>
         </Element>
         <Element Id="ServerConnectionInterfaceParam" PackageId="ImtComPck" ComponentId="ServerConnectionInterfaceParam">
@@ -144,7 +133,6 @@
         <Interface InterfaceId="ibase::IApplicationInfo" ComponentId="ApplicationInfoController"/>
         <Interface InterfaceId="imtbase::IApplicationInfoController" ComponentId="ApplicationInfoController"/>
         <Interface InterfaceId="imtcom::IServerDispatcher" ComponentId="ServerController"/>
-        <Interface InterfaceId="imtdb::IDatabaseLoginSettings" ComponentId="PumaDatabaseAccessSettings"/>
         <Interface InterfaceId="imtlic::IProductInfo" ComponentId="AuthorizableServerFramework"/>
     </ExportedInterfaces>
     <ExportedComponents>

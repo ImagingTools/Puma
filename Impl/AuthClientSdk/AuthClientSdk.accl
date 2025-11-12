@@ -8,22 +8,50 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="ApplicationInfoController" X="625" Y="450" Note=""/>
-        <Element ComponentName="ClientRequestGroupManager" X="200" Y="550" Note=""/>
-        <Element ComponentName="ClientRequestRoleManager" X="625" Y="550" Note=""/>
-        <Element ComponentName="ClientRequestUserManager" X="1025" Y="650" Note=""/>
-        <Element ComponentName="IdentifiableProductInfo" X="175" Y="75" Note=""/>
-        <Element ComponentName="PumaClientEngine" X="625" Y="75" Note=""/>
-        <Element ComponentName="RemoteSuperuserController" X="1025" Y="350" Note=""/>
-        <Element ComponentName="Role" X="600" Y="675" Note=""/>
-        <Element ComponentName="ServerConnectionInterface" X="1025" Y="75" Note=""/>
-        <Element ComponentName="SimpleLoginWrap" X="275" Y="375" Note=""/>
-        <Element ComponentName="SuperuserProvider" X="625" Y="375" Note=""/>
-        <Element ComponentName="UserGroupInfo" X="200" Y="650" Note=""/>
-        <Element ComponentName="UserInfo" X="1025" Y="450" Note=""/>
-        <Element ComponentName="VersionInfo" X="850" Y="200" Note=""/>
-        <Element ComponentName="WebSocketClient" X="275" Y="275" Note=""/>
-        <Element ComponentName="WebSocketProtocolEngine" X="150" Y="175" Note=""/>
+        <Element ComponentName="ApplicationInfoController" X="175" Y="300" Note=""/>
+        <Element ComponentName="CheckPermissionOr" X="1000" Y="300" Note=""/>
+        <Element ComponentName="GraphQLClientEngine" X="575" Y="75" Note=""/>
+        <Element ComponentName="GroupRequests" X="225" Y="550" Note=""/>
+        <Element ComponentName="RoleRequests" X="1000" Y="550" Note=""/>
+        <Element ComponentName="SimpleLoginWrap" X="625" Y="300" Note=""/>
+        <Element ComponentName="UserInfo" X="775" Y="425" Note=""/>
+        <Element ComponentName="UserRequests" X="625" Y="550" Note=""/>
+        <Element ComponentName="VersionInfo" X="175" Y="75" Note=""/>
     </PositionMap>
-    <EmbeddedRegistries/>
+    <EmbeddedRegistries>
+        <EmbededRegistry Id="GroupRequests">
+            <PositionMap>
+                <Element ComponentName="ClientRequestGroupInfoProvider" X="550" Y="125" Note=""/>
+                <Element ComponentName="ClientRequestGroupManager" X="550" Y="650" Note=""/>
+                <Element ComponentName="UserGroupInfo" X="550" Y="375" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+        <EmbededRegistry Id="RoleRequests">
+            <PositionMap>
+                <Element ComponentName="ClientRequestRoleInfoProvider" X="575" Y="100" Note=""/>
+                <Element ComponentName="ClientRequestRoleManager" X="575" Y="550" Note=""/>
+                <Element ComponentName="Role" X="575" Y="350" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+        <EmbededRegistry Id="GraphQLClientEngine">
+            <PositionMap>
+                <Element ComponentName="ApiClient" X="200" Y="125" Note=""/>
+                <Element ComponentName="GraphQLClientEngine" X="575" Y="125" Note=""/>
+                <Element ComponentName="ServerConnectionInterface" X="950" Y="125" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+        <EmbededRegistry Id="UserRequests">
+            <PositionMap>
+                <Element ComponentName="ClientRequestUserInfoProvider" X="550" Y="350" Note=""/>
+                <Element ComponentName="ClientRequestUserManager" X="525" Y="225" Note=""/>
+                <Element ComponentName="RemoteSuperuserController" X="525" Y="100" Note=""/>
+                <Element ComponentName="SuperuserProvider" X="550" Y="475" Note=""/>
+                <Element ComponentName="UserInfo" X="975" Y="250" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+    </EmbeddedRegistries>
 </Acf>

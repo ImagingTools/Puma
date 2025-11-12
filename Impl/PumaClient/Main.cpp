@@ -15,15 +15,15 @@ int main(int argc, char *argv[])
 	Q_INIT_RESOURCE(PumaClient);
 
 	QApplication app(argc, argv);
-	// AuthServerSdk::CAuthorizableServer server;
-	// server.SetDatabaseSettings("localhost", 5432, "test", "postgres", "root");
-	// server.SetPumaConnectionParam("localhost", 7788, 8788);
-	// server.SetProductId("ProLife");
-	// server.SetFeaturesFilePath(":/Features/TestFeatures");
+	AuthServerSdk::CAuthorizableServer server;
+	server.SetPumaConnectionParam("localhost", 7788, 8788);
+	server.SetProductId("ProLife");
+	server.SetFeaturesFilePath(":/Features/TestFeatures");
 
-	// server.Start(7777, 8888);
+	server.Start(7777, 8888);
 
 	AuthClientSdk::CAuthorizationController authorizationController;
+	authorizationController.SetConnectionParam("localhost", 7777, 8888);
 
 	AuthClientSdk::Login loginData;
 	authorizationController.SetProductId("ProLife");

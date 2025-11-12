@@ -35,7 +35,6 @@ public:
 	virtual bool SetFeaturesFilePath(const QString& filePath);
 	virtual bool SetPumaConnectionParam(const QString& host, int httpPort, int wsPort);
 	virtual bool SetProductId(const QByteArray& productId);
-	virtual bool SetDatabaseSettings(const QString& host, int port, const QString& dbName, const QString& username, const QString& password);
 
 private:
 	CAuthorizableServerImpl* m_implPtr;

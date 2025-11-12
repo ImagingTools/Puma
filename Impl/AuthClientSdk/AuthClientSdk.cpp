@@ -18,6 +18,7 @@
 #include <imtauth/IUserManager.h>
 #include <imtauth/IRoleManager.h>
 #include <imtauth/IUserGroupManager.h>
+#include <imtcom/IServerConnectionInterface.h>
 
 // Local includes
 #include <GeneratedFiles/AuthClientSdk/CAuthClientSdk.h>
@@ -91,6 +92,21 @@ public:
 		}
 
 		return loginPtr->Logout();
+	}
+
+	bool SetConnectionParam(const QString& host, int httpPort, int wsPort)
+	{
+		imtcom::IServerConnectionInterface* connectionInterfacePtr = m_sdk.GetInterface<imtcom::IServerConnectionInterface>();
+		if (connectionInterfacePtr == nullptr) {
+			qWarning() << "[SetConnectionParam] Failed: imtcom::IServerConnectionInterface interface not found";
+			return false;
+		}
+
+		connectionInterfacePtr->SetHost(host);
+		connectionInterfacePtr->SetPort(imtcom::IServerConnectionInterface::PT_HTTP, httpPort);
+		connectionInterfacePtr->SetPort(imtcom::IServerConnectionInterface::PT_WEBSOCKET, wsPort);
+
+		return false;
 	}
 
 	bool HasPermission(const QByteArray& permissionId)
@@ -533,6 +549,16 @@ bool CAuthorizationController::Logout()
 {
 	if (m_implPtr != nullptr){
 		return m_implPtr->Logout();
+	}
+
+	return false;
+}
+
+
+bool CAuthorizationController::SetConnectionParam(const QString& host, int httpPort, int wsPort)
+{
+	if (m_implPtr != nullptr){
+		return m_implPtr->SetConnectionParam(host, httpPort, wsPort);
 	}
 
 	return false;

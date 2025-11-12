@@ -82,6 +82,7 @@ public:
 
 	virtual bool Login(const QString& login, const QString& password, Login& out);
 	virtual bool Logout();
+	bool SetConnectionParam(const QString& host, int httpPort, int wsPort);
 	virtual bool HasPermission(const QByteArray& permissionId);
 	virtual QByteArray GetToken() const;
 	virtual void SetProductId(const QByteArray& productId);

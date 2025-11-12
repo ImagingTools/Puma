@@ -19,111 +19,52 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="ClientRequestGroupManager" PackageId="ImtAuthGqlPck" ComponentId="ClientRequestGroupManager">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="AccessTokenProvider" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="SimpleLoginWrap"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="PumaClientEngine"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ApplicationInfoController"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="UserGroupFactory" Type="Factory" ExportId="">
-                        <Data IsEnabled="true" Value="UserGroupInfo"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="ClientRequestRoleManager" PackageId="ImtAuthGqlPck" ComponentId="ClientRequestRoleManager">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="AccessTokenProvider" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="SimpleLoginWrap"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="PumaClientEngine"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ApplicationInfoController"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="RoleFactory" Type="Factory" ExportId="">
-                        <Data IsEnabled="true" Value="Role"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="ClientRequestUserManager" PackageId="ImtAuthGqlPck" ComponentId="ClientRequestUserManager">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="AccessTokenProvider" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="SimpleLoginWrap"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="PumaClientEngine"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ApplicationInfoController"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="UserFactory" Type="Factory" ExportId="">
-                        <Data IsEnabled="true" Value="UserInfo"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="IdentifiableProductInfo" PackageId="ImtLicensePck" ComponentId="IdentifiableProductInfo">
+        <Element Id="CheckPermissionOr" PackageId="ImtAuthPck" ComponentId="CheckPermissionOr">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap/>
             </Data>
         </Element>
-        <Element Id="PumaClientEngine" PackageId="ImtGraphQlVoce" ComponentId="PumaGQLClientEngine">
+        <Element Id="GraphQLClientEngine" PackageId="" ComponentId="GraphQLClientEngine">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="ProductInfo" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="IdentifiableProductInfo"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="RequestManager" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="WebSocketClient"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ServerConnectionInterface" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ServerConnectionInterface"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="VersionInfo"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="RemoteSuperuserController" PackageId="ImtAuthGqlPck" ComponentId="RemoteSuperuserController">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="PumaClientEngine"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ApplicationInfoController"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="Role" PackageId="ImtAuthPck" ComponentId="Role">
-            <Data IsEnabled="true" Flags="2">
-                <AttributeInfoMap/>
-            </Data>
-        </Element>
-        <Element Id="ServerConnectionInterface" PackageId="ImtComPck" ComponentId="ServerConnectionInterfaceParam">
+        <Element Id="GroupRequests" PackageId="" ComponentId="GroupRequests">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="DefaultHost" Type="String" ExportId="">
-                        <Data IsEnabled="true" Value="localhost"/>
+                    <AttributeInfo Id="AccessTokenProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SimpleLoginWrap"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="DefaultHttpPort" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="7788"/>
+                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="GraphQLClientEngine"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="DefaultWebSocketPort" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="8788"/>
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ApplicationInfoController"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RoleProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="RoleRequests"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="UserRequests"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="RoleRequests" PackageId="" ComponentId="RoleRequests">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="AccessTokenProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SimpleLoginWrap"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="GraphQLClientEngine"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ApplicationInfoController"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -132,13 +73,16 @@
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ApiClient" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="PumaClientEngine"/>
+                        <Data IsEnabled="true" Value="GraphQLClientEngine"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ApplicationInfoController"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="PermissionChecker" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="CheckPermissionOr"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="SuperuserProvider" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="SuperuserProvider"/>
+                        <Data IsEnabled="true" Value="UserRequests"/>
                     </AttributeInfo>
                     <AttributeInfo Id="UserFactory" Type="Factory" ExportId="">
                         <Data IsEnabled="true" Value="UserInfo"/>
@@ -146,28 +90,38 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="SuperuserProvider" PackageId="ImtAuthGqlPck" ComponentId="ClientRequestRemoteSuperuserProvider">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="PumaClientEngine"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="SuperuserId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="su"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="UserGroupInfo" PackageId="ImtAuthPck" ComponentId="UserGroupInfo">
-            <Data IsEnabled="true" Flags="2">
-                <AttributeInfoMap/>
-            </Data>
-        </Element>
         <Element Id="UserInfo" PackageId="ImtAuthPck" ComponentId="UserInfo">
             <Data IsEnabled="true" Flags="2">
                 <AttributeInfoMap>
                     <AttributeInfo Id="AdminId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="su"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RoleProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="RoleRequests"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserGroupProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="GroupRequests"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="UserRequests" PackageId="" ComponentId="UserRequests">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="AccessTokenProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SimpleLoginWrap"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="GraphQLClientEngine"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ApplicationInfoController"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RoleProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="RoleRequests"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserGroupProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="GroupRequests"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -184,39 +138,273 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="WebSocketClient" PackageId="ImtClientGqlPck" ComponentId="WebSocketClient">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="ProtocolEngine" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="WebSocketProtocolEngine"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ServerConnectionInterface" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ServerConnectionInterface"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="WebSocketProtocolEngine" PackageId="ImtRestPck" ComponentId="WebSocketProtocolEngine">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap/>
-            </Data>
-        </Element>
     </ElementsList>
-    <EmbeddedRegistriesList/>
+    <EmbeddedRegistriesList>
+        <EmbeddedRegistry Id="GraphQLClientEngine">
+            <Data Description="" Keywords="">
+                <ElementsList>
+                    <Element Id="ApiClient" PackageId="ImtClientGqlPck" ComponentId="ApiClient">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="ProtocolEngine" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="GraphQLClientEngine"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="GraphQLClientEngine" PackageId="ImtClientGqlPck" ComponentId="GraphQLClientEngine">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ServerConnectionInterface" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="ServerConnectionInterface"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="ServerConnectionInterface" PackageId="ImtComPck" ComponentId="ServerConnectionInterfaceParam">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap/>
+                        </Data>
+                    </Element>
+                </ElementsList>
+                <EmbeddedRegistriesList/>
+                <ExportedInterfaces>
+                    <Interface InterfaceId="imtclientgql::IClientProtocolEngine" ComponentId="GraphQLClientEngine"/>
+                    <Interface InterfaceId="imtclientgql::IGqlClient" ComponentId="ApiClient"/>
+                    <Interface InterfaceId="imtcom::IServerConnectionInterface" ComponentId="ServerConnectionInterface"/>
+                </ExportedInterfaces>
+                <ExportedComponents/>
+            </Data>
+        </EmbeddedRegistry>
+        <EmbeddedRegistry Id="GroupRequests">
+            <Data Description="" Keywords="">
+                <ElementsList>
+                    <Element Id="ClientRequestGroupInfoProvider" PackageId="ImtAuthGqlPck" ComponentId="ClientRequestGroupInfoProvider">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="ApiClient" Type="Reference" ExportId="ApiClient">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="UserGroupFactory" Type="Factory" ExportId="">
+                                    <Data IsEnabled="true" Value="UserGroupInfo"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="ClientRequestGroupManager" PackageId="ImtAuthGqlPck" ComponentId="ClientRequestGroupManager">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="AccessTokenProvider" Type="Reference" ExportId="AccessTokenProvider">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ApiClient" Type="Reference" ExportId="ApiClient">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="UserGroupFactory" Type="Factory" ExportId="">
+                                    <Data IsEnabled="true" Value="UserGroupInfo"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="UserGroupInfo" PackageId="ImtAuthPck" ComponentId="UserGroupInfo">
+                        <Data IsEnabled="true" Flags="2">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="RoleProvider" Type="Reference" ExportId="RoleProvider">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="UserGroupProvider" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="ClientRequestGroupInfoProvider"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="UserProvider" Type="Reference" ExportId="UserProvider">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                </ElementsList>
+                <EmbeddedRegistriesList/>
+                <ExportedInterfaces>
+                    <Interface InterfaceId="imtauth::IUserGroupInfoProvider" ComponentId="ClientRequestGroupInfoProvider"/>
+                    <Interface InterfaceId="imtauth::IUserGroupManager" ComponentId="ClientRequestGroupManager"/>
+                </ExportedInterfaces>
+                <ExportedComponents/>
+            </Data>
+        </EmbeddedRegistry>
+        <EmbeddedRegistry Id="RoleRequests">
+            <Data Description="" Keywords="">
+                <ElementsList>
+                    <Element Id="ClientRequestRoleInfoProvider" PackageId="ImtAuthGqlPck" ComponentId="ClientRequestRoleInfoProvider">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="ApiClient" Type="Reference" ExportId="ApiClient">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="RoleFactory" Type="Factory" ExportId="">
+                                    <Data IsEnabled="true" Value="Role"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="ClientRequestRoleManager" PackageId="ImtAuthGqlPck" ComponentId="ClientRequestRoleManager">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="AccessTokenProvider" Type="Reference" ExportId="AccessTokenProvider">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ApiClient" Type="Reference" ExportId="ApiClient">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="RoleFactory" Type="Factory" ExportId="">
+                                    <Data IsEnabled="true" Value="Role"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="Role" PackageId="ImtAuthPck" ComponentId="Role">
+                        <Data IsEnabled="true" Flags="2">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="ParentRoleProvider" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="ClientRequestRoleInfoProvider"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                </ElementsList>
+                <EmbeddedRegistriesList/>
+                <ExportedInterfaces>
+                    <Interface InterfaceId="imtauth::IRoleInfoProvider" ComponentId="ClientRequestRoleInfoProvider"/>
+                    <Interface InterfaceId="imtauth::IRoleManager" ComponentId="ClientRequestRoleManager"/>
+                </ExportedInterfaces>
+                <ExportedComponents/>
+            </Data>
+        </EmbeddedRegistry>
+        <EmbeddedRegistry Id="UserRequests">
+            <Data Description="" Keywords="">
+                <ElementsList>
+                    <Element Id="ClientRequestUserInfoProvider" PackageId="ImtAuthGqlPck" ComponentId="ClientRequestUserInfoProvider">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="ApiClient" Type="Reference" ExportId="ApiClient">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="UserFactory" Type="Factory" ExportId="">
+                                    <Data IsEnabled="true" Value="UserInfo"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="ClientRequestUserManager" PackageId="ImtAuthGqlPck" ComponentId="ClientRequestUserManager">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="AccessTokenProvider" Type="Reference" ExportId="AccessTokenProvider">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ApiClient" Type="Reference" ExportId="ApiClient">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="UserFactory" Type="Factory" ExportId="">
+                                    <Data IsEnabled="true" Value="UserInfo"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="RemoteSuperuserController" PackageId="ImtAuthGqlPck" ComponentId="RemoteSuperuserController">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="ApiClient" Type="Reference" ExportId="ApiClient">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="SuperuserMail" Type="String" ExportId="">
+                                    <Data IsEnabled="true" Value="superuser"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="SuperuserName" Type="String" ExportId="">
+                                    <Data IsEnabled="true" Value="superuser"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="SuperuserProvider" PackageId="ImtAuthGqlPck" ComponentId="ClientRequestRemoteSuperuserProvider">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="ApiClient" Type="Reference" ExportId="ApiClient">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="SuperuserId" Type="Id" ExportId="">
+                                    <Data IsEnabled="true" Value="su"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="UserInfo" PackageId="ImtAuthPck" ComponentId="UserInfo">
+                        <Data IsEnabled="true" Flags="2">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="AdminId" Type="Id" ExportId="">
+                                    <Data IsEnabled="true" Value="su"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="RoleProvider" Type="Reference" ExportId="RoleProvider">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="UserGroupProvider" Type="Reference" ExportId="UserGroupProvider">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                </ElementsList>
+                <EmbeddedRegistriesList/>
+                <ExportedInterfaces>
+                    <Interface InterfaceId="imtauth::ISuperuserController" ComponentId="RemoteSuperuserController"/>
+                    <Interface InterfaceId="imtauth::ISuperuserProvider" ComponentId="SuperuserProvider"/>
+                    <Interface InterfaceId="imtauth::IUserInfoProvider" ComponentId="ClientRequestUserInfoProvider"/>
+                    <Interface InterfaceId="imtauth::IUserManager" ComponentId="ClientRequestUserManager"/>
+                </ExportedInterfaces>
+                <ExportedComponents/>
+            </Data>
+        </EmbeddedRegistry>
+    </EmbeddedRegistriesList>
     <ExportedInterfaces>
         <Interface InterfaceId="iauth::ILogin" ComponentId="SimpleLoginWrap"/>
         <Interface InterfaceId="iauth::IRightsProvider" ComponentId="SimpleLoginWrap"/>
         <Interface InterfaceId="ibase::IApplicationInfo" ComponentId="ApplicationInfoController"/>
         <Interface InterfaceId="imtauth::IAccessTokenProvider" ComponentId="SimpleLoginWrap"/>
-        <Interface InterfaceId="imtauth::IRoleManager" ComponentId="ClientRequestRoleManager"/>
-        <Interface InterfaceId="imtauth::ISuperuserController" ComponentId="RemoteSuperuserController"/>
-        <Interface InterfaceId="imtauth::ISuperuserProvider" ComponentId="SuperuserProvider"/>
-        <Interface InterfaceId="imtauth::IUserGroupManager" ComponentId="ClientRequestGroupManager"/>
-        <Interface InterfaceId="imtauth::IUserManager" ComponentId="ClientRequestUserManager"/>
+        <Interface InterfaceId="imtauth::IPermissionChecker" ComponentId="CheckPermissionOr"/>
+        <Interface InterfaceId="imtauth::IRoleInfoProvider" ComponentId="RoleRequests"/>
+        <Interface InterfaceId="imtauth::IRoleManager" ComponentId="RoleRequests"/>
+        <Interface InterfaceId="imtauth::ISuperuserController" ComponentId="UserRequests"/>
+        <Interface InterfaceId="imtauth::ISuperuserProvider" ComponentId="UserRequests"/>
+        <Interface InterfaceId="imtauth::IUserGroupInfoProvider" ComponentId="GroupRequests"/>
+        <Interface InterfaceId="imtauth::IUserGroupManager" ComponentId="GroupRequests"/>
+        <Interface InterfaceId="imtauth::IUserInfoProvider" ComponentId="UserRequests"/>
+        <Interface InterfaceId="imtauth::IUserManager" ComponentId="UserRequests"/>
         <Interface InterfaceId="imtauth::IUserPermissionsController" ComponentId="SimpleLoginWrap"/>
         <Interface InterfaceId="imtbase::IApplicationInfoController" ComponentId="ApplicationInfoController"/>
-        <Interface InterfaceId="imtcom::IServerConnectionInterface" ComponentId="ServerConnectionInterface"/>
-        <Interface InterfaceId="imtlic::IProductInfo" ComponentId="IdentifiableProductInfo"/>
+        <Interface InterfaceId="imtclientgql::IClientProtocolEngine" ComponentId="GraphQLClientEngine"/>
+        <Interface InterfaceId="imtclientgql::IGqlClient" ComponentId="GraphQLClientEngine"/>
+        <Interface InterfaceId="imtcom::IServerConnectionInterface" ComponentId="GraphQLClientEngine"/>
         <Interface InterfaceId="iser::IVersionInfo" ComponentId="VersionInfo"/>
     </ExportedInterfaces>
     <ExportedComponents/>

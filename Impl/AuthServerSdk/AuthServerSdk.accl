@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5416" Description="ACF"/>
-            <Version Id="1" Number="2251" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395265" Description="Qt Framework"/>
+            <Version Id="0" Number="5430" Description="ACF"/>
+            <Version Id="1" Number="2253" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
@@ -12,8 +12,7 @@
         <Element ComponentName="ApplicationInfoController" X="525" Y="575" Note=""/>
         <Element ComponentName="AuthorizableServerFramework" X="525" Y="225" Note=""/>
         <Element ComponentName="PumaConnectionInterfaceParam" X="200" Y="580" Note=""/>
-        <Element ComponentName="PumaDatabaseAccessSettings" X="200" Y="375" Note=""/>
-        <Element ComponentName="ServerConnectionInterfaceParam" X="880" Y="580" Note=""/>
+        <Element ComponentName="ServerConnectionInterfaceParam" X="875" Y="575" Note=""/>
         <Element ComponentName="ServerController" X="575" Y="100" Note=""/>
         <Element ComponentName="VersionInfo" X="1000" Y="350" Note=""/>
     </PositionMap>

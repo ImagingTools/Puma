@@ -125,25 +125,6 @@ public:
 		return true;
 	}
 
-
-	bool SetDatabaseSettings(const QString& host, int port, const QString& dbName, const QString& username, const QString& password)
-	{
-		imtdb::IDatabaseLoginSettings* databaseLoginSettingsPtr = m_sdk.GetInterface<imtdb::IDatabaseLoginSettings>();
-		if (databaseLoginSettingsPtr == nullptr){
-			return false;
-		}
-
-		istd::CChangeGroup changeGroup(databaseLoginSettingsPtr);
-
-		databaseLoginSettingsPtr->SetHost(host);
-		databaseLoginSettingsPtr->SetPort(port);
-		databaseLoginSettingsPtr->SetDatabaseName(dbName);
-		databaseLoginSettingsPtr->SetUserName(username);
-		databaseLoginSettingsPtr->SetPassword(password);
-
-		return true;
-	}
-	
 private:
 	bool SetConnectionParamInternal(const QString& host, int httpPort, int wsPort, const QByteArray& componentId)
 	{
@@ -229,14 +210,6 @@ bool CAuthorizableServer::SetProductId(const QByteArray& productId)
 }
 
 
-bool CAuthorizableServer::SetDatabaseSettings(const QString& host, int port, const QString& dbName, const QString& username, const QString& password)
-{
-	if (m_implPtr != nullptr){
-		return m_implPtr->SetDatabaseSettings(host, port,  dbName, username, password);
-	}
-
-	return false;
-}
-
-
 } // namespace AuthServerSdk
+
+
