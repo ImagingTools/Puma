@@ -27,6 +27,7 @@ private slots:
 	void cleanupTestCase();
 
 private:
+	AuthServerSdk::CAuthorizableServer m_authorizableServer;
 	AuthClientSdk::CAuthorizationController m_authorizationController;
 };
 

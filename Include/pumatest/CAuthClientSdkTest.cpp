@@ -16,7 +16,13 @@ static const QByteArrayList s_groupNames = {"Test1", "Test2", "Test3", "Test4", 
 void CAuthClientSdkTest::initTestCase()
 {
 	qDebug() << "=== [Init] AuthClientSdk tests start ===";
+
+	m_authorizableServer.SetPumaConnectionParam("localhost", 7788, 8788);
+	m_authorizableServer.SetProductId("Test");
+	QVERIFY(m_authorizableServer.Start(7777, 8888));
+
 	m_authorizationController.SetProductId("Test");
+	m_authorizationController.SetConnectionParam("localhost", 7777, 8888);
 	QVERIFY(m_authorizationController.GetToken().isEmpty());
 }
 

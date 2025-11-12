@@ -5,8 +5,17 @@ set(ARXC_FILES "${PROJECT_SOURCE_DIR}/../${PROJECT_NAME}.acc")
 set(ARXC_OUTDIR "${AUX_INCLUDE_DIR}")
 set(ARX_ENABLE_GENERATE_DEPENDENCIES_LIST ON)
 
+set(TARGET_EXT ".dll")
+include(${ACFDIR}/Config/CMake/SharedLibraryConfig.cmake)
+
 include(${ACFDIR}/Config/CMake/CustomBuild.cmake)
-include(${ACFDIR}/Config/CMake/StaticConfig.cmake)
+
+target_sources(${PROJECT_NAME}
+	PRIVATE
+	"${AUX_INCLUDE_DIR}/${PROJECT_NAME}/C${PROJECT_NAME}.cpp"
+	"${AUX_INCLUDE_DIR}/${PROJECT_NAME}/C${PROJECT_NAME}.h"
+)
+
 include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 
 target_sources(${PROJECT_NAME} PRIVATE ${SOURCES})
