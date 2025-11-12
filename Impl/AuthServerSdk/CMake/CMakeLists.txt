@@ -20,11 +20,26 @@ include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 
 target_sources(${PROJECT_NAME} PRIVATE ${SOURCES})
 
-target_link_libraries(${PROJECT_NAME} iauth imeas iqtmeas iqtinsp iproc iinsp iipr iprocgui isig iqtsig icalibgui icalib icam iqtcam AcfSlnLoc AcfLoc iedge iedgegui imtrepo iqtgui iview iqtprm iwidgets iloggui iqtdoc ifilegui icomm idoc)
+find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Widgets Sql Xml Core Gui Network WebSockets QuickWidgets Qml REQUIRED)
+target_link_libraries(${PROJECT_NAME} iauth iser imeas iqtmeas iqtinsp iproc iinsp iipr iprocgui isig iqtsig icalibgui icalib icam iqtcam AcfSlnLoc AcfLoc iedge iedgegui imtrepo iqtgui iview iqtprm iwidgets iloggui iqtdoc ifilegui icomm idoc)
 target_link_libraries(${PROJECT_NAME} imtbase imtdesign imtdev imtgui imtdb imtdbgui imtlog imtloggui imtwidgets imtstyle imtguigql imtrest imt3d imtlic imtlicgui imt3dgui imt3dview ImtCoreLoc i2d iqt2d iedge)
 target_link_libraries(${PROJECT_NAME} imtlicgui imtauthgui imtclientgql imtgql imtbase imtauth imtauthgui imtauthdb imtauthgql imtcrypt imtlicgui imtlicgql imtapp imtcolorsdl imtserverapp)
 target_link_libraries(${PROJECT_NAME} imtqml imtdocguiqml imtauthguiqml imtlicguiqml imtcolguiqml imtguigqlqml imtguiqml imtcontrolsqml imtstylecontrolsqml imtcom imtauthsdl imtappsdl imtservergql imtbasesdl imtcol imtzip)
 target_link_libraries(${PROJECT_NAME}  Qt${QT_VERSION_MAJOR}::QuickWidgets  Qt${QT_VERSION_MAJOR}::WebSockets)
 
+target_link_libraries(${PROJECT_NAME}
+	Qt${QT_VERSION_MAJOR}::Core
+	Qt${QT_VERSION_MAJOR}::Gui
+	Qt${QT_VERSION_MAJOR}::Sql
+	Qt${QT_VERSION_MAJOR}::Xml
+	Qt${QT_VERSION_MAJOR}::Core
+	Qt${QT_VERSION_MAJOR}::Widgets
+	Qt${QT_VERSION_MAJOR}::Network
+	Qt${QT_VERSION_MAJOR}::WebSockets
+	Qt${QT_VERSION_MAJOR}::Qml
+	Qt${QT_VERSION_MAJOR}::QuickWidgets
+)
+
+include(${IACFDIR}/Config/CMake/zlib.cmake)
 ADD_DEFINITIONS(-DUNICODE)
 ADD_DEFINITIONS(-D_UNICODE)
