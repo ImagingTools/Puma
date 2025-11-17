@@ -19,22 +19,6 @@
         <Element ComponentName="VersionInfo" X="175" Y="75" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
-        <EmbededRegistry Id="GroupRequests">
-            <PositionMap>
-                <Element ComponentName="ClientRequestGroupInfoProvider" X="550" Y="125" Note=""/>
-                <Element ComponentName="ClientRequestGroupManager" X="550" Y="650" Note=""/>
-                <Element ComponentName="UserGroupInfo" X="550" Y="375" Note=""/>
-            </PositionMap>
-            <EmbeddedRegistries/>
-        </EmbededRegistry>
-        <EmbededRegistry Id="RoleRequests">
-            <PositionMap>
-                <Element ComponentName="ClientRequestRoleInfoProvider" X="575" Y="100" Note=""/>
-                <Element ComponentName="ClientRequestRoleManager" X="575" Y="550" Note=""/>
-                <Element ComponentName="Role" X="575" Y="350" Note=""/>
-            </PositionMap>
-            <EmbeddedRegistries/>
-        </EmbededRegistry>
         <EmbededRegistry Id="GraphQLClientEngine">
             <PositionMap>
                 <Element ComponentName="ApiClient" X="200" Y="125" Note=""/>
@@ -50,6 +34,22 @@
                 <Element ComponentName="RemoteSuperuserController" X="525" Y="100" Note=""/>
                 <Element ComponentName="SuperuserProvider" X="550" Y="475" Note=""/>
                 <Element ComponentName="UserInfo" X="975" Y="250" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+        <EmbededRegistry Id="GroupRequests">
+            <PositionMap>
+                <Element ComponentName="ClientRequestGroupInfoProvider" X="550" Y="125" Note=""/>
+                <Element ComponentName="ClientRequestGroupManager" X="550" Y="650" Note=""/>
+                <Element ComponentName="UserGroupInfo" X="550" Y="375" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+        <EmbededRegistry Id="RoleRequests">
+            <PositionMap>
+                <Element ComponentName="ClientRequestRoleInfoProvider" X="575" Y="100" Note=""/>
+                <Element ComponentName="ClientRequestRoleManager" X="575" Y="550" Note=""/>
+                <Element ComponentName="Role" X="575" Y="350" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>

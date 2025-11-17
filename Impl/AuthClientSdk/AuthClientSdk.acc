@@ -57,9 +57,6 @@
         <Element Id="RoleRequests" PackageId="" ComponentId="RoleRequests">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="AccessTokenProvider" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="SimpleLoginWrap"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="ApiClient" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="GraphQLClientEngine"/>
                     </AttributeInfo>
