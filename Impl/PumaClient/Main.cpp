@@ -30,11 +30,6 @@ int main(int argc, char *argv[])
 
 	QString errorMessage;
 	AuthClientSdk::SuperuserStatus suExists = authorizationController.SuperuserExists(errorMessage);
-	qDebug() << "SU exists" << suExists;
-
-	if (suExists == AuthClientSdk::NotExists){
-		authorizationController.CreateSuperuser("1");
-	}
 
 	QByteArrayList userIds = authorizationController.GetUserIds();
 	QByteArray userId = authorizationController.CreateUser("Ivan", "Ivan", "1", "ivan@mail.ru");
@@ -46,6 +41,11 @@ int main(int argc, char *argv[])
 	else{
 		qDebug() << "Login failed";
 	}
+
+	AuthClientSdk::SystemType systemType = authorizationController.GetUserAuthSystem("su");
+	
+	AuthClientSdk::User suUserData;
+	authorizationController.GetUserByLogin("su", suUserData);
 
 	QByteArrayList userIds2 = authorizationController.GetUserIds();
 

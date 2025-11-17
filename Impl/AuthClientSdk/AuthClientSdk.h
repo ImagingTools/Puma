@@ -63,10 +63,19 @@ struct Group
 };
 
 
-enum SuperuserStatus {
+enum class SuperuserStatus 
+{
 	Unknown,
 	Exists,
 	NotExists
+};
+
+
+enum class SystemType
+{
+	Unknown,
+	Local,
+	Ldap
 };
 
 
@@ -90,12 +99,14 @@ public:
 	virtual bool CreateSuperuser(const QByteArray& password);
 	virtual QByteArrayList GetUserIds() const;
 	virtual bool GetUser(const QByteArray& userId, User& userData) const;
+	virtual bool GetUserByLogin(const QByteArray& login, User& userData) const;
 	virtual bool RemoveUser(const QByteArray& userId);
 	virtual QByteArray CreateUser(const QString& userName, const QByteArray& login, const QByteArray& password, const QString& email);
 	virtual bool ChangeUserPassword(const QByteArray& login, const QByteArray& oldPassword, const QByteArray& newPassword);
 	virtual bool AddRolesToUser(const QByteArray& userId, const QByteArrayList& roleIds);
 	virtual bool RemoveRolesFromUser(const QByteArray& userId, const QByteArrayList& roleIds);
 	virtual QByteArrayList GetUserPermissions(const QByteArray& userId) const;
+	virtual SystemType GetUserAuthSystem(const QByteArray& login) const;
 
 	virtual QByteArrayList GetRoleIds() const;
 	virtual bool GetRole(const QByteArray& roleId, Role& roleData) const;

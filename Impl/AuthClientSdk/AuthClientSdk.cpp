@@ -152,17 +152,17 @@ public:
 			imtauth::ISuperuserProvider::ExistsStatus status = superuserProviderPtr->SuperuserExists(errorMessage);
 			switch (status){
 			case imtauth::ISuperuserProvider::ES_EXISTS:
-				return Exists;
+				return SuperuserStatus::Exists;
 			case imtauth::ISuperuserProvider::ES_NOT_EXISTS:
-				return NotExists;
+				return SuperuserStatus::NotExists;
 			case imtauth::ISuperuserProvider::ES_UNKNOWN:
-				return Unknown;
+				return SuperuserStatus::Unknown;
 			}
 		}
 
 		qWarning() << "[SuperuserExists] Failed: imtauth::ISuperuserProvider interface not found";
 
-		return Unknown;
+		return SuperuserStatus::Unknown;
 	}
 
 	bool CreateSuperuser(const QByteArray& password)
@@ -194,6 +194,32 @@ public:
 		imtauth::IUserManager* userManagerPtr = m_sdk.GetInterface<imtauth::IUserManager>();
 		if (userManagerPtr != nullptr){
 			imtauth::IUserInfoUniquePtr userInfoPtr = userManagerPtr->GetUser(userId);
+			if (!userInfoPtr.IsValid()){
+				return false;
+			}
+
+			QByteArray productId = GetProductId();
+
+			userData.name = userInfoPtr->GetName();
+			userData.email = userInfoPtr->GetMail();
+			userData.login = userInfoPtr->GetId();
+			userData.roleIds = userInfoPtr->GetRoles(productId);
+			userData.groupIds = userInfoPtr->GetGroups();
+	
+			return true;
+		}
+
+		qWarning() << "[GetUser] Failed: imtauth::IUserManager interface not found";
+
+		return false;
+	}
+
+	bool GetUserByLogin(const QByteArray& login, User& userData) const
+	{
+		imtauth::IUserManager* userManagerPtr = m_sdk.GetInterface<imtauth::IUserManager>();
+		if (userManagerPtr != nullptr){
+			QByteArray objectId = userManagerPtr->GetUserObjectId(login);
+			imtauth::IUserInfoUniquePtr userInfoPtr = userManagerPtr->GetUser(objectId);
 			if (!userInfoPtr.IsValid()){
 				return false;
 			}
@@ -254,7 +280,8 @@ public:
 	{
 		imtauth::IUserManager* userManagerPtr = m_sdk.GetInterface<imtauth::IUserManager>();
 		if (userManagerPtr != nullptr){
-			return userManagerPtr->AddRolesToUser(userId, roleIds);
+			QByteArray productId = GetProductId();
+			return userManagerPtr->AddRolesToUser(userId, productId, roleIds);
 		}
 
 		qWarning() << "[AddRolesToUser] Failed: imtauth::IUserManager interface not found";
@@ -266,7 +293,8 @@ public:
 	{
 		imtauth::IUserManager* userManagerPtr = m_sdk.GetInterface<imtauth::IUserManager>();
 		if (userManagerPtr != nullptr){
-			return userManagerPtr->RemoveRolesFromUser(userId, roleIds);
+			QByteArray productId = GetProductId();
+			return userManagerPtr->RemoveRolesFromUser(userId, productId, roleIds);
 		}
 
 		qWarning() << "[RemoveRolesFromUser] Failed: imtauth::IUserManager interface not found";
@@ -278,12 +306,33 @@ public:
 	{
 		imtauth::IUserManager* userManagerPtr = m_sdk.GetInterface<imtauth::IUserManager>();
 		if (userManagerPtr != nullptr){
-			return userManagerPtr->GetUserPermissions(userId);
+			return userManagerPtr->GetUserPermissions(userId, GetProductId());
 		}
 
 		qWarning() << "[GetUserPermissions] Failed: imtauth::IUserManager interface not found";
 
 		return QByteArrayList();
+	}
+
+	SystemType GetUserAuthSystem(const QByteArray& login) const
+	{
+		imtauth::IUserManager* userManagerPtr = m_sdk.GetInterface<imtauth::IUserManager>();
+		if (userManagerPtr != nullptr){
+			imtauth::IUserInfo::SystemInfo systemInfo;
+			if (!userManagerPtr->GetUserAuthSystem(login, systemInfo)){
+				return SystemType::Unknown;
+			}
+
+			if (!systemInfo.systemId.isEmpty()){
+				return SystemType::Ldap;
+			}
+
+			return SystemType::Local;
+		}
+
+		qWarning() << "[GetUserAuthSystem] Failed: imtauth::IUserManager interface not found";
+
+		return SystemType::Unknown;
 	}
 
 	QByteArrayList GetRoleIds() const
@@ -633,6 +682,16 @@ bool CAuthorizationController::GetUser(const QByteArray& userId, User& userData)
 }
 
 
+bool CAuthorizationController::GetUserByLogin(const QByteArray& login, User& userData) const
+{
+	if (m_implPtr != nullptr){
+		return m_implPtr->GetUserByLogin(login, userData);
+	}
+
+	return false;
+}
+
+
 bool CAuthorizationController::RemoveUser(const QByteArray& userId)
 {
 	if (m_implPtr != nullptr){
@@ -690,6 +749,16 @@ QByteArrayList CAuthorizationController::GetUserPermissions(const QByteArray& us
 	}
 
 	return QByteArrayList();
+}
+
+
+SystemType CAuthorizationController::GetUserAuthSystem(const QByteArray& login) const
+{
+	if (m_implPtr != nullptr){
+		return m_implPtr->GetUserAuthSystem(login);
+	}
+
+	return SystemType::Unknown;
 }
 
 
