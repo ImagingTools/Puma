@@ -21,8 +21,8 @@ public:
 	CLoginViewWidget();
 	~CLoginViewWidget();
 
-	bool SetConnectionParam(const QString& host, int httpPort, int wsPort);
-	bool SetLoginParam(Login param);
+	bool SetConnectionParam(const QString& host, int httpPort, int wsPort) const;
+	bool SetLoginParam(Login param) const;
 
 private:
 	CLoginViewWidgetImpl* m_implPtr;

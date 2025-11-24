@@ -160,7 +160,7 @@ CAuthorizableServer::~CAuthorizableServer()
 }
 
 
-bool CAuthorizableServer::Start(int httpPort, int wsPort)
+bool CAuthorizableServer::Start(int httpPort, int wsPort) const
 {
 	if (m_implPtr != nullptr){
 		return m_implPtr->Start(httpPort, wsPort);
@@ -170,7 +170,7 @@ bool CAuthorizableServer::Start(int httpPort, int wsPort)
 }
 
 
-bool CAuthorizableServer::Stop()
+bool CAuthorizableServer::Stop() const
 {
 	if (m_implPtr != nullptr){
 		return m_implPtr->Stop();
@@ -180,7 +180,7 @@ bool CAuthorizableServer::Stop()
 }
 
 
-bool CAuthorizableServer::SetFeaturesFilePath(const QString& filePath)
+bool CAuthorizableServer::SetFeaturesFilePath(const QString& filePath) const
 {
 	if (m_implPtr != nullptr){
 		return m_implPtr->SetFeaturesFilePath(filePath);
@@ -190,7 +190,7 @@ bool CAuthorizableServer::SetFeaturesFilePath(const QString& filePath)
 }
 
 
-bool CAuthorizableServer::SetPumaConnectionParam(const QString& host, int httpPort, int wsPort)
+bool CAuthorizableServer::SetPumaConnectionParam(const QString& host, int httpPort, int wsPort) const
 {
 	if (m_implPtr != nullptr){
 		return m_implPtr->SetPumaConnectionParam(host, httpPort,  wsPort);
@@ -200,7 +200,7 @@ bool CAuthorizableServer::SetPumaConnectionParam(const QString& host, int httpPo
 }
 
 
-bool CAuthorizableServer::SetProductId(const QByteArray& productId)
+bool CAuthorizableServer::SetProductId(const QByteArray& productId) const
 {
 	if (m_implPtr != nullptr){
 		return m_implPtr->SetProductId(productId);

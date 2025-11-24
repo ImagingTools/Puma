@@ -30,11 +30,11 @@ class AUTH_SERVER_SDK_EXPORT CAuthorizableServer
 public:
 	CAuthorizableServer();
 	virtual ~CAuthorizableServer();
-	virtual bool Start(int httpPort, int wsPort);
-	virtual bool Stop();
-	virtual bool SetFeaturesFilePath(const QString& filePath);
-	virtual bool SetPumaConnectionParam(const QString& host, int httpPort, int wsPort);
-	virtual bool SetProductId(const QByteArray& productId);
+	virtual bool Start(int httpPort, int wsPort) const;
+	virtual bool Stop() const;
+	virtual bool SetFeaturesFilePath(const QString& filePath) const;
+	virtual bool SetPumaConnectionParam(const QString& host, int httpPort, int wsPort) const;
+	virtual bool SetProductId(const QByteArray& productId) const;
 
 private:
 	CAuthorizableServerImpl* m_implPtr;

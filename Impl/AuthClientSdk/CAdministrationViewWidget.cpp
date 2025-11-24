@@ -125,7 +125,7 @@ CAdministrationViewWidget::~CAdministrationViewWidget()
 }
 
 
-bool CAdministrationViewWidget::SetConnectionParam(const QString& host, int httpPort, int wsPort)
+bool CAdministrationViewWidget::SetConnectionParam(const QString& host, int httpPort, int wsPort) const
 {
 	if (m_implPtr != nullptr){
 		return m_implPtr->SetConnectionParam(host, httpPort, wsPort);
@@ -135,7 +135,7 @@ bool CAdministrationViewWidget::SetConnectionParam(const QString& host, int http
 }
 
 
-bool CAdministrationViewWidget::SetLoginParam(Login param)
+bool CAdministrationViewWidget::SetLoginParam(Login param) const
 {
 	if (m_implPtr != nullptr){
 		return m_implPtr->SetLoginParam(param);

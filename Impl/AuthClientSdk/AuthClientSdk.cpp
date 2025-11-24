@@ -584,7 +584,7 @@ CAuthorizationController::~CAuthorizationController()
 }
 
 
-bool CAuthorizationController::Login(const QString& login, const QString& password, struct Login& out)
+bool CAuthorizationController::Login(const QString& login, const QString& password, struct Login& out) const
 {
 	if (m_implPtr != nullptr){
 		return m_implPtr->Login(login, password, out);
@@ -594,7 +594,7 @@ bool CAuthorizationController::Login(const QString& login, const QString& passwo
 }
 
 
-bool CAuthorizationController::Logout()
+bool CAuthorizationController::Logout() const
 {
 	if (m_implPtr != nullptr){
 		return m_implPtr->Logout();
@@ -604,7 +604,7 @@ bool CAuthorizationController::Logout()
 }
 
 
-bool CAuthorizationController::SetConnectionParam(const QString& host, int httpPort, int wsPort)
+bool CAuthorizationController::SetConnectionParam(const QString& host, int httpPort, int wsPort) const
 {
 	if (m_implPtr != nullptr){
 		return m_implPtr->SetConnectionParam(host, httpPort, wsPort);
@@ -614,7 +614,7 @@ bool CAuthorizationController::SetConnectionParam(const QString& host, int httpP
 }
 
 
-bool CAuthorizationController::HasPermission(const QByteArray& permissionId)
+bool CAuthorizationController::HasPermission(const QByteArray& permissionId) const
 {
 	if (m_implPtr != nullptr){
 		return m_implPtr->HasPermission(permissionId);
@@ -634,7 +634,7 @@ QByteArray CAuthorizationController::GetToken() const
 }
 
 
-void CAuthorizationController::SetProductId(const QByteArray& productId)
+void CAuthorizationController::SetProductId(const QByteArray& productId) const 
 {
 	if (m_implPtr != nullptr){
 		m_implPtr->SetProductId(productId);
@@ -642,7 +642,7 @@ void CAuthorizationController::SetProductId(const QByteArray& productId)
 }
 
 
-SuperuserStatus CAuthorizationController::SuperuserExists(QString& errorMessage)
+SuperuserStatus CAuthorizationController::SuperuserExists(QString& errorMessage) const
 {
 	if (m_implPtr != nullptr){
 		return m_implPtr->SuperuserExists(errorMessage);
@@ -652,7 +652,7 @@ SuperuserStatus CAuthorizationController::SuperuserExists(QString& errorMessage)
 }
 
 
-bool CAuthorizationController::CreateSuperuser(const QByteArray& password)
+bool CAuthorizationController::CreateSuperuser(const QByteArray& password) const
 {
 	if (m_implPtr != nullptr){
 		return m_implPtr->CreateSuperuser(password);
@@ -692,7 +692,7 @@ bool CAuthorizationController::GetUserByLogin(const QByteArray& login, User& use
 }
 
 
-bool CAuthorizationController::RemoveUser(const QByteArray& userId)
+bool CAuthorizationController::RemoveUser(const QByteArray& userId) const
 {
 	if (m_implPtr != nullptr){
 		return m_implPtr->RemoveUser(userId);
@@ -702,7 +702,7 @@ bool CAuthorizationController::RemoveUser(const QByteArray& userId)
 }
 
 
-QByteArray CAuthorizationController::CreateUser(const QString& userName, const QByteArray& login, const QByteArray& password, const QString& email)
+QByteArray CAuthorizationController::CreateUser(const QString& userName, const QByteArray& login, const QByteArray& password, const QString& email) const
 {
 	if (m_implPtr != nullptr){
 		return m_implPtr->CreateUser(userName, login, password, email);
@@ -712,7 +712,7 @@ QByteArray CAuthorizationController::CreateUser(const QString& userName, const Q
 }
 
 
-bool CAuthorizationController::ChangeUserPassword(const QByteArray& login, const QByteArray& oldPassword, const QByteArray& newPassword)
+bool CAuthorizationController::ChangeUserPassword(const QByteArray& login, const QByteArray& oldPassword, const QByteArray& newPassword) const
 {
 	if (m_implPtr != nullptr){
 		return m_implPtr->ChangeUserPassword(login, oldPassword, newPassword);
@@ -722,7 +722,7 @@ bool CAuthorizationController::ChangeUserPassword(const QByteArray& login, const
 }
 
 
-bool CAuthorizationController::AddRolesToUser(const QByteArray& userId, const QByteArrayList& roleIds)
+bool CAuthorizationController::AddRolesToUser(const QByteArray& userId, const QByteArrayList& roleIds) const
 {
 	if (m_implPtr != nullptr){
 		return m_implPtr->AddRolesToUser(userId, roleIds);
@@ -732,7 +732,7 @@ bool CAuthorizationController::AddRolesToUser(const QByteArray& userId, const QB
 }
 
 
-bool CAuthorizationController::RemoveRolesFromUser(const QByteArray& userId, const QByteArrayList& roleIds)
+bool CAuthorizationController::RemoveRolesFromUser(const QByteArray& userId, const QByteArrayList& roleIds) const
 {
 	if (m_implPtr != nullptr){
 		return m_implPtr->RemoveRolesFromUser(userId, roleIds);
@@ -795,7 +795,7 @@ QByteArray CAuthorizationController::CreateRole(
 }
 
 
-bool CAuthorizationController::RemoveRole(const QByteArray& roleId)
+bool CAuthorizationController::RemoveRole(const QByteArray& roleId) const
 {
 	if (m_implPtr != nullptr){
 		return m_implPtr->RemoveRole(roleId);
@@ -815,7 +815,7 @@ QByteArrayList CAuthorizationController::GetRolePermissions(const QByteArray& ro
 }
 
 
-bool CAuthorizationController::AddPermissionsToRole(const QByteArray& roleId, const QByteArrayList& permissions)
+bool CAuthorizationController::AddPermissionsToRole(const QByteArray& roleId, const QByteArrayList& permissions) const
 {
 	if (m_implPtr != nullptr){
 		return m_implPtr->AddPermissionsToRole(roleId, permissions);
@@ -825,7 +825,7 @@ bool CAuthorizationController::AddPermissionsToRole(const QByteArray& roleId, co
 }
 
 
-bool CAuthorizationController::RemovePermissionsFromRole(const QByteArray& roleId, const QByteArrayList& permissions)
+bool CAuthorizationController::RemovePermissionsFromRole(const QByteArray& roleId, const QByteArrayList& permissions) const
 {
 	if (m_implPtr != nullptr){
 		return m_implPtr->RemovePermissionsFromRole(roleId, permissions);
@@ -845,7 +845,7 @@ QByteArrayList CAuthorizationController::GetGroupIds() const
 }
 
 
-QByteArray CAuthorizationController::CreateGroup(const QString& groupName, const QString& description)
+QByteArray CAuthorizationController::CreateGroup(const QString& groupName, const QString& description) const
 {
 	if (m_implPtr != nullptr){
 		return m_implPtr->CreateGroup(groupName, description);
@@ -855,7 +855,7 @@ QByteArray CAuthorizationController::CreateGroup(const QString& groupName, const
 }
 
 
-bool CAuthorizationController::RemoveGroup(const QByteArray& groupId)
+bool CAuthorizationController::RemoveGroup(const QByteArray& groupId) const
 {
 	if (m_implPtr != nullptr){
 		return m_implPtr->RemoveGroup(groupId);
@@ -875,7 +875,7 @@ bool CAuthorizationController::GetGroup(const QByteArray& groupId, Group& groupD
 }
 
 
-bool CAuthorizationController::AddUsersToGroup(const QByteArray& groupId, const QByteArrayList& userIds)
+bool CAuthorizationController::AddUsersToGroup(const QByteArray& groupId, const QByteArrayList& userIds) const
 {
 	if (m_implPtr != nullptr){
 		return m_implPtr->AddUsersToGroup(groupId, userIds);
@@ -885,7 +885,7 @@ bool CAuthorizationController::AddUsersToGroup(const QByteArray& groupId, const 
 }
 
 
-bool CAuthorizationController::RemoveUsersFromGroup(const QByteArray& groupId, const QByteArrayList& userIds)
+bool CAuthorizationController::RemoveUsersFromGroup(const QByteArray& groupId, const QByteArrayList& userIds) const
 {
 	if (m_implPtr != nullptr){
 		return m_implPtr->RemoveUsersFromGroup(groupId, userIds);
@@ -895,7 +895,7 @@ bool CAuthorizationController::RemoveUsersFromGroup(const QByteArray& groupId, c
 }
 
 
-bool CAuthorizationController::AddRolesToGroup(const QByteArray& groupId, const QByteArrayList& roleIds)
+bool CAuthorizationController::AddRolesToGroup(const QByteArray& groupId, const QByteArrayList& roleIds) const
 {
 	if (m_implPtr != nullptr){
 		return m_implPtr->AddRolesToGroup(groupId, roleIds);
@@ -905,7 +905,7 @@ bool CAuthorizationController::AddRolesToGroup(const QByteArray& groupId, const 
 }
 
 
-bool CAuthorizationController::RemoveRolesFromGroup(const QByteArray& groupId, const QByteArrayList& roleIds)
+bool CAuthorizationController::RemoveRolesFromGroup(const QByteArray& groupId, const QByteArrayList& roleIds) const
 {
 	if (m_implPtr != nullptr){
 		return m_implPtr->RemoveRolesFromGroup(groupId, roleIds);

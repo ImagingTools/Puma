@@ -131,7 +131,7 @@ CLoginViewWidget::~CLoginViewWidget()
 }
 
 
-bool CLoginViewWidget::SetConnectionParam(const QString& host, int httpPort, int wsPort)
+bool CLoginViewWidget::SetConnectionParam(const QString& host, int httpPort, int wsPort) const
 {
 	if (m_implPtr != nullptr){
 		return m_implPtr->SetConnectionParam(host, httpPort, wsPort);
@@ -141,7 +141,7 @@ bool CLoginViewWidget::SetConnectionParam(const QString& host, int httpPort, int
 }
 
 
-bool CLoginViewWidget::SetLoginParam(Login param)
+bool CLoginViewWidget::SetLoginParam(Login param) const
 {
 	if (m_implPtr != nullptr){
 		return m_implPtr->SetLoginParam(param);

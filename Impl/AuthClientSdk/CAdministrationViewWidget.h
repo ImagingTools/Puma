@@ -21,8 +21,8 @@ public:
 	CAdministrationViewWidget();
 	~CAdministrationViewWidget();
 
-	bool SetConnectionParam(const QString& host, int httpPort, int wsPort);
-	bool SetLoginParam(Login param);
+	bool SetConnectionParam(const QString& host, int httpPort, int wsPort) const;
+	bool SetLoginParam(Login param) const;
 
 private:
 	CAdministrationViewWidgetImpl* m_implPtr;
