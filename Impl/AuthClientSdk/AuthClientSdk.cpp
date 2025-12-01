@@ -106,7 +106,7 @@ public:
 		connectionInterfacePtr->SetPort(imtcom::IServerConnectionInterface::PT_HTTP, httpPort);
 		connectionInterfacePtr->SetPort(imtcom::IServerConnectionInterface::PT_WEBSOCKET, wsPort);
 
-		return false;
+		return true;
 	}
 
 	bool HasPermission(const QByteArray& permissionId)

@@ -7,8 +7,8 @@
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
-    <Description>Surface inspection plugin</Description>
-    <Keywords>Contour Plugin Test Analyse Wortkflow Surface</Keywords>
+    <Description>Authorization client SDK  based on Puma server</Description>
+    <Keywords></Keywords>
     <ElementsList>
         <Element Id="ApplicationInfoController" PackageId="ImtCorePck" ComponentId="ApplicationInfoController">
             <Data IsEnabled="true" Flags="0">
@@ -163,7 +163,14 @@
                     </Element>
                     <Element Id="ServerConnectionInterface" PackageId="ImtComPck" ComponentId="ServerConnectionInterfaceParam">
                         <Data IsEnabled="true" Flags="0">
-                            <AttributeInfoMap/>
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="DefaultHttpPort" Type="Integer" ExportId="">
+                                    <Data IsEnabled="true" Value="-1"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="DefaultWebSocketPort" Type="Integer" ExportId="">
+                                    <Data IsEnabled="true" Value="-1"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
                         </Data>
                     </Element>
                 </ElementsList>
