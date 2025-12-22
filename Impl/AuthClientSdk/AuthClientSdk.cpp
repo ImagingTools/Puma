@@ -94,7 +94,7 @@ public:
 		return loginPtr->Logout();
 	}
 
-	bool SetConnectionParam(const QString& host, int httpPort, int wsPort)
+	bool SetConnectionParam(const ServerConfig& config)
 	{
 		imtcom::IServerConnectionInterface* connectionInterfacePtr = m_sdk.GetInterface<imtcom::IServerConnectionInterface>();
 		if (connectionInterfacePtr == nullptr) {
@@ -102,9 +102,13 @@ public:
 			return false;
 		}
 
-		connectionInterfacePtr->SetHost(host);
-		connectionInterfacePtr->SetPort(imtcom::IServerConnectionInterface::PT_HTTP, httpPort);
-		connectionInterfacePtr->SetPort(imtcom::IServerConnectionInterface::PT_WEBSOCKET, wsPort);
+		if (config.sslConfig.has_value()){
+			connectionInterfacePtr->SetConnectionFlags(imtcom::IServerConnectionInterface::CF_SECURE);
+		}
+
+		connectionInterfacePtr->SetHost(config.host);
+		connectionInterfacePtr->SetPort(imtcom::IServerConnectionInterface::PT_HTTP, config.httpPort);
+		connectionInterfacePtr->SetPort(imtcom::IServerConnectionInterface::PT_WEBSOCKET, config.wsPort);
 
 		return true;
 	}
@@ -604,10 +608,10 @@ bool CAuthorizationController::Logout() const
 }
 
 
-bool CAuthorizationController::SetConnectionParam(const QString& host, int httpPort, int wsPort) const
+bool CAuthorizationController::SetConnectionParam(const ServerConfig& config) const
 {
 	if (m_implPtr != nullptr){
-		return m_implPtr->SetConnectionParam(host, httpPort, wsPort);
+		return m_implPtr->SetConnectionParam(config);
 	}
 
 	return false;

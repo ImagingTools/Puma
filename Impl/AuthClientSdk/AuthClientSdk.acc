@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5430" Description="ACF"/>
-            <Version Id="1" Number="2253" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5445" Description="ACF"/>
+            <Version Id="1" Number="2256" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -36,9 +36,6 @@
         <Element Id="GroupRequests" PackageId="" ComponentId="GroupRequests">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="AccessTokenProvider" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="SimpleLoginWrap"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="ApiClient" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="GraphQLClientEngine"/>
                     </AttributeInfo>
@@ -105,9 +102,6 @@
         <Element Id="UserRequests" PackageId="" ComponentId="UserRequests">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="AccessTokenProvider" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="SimpleLoginWrap"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="ApiClient" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="GraphQLClientEngine"/>
                     </AttributeInfo>
@@ -204,9 +198,6 @@
                     <Element Id="ClientRequestGroupManager" PackageId="ImtAuthGqlPck" ComponentId="ClientRequestGroupManager">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
-                                <AttributeInfo Id="AccessTokenProvider" Type="Reference" ExportId="AccessTokenProvider">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
                                 <AttributeInfo Id="ApiClient" Type="Reference" ExportId="ApiClient">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
@@ -264,9 +255,6 @@
                     <Element Id="ClientRequestRoleManager" PackageId="ImtAuthGqlPck" ComponentId="ClientRequestRoleManager">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
-                                <AttributeInfo Id="AccessTokenProvider" Type="Reference" ExportId="AccessTokenProvider">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
                                 <AttributeInfo Id="ApiClient" Type="Reference" ExportId="ApiClient">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
@@ -318,9 +306,6 @@
                     <Element Id="ClientRequestUserManager" PackageId="ImtAuthGqlPck" ComponentId="ClientRequestUserManager">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
-                                <AttributeInfo Id="AccessTokenProvider" Type="Reference" ExportId="AccessTokenProvider">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
                                 <AttributeInfo Id="ApiClient" Type="Reference" ExportId="ApiClient">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>

@@ -16,6 +16,7 @@
 #include <imtdb/IDatabaseLoginSettings.h>
 #include <imtcom/IServerConnectionInterface.h>
 #include <imtcom/IServerDispatcher.h>
+#include <imtcom/ISslConfigurationApplier.h>
 
 // Local includes
 #include <GeneratedFiles/AuthServerSdk/CAuthServerSdk.h>
@@ -34,24 +35,93 @@ public:
 	}
 
 
-	bool Start(int httpPort, int wsPort)
+	bool Start(const ServerConfig& serverConfig)
 	{
 		imtcom::IServerDispatcher* serverControllerPtr = m_sdk.GetInterface<imtcom::IServerDispatcher>();
 		if (serverControllerPtr == nullptr){
+			qWarning() << "Server dispatcher interface is not available";
 			return false;
 		}
 
-		if (!SetConnectionParam("localhost", httpPort, wsPort)){
+		if (!SetConnectionParam(serverConfig)){
+			qWarning() << "Failed to set connection parameters: HTTP" << serverConfig.httpPort << "WS" << serverConfig.wsPort;
 			return false;
+		}
+
+		if (serverConfig.sslConfig.has_value()){
+			const SslConfig& sslConfig = *serverConfig.sslConfig;
+			imtcom::ISslConfigurationApplier* sslConfigurationApplierPtr = m_sdk.GetInterface<imtcom::ISslConfigurationApplier>();
+			if (sslConfigurationApplierPtr == nullptr){
+				qWarning() << "SSL configuration applier interface is not available";
+				return false;
+			}
+
+			if (sslConfig.localCertificatePath.isEmpty() || sslConfig.privateKeyPath.isEmpty()){
+				qWarning() << "Local certificate or private key path is empty";
+				return false;
+			}
+
+			// Local certificate
+			if (!sslConfigurationApplierPtr->LoadLocalCertificateFromFile(
+					sslConfig.localCertificatePath, sslConfig.localCertificateFormat)){
+				qWarning() << "Failed to load local certificate from" << sslConfig.localCertificatePath;
+				return false;
+			}
+			qDebug() << "Loaded local certificate from" << sslConfig.localCertificatePath;
+
+			// CA certificates
+			if (!sslConfig.caCertificatePaths.isEmpty()){
+				for (const QString& certPath : sslConfig.caCertificatePaths){
+					if (!sslConfigurationApplierPtr->LoadCaCertificatesFromFile(certPath, sslConfig.caCertificateFormat)){
+						qWarning() << "Failed to load CA certificate from" << certPath;
+						return false;
+					}
+					qDebug() << "Loaded CA certificate from" << certPath;
+				}
+			}
+			else{
+				qDebug() << "No CA certificates specified";
+			}
+
+			// Private key
+			if (!sslConfigurationApplierPtr->LoadPrivateKeyFromFile(
+					sslConfig.privateKeyPath,
+					sslConfig.privateKeyAlgorithm,
+					sslConfig.privateKeyFormat,
+					sslConfig.privateKeyPassPhrase)){
+				qWarning() << "Failed to load private key from" << sslConfig.privateKeyPath;
+				return false;
+			}
+			qDebug() << "Loaded private key from" << sslConfig.privateKeyPath;
+
+			// SSL protocol
+			if (!sslConfigurationApplierPtr->SetSslProtocol(sslConfig.protocol)){
+				qWarning() << "Failed to set SSL protocol:" << sslConfig.protocol;
+				return false;
+			}
+			qDebug() << "SSL protocol set to" << sslConfig.protocol;
+
+			// Peer verify mode
+			if (!sslConfigurationApplierPtr->SetPeerVerifyMode(sslConfig.verifyMode)){
+				qWarning() << "Failed to set peer verify mode:" << sslConfig.verifyMode;
+				return false;
+			}
+			qDebug() << "Peer verify mode set to" << static_cast<int>(sslConfig.verifyMode);
 		}
 
 		if (!serverControllerPtr->StartServer(imtcom::IServerConnectionInterface::PT_HTTP)){
+			qWarning() << "Failed to start HTTP server on port" << serverConfig.httpPort;
 			return false;
 		}
+		qDebug() << "HTTP server started on port" << serverConfig.httpPort;
 
 		if (!serverControllerPtr->StartServer(imtcom::IServerConnectionInterface::PT_WEBSOCKET)){
+			qWarning() << "Failed to start WebSocket server on port" << serverConfig.wsPort;
 			return false;
 		}
+		qDebug() << "WebSocket server started on port" << serverConfig.wsPort;
+
+		qDebug() << "Server started successfully";
 
 		return true;
 	}
@@ -61,6 +131,7 @@ public:
 	{
 		imtcom::IServerDispatcher* serverControllerPtr = m_sdk.GetInterface<imtcom::IServerDispatcher>();
 		if (serverControllerPtr == nullptr){
+			qWarning() << "Server dispatcher interface is not available";
 			return false;
 		}
 
@@ -101,15 +172,15 @@ public:
 	}
 
 
-	bool SetConnectionParam(const QString& host, int httpPort, int wsPort)
+	bool SetConnectionParam(const ServerConfig& serverConfig)
 	{
-		return SetConnectionParamInternal(host, httpPort, wsPort, "ServerConnectionInterfaceParam");
+		return SetConnectionParamInternal(serverConfig, "ServerConnectionInterfaceParam");
 	}
 
 
-	bool SetPumaConnectionParam(const QString& host, int httpPort, int wsPort)
+	bool SetPumaConnectionParam(const ServerConfig& serverConfig)
 	{
-		return SetConnectionParamInternal(host, httpPort, wsPort, "PumaConnectionInterfaceParam");
+		return SetConnectionParamInternal(serverConfig, "PumaConnectionInterfaceParam");
 	}
 
 
@@ -126,13 +197,17 @@ public:
 	}
 
 private:
-	bool SetConnectionParamInternal(const QString& host, int httpPort, int wsPort, const QByteArray& componentId)
+	bool SetConnectionParamInternal(const ServerConfig& serverConfig, const QByteArray& componentId)
 	{
 		imtcom::IServerConnectionInterface* serverConnectionParamPtr = m_sdk.GetInterface<imtcom::IServerConnectionInterface>(componentId);
 		if (serverConnectionParamPtr != nullptr){
-			serverConnectionParamPtr->SetHost(host);
-			serverConnectionParamPtr->SetPort(imtcom::IServerConnectionInterface::PT_HTTP, httpPort);
-			serverConnectionParamPtr->SetPort(imtcom::IServerConnectionInterface::PT_WEBSOCKET, wsPort);
+			serverConnectionParamPtr->SetHost(serverConfig.host);
+			serverConnectionParamPtr->SetPort(imtcom::IServerConnectionInterface::PT_HTTP, serverConfig.httpPort);
+			serverConnectionParamPtr->SetPort(imtcom::IServerConnectionInterface::PT_WEBSOCKET, serverConfig.wsPort);
+
+			if (serverConfig.sslConfig.has_value()){
+				serverConnectionParamPtr->SetConnectionFlags(imtcom::IServerConnectionInterface::CF_SECURE);
+			}
 
 			return true;
 		}
@@ -160,10 +235,10 @@ CAuthorizableServer::~CAuthorizableServer()
 }
 
 
-bool CAuthorizableServer::Start(int httpPort, int wsPort) const
+bool CAuthorizableServer::Start(const ServerConfig& serverConfig) const
 {
 	if (m_implPtr != nullptr){
-		return m_implPtr->Start(httpPort, wsPort);
+		return m_implPtr->Start(serverConfig);
 	}
 
 	return false;
@@ -190,10 +265,10 @@ bool CAuthorizableServer::SetFeaturesFilePath(const QString& filePath) const
 }
 
 
-bool CAuthorizableServer::SetPumaConnectionParam(const QString& host, int httpPort, int wsPort) const
+bool CAuthorizableServer::SetPumaConnectionParam(const ServerConfig& serverConfig) const
 {
 	if (m_implPtr != nullptr){
-		return m_implPtr->SetPumaConnectionParam(host, httpPort,  wsPort);
+		return m_implPtr->SetPumaConnectionParam(serverConfig);
 	}
 
 	return false;

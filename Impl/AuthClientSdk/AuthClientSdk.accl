@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5430" Description="ACF"/>
-            <Version Id="1" Number="2253" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5445" Description="ACF"/>
+            <Version Id="1" Number="2256" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -19,14 +19,6 @@
         <Element ComponentName="VersionInfo" X="175" Y="75" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
-        <EmbededRegistry Id="GraphQLClientEngine">
-            <PositionMap>
-                <Element ComponentName="ApiClient" X="200" Y="125" Note=""/>
-                <Element ComponentName="GraphQLClientEngine" X="575" Y="125" Note=""/>
-                <Element ComponentName="ServerConnectionInterface" X="950" Y="125" Note=""/>
-            </PositionMap>
-            <EmbeddedRegistries/>
-        </EmbededRegistry>
         <EmbededRegistry Id="UserRequests">
             <PositionMap>
                 <Element ComponentName="ClientRequestUserInfoProvider" X="550" Y="350" Note=""/>
@@ -42,6 +34,14 @@
                 <Element ComponentName="ClientRequestGroupInfoProvider" X="550" Y="125" Note=""/>
                 <Element ComponentName="ClientRequestGroupManager" X="550" Y="650" Note=""/>
                 <Element ComponentName="UserGroupInfo" X="550" Y="375" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+        <EmbededRegistry Id="GraphQLClientEngine">
+            <PositionMap>
+                <Element ComponentName="ApiClient" X="200" Y="125" Note=""/>
+                <Element ComponentName="GraphQLClientEngine" X="575" Y="125" Note=""/>
+                <Element ComponentName="ServerConnectionInterface" X="950" Y="125" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>

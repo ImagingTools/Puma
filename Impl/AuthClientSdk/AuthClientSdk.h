@@ -14,6 +14,7 @@
 #include <QtCore/QString>
 #include <QtCore/QByteArray>
 #include <QtCore/QByteArrayList>
+#include <QtNetwork/QSslConfiguration>
 
 
 namespace AuthClientSdk
@@ -79,6 +80,24 @@ enum class SystemType
 };
 
 
+struct SslConfig
+{
+	QList<QString> caCertificatePaths;
+	QSsl::EncodingFormat caCertificateFormat = QSsl::Pem;
+	QSsl::SslProtocol protocol = QSsl::TlsV1_2;
+	bool ignoreSslErrors = false;
+};
+
+
+struct ServerConfig
+{
+	QString host = "localhost";
+	int httpPort;
+	int wsPort;
+	std::optional<SslConfig> sslConfig;
+};
+
+
 /**
 *	\ingroup AuthClientSdk
 */
@@ -91,7 +110,7 @@ public:
 
 	virtual bool Login(const QString& login, const QString& password, Login& out) const;
 	virtual bool Logout() const;
-	bool SetConnectionParam(const QString& host, int httpPort, int wsPort) const;
+	bool SetConnectionParam(const ServerConfig& config) const;
 	virtual bool HasPermission(const QByteArray& permissionId) const;
 	virtual QByteArray GetToken() const;
 	virtual void SetProductId(const QByteArray& productId) const;

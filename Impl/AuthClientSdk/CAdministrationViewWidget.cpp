@@ -46,15 +46,19 @@ public:
 	}
 
 
-	bool SetConnectionParam(const QString& host, int httpPort, int wsPort)
+	bool SetConnectionParam(const ServerConfig& config)
 	{
 		imtcom::IServerConnectionInterface* serverConnectionParamPtr = m_sdk.GetInterface<imtcom::IServerConnectionInterface>();
 		if (serverConnectionParamPtr != nullptr){
 			istd::CChangeGroup changeGroup(serverConnectionParamPtr);
 
-			serverConnectionParamPtr->SetHost(host);
-			serverConnectionParamPtr->SetPort(imtcom::IServerConnectionInterface::PT_HTTP, httpPort);
-			serverConnectionParamPtr->SetPort(imtcom::IServerConnectionInterface::PT_WEBSOCKET, wsPort);
+			serverConnectionParamPtr->SetHost(config.host);
+			serverConnectionParamPtr->SetPort(imtcom::IServerConnectionInterface::PT_HTTP, config.httpPort);
+			serverConnectionParamPtr->SetPort(imtcom::IServerConnectionInterface::PT_WEBSOCKET, config.wsPort);
+
+			if (config.sslConfig.has_value()){
+				serverConnectionParamPtr->SetConnectionFlags(imtcom::IServerConnectionInterface::CF_SECURE);
+			}
 
 			return true;
 		}
@@ -125,10 +129,10 @@ CAdministrationViewWidget::~CAdministrationViewWidget()
 }
 
 
-bool CAdministrationViewWidget::SetConnectionParam(const QString& host, int httpPort, int wsPort) const
+bool CAdministrationViewWidget::SetConnectionParam(const ServerConfig& config) const
 {
 	if (m_implPtr != nullptr){
-		return m_implPtr->SetConnectionParam(host, httpPort, wsPort);
+		return m_implPtr->SetConnectionParam(config);
 	}
 
 	return false;
