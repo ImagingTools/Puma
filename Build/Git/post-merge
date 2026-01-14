@@ -1,0 +1,21 @@
+#!/bin/sh
+
+echo "Running post-merge hook..."
+
+REPO_ROOT="$(pwd)"
+BAT_FILE="$REPO_ROOT/Build/Git/UpdateVersion.bat"
+
+echo "Looking for: $BAT_FILE"
+
+if [ -f "$BAT_FILE" ]; then
+    echo "Executing $BAT_FILE..."
+    cd "$REPO_ROOT"
+    cmd //c "$BAT_FILE"
+else
+    echo "Error: $BAT_FILE not found"
+    echo "Checking Build/Git directory:"
+    ls -la "Build/Git/" 2>/dev/null || echo "Directory Build/Git does not exist"
+    exit 1
+fi
+
+echo "Post-merge hook completed"
