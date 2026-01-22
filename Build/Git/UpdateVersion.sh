@@ -5,8 +5,10 @@ cd "$(dirname "$0")"
 
 FILE="../../Partitura/PumaVoce.arp/VersionInfo.acc.xtrsvn"
 
-# Fetch and unshallow if needed
-git fetch --prune --unshallow 2>/dev/null
+# Fetch and unshallow if needed (only if repository is shallow)
+if git rev-parse --is-shallow-repository 2>/dev/null | grep -q "true"; then
+    git fetch --prune --unshallow 2>/dev/null
+fi
 
 # Get revision count
 REV=$(git rev-list --count origin/master 2>/dev/null)
@@ -31,7 +33,7 @@ echo "Processing file: $FILE"
 # Generate output filename
 OUT="${FILE%.xtrsvn}"
 
-# Process the file - escape dollar signs properly
-sed -e "s/\\\$WCREV\\\$/$REV/g" -e "s/\\\$WCMODS?1:0\\\$/$DIRTY/g" "$FILE" > "$OUT"
+# Process the file - use separate sed commands for better readability
+sed -e "s/\\\$WCREV\\\$/$REV/g" "$FILE" | sed -e "s/\\\$WCMODS?1:0\\\$/$DIRTY/g" > "$OUT"
 
 echo "Wrote $OUT with WCREV=$REV and WCMODS=$DIRTY"

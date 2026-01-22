@@ -3,9 +3,10 @@
 echo "Running post-merge hook..."
 
 REPO_ROOT="$(pwd)"
+OS="$(uname -s)"
 
 # Detect OS and choose appropriate script
-if [ "$(uname -s)" = "Linux" ] || [ "$(uname -s)" = "Darwin" ]; then
+if [ "$OS" = "Linux" ] || [ "$OS" = "Darwin" ]; then
     # Linux or macOS
     SCRIPT_FILE="$REPO_ROOT/Build/Git/UpdateVersion.sh"
     echo "Looking for: $SCRIPT_FILE"
