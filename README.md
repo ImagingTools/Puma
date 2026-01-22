@@ -83,7 +83,7 @@ Installation scripts are provided in the `Install/` directory. After building, r
 
 ## Configuration
 
-Configuration files are managed through the Partitura system (`.acc` files) located in the `Partitura/` directory. The main configuration file is `PumaVoce.arp`.
+Configuration files are managed through the Partitura system (`.acc` files) located in the `Partitura/` directory. The main configuration package is `Partitura/PumaVoce.arp/` which contains various `.acc` configuration files for different components.
 
 Server configuration can be managed through:
 - **PumaServerConfigurator** GUI tool
@@ -99,7 +99,7 @@ Puma includes an automated Git-based version management system. See [Build/Git/R
 
 ## Documentation
 
-- **API Documentation** - Generate using Doxygen: `Docs/Doxyfile`
+- **API Documentation** - Generate using Doxygen (see `Docs/Doxyfile`)
 - **Git Scripts** - [Build/Git/README.md](Build/Git/README.md)
 - **Source Code** - Headers in `Include/`, implementations in `Impl/`
 
@@ -109,6 +109,8 @@ Puma includes an automated Git-based version management system. See [Build/Git/R
 cd Docs
 doxygen Doxyfile
 ```
+
+Note: The Doxyfile may need to be updated to reflect the current project name.
 
 ## Project Structure
 
