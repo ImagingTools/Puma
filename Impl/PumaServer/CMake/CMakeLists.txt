@@ -43,8 +43,8 @@ if(WIN32)
 	windeploy(${PROJECT_NAME} "${listOptions}" "${files}")
 	unset(listOptions)
 
-	file(COPY ${PROJECT_SOURCE_DIR}/../../../../ImtCore/3rdParty/openssl/1.1/lib/x64/libcrypto-1_1-x64.dll DESTINATION ${PROJECT_SOURCE_DIR}/../../../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME})
-	file(COPY ${PROJECT_SOURCE_DIR}/../../../../ImtCore/3rdParty/openssl/1.1/lib/x64/libssl-1_1-x64.dll DESTINATION ${PROJECT_SOURCE_DIR}/../../../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME})
+	file(COPY ${OPENSSLDIR}/lib/x64/libcrypto-1_1-x64.dll DESTINATION ${PROJECT_SOURCE_DIR}/../../../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME})
+	file(COPY ${OPENSSLDIR}/lib/x64/libssl-1_1-x64.dll DESTINATION ${PROJECT_SOURCE_DIR}/../../../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME})
 endif()
 
 # for OSX if make bundle, copy migrations into a bundle
