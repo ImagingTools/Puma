@@ -17,13 +17,26 @@ void CAuthClientSdkTest::initTestCase()
 {
 	qDebug() << "=== [Init] AuthClientSdk tests start ===";
 
-	// m_authorizableServer.SetPumaConnectionParam("localhost", 7788, 8788);
-	// m_authorizableServer.SetProductId("Test");
-	// QVERIFY(m_authorizableServer.Start(7777, 8888));
+	AuthServerSdk::ServerConfig pumaConfig;
+	pumaConfig.wsPort = 8788;
+	pumaConfig.httpPort = 7788;
+	
+	m_authorizableServer.SetPumaConnectionParam(pumaConfig);
+	m_authorizableServer.SetProductId("Test");
 
-	// m_authorizationController.SetProductId("Test");
-	// m_authorizationController.SetConnectionParam("localhost", 7777, 8888);
-	// QVERIFY(m_authorizationController.GetToken().isEmpty());
+	AuthServerSdk::ServerConfig config;
+	config.wsPort = 8888;
+	config.httpPort = 7777;
+
+	QVERIFY(m_authorizableServer.Start(config));
+
+	m_authorizationController.SetProductId("Test");
+
+	AuthClientSdk::ServerConfig serverConfig;
+	serverConfig.wsPort = 8888;
+	serverConfig.httpPort = 7777;
+	m_authorizationController.SetConnectionParam(serverConfig);
+	QVERIFY(m_authorizationController.GetToken().isEmpty());
 }
 
 
