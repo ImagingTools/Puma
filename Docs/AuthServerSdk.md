@@ -16,17 +16,21 @@
 
 The AuthServerSdk (Authorization Server SDK) is a C++ library that provides a high-level API for embedding an authorization server into your applications. It enables applications to implement robust authentication and authorization mechanisms with optional SSL/TLS support, WebSocket communication, and flexible configuration options.
 
+**Important**: The AuthServerSdk implementation is based internally on communication with the Puma server. The SDK acts as a wrapper that configures and manages the connection to the underlying Puma authorization infrastructure, providing a simplified API for embedding authorization capabilities into host applications.
+
 The SDK is designed for:
 - Applications that need to provide authentication services to multiple clients
 - Enterprise systems requiring centralized authorization management
 - Secure server implementations with SSL/TLS encryption
 - Systems requiring WebSocket-based real-time communication
+- Applications that need to integrate with the Puma authorization framework
 
 ### Key Characteristics
 - **PIMPL Pattern**: Uses the Pointer to Implementation (PIMPL) design pattern for ABI stability
 - **Platform Support**: Windows-only (WIN32 conditional compilation)
 - **Qt-based**: Built on Qt framework for cross-platform compatibility within Windows
 - **ImtCore Integration**: Leverages ImtCore component framework for modular architecture
+- **Puma Integration**: Internally communicates with Puma server infrastructure for authorization services
 
 ## Features
 
@@ -36,7 +40,8 @@ The SDK is designed for:
 - **Certificate Management**: Support for server certificates, CA certificates, and private keys
 - **Flexible Configuration**: Runtime configuration of ports, hosts, and security settings
 - **Product Licensing**: Integration with product ID and features file management
-- **Connection Management**: Separate configuration for server and Puma backend connections
+- **Puma Backend Integration**: Internal communication with Puma server for authorization processing
+- **Connection Management**: Separate configuration for external server endpoints and internal Puma backend connections
 
 ### Security Features
 - **SSL/TLS 1.2+**: Modern TLS protocol support
@@ -50,22 +55,68 @@ The SDK is designed for:
 ### Component Structure
 
 ```
-┌─────────────────────────────────────┐
-│   CAuthorizableServer (Public API)  │
-├─────────────────────────────────────┤
-│   CAuthorizableServerImpl (PIMPL)   │
-├─────────────────────────────────────┤
-│      CAuthServerSdk (Component)     │
-├─────────────────────────────────────┤
-│         ImtCore Framework           │
-│  ┌──────────────────────────────┐   │
-│  │ IServerDispatcher            │   │
-│  │ IServerConnectionInterface   │   │
-│  │ ISslConfigurationApplier     │   │
-│  │ IApplicationInfoController   │   │
-│  │ IProductInfo                 │   │
-│  └──────────────────────────────┘   │
-└─────────────────────────────────────┘
+┌──────────────────────────────────────────────────────┐
+│            CAuthorizableServer (Public API)          │
+├──────────────────────────────────────────────────────┤
+│         CAuthorizableServerImpl (PIMPL)              │
+├──────────────────────────────────────────────────────┤
+│            CAuthServerSdk (Component)                │
+├──────────────────────────────────────────────────────┤
+│              ImtCore Framework                       │
+│  ┌───────────────────────────────────────────────┐   │
+│  │ IServerDispatcher                            │   │
+│  │ IServerConnectionInterface                   │   │
+│  │ ISslConfigurationApplier                     │   │
+│  │ IApplicationInfoController                   │   │
+│  │ IProductInfo                                 │   │
+│  └───────────────────────────────────────────────┘   │
+└──────────────────────────────────────────────────────┘
+                         ↓
+                         ↓ (Internal Communication)
+                         ↓
+┌──────────────────────────────────────────────────────┐
+│              Puma Authorization Server               │
+│  ┌───────────────────────────────────────────────┐   │
+│  │ • User Authentication                        │   │
+│  │ • Authorization Processing                   │   │
+│  │ • Database Management                        │   │
+│  │ • Session Management                         │   │
+│  │ • Permission Resolution                      │   │
+│  └───────────────────────────────────────────────┘   │
+└──────────────────────────────────────────────────────┘
+```
+
+### Architecture Overview
+
+The AuthServerSdk operates as a **bridge layer** between your application and the Puma authorization server:
+
+1. **Public API Layer** (`CAuthorizableServer`): Provides a clean, stable API for host applications
+2. **Implementation Layer** (`CAuthorizableServerImpl`): Handles configuration and communication setup
+3. **Component Layer** (`CAuthServerSdk`): Manages ImtCore components and interfaces
+4. **ImtCore Framework**: Provides low-level server communication and SSL capabilities
+5. **Puma Server** (Backend): Performs actual authentication, authorization, and user management
+
+**Important**: The SDK does not implement authorization logic itself. Instead, it:
+- Configures the connection parameters to the Puma server
+- Manages SSL/TLS settings for secure communication
+- Starts HTTP and WebSocket server endpoints
+- Routes requests to the underlying Puma infrastructure
+- Manages product licensing and features configuration
+
+### Communication Flow
+
+```
+Client Application
+       ↓
+  HTTP/WebSocket
+       ↓
+AuthServerSdk (This SDK)
+       ↓
+  Internal Connection
+       ↓
+Puma Authorization Server
+       ↓
+  Database / LDAP
 ```
 
 ### Dependencies
@@ -73,15 +124,32 @@ The SDK is designed for:
 - **Qt Network**: QSslConfiguration, QSslSocket, QSsl
 - **ACF (Adaptive Component Framework)**: Component lifecycle management
 - **ImtCore**: Application info, licensing, server communication, SSL configuration
+- **Puma Server**: Backend authorization infrastructure (required for operation)
 
 ## Getting Started
 
 ### Prerequisites
+
 - Qt 5 or Qt 6
 - C++ compiler with C++17 support
 - OpenSSL libraries
 - ImtCore framework installed
+- **Puma Authorization Server** - The SDK requires a running Puma server instance for backend operations
 - Windows platform (WIN32)
+
+### Deployment Models
+
+The AuthServerSdk can be deployed in two primary configurations:
+
+1. **Embedded Mode**: Your application embeds the SDK and connects to a separate Puma server instance
+   - SDK runs in your application process
+   - Communicates with external Puma server
+   - Best for distributed architectures
+
+2. **Integrated Mode**: Your application and Puma server run in the same infrastructure
+   - SDK manages connection to local Puma server
+   - Simplified deployment
+   - Best for standalone applications
 
 ### Basic Integration
 
@@ -180,14 +248,38 @@ The file should be a CompactXML format containing product feature definitions.
 ```cpp
 virtual bool SetPumaConnectionParam(const ServerConfig& serverConfig) const;
 ```
-Configures connection parameters for Puma backend integration.
+Configures connection parameters for the backend Puma authorization server.
+
+**Important**: This method configures the **internal connection** from the SDK to the Puma backend server, which handles the actual authorization processing. This is different from the external server configuration set via `Start()`.
 
 **Parameters:**
-- `serverConfig`: Configuration for Puma connection
+- `serverConfig`: Configuration for the Puma backend connection (host, ports, SSL)
 
 **Returns:**
 - `true` if parameters applied successfully
 - `false` if Puma connection interface unavailable
+
+**Usage Scenario**:
+- When your AuthServerSdk instance needs to connect to a separate Puma server
+- Use this to specify where the Puma authorization backend is running
+- Typically called before `Start()` to establish the backend connection
+
+**Example**:
+```cpp
+// Configure connection to Puma backend server
+ServerConfig pumaBackend;
+pumaBackend.host = "puma-backend.internal";
+pumaBackend.httpPort = 9080;
+pumaBackend.wsPort = 9090;
+server.SetPumaConnectionParam(pumaBackend);
+
+// Then configure and start the external-facing server
+ServerConfig externalServer;
+externalServer.host = "0.0.0.0";
+externalServer.httpPort = 8080;
+externalServer.wsPort = 8090;
+server.Start(externalServer);
+```
 
 #### `SetProductId()`
 ```cpp
@@ -232,6 +324,100 @@ struct SslConfig {
 ```
 
 ## Configuration
+
+### Understanding the Dual Configuration Model
+
+The AuthServerSdk uses a **dual configuration model** because it operates as a bridge between external clients and the internal Puma authorization server:
+
+1. **External Server Configuration** (via `Start()`):
+   - Defines the ports and host that **external clients** connect to
+   - This is your application's public-facing authorization endpoint
+   - Clients (AuthClientSdk instances) connect to these endpoints
+   - Example: `httpPort = 8080, wsPort = 8090, host = "0.0.0.0"`
+
+2. **Puma Backend Configuration** (via `SetPumaConnectionParam()`):
+   - Defines where the **Puma authorization server** is running
+   - This is the internal connection for authorization processing
+   - The SDK forwards requests to this backend
+   - Example: `httpPort = 9080, wsPort = 9090, host = "puma-backend.internal"`
+
+**Communication Flow**:
+```
+Client → [External:8080] → AuthServerSdk → [Internal:9080] → Puma Server
+```
+
+### Configuration Scenarios
+
+#### Scenario 1: Standalone Deployment (Local Puma)
+When Puma server runs on the same machine:
+
+```cpp
+ServerConfig config;
+config.httpPort = 8080;
+config.wsPort = 8090;
+config.host = "localhost";
+
+// Puma backend might be on different ports
+ServerConfig pumaConfig;
+pumaConfig.httpPort = 9080;
+pumaConfig.wsPort = 9090;
+pumaConfig.host = "localhost";
+
+server.SetPumaConnectionParam(pumaConfig);
+server.Start(config);
+```
+
+#### Scenario 2: Distributed Deployment (Remote Puma)
+When Puma server runs on a different machine:
+
+```cpp
+// External facing configuration
+ServerConfig externalConfig;
+externalConfig.httpPort = 8080;
+externalConfig.wsPort = 8090;
+externalConfig.host = "0.0.0.0";  // Accept external connections
+
+// Internal Puma backend configuration
+ServerConfig pumaConfig;
+pumaConfig.httpPort = 9080;
+pumaConfig.wsPort = 9090;
+pumaConfig.host = "puma.internal.network";  // Internal Puma server
+
+server.SetPumaConnectionParam(pumaConfig);
+server.Start(externalConfig);
+```
+
+#### Scenario 3: Secure Deployment (SSL on Both Connections)
+When both external and internal connections use SSL:
+
+```cpp
+// External SSL configuration
+SslConfig externalSsl;
+externalSsl.localCertificatePath = "certs/external.crt";
+externalSsl.privateKeyPath = "certs/external.key";
+externalSsl.caCertificatePaths.append("certs/ca.crt");
+
+ServerConfig externalConfig;
+externalConfig.httpPort = 8443;
+externalConfig.wsPort = 8453;
+externalConfig.host = "0.0.0.0";
+externalConfig.sslConfig = externalSsl;
+
+// Internal Puma SSL configuration
+SslConfig internalSsl;
+internalSsl.localCertificatePath = "certs/internal.crt";
+internalSsl.privateKeyPath = "certs/internal.key";
+internalSsl.caCertificatePaths.append("certs/puma-ca.crt");
+
+ServerConfig pumaConfig;
+pumaConfig.httpPort = 9443;
+pumaConfig.wsPort = 9453;
+pumaConfig.host = "puma.internal.network";
+pumaConfig.sslConfig = internalSsl;
+
+server.SetPumaConnectionParam(pumaConfig);
+server.Start(externalConfig);
+```
 
 ### Basic HTTP Configuration
 ```cpp
@@ -388,7 +574,7 @@ int main(int argc, char *argv[])
 }
 ```
 
-### Example 4: Server with Puma Backend Integration
+### Example 4: Distributed Architecture with Puma Backend
 ```cpp
 #include <AuthServerSdk/AuthServerSdk.h>
 #include <QCoreApplication>
@@ -401,26 +587,46 @@ int main(int argc, char *argv[])
     
     CAuthorizableServer server;
     
-    // Configure Puma backend connection
-    ServerConfig pumaConfig;
-    pumaConfig.httpPort = 9080;
-    pumaConfig.wsPort = 9090;
-    pumaConfig.host = "puma-backend.local";
+    // STEP 1: Configure connection to Puma backend server
+    // This is where the actual authorization logic runs
+    ServerConfig pumaBackendConfig;
+    pumaBackendConfig.httpPort = 9080;
+    pumaBackendConfig.wsPort = 9090;
+    pumaBackendConfig.host = "puma-backend.internal.network";
     
-    if (!server.SetPumaConnectionParam(pumaConfig)) {
-        qWarning() << "Failed to configure Puma connection";
+    if (!server.SetPumaConnectionParam(pumaBackendConfig)) {
+        qCritical() << "Failed to configure Puma backend connection";
+        return 1;
     }
     
-    // Configure main server
-    ServerConfig config;
-    config.httpPort = 8080;
-    config.wsPort = 8090;
-    config.host = "0.0.0.0";
+    qInfo() << "Configured Puma backend at" 
+            << pumaBackendConfig.host 
+            << ":" << pumaBackendConfig.httpPort;
     
-    if (!server.Start(config)) {
+    // STEP 2: Configure external-facing server endpoints
+    // This is what clients will connect to
+    ServerConfig externalConfig;
+    externalConfig.httpPort = 8080;
+    externalConfig.wsPort = 8090;
+    externalConfig.host = "0.0.0.0";  // Accept from all interfaces
+    
+    // STEP 3: Start the server
+    // This starts the external endpoints and connects to Puma backend
+    if (!server.Start(externalConfig)) {
         qCritical() << "Failed to start server";
         return 1;
     }
+    
+    qInfo() << "Authorization server running";
+    qInfo() << "External clients connect to:" 
+            << externalConfig.host 
+            << ":" << externalConfig.httpPort;
+    qInfo() << "Backend Puma server at:" 
+            << pumaBackendConfig.host 
+            << ":" << pumaBackendConfig.httpPort;
+    
+    // Architecture:
+    // Client Apps → [8080] → AuthServerSdk → [9080] → Puma Server
     
     return app.exec();
 }
@@ -492,11 +698,15 @@ Supported protocols (in order of security):
 7. **Disable weak protocols**: Avoid TLS 1.0 and 1.1
 
 ### Configuration
-1. **Bind to specific interfaces**: Use specific IPs instead of "0.0.0.0" in production
-2. **Use non-standard ports**: Avoid default ports (80, 443) when possible
-3. **Separate environments**: Different ports/hosts for development, staging, production
-4. **Validate configuration**: Check return values of all configuration methods
-5. **Load features files**: Use features files for flexible licensing
+1. **Configure Puma backend first**: Always call `SetPumaConnectionParam()` before `Start()`
+2. **Verify Puma server availability**: Ensure Puma backend server is running before starting the SDK
+3. **Separate external and internal ports**: Use different port ranges for external clients and internal Puma communication
+4. **Bind to specific interfaces**: Use specific IPs instead of "0.0.0.0" in production
+5. **Use non-standard ports**: Avoid default ports (80, 443) when possible
+6. **Separate environments**: Different ports/hosts for development, staging, production
+7. **Validate configuration**: Check return values of all configuration methods
+8. **Load features files**: Use features files for flexible licensing
+9. **Document deployment architecture**: Clearly document which ports are for external clients vs. internal Puma communication
 
 ### Resource Management
 1. **Proper cleanup**: Always stop the server before destruction
@@ -511,6 +721,39 @@ Supported protocols (in order of security):
 4. **Don't log secrets**: Never log private keys or passphrases
 
 ## Troubleshooting
+
+### Puma Backend Connection Issues
+
+**Problem**: Server starts but authorization requests fail
+
+**Possible Causes:**
+1. Puma backend server not running
+2. Incorrect Puma connection configuration
+3. Network connectivity issues to Puma server
+4. Firewall blocking internal connection
+
+**Solutions:**
+```cpp
+// Verify Puma server is running and accessible
+// Check Puma server logs for connection attempts
+
+// Ensure SetPumaConnectionParam is called before Start()
+ServerConfig pumaConfig;
+pumaConfig.host = "puma-backend.internal";
+pumaConfig.httpPort = 9080;
+pumaConfig.wsPort = 9090;
+
+if (!server.SetPumaConnectionParam(pumaConfig)) {
+    qCritical() << "Failed to configure Puma connection";
+    // Check if PumaConnectionInterfaceParam component is available
+}
+
+// Test connectivity to Puma server manually
+// ping puma-backend.internal
+// telnet puma-backend.internal 9080
+```
+
+**Important**: The AuthServerSdk cannot function without a properly configured and running Puma backend server. All authorization operations are processed by the Puma server.
 
 ### Server Fails to Start
 
