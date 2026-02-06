@@ -185,10 +185,12 @@ The application is built on the **Adaptive Component Framework (ACF)** which pro
 - **Interface-based Design** - Clean separation of concerns
 - **Runtime Composition** - Dynamic component assembly
 
-The ACF versions used in the Partitura:
-- **ACF Version**: 5398-5430
-- **ACF-Solutions Version**: 2202-2253
-- **Qt Framework**: 394753-395264
+The ACF framework versions referenced in the Partitura components:
+- **ACF Version**: 5398-5430 (revision numbers)
+- **ACF-Solutions Version**: 2202-2253 (revision numbers)
+- **Qt Framework**: 394753-395264 (revision numbers)
+
+These are internal revision/build numbers from the ACF framework, not semantic versions.
 
 ## Package Usage Statistics
 
@@ -220,11 +222,11 @@ Based on the component composition analysis:
 
 ### Prerequisites
 
-- Qt Framework (version 5.x or 6.x)
-- PostgreSQL client libraries
+- Qt Framework (compatible with ACF revisions 394753-395264)
+- PostgreSQL client libraries (for QPSQL driver)
 - C++ compiler (MSVC, GCC, or Clang)
-- ImagingTools/ImtCore repository
-- ImagingTools/Acf framework
+- ImagingTools/ImtCore repository (compatible revision)
+- ImagingTools/Acf framework (revisions 5398-5430)
 
 ### Build Process
 
