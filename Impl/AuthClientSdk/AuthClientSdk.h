@@ -536,7 +536,7 @@ public:
 	* 
 	* Login sessionData;
 	* if (controller.Login("alice", "secret123", sessionData)) {
-	*     qDebug() << "Welcome," << sessionData.userName;
+	*     qDebug() << "Welcome, " << sessionData.userName;
 	*     qDebug() << "Your permissions:" << sessionData.permissions;
 	* } else {
 	*     qDebug() << "Login failed";
