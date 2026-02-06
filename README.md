@@ -151,15 +151,39 @@ The project includes a comprehensive testing framework (`pumatest`) with test ca
 
 ## License
 
-Please refer to the license file in the repository for licensing information.
+Puma is licensed under the MIT License. See [LICENSE](LICENSE) for full license text.
+
+For information about third-party dependencies and their licenses, see [Docs/Dependencies.md](Docs/Dependencies.md).
+
+## Security
+
+Security is a top priority for Puma. For information about:
+- Reporting security vulnerabilities
+- Security best practices
+- Supported versions
+- Security advisories
+
+Please see our [Security Policy](SECURITY.md).
+
+## Compliance
+
+Puma is designed to comply with the EU Cyber Resilience Act (CRA) and includes:
+- **Software Bill of Materials (SBOM)**: [Docs/SBOM.json](Docs/SBOM.json) - Complete inventory of dependencies
+- **Dependencies Documentation**: [Docs/Dependencies.md](Docs/Dependencies.md) - Detailed dependency information
+- **Security Policy**: [SECURITY.md](SECURITY.md) - Vulnerability disclosure and security practices
 
 ## Contributing
 
-Contributions are welcome! Please ensure that:
-- Code follows the existing style and conventions
-- Tests are included for new features
-- Documentation is updated as needed
-- Builds successfully on supported platforms
+Contributions are welcome! Please read our [Contributing Guidelines](CONTRIBUTING.md) before submitting changes.
+
+Key points for contributors:
+- Follow existing code style and conventions
+- Include tests for new features
+- Update documentation as needed
+- Follow security guidelines for authentication/authorization code
+- Builds must succeed on all supported platforms
+
+For security-related contributions, please review [SECURITY.md](SECURITY.md) first.
 
 ## Support
 

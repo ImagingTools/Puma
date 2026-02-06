@@ -1,0 +1,163 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "Puma SBOM",
+  "documentNamespace": "https://github.com/ImagingTools/Puma/sbom/2024",
+  "creationInfo": {
+    "created": "2024-01-01T00:00:00Z",
+    "creators": [
+      "Tool: manual"
+    ],
+    "licenseListVersion": "3.21"
+  },
+  "packages": [
+    {
+      "SPDXID": "SPDXRef-Package-Puma",
+      "name": "Puma",
+      "versionInfo": "1.0.0",
+      "downloadLocation": "https://github.com/ImagingTools/Puma",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "description": "Cross-Platform Authentication and Authorization Framework",
+      "comment": "Main Puma package including server, client, and SDK components"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Qt",
+      "name": "Qt",
+      "versionInfo": "5.x or 6.x",
+      "supplier": "Organization: The Qt Company",
+      "downloadLocation": "https://www.qt.io/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only OR LicenseRef-Qt-Commercial",
+      "licenseDeclared": "LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only OR LicenseRef-Qt-Commercial",
+      "copyrightText": "Copyright (C) The Qt Company Ltd.",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:generic/qt"
+        }
+      ],
+      "description": "Cross-platform application development framework",
+      "comment": "Required components: Core, Widgets, QuickWidgets, Gui, Xml, Network, Svg, Sql, WebSockets, Qml, Concurrent. Qt6 builds also require Core5Compat."
+    },
+    {
+      "SPDXID": "SPDXRef-Package-OpenSSL",
+      "name": "OpenSSL",
+      "versionInfo": "1.1.1 or 3.x",
+      "supplier": "Organization: OpenSSL Software Foundation",
+      "downloadLocation": "https://www.openssl.org/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Apache-2.0",
+      "licenseDeclared": "Apache-2.0",
+      "copyrightText": "Copyright (c) 1998-2024 The OpenSSL Project",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:generic/openssl"
+        },
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:openssl:openssl:*:*:*:*:*:*:*:*"
+        }
+      ],
+      "description": "Cryptography and SSL/TLS toolkit",
+      "comment": "Used for SSL/TLS secure connections and cryptographic operations. OpenSSL 3.x is recommended for security."
+    },
+    {
+      "SPDXID": "SPDXRef-Package-SQLite",
+      "name": "SQLite",
+      "versionInfo": "3.x",
+      "supplier": "Organization: SQLite Development Team",
+      "downloadLocation": "https://www.sqlite.org/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "blessing",
+      "licenseDeclared": "blessing",
+      "copyrightText": "Public Domain",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:generic/sqlite"
+        },
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:sqlite:sqlite:*:*:*:*:*:*:*:*"
+        }
+      ],
+      "description": "Self-contained, serverless, zero-configuration, transactional SQL database engine",
+      "comment": "Used for database persistence of user and authorization data. Included with Qt SQL module."
+    },
+    {
+      "SPDXID": "SPDXRef-Package-ImtCore",
+      "name": "ImtCore",
+      "versionInfo": "unknown",
+      "supplier": "Organization: ImagingTools",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "description": "Component-based application framework",
+      "comment": "ImagingTools Core framework providing component architecture, authentication components, database support, GraphQL server, and HTTP server functionality. Required packages: ImtCoreVoce, ImtAuthVoce, ImtServerGqlPck, ImtUserAdministrationVoce, and additional supporting packages."
+    },
+    {
+      "SPDXID": "SPDXRef-Package-CMake",
+      "name": "CMake",
+      "versionInfo": "3.26 or higher",
+      "supplier": "Organization: Kitware",
+      "downloadLocation": "https://cmake.org/",
+      "filesAnalyzed": false,
+      "licenseConcluded": "BSD-3-Clause",
+      "licenseDeclared": "BSD-3-Clause",
+      "copyrightText": "Copyright 2000-2024 Kitware, Inc.",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:generic/cmake"
+        }
+      ],
+      "description": "Cross-platform build system generator",
+      "comment": "Build-time dependency only, not included in runtime distribution"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-Package-Puma"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-Puma",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-Qt"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-Puma",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-OpenSSL"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-Puma",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-SQLite"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-Puma",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-ImtCore"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-Puma",
+      "relationshipType": "BUILD_TOOL_OF",
+      "relatedSpdxElement": "SPDXRef-Package-CMake"
+    }
+  ]
+}
