@@ -1,3 +1,40 @@
+/**
+* @file AuthServerSdk.cpp
+* @brief Implementation of the Authorizable Server SDK.
+*
+* This file contains the implementation of the CAuthorizableServer
+* class and its internal implementation class CAuthorizableServerImpl.
+* It provides the bridge between the public SDK API and the underlying
+* ACF/ImtCore server infrastructure.
+*
+* @section implementation_overview Implementation Overview
+*
+* The implementation uses the PIMPL pattern with:
+* - CAuthorizableServer: Public API facade
+* - CAuthorizableServerImpl: Internal implementation
+* - CAuthServerSdk: ACF component wrapper (auto-generated)
+*
+* Component dependencies (via ACF interfaces):
+* - imtcom::IServerDispatcher - Server lifecycle control
+* - imtcom::IServerConnectionInterface - Connection parameters
+* - imtcom::ISslConfigurationApplier - SSL/TLS setup
+* - imtbase::IApplicationInfoController - Product configuration
+* - imtlic::IProductInfo - Feature/license management
+*
+* @section startup_sequence Server Startup Sequence
+*
+* 1. Apply connection parameters (host, ports)
+* 2. Load and configure SSL certificates (if SSL enabled)
+* 3. Start HTTP server listener
+* 4. Start WebSocket server listener
+* 5. Begin accepting client connections
+*
+* @note All operations use Qt's debug/warning logging for diagnostics.
+*       Enable Qt logging categories to see detailed startup information.
+*
+* @ingroup AuthServerSdk
+*/
+
 #include <AuthServerSdk/AuthServerSdk.h>
 
 
@@ -26,6 +63,23 @@ namespace AuthServerSdk
 {
 
 
+/**
+* @brief Internal implementation class for CAuthorizableServer.
+*
+* This class implements the actual server functionality using ACF
+* component interfaces. It is hidden from the public API via the
+* PIMPL pattern.
+*
+* The implementation:
+* - Manages server lifecycle (startup/shutdown)
+* - Configures network listeners (HTTP, WebSocket)
+* - Applies SSL/TLS configuration
+* - Loads product features and licenses
+* - Handles backend integration
+*
+* @note The m_sdk member is initialized with auto-init components
+*       to ensure all required dependencies are available.
+*/
 class CAuthorizableServerImpl
 {
 public:
@@ -197,6 +251,19 @@ public:
 	}
 
 private:
+	/**
+	* @brief Helper method to configure connection parameters.
+	*
+	* Internal implementation shared by SetConnectionParam and
+	* SetPumaConnectionParam. Applies network configuration to
+	* the specified component.
+	*
+	* @param serverConfig Server configuration to apply.
+	* @param componentId ID of the target connection interface component.
+	*
+	* @return true if parameters were successfully applied.
+	* @return false if the specified component interface is unavailable.
+	*/
 	bool SetConnectionParamInternal(const ServerConfig& serverConfig, const QByteArray& componentId)
 	{
 		imtcom::IServerConnectionInterface* serverConnectionParamPtr = m_sdk.GetInterface<imtcom::IServerConnectionInterface>(componentId);
@@ -216,6 +283,13 @@ private:
 	}
 
 private:
+	/**
+	* @brief ACF SDK component instance.
+	*
+	* Provides access to ACF component interfaces through the
+	* GetInterface<T>() method. Auto-init components are created
+	* during construction to ensure availability of server infrastructure.
+	*/
 	mutable CAuthServerSdk m_sdk;
 };
 

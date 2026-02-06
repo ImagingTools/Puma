@@ -1,3 +1,36 @@
+/**
+* @file AuthClientSdk.cpp
+* @brief Implementation of the Authorization Client SDK.
+*
+* This file contains the implementation of the CAuthorizationController
+* class and its internal implementation class CAuthorizationControllerImpl.
+* It provides the bridge between the public SDK API and the underlying
+* ACF/ImtCore component infrastructure.
+*
+* @section implementation_overview Implementation Overview
+*
+* The implementation uses the PIMPL pattern with:
+* - CAuthorizationController: Public API facade
+* - CAuthorizationControllerImpl: Internal implementation
+* - CAuthClientSdk: ACF component wrapper (auto-generated)
+*
+* Component dependencies (via ACF interfaces):
+* - iauth::ILogin - User authentication
+* - iauth::IRightsProvider - Permission checking
+* - imtauth::IAccessTokenProvider - Token management
+* - imtauth::IUserManager - User CRUD operations
+* - imtauth::IRoleManager - Role management
+* - imtauth::IUserGroupManager - Group management
+* - imtauth::ISuperuserController - Superuser operations
+* - imtbase::IApplicationInfo - Product information
+* - imtcom::IServerConnectionInterface - Network settings
+*
+* @note All operations use Qt's warning/debug logging for diagnostics.
+*       Check console output for detailed error messages.
+*
+* @ingroup AuthClientSdk
+*/
+
 #include <AuthClientSdk/AuthClientSdk.h>
 
 
@@ -28,6 +61,19 @@ namespace AuthClientSdk
 {
 
 
+/**
+* @brief Internal implementation class for CAuthorizationController.
+*
+* This class implements the actual functionality of the authorization
+* controller using ACF component interfaces. It is hidden from the
+* public API via the PIMPL pattern.
+*
+* The implementation maintains a CAuthClientSdk instance that provides
+* access to required ACF interfaces through dependency injection.
+*
+* @note All public methods check for interface availability and log
+*       warnings if required interfaces are not found.
+*/
 class CAuthorizationControllerImpl
 {
 public:
@@ -559,6 +605,16 @@ public:
 	}
 
 private:
+	/**
+	* @brief Helper method to retrieve the current product ID.
+	*
+	* Queries the application info interface for the product identifier.
+	* Used internally by methods that need to scope operations to the
+	* current product.
+	*
+	* @return Current product ID as byte array.
+	* @return Empty QByteArray if product ID is not set or interface unavailable.
+	*/
 	QByteArray GetProductId() const
 	{
 		ibase::IApplicationInfo* applicationInfoPtr = m_sdk.GetInterface<ibase::IApplicationInfo>();
@@ -569,6 +625,13 @@ private:
 		return applicationInfoPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
 	}
 
+	/**
+	* @brief ACF SDK component instance.
+	*
+	* Provides access to ACF component interfaces through the
+	* GetInterface<T>() method. Automatically initialized and
+	* maintained throughout the controller's lifetime.
+	*/
 	mutable CAuthClientSdk m_sdk;
 };
 
