@@ -99,6 +99,13 @@ Puma includes an automated Git-based version management system. See [Build/Git/R
 
 ## Documentation
 
+### SDK Documentation
+
+- **AuthServerSdk** - [Docs/AuthServerSdk.md](Docs/AuthServerSdk.md) - Complete guide for embedding authorization server functionality
+- **AuthClientSdk** - [Docs/AuthClientSdk.md](Docs/AuthClientSdk.md) - Complete guide for client authentication and user management
+
+### Other Documentation
+
 - **API Documentation** - Generate using Doxygen (see `Docs/Doxyfile`)
 - **Git Scripts** - [Build/Git/README.md](Build/Git/README.md)
 - **Source Code** - Headers in `Include/`, implementations in `Impl/`
