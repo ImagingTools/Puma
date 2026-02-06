@@ -18,7 +18,17 @@ The AuthServerSdk (Authorization Server SDK) is a C++ library that provides a hi
 
 **Important**: The AuthServerSdk implementation is based internally on communication with the Puma server. The SDK acts as a wrapper that configures and manages the connection to the underlying Puma authorization infrastructure, providing a simplified API for embedding authorization capabilities into host applications.
 
+### Primary Use Case
+
+**The AuthServerSdk can be integrated into a server application to leverage Puma-based user and role management.** This allows your server to:
+- Offload authentication and authorization to the proven Puma framework
+- Utilize Puma's comprehensive user, role, and permission management
+- Benefit from Puma's database integration for user storage
+- Support both local authentication and LDAP integration
+- Implement enterprise-grade authorization without building it from scratch
+
 The SDK is designed for:
+- Server applications that need to add authentication/authorization capabilities
 - Applications that need to provide authentication services to multiple clients
 - Enterprise systems requiring centralized authorization management
 - Secure server implementations with SSL/TLS encryption
@@ -26,6 +36,7 @@ The SDK is designed for:
 - Applications that need to integrate with the Puma authorization framework
 
 ### Key Characteristics
+- **Easy Integration**: Simple API for adding Puma-based auth to existing servers
 - **PIMPL Pattern**: Uses the Pointer to Implementation (PIMPL) design pattern for ABI stability
 - **Platform Support**: Windows-only (WIN32 conditional compilation)
 - **Qt-based**: Built on Qt framework for cross-platform compatibility within Windows
@@ -35,6 +46,8 @@ The SDK is designed for:
 ## Features
 
 ### Core Capabilities
+- **Puma-Based User Management**: Complete user lifecycle management (create, read, update, delete)
+- **Role-Based Access Control**: Comprehensive role and permission management via Puma
 - **Dual Protocol Support**: HTTP and WebSocket server capabilities
 - **SSL/TLS Security**: Comprehensive SSL/TLS configuration with certificate management
 - **Certificate Management**: Support for server certificates, CA certificates, and private keys
@@ -42,6 +55,7 @@ The SDK is designed for:
 - **Product Licensing**: Integration with product ID and features file management
 - **Puma Backend Integration**: Internal communication with Puma server for authorization processing
 - **Connection Management**: Separate configuration for external server endpoints and internal Puma backend connections
+- **Server Integration**: Easy integration into existing server applications
 
 ### Security Features
 - **SSL/TLS 1.2+**: Modern TLS protocol support
@@ -150,6 +164,62 @@ The AuthServerSdk can be deployed in two primary configurations:
    - SDK manages connection to local Puma server
    - Simplified deployment
    - Best for standalone applications
+
+### Integration into Server Applications
+
+**Common Use Case**: Integrate AuthServerSdk into your existing server application to add Puma-based user and role management.
+
+**Benefits of Integration**:
+- **Leverage Puma's User Management**: Complete user, role, and permission management out-of-the-box
+- **Database Integration**: Puma handles user data persistence (SQLite/SQL)
+- **LDAP Support**: Integrate with enterprise LDAP directories
+- **Proven Security**: Battle-tested authentication and authorization
+- **No Reinventing the Wheel**: Focus on your application logic, not auth infrastructure
+
+**Integration Pattern**:
+```cpp
+// Your existing server application
+class MyServerApplication {
+public:
+    void initialize() {
+        // Initialize your server components
+        setupMyServer();
+        
+        // Integrate Puma-based auth
+        setupAuthorizationServer();
+    }
+    
+private:
+    void setupAuthorizationServer() {
+        // Configure Puma backend
+        AuthServerSdk::ServerConfig pumaConfig;
+        pumaConfig.host = "localhost";
+        pumaConfig.httpPort = 9080;
+        pumaConfig.wsPort = 9090;
+        m_authServer.SetPumaConnectionParam(pumaConfig);
+        
+        // Start auth endpoints for clients
+        AuthServerSdk::ServerConfig authConfig;
+        authConfig.httpPort = 8080;
+        authConfig.wsPort = 8090;
+        m_authServer.Start(authConfig);
+        
+        // Now your server has Puma-based user/role management!
+    }
+    
+    AuthServerSdk::CAuthorizableServer m_authServer;
+};
+```
+
+**What You Get**:
+- HTTP/WebSocket endpoints for client authentication
+- User creation, modification, deletion
+- Role-based access control (RBAC)
+- Permission management
+- Group management
+- Session management
+- Token-based authentication
+
 
 ### Basic Integration
 
@@ -631,6 +701,191 @@ int main(int argc, char *argv[])
     return app.exec();
 }
 ```
+
+### Example 5: Integration into Existing Server Application
+```cpp
+#include <AuthServerSdk/AuthServerSdk.h>
+#include <QCoreApplication>
+#include <QTimer>
+
+/**
+ * Example: Custom server application that integrates AuthServerSdk
+ * to add Puma-based user and role management capabilities
+ */
+class CustomServerApplication : public QObject
+{
+    Q_OBJECT
+    
+public:
+    CustomServerApplication(QObject* parent = nullptr)
+        : QObject(parent)
+    {
+    }
+    
+    bool initialize()
+    {
+        qInfo() << "Initializing Custom Server Application";
+        
+        // Step 1: Initialize your custom business logic
+        if (!initializeBusinessLogic()) {
+            qCritical() << "Failed to initialize business logic";
+            return false;
+        }
+        
+        // Step 2: Integrate Puma-based authorization
+        if (!initializeAuthorization()) {
+            qCritical() << "Failed to initialize authorization";
+            return false;
+        }
+        
+        qInfo() << "Custom Server Application initialized successfully";
+        qInfo() << "- Business API available on port 7000";
+        qInfo() << "- Authorization API available on port 8080";
+        qInfo() << "- Using Puma backend for user/role management";
+        
+        return true;
+    }
+    
+    void shutdown()
+    {
+        qInfo() << "Shutting down Custom Server Application";
+        
+        // Stop authorization server
+        m_authServer.Stop();
+        
+        // Shutdown your business logic
+        shutdownBusinessLogic();
+    }
+    
+private:
+    bool initializeBusinessLogic()
+    {
+        // Initialize your server's core functionality
+        // Example: Setup custom API endpoints, database connections, etc.
+        qInfo() << "  [Business] Initializing custom server logic...";
+        
+        // Your custom server setup code here
+        // setupDatabaseConnection();
+        // setupCustomAPIEndpoints();
+        // initializeBusinessRules();
+        
+        qInfo() << "  [Business] Custom server logic initialized";
+        return true;
+    }
+    
+    bool initializeAuthorization()
+    {
+        using namespace AuthServerSdk;
+        
+        qInfo() << "  [Auth] Integrating Puma-based authorization...";
+        
+        // Configure connection to Puma backend
+        // This is where user/role management actually happens
+        ServerConfig pumaBackend;
+        pumaBackend.host = "localhost";  // or remote Puma server
+        pumaBackend.httpPort = 9080;
+        pumaBackend.wsPort = 9090;
+        
+        if (!m_authServer.SetPumaConnectionParam(pumaBackend)) {
+            qCritical() << "  [Auth] Failed to configure Puma backend";
+            return false;
+        }
+        
+        qInfo() << "  [Auth] Connected to Puma backend at" 
+                << pumaBackend.host << ":" << pumaBackend.httpPort;
+        
+        // Set product ID for licensing
+        m_authServer.SetProductId("MyCustomServer-v1.0");
+        
+        // Optional: Load features file
+        m_authServer.SetFeaturesFilePath("config/features.xml");
+        
+        // Configure external-facing auth endpoints
+        // Clients will connect to these endpoints for authentication
+        ServerConfig externalAuth;
+        externalAuth.host = "0.0.0.0";
+        externalAuth.httpPort = 8080;  // Auth endpoint
+        externalAuth.wsPort = 8090;
+        
+        // Optional: Enable SSL for auth endpoints
+        // externalAuth.sslConfig = configureSsl();
+        
+        if (!m_authServer.Start(externalAuth)) {
+            qCritical() << "  [Auth] Failed to start authorization endpoints";
+            return false;
+        }
+        
+        qInfo() << "  [Auth] Authorization endpoints started on port" 
+                << externalAuth.httpPort;
+        qInfo() << "  [Auth] Puma-based user/role management ready";
+        
+        return true;
+    }
+    
+    void shutdownBusinessLogic()
+    {
+        // Cleanup your business logic
+        qInfo() << "  [Business] Shutting down custom server logic";
+    }
+    
+    AuthServerSdk::CAuthorizableServer m_authServer;
+};
+
+int main(int argc, char *argv[])
+{
+    QCoreApplication app(argc, argv);
+    
+    CustomServerApplication server;
+    
+    if (!server.initialize()) {
+        qCritical() << "Failed to initialize server";
+        return 1;
+    }
+    
+    qInfo() << "";
+    qInfo() << "Server running! Your application now has:";
+    qInfo() << "  ✓ Custom business logic";
+    qInfo() << "  ✓ Puma-based user management";
+    qInfo() << "  ✓ Puma-based role management";
+    qInfo() << "  ✓ Authorization and authentication";
+    qInfo() << "  ✓ HTTP and WebSocket support";
+    qInfo() << "";
+    qInfo() << "Clients can:";
+    qInfo() << "  - Authenticate at http://localhost:8080";
+    qInfo() << "  - Create/manage users";
+    qInfo() << "  - Assign roles and permissions";
+    qInfo() << "  - Check user permissions";
+    qInfo() << "";
+    
+    // Setup graceful shutdown
+    QTimer::singleShot(0, [&]() {
+        // Connect to signals for shutdown if needed
+        // QObject::connect(&app, &QCoreApplication::aboutToQuit, 
+        //                  &server, &CustomServerApplication::shutdown);
+    });
+    
+    int result = app.exec();
+    
+    server.shutdown();
+    return result;
+}
+
+#include "main.moc"  // For Q_OBJECT macro
+```
+
+**What This Example Demonstrates**:
+- Integration of AuthServerSdk into a custom server application
+- Separation of business logic and authorization concerns
+- Configuration of Puma backend for user/role management
+- Setup of external authentication endpoints for clients
+- Clean initialization and shutdown patterns
+- Real-world server application structure
+
+**Key Benefits**:
+- Your server gets enterprise-grade user/role management without implementing it
+- Puma handles all the complexity of authentication, authorization, and user storage
+- You focus on your application's unique business logic
+- Clients get standardized authentication APIs
 
 ## SSL/TLS Configuration
 
