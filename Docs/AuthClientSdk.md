@@ -1478,8 +1478,8 @@ void assignRolesToUsers(
 - Compatible with Visual C++ 2015/2017/2019
 
 ### Build Systems
-- CMake: `/home/runner/work/Puma/Puma/Impl/AuthClientSdk/CMake`
-- QMake: `/home/runner/work/Puma/Puma/Impl/AuthClientSdk/QMake`
+- CMake: `Impl/AuthClientSdk/CMake`
+- QMake: `Impl/AuthClientSdk/QMake`
 
 ### UI Components
 The SDK includes QML widgets for login and administration:
@@ -1492,7 +1492,7 @@ See source files:
 
 ## Additional Resources
 
-- **Main README**: [/home/runner/work/Puma/Puma/README.md](../README.md)
+- **Main README**: [README.md](../README.md)
 - **AuthServerSdk Documentation**: [AuthServerSdk.md](AuthServerSdk.md)
 - **Doxygen API**: Generate with `doxygen Doxyfile` in Docs directory
 - **ImtCore Documentation**: Refer to ImtCore framework documentation

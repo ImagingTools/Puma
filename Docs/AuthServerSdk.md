@@ -886,13 +886,13 @@ These interfaces are accessed through the SDK's component framework.
 - Tested with Visual C++ 2015/2017/2019
 
 ### Build Systems
-- CMake: `/home/runner/work/Puma/Puma/Impl/AuthServerSdk/CMake`
-- QMake: `/home/runner/work/Puma/Puma/Impl/AuthServerSdk/QMake`
-- Visual Studio: `/home/runner/work/Puma/Puma/Impl/AuthServerSdk/VC`
+- CMake: `Impl/AuthServerSdk/CMake`
+- QMake: `Impl/AuthServerSdk/QMake`
+- Visual Studio: `Impl/AuthServerSdk/VC`
 
 ## Additional Resources
 
-- **Main README**: [/home/runner/work/Puma/Puma/README.md](../README.md)
+- **Main README**: [README.md](../README.md)
 - **AuthClientSdk Documentation**: [AuthClientSdk.md](AuthClientSdk.md)
 - **Doxygen API**: Generate with `doxygen Doxyfile` in Docs directory
 - **ImtCore Documentation**: Refer to ImtCore framework documentation
