@@ -329,7 +329,8 @@ enum class SystemType
 * Defines SSL parameters for secure communication with the server.
 * When this structure is provided in ServerConfig, the client enables
 * secure HTTPS/WSS connections by setting the CF_SECURE flag on the
-* underlying connection interface.
+* underlying connection interface. If not provided, the client uses
+* unencrypted HTTP/WebSocket connections.
 *
 * @note The actual SSL configuration and certificate handling is managed
 *       by the underlying ImtCore connection interface (IServerConnectionInterface).
@@ -350,8 +351,7 @@ struct SslConfig
 	* @brief Paths to trusted CA certificates.
 	*
 	* Optional file paths to Certificate Authority (CA) certificates for
-	* verifying the server's SSL certificate. The underlying connection
-	* interface may use system certificates by default if not specified.
+	* verifying the server's SSL certificate.
 	*
 	* @note Usage depends on the connection interface implementation.
 	*/
