@@ -327,23 +327,33 @@ enum class SystemType
 * @brief SSL/TLS client configuration.
 *
 * Defines SSL parameters for secure communication with the server.
-* This structure is optional; if not provided, an unencrypted HTTP
-* connection is used instead.
+* When this structure is provided in ServerConfig, the client enables
+* secure HTTPS/WSS connections by setting the CF_SECURE flag on the
+* underlying connection interface.
+*
+* @note The actual SSL configuration and certificate handling is managed
+*       by the underlying ImtCore connection interface (IServerConnectionInterface).
+*       The fields in this structure are available for advanced scenarios
+*       (such as mutual TLS with client certificates) but their usage depends
+*       on the connection interface implementation. For basic HTTPS client
+*       connections, simply providing this structure (even with default values)
+*       is typically sufficient to enable secure connections.
 *
 * @warning For production environments, SSL should always be enabled
 *          to protect authentication credentials and sensitive data.
 *
-* @note The ignoreSslErrors flag should only be set to true in
-*       development/testing environments with self-signed certificates.
+* @see ServerConfig, SetConnectionParam()
 */
 struct SslConfig
 {
 	/**
 	* @brief Paths to trusted CA certificates.
 	*
-	* One or more file paths to Certificate Authority (CA) certificates
-	* used to verify the server's SSL certificate. Required for secure
-	* connections unless ignoreSslErrors is true.
+	* Optional file paths to Certificate Authority (CA) certificates for
+	* verifying the server's SSL certificate. The underlying connection
+	* interface may use system certificates by default if not specified.
+	*
+	* @note Usage depends on the connection interface implementation.
 	*/
 	QList<QString> caCertificatePaths;
 
@@ -352,6 +362,8 @@ struct SslConfig
 	*
 	* Specifies whether certificates are in PEM (Base64-encoded) or
 	* DER (binary) format. Default is PEM, which is most common.
+	*
+	* @note Usage depends on the connection interface implementation.
 	*/
 	QSsl::EncodingFormat caCertificateFormat = QSsl::Pem;
 
@@ -363,19 +375,23 @@ struct SslConfig
 	*
 	* @note Older protocols like SSLv2, SSLv3, and TLS 1.0 are deprecated
 	*       and should not be used due to known security vulnerabilities.
+	*       Usage depends on the connection interface implementation.
 	*/
 	QSsl::SslProtocol protocol = QSsl::TlsV1_2;
 
 	/**
 	* @brief Ignore SSL validation errors.
 	*
-	* When true, SSL certificate validation errors are ignored. This allows
-	* connections to servers with self-signed or expired certificates.
+	* When true, SSL certificate validation errors may be ignored by the
+	* connection interface. This allows connections to servers with
+	* self-signed or expired certificates.
 	*
-	* @warning This setting MUST be false in production environments.
+	* @warning This setting should be false in production environments.
 	*          Only set to true for testing with self-signed certificates.
 	*          Ignoring SSL errors exposes the application to man-in-the-middle
 	*          attacks and defeats the purpose of using SSL/TLS.
+	*
+	* @note Usage depends on the connection interface implementation.
 	*/
 	bool ignoreSslErrors = false;
 };
@@ -570,6 +586,12 @@ public:
 	* authorization server. This must be called before attempting
 	* to login or perform any server operations.
 	*
+	* When SSL configuration is provided, this method enables secure
+	* connections by setting the CF_SECURE flag on the underlying
+	* IServerConnectionInterface. The detailed SSL configuration fields
+	* (certificates, protocols, etc.) are available for advanced scenarios
+	* but their actual usage depends on the connection interface implementation.
+	*
 	* @param config Server configuration including host, ports, and
 	*               optional SSL settings.
 	*
@@ -580,6 +602,10 @@ public:
 	* @note This method can be called multiple times to update connection
 	*       parameters, but should not be called while operations are in
 	*       progress.
+	*
+	* @note For basic HTTPS client connections, providing an SslConfig
+	*       structure (even with default values) is typically sufficient
+	*       to enable secure communication.
 	*
 	* @see ServerConfig, SslConfig
 	*

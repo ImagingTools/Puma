@@ -140,6 +140,21 @@ public:
 		return loginPtr->Logout();
 	}
 
+	/**
+	* @brief Configures server connection parameters.
+	*
+	* Sets host, ports, and SSL mode for connecting to the authorization server.
+	*
+	* @note When sslConfig is provided, this method sets the CF_SECURE flag
+	*       on the connection interface to enable HTTPS/WSS. The detailed SSL
+	*       configuration fields (certificates, protocols, etc.) in SslConfig
+	*       are available for advanced scenarios but are handled by the
+	*       underlying IServerConnectionInterface implementation. For basic
+	*       HTTPS client connections, the presence of sslConfig is sufficient.
+	*
+	* @param config Server configuration with host, ports, and optional SSL.
+	* @return true if parameters were applied successfully, false otherwise.
+	*/
 	bool SetConnectionParam(const ServerConfig& config)
 	{
 		imtcom::IServerConnectionInterface* connectionInterfacePtr = m_sdk.GetInterface<imtcom::IServerConnectionInterface>();
@@ -148,6 +163,7 @@ public:
 			return false;
 		}
 
+		// Enable secure mode if SSL configuration is provided
 		if (config.sslConfig.has_value()){
 			connectionInterfacePtr->SetConnectionFlags(imtcom::IServerConnectionInterface::CF_SECURE);
 		}
