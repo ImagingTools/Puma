@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
 * @file AuthServerSdk.cpp
 * @brief Implementation of the Authorizable Server SDK.
