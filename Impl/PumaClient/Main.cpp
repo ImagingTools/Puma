@@ -7,9 +7,6 @@
 // ImtCore includes
 #include <imtbase/Init.h>
 
-// PumaClient includes
-#include <GeneratedFiles/PumaClient/CPumaClient.h>
-
 // Authorization SDK includes
 #include <AuthClientSdk/CAdministrationViewWidget.h>
 #include <AuthServerSdk/AuthServerSdk.h>
