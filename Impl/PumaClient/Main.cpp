@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-Puma-Commercial
 
 // Qt includes
 #include <QLayout>
@@ -6,6 +7,9 @@
 
 // ImtCore includes
 #include <imtbase/Init.h>
+
+// PumaClient includes
+#include <GeneratedFiles/PumaClient/CPumaClient.h>
 
 // Authorization SDK includes
 #include <AuthClientSdk/CAdministrationViewWidget.h>
