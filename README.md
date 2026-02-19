@@ -153,7 +153,7 @@ The project includes a comprehensive testing framework (`pumatest`) with test ca
 
 Puma is licensed under a Commercial License. See [LICENSE](LICENSE) for full license text.
 
-For licensing inquiries, please contact: license@imagingtools.org
+For licensing inquiries, please contact: info@imagingtools.de
 
 For information about third-party dependencies and their licenses, see [Docs/Dependencies.md](Docs/Dependencies.md).
 
