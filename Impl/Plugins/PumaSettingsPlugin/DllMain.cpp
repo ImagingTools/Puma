@@ -15,12 +15,12 @@ IMT_REGISTER_PLUGIN(
 			imtservice::IConnectionCollectionPlugin,
 			imtservice::TConnectionCollectionPluginComponentImpl<CPumaSettingsPlugin>,
 			ServiceSettings,
-			PumaSettings);
+			PumaServerSettings);
 
 IMT_REGISTER_PLUGIN(
 			imtservice::IObjectCollectionPlugin,
 			imtservice::TObjectCollectionPluginComponentImpl<CPumaSettingsPlugin>,
 			ServiceLog,
-			PumaSettings);
+			PumaServerLog);
 
 
