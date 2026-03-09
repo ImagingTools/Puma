@@ -38,7 +38,7 @@
                         <Data IsEnabled="true" Value="localhost"/>
                     </AttributeInfo>
                     <AttributeInfo Id="PgPort" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="5432"/>
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaSettings/TracingConfiguration"/>
