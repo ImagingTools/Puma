@@ -20,7 +20,7 @@
                         <Data IsEnabled="true" Value="PumaSettings/DatabaseAccessSettings"/>
                     </AttributeInfo>
                     <AttributeInfo Id="DbName" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="puma"/>
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="DbType" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="QPSQL"/>
@@ -32,10 +32,10 @@
                         <Data IsEnabled="true" Value="Migrations"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Password" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="root"/>
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="PgHostName" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="localhost"/>
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="PgPort" Type="Integer" ExportId="">
                         <Data IsEnabled="false"/>
@@ -44,7 +44,7 @@
                         <Data IsEnabled="true" Value="PumaSettings/TracingConfiguration"/>
                     </AttributeInfo>
                     <AttributeInfo Id="UserName" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="postgres"/>
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
