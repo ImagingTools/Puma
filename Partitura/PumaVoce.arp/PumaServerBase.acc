@@ -2,53 +2,14 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5430" Description="ACF"/>
-            <Version Id="1" Number="2253" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6318" Description="ACF"/>
+            <Version Id="1" Number="2296" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="DatabaseEngine" PackageId="ImtCoreVoce" ComponentId="DatabaseEngine">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="BackupSettings" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="PumaSettings/Backup"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="DatabaseAccessSettings" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="PumaSettings/DatabaseAccessSettings"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="DbName" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="puma"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="DbType" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="QPSQL"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="MigrationController" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="Migrations"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Password" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="root"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="PgHostName" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="localhost"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="PgPort" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="5432"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="PumaSettings/TracingConfiguration"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="UserName" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="postgres"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
         <Element Id="HttpServerFramework" PackageId="ImtHttpServerVoce" ComponentId="HttpServerFramework">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -83,7 +44,7 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="DatabaseEngine"/>
+                        <Data IsEnabled="true" Value="PumaDatabasePostgres"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
@@ -91,21 +52,45 @@
                     <AttributeInfo Id="SqlDatabaseObjectDelegates" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>Repositories/RoleDatabaseDelegate</Value>
-                                <Value>Repositories/UserDatabaseDocumentDelegate</Value>
-                                <Value>Repositories/GroupDatabaseDocumentDelegate</Value>
+                                <Value>PumaDatabasePostgres/RoleDocumentSqlRepository</Value>
+                                <Value>PumaDatabasePostgres/UserSqlRepository</Value>
+                                <Value>PumaDatabasePostgres/UserGroupSqlRepository</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="SqlDatabaseObjectDelegates6" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>Repositories/UserConnectionDatabaseDelegate</Value>
+                                <Value>PumaDatabasePostgres/UserConnectionRepository</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaSettings/TracingConfiguration"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="PumaDatabasePostgres" PackageId="PumaVoce" ComponentId="PumaDatabasePostgres">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="BackupSettings" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaSettings/Backup"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DatabaseAccessSettings" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaSettings/DatabaseAccessSettings"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MigrationController" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Migrations"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaSettings/TracingConfiguration"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -123,17 +108,14 @@
                         <Data IsEnabled="true" Value="PumaSettings/DatabaseAccessSettings"/>
                     </AttributeInfo>
                     <AttributeInfo Id="DatabaseConnectionChecker" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="DatabaseEngine/PgSqlDatabaseEngine"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="DatabaseEngine"/>
+                        <Data IsEnabled="true" Value="PumaDatabasePostgres"/>
                     </AttributeInfo>
                     <AttributeInfo Id="DocumentRepositories" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>Repositories/RoleRepository</Value>
-                                <Value>Repositories/UserRepository</Value>
-                                <Value>Repositories/UserGroupSqlRepository</Value>
+                                <Value>PumaDatabasePostgres/RoleDocumentSqlRepository</Value>
+                                <Value>PumaDatabasePostgres/UserSqlRepository</Value>
+                                <Value>PumaDatabasePostgres/UserGroupSqlRepository</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -147,13 +129,16 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="RoleInfoProvider" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="Repositories/RoleCollectionAdapter"/>
+                        <Data IsEnabled="true" Value="PumaDatabasePostgres/RoleDocumentSqlRepository"/>
                     </AttributeInfo>
                     <AttributeInfo Id="RoleRepository" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="Repositories/RoleRepository"/>
+                        <Data IsEnabled="true" Value="PumaDatabasePostgres/RoleDocumentSqlRepository"/>
                     </AttributeInfo>
                     <AttributeInfo Id="RuntimeStatus" Type="Reference" ExportId="RuntimeStatus">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SessionCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaDatabasePostgres/SessionSqlRepository"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SmtpClient" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="SmtpClient"/>
@@ -168,25 +153,25 @@
                         <Data IsEnabled="true" Value="PumaLocalization"/>
                     </AttributeInfo>
                     <AttributeInfo Id="UserCollection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="Repositories/UserRepository"/>
+                        <Data IsEnabled="true" Value="PumaDatabasePostgres/UserSqlRepository"/>
                     </AttributeInfo>
                     <AttributeInfo Id="UserConnectionCollection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="Repositories/UserConnectionRepository"/>
+                        <Data IsEnabled="true" Value="PumaDatabasePostgres/UserConnectionRepository"/>
                     </AttributeInfo>
                     <AttributeInfo Id="UserGroupInfoProvider" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="Repositories/UserGroupInfoProvider"/>
+                        <Data IsEnabled="true" Value="PumaDatabasePostgres/UserGroupSqlRepository"/>
                     </AttributeInfo>
                     <AttributeInfo Id="UserGroupRepository" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="Repositories/UserGroupSqlRepository"/>
+                        <Data IsEnabled="true" Value="PumaDatabasePostgres/UserGroupSqlRepository"/>
                     </AttributeInfo>
                     <AttributeInfo Id="UserInfoProvider" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="Repositories/UserCollectionAdapter"/>
+                        <Data IsEnabled="true" Value="PumaDatabasePostgres/UserSqlRepository"/>
                     </AttributeInfo>
                     <AttributeInfo Id="UserRepository" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="Repositories/UserRepository"/>
+                        <Data IsEnabled="true" Value="PumaDatabasePostgres/UserSqlRepository"/>
                     </AttributeInfo>
                     <AttributeInfo Id="UserVerificationCollection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="Repositories/UserVerificationCollection"/>
+                        <Data IsEnabled="true" Value="UserVerificationCollection"/>
                     </AttributeInfo>
                     <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
                         <Data IsEnabled="false"/>
@@ -224,24 +209,6 @@
                     </AttributeInfo>
                     <AttributeInfo Id="RuntimeStatus" Type="Reference" ExportId="RuntimeStatus">
                         <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="Repositories" PackageId="" ComponentId="Repositories">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="DatabaseEngine"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="PumaSettings/TracingConfiguration"/>
                     </AttributeInfo>
                     <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
                         <Data IsEnabled="false"/>
@@ -295,7 +262,7 @@
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="GroupRepository" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="Repositories/UserGroupSqlRepository"/>
+                        <Data IsEnabled="true" Value="PumaDatabasePostgres/UserGroupSqlRepository"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
@@ -304,13 +271,38 @@
                         <Data IsEnabled="true" Value="WebSocketServerFramework"/>
                     </AttributeInfo>
                     <AttributeInfo Id="RoleRepository" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="Repositories/RoleRepository"/>
+                        <Data IsEnabled="true" Value="PumaDatabasePostgres/RoleDocumentSqlRepository"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaSettings/TracingConfiguration"/>
                     </AttributeInfo>
                     <AttributeInfo Id="UserRepository" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="Repositories/UserRepository"/>
+                        <Data IsEnabled="true" Value="PumaDatabasePostgres/UserSqlRepository"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="UserVerification" PackageId="ImtAuthPck" ComponentId="UserVerification">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="UserVerificationCollection" PackageId="ImtCorePck" ComponentId="ObjectCollection">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ObjectFactories" Type="Factory[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>UserVerification</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>UserVerification</Value>
+                            </Values>
+                        </Data>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -619,31 +611,6 @@
                             </AttributeInfoMap>
                         </Data>
                     </Element>
-                    <Element Id="UserVerification" PackageId="ImtAuthPck" ComponentId="UserVerification">
-                        <Data IsEnabled="true" Flags="2">
-                            <AttributeInfoMap/>
-                        </Data>
-                    </Element>
-                    <Element Id="UserVerificationCollection" PackageId="ImtCorePck" ComponentId="ObjectCollection">
-                        <Data IsEnabled="true" Flags="0">
-                            <AttributeInfoMap>
-                                <AttributeInfo Id="ObjectFactories" Type="Factory[]" ExportId="">
-                                    <Data IsEnabled="true">
-                                        <Values>
-                                            <Value>UserVerification</Value>
-                                        </Values>
-                                    </Data>
-                                </AttributeInfo>
-                                <AttributeInfo Id="TypeIds" Type="Id[]" ExportId="">
-                                    <Data IsEnabled="true">
-                                        <Values>
-                                            <Value>UserVerification</Value>
-                                        </Values>
-                                    </Data>
-                                </AttributeInfo>
-                            </AttributeInfoMap>
-                        </Data>
-                    </Element>
                 </ElementsList>
                 <EmbeddedRegistriesList/>
                 <ExportedInterfaces/>
@@ -661,7 +628,6 @@
                     <Component ExportedId="UserGroupSqlRepository" ComponentId="UserGroupSqlRepository"/>
                     <Component ExportedId="UserRepository" ComponentId="UserSqlRepository/UserRepository"/>
                     <Component ExportedId="UserSettingsRepository" ComponentId="UserSettingsDatabaseDelegate/UserSettingsRepository"/>
-                    <Component ExportedId="UserVerificationCollection" ComponentId="UserVerificationCollection"/>
                 </ExportedComponents>
             </Data>
         </EmbeddedRegistry>
@@ -779,6 +745,7 @@
     </ExportedInterfaces>
     <ExportedComponents>
         <Component ExportedId="AutoPersistence" ComponentId="PumaSettings/AutoPersistence"/>
+        <Component ExportedId="DatabaseEngine" ComponentId="PumaDatabasePostgres/DatabaseEngine"/>
         <Component ExportedId="PgSqlDatabaseEngine" ComponentId="DatabaseEngine/PgSqlDatabaseEngine"/>
         <Component ExportedId="WebSocketServerFramework" ComponentId="WebSocketServerFramework"/>
     </ExportedComponents>

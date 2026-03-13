@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5423" Description="ACF"/>
-            <Version Id="1" Number="2252" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6318" Description="ACF"/>
+            <Version Id="1" Number="2296" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -42,8 +42,8 @@
                     <AttributeInfo Id="RoleCollection" Type="Reference" ExportId="RoleCollection">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="SessionCollection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="JwtSessionController"/>
+                    <AttributeInfo Id="SessionCollection" Type="Reference" ExportId="SessionCollection">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SystemId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="Ldap"/>
@@ -147,9 +147,6 @@
                     <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="DefaultPath" Type="String" ExportId="">
                         <Data IsEnabled="true" Value="Puma/Puma Server/key.xml"/>
                     </AttributeInfo>
@@ -159,7 +156,7 @@
                     <AttributeInfo Id="RuntimeStatus" Type="Reference" ExportId="RuntimeStatus">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                    <AttributeInfo Id="SessionCollection" Type="Reference" ExportId="SessionCollection">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
@@ -192,8 +189,8 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="JwtSessionController"/>
+                    <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="SessionCollection">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ObjectTypeIds" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
