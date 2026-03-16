@@ -1,4 +1,4 @@
-TARGET = PumaServer
+TARGET = PumaServerSl
 
 include($(ACFDIR)/Config/QMake/ApplicationConfig.pri)
 include($(ACFDIR)/Config/QMake/QtBaseConfig.pri)
@@ -33,7 +33,7 @@ win32-msvc*{
 
 !macx-ios*{
 	mac{
-	#	ICON += $$PWD/../Mac/PumaServer.icns
+	#	ICON += $$PWD/../Mac/PumaServerSl.icns
 	#	QMAKE_INFO_PLIST = $$PWD/../Mac/Info.plist
 	}
 }
@@ -41,18 +41,18 @@ win32-msvc*{
 # Set configuration of custom builds:
 # ARX Compiler:
 ARXC_CONFIG = $$PWD/../../../Config/PumaServer.awc
-ARXC_FILES += $$PWD/../PumaServer.acc
+ARXC_FILES += $$PWD/../PumaServerSl.acc
 ARXC_OUTDIR = $$OUT_PWD/$$AUXINCLUDEPATH/GeneratedFiles/$$TARGET
 
 # Conversion of resource templates:
 win*{
 # File transformation
-	# ACF_CONVERT_FILES = $$PWD/../VC/PumaServer.rc.xtracf
+	# ACF_CONVERT_FILES = $$PWD/../VC/PumaServerSl.rc.xtracf
 	ACF_CONVERT_OUTDIR = $$AUXINCLUDEPATH/GeneratedFiles/$$TARGET
 	ACF_CONVERT_REGISTRY =  $$PWD/../VC/FileSubstitCopyApp.acc
 	ACF_CONVERT_CONFIG = $$PWD/../../../Config/BaseOnly.awc
 
-# RC_FILE = $$OUT_PWD/$$AUXINCLUDEPATH/GeneratedFiles/$$TARGET/PumaServer.rc
+# RC_FILE = $$OUT_PWD/$$AUXINCLUDEPATH/GeneratedFiles/$$TARGET/PumaServerSl.rc
 	RC_INCLUDEPATH = $$_PRO_FILE_PWD_
 }
 

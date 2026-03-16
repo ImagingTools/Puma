@@ -10,7 +10,6 @@
     <PositionMap>
         <Element ComponentName="HttpServerFramework" X="625" Y="75" Note=""/>
         <Element ComponentName="Migrations" X="1025" Y="200" Note=""/>
-        <Element ComponentName="PumaDatabasePostgres" X="275" Y="575" Note=""/>
         <Element ComponentName="PumaHandlers" X="650" Y="475" Note=""/>
         <Element ComponentName="PumaLocalization" X="975" Y="375" Note=""/>
         <Element ComponentName="PumaSettings" X="125" Y="375" Note=""/>

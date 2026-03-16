@@ -82,7 +82,7 @@ When using Puma, we recommend following these security best practices:
 
 ### Server Deployment
 
-- Run PumaServer with minimal required privileges
+- Run PumaServerPg/PumaServerSl with minimal required privileges
 - Use firewalls to restrict network access
 - Enable logging and monitoring for security events
 - Keep the operating system and all system libraries patched

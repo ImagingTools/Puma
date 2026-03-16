@@ -1,0 +1,4 @@
+@echo on
+set PUMA_BUILD_DIR=..\..\..\Bin\Debug_Qt6_VC16_x64
+iscc PumaServerPg.iss
+pause

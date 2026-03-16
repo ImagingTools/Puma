@@ -14,7 +14,7 @@
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ApplicationName" Type="Text" ExportId="">
-					    <Data IsEnabled="true" Value="PumaServer"/>
+					    <Data IsEnabled="true" Value="PumaServerPg"/>
                     </AttributeInfo>
                     <AttributeInfo Id="CompanyName" Type="Text" ExportId="">
 						<Data IsEnabled="true" Value="ImagingTools"/>
