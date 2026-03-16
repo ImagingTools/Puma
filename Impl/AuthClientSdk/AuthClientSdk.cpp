@@ -92,10 +92,60 @@ public:
 			return false;
 		}
 
+		// Automatically logout any previously active session before attempting a new
+		// login. This prevents failures when a prior session was not explicitly
+		// terminated (e.g. after a crash or missing Logout() call).
+		loginPtr->Logout();
+
 		bool ok = loginPtr->Login(login, password);
 		if (!ok) {
 			qWarning() << "[Login] Failed: iauth::ILogin::Login() returned false";
 			return false;
+		}
+
+		// Detect and resolve LDAP vs. local user conflict.
+		//
+		// When an LDAP user successfully authenticates, there must be no local
+		// (non-LDAP) user entry with the same login name.  Such a stale local
+		// entry would cause role-management operations to operate on the wrong
+		// record and make subsequent logins unreliable.  If one is found it is
+		// removed automatically so that the authoritative LDAP identity takes
+		// precedence.
+		imtauth::IUserManager* userManagerPtr = m_sdk.GetInterface<imtauth::IUserManager>();
+		if (userManagerPtr != nullptr) {
+			imtauth::IUserInfo::SystemInfo systemInfo;
+			if (userManagerPtr->GetUserAuthSystem(login.toUtf8(), systemInfo)) {
+				if (!systemInfo.systemId.isEmpty()) {
+					// The authenticated user is an LDAP user.
+					// Obtain the authoritative objectId for this login after the
+					// successful LDAP authentication.  Any other user record that
+					// carries the same login name is a conflicting local entry and
+					// must be removed.
+					QByteArray ldapObjectId = userManagerPtr->GetUserObjectId(login.toUtf8());
+
+					QByteArrayList allUserIds = userManagerPtr->GetUserIds();
+					for (const QByteArray& uid : allUserIds) {
+						if (uid == ldapObjectId) {
+							continue; // This is the LDAP user record – keep it.
+						}
+
+						imtauth::IUserInfoUniquePtr infoPtr = userManagerPtr->GetUser(uid);
+						if (!infoPtr.IsValid()) {
+							continue;
+						}
+
+						if (infoPtr->GetId() != login.toUtf8()) {
+							continue; // Different login name – not related.
+						}
+
+						// Same login name, different objectId from the LDAP entry.
+						// This is a stale local (non-LDAP) user record – remove it.
+						qWarning() << "[Login] Removing conflicting local user with login" << login
+								   << "to allow LDAP identity to take precedence.";
+						userManagerPtr->RemoveUser(uid);
+					}
+				}
+			}
 		}
 
 		iauth::CUser* userPtr = loginPtr->GetLoggedUser();
@@ -267,6 +317,7 @@ public:
 
 			QByteArray productId = GetProductId();
 
+			userData.id = userId;
 			userData.name = userInfoPtr->GetName();
 			userData.email = userInfoPtr->GetMail();
 			userData.login = userInfoPtr->GetId();
@@ -293,6 +344,7 @@ public:
 
 			QByteArray productId = GetProductId();
 
+			userData.id = objectId;
 			userData.name = userInfoPtr->GetName();
 			userData.email = userInfoPtr->GetMail();
 			userData.login = userInfoPtr->GetId();
@@ -664,7 +716,14 @@ CAuthorizationController::CAuthorizationController()
 
 CAuthorizationController::~CAuthorizationController()
 {
-	delete m_implPtr;
+	if (m_implPtr != nullptr){
+		// Perform a best-effort logout to ensure the server-side session is
+		// cleaned up and to avoid debug-mode assertions in the underlying
+		// authentication framework when the controller is destroyed while a
+		// user session is still active.
+		m_implPtr->Logout();
+		delete m_implPtr;
+	}
 }
 
 

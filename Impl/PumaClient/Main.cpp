@@ -127,7 +127,7 @@ int main(int argc, char *argv[])
 	bool ok = authorizationController.Login("su", "1", loginData);
 	if (ok)
 	{
-		qDebug() << "Login successful, token:" << loginData.accessToken;
+		qDebug() << "Login successful";
 	}
 	else
 	{
