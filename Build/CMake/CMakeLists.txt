@@ -56,5 +56,4 @@ if(WIN32)
 	endif()
 endif()
 
-file(COPY ../Migrations DESTINATION ${AUX_INCLUDE_DIR}/../../../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME})
 

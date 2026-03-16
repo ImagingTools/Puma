@@ -1,0 +1,11 @@
+ALTER TABLE "Users" ADD COLUMN "OwnerId" VARCHAR;
+ALTER TABLE "Users" ADD COLUMN "OwnerName" VARCHAR;
+ALTER TABLE "Users" ADD COLUMN "OperationDescription" VARCHAR;
+
+ALTER TABLE "Roles" ADD COLUMN "OwnerId" VARCHAR;
+ALTER TABLE "Roles" ADD COLUMN "OwnerName" VARCHAR;
+ALTER TABLE "Roles" ADD COLUMN "OperationDescription" VARCHAR;
+
+ALTER TABLE "UserGroups" ADD COLUMN "OwnerId" VARCHAR;
+ALTER TABLE "UserGroups" ADD COLUMN "OwnerName" VARCHAR;
+ALTER TABLE "UserGroups" ADD COLUMN "OperationDescription" VARCHAR;

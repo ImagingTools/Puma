@@ -19,8 +19,6 @@ CONFIG += console
 
 QT += xml network sql quick qml websockets
 
-copyToDestDir($$PWD/../../../Build/Migrations, $$PWD/../../../Bin/$$COMPILER_DIR/Migrations)
-
 # Set OS-specific build options:
 win32-msvc*{
 	QMAKE_CXXFLAGS += /wd4264
