@@ -173,6 +173,25 @@ struct Login
 struct User
 {
 	/**
+	* @brief Internal object identifier.
+	*
+	* Unique internal database identifier for the user, as returned by
+	* GetUserIds() and CreateUser(). This is the ID required by user
+	* management operations such as AddRolesToUser(), RemoveRolesFromUser(),
+	* RemoveUser(), AddUsersToGroup(), and RemoveUsersFromGroup().
+	*
+	* This ID is distinct from the login identifier and remains stable
+	* across password changes and profile updates. Both local and LDAP
+	* users have an internal object ID.
+	*
+	* @note Always use this field (not login) when calling user management
+	*       operations such as AddRolesToUser() or RemoveUser().
+	*
+	* @see GetUserIds(), GetUser(), GetUserByLogin()
+	*/
+	QByteArray id;
+
+	/**
 	* @brief User name.
 	*/
 	QString name;
@@ -187,6 +206,9 @@ struct User
 	*
 	* Unique identifier used for authentication. This is the username
 	* entered during login and is distinct from the internal user ID.
+	*
+	* @note Use the id field (not this field) when calling user management
+	*       operations such as AddRolesToUser() or RemoveUser().
 	*/
 	QByteArray login;
 
@@ -479,7 +501,37 @@ struct ServerConfig
 * 3. Set product ID with SetProductId()
 * 4. Call Login() to authenticate a user
 * 5. Perform authorized operations (check permissions, manage users, etc.)
-* 6. Call Logout() when done
+* 6. Call Logout() when done (or let the destructor handle it automatically)
+*
+* @section auto_logout Automatic Session Management
+*
+* Login() automatically terminates any previously active session before
+* starting a new one. This means it is safe to call Login() without a
+* prior Logout() call — the old session will be cleaned up automatically.
+* The destructor also performs a best-effort logout so that server-side
+* sessions are released when the controller is destroyed.
+*
+* @section admin_delegation Delegating Administrative Privileges
+*
+* The superuser ("su") is the only account guaranteed to exist after
+* initial setup. However, any regular user can be granted full
+* administrative capabilities by assigning them an appropriate admin role:
+*
+* @code
+* // While logged in as superuser:
+* QByteArray adminRoleId = controller.CreateRole(
+*     "Administrator",
+*     "Full user-management access",
+*     {"imtauth.users.manage", "imtauth.roles.manage", "imtauth.groups.manage"});
+*
+* QByteArray userId = controller.CreateUser("Alice", "alice", "password", "alice@example.com");
+* controller.AddRolesToUser(userId, {adminRoleId});
+* @endcode
+*
+* After this, logging in as "alice" grants the same user-management
+* capabilities as the superuser, without sharing the superuser credentials.
+* This is the recommended pattern for deployments where multiple people
+* need administrative access.
 *
 * @section thread_safety Thread Safety
 *
@@ -511,9 +563,9 @@ public:
 	* @brief Virtual destructor.
 	*
 	* Destroys the controller and releases all associated resources.
-	* If a user is currently logged in, this does NOT automatically
-	* call Logout() - you should explicitly logout before destruction
-	* if server-side session cleanup is required.
+	* If a user is currently logged in, Logout() is called automatically
+	* as a best-effort cleanup of the server-side session before the
+	* controller is destroyed.
 	*/
 	virtual ~CAuthorizationController();
 
@@ -524,6 +576,10 @@ public:
 	* against the authorization server. On success, populates the output
 	* structure with session data including access token, username,
 	* product ID, and permissions.
+	*
+	* Any previously active session is automatically terminated (logged out)
+	* before the new authentication attempt is made. It is therefore safe
+	* to call Login() again without calling Logout() first.
 	*
 	* @param login User login identifier (username).
 	* @param password User password in plain text (transmitted securely if SSL is enabled).
