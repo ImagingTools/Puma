@@ -59,16 +59,16 @@
         <Element Id="PumaDatabaseSQLite" PackageId="PumaVoce" ComponentId="PumaDatabaseSQLite">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="Application/ApplicationInfo"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="Application/Log"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaServerBase/TracingConfiguration"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="VersionInfo"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -82,9 +82,6 @@
                     </AttributeInfo>
                     <AttributeInfo Id="DatabaseConnectionChecker" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaDatabaseSQLite"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="PumaDatabaseSQLite/DatabaseEngine"/>
                     </AttributeInfo>
                     <AttributeInfo Id="DocumentRepositories" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
@@ -115,22 +112,6 @@
                     </AttributeInfo>
                     <AttributeInfo Id="SessionCollection" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaDatabaseSQLite/SessionSqlRepository"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="SqlDatabaseObjectDelegates" Type="Reference[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>PumaDatabaseSQLite/RoleRepository</Value>
-                                <Value>PumaDatabaseSQLite/UserRepository</Value>
-                                <Value>PumaDatabaseSQLite/UserGroupRepository</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="SqlDatabaseObjectDelegates6" Type="Reference[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>PumaDatabaseSQLite/UserConnectionRepository</Value>
-                            </Values>
-                        </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="UserCollection" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaDatabaseSQLite/UserRepository"/>
