@@ -28,8 +28,8 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="MigrationController" Type="Reference" ExportId="MigrationController">
-                        <Data IsEnabled="false"/>
+                    <AttributeInfo Id="MigrationController" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PostgresMigrations"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Password" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="root"/>
@@ -45,6 +45,40 @@
                     </AttributeInfo>
                     <AttributeInfo Id="UserName" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="postgres"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="PostgresMigrations" PackageId="PumaVoce" ComponentId="PostgresMigrations">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="DatabaseEngine"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SqlDatabaseObjectDelegates" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>RoleDocumentSqlRepository</Value>
+                                <Value>UserSqlRepository</Value>
+                                <Value>UserGroupSqlRepository</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SqlDatabaseObjectDelegates6" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>UserConnectionRepository</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>

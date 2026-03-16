@@ -27,12 +27,12 @@ BEGIN
         BEGIN
 			VALUE "Comments", "Internal build version ($AcfRawVersion:1987$), based on ACF $AcfVersion:0$ ($AcfRawVersion:0$), ACF-Solutions $AcfVersion:1$ ($AcfRawVersion:1$)  and Qt $AcfVersion:1023$, build on $AcfTimestamp$ ($CompilerName$)"
             VALUE "CompanyName", "ImagingTools GmbH"
-			VALUE "FileDescription", "Puma Server Runtime"
+			VALUE "FileDescription", "Puma Server Sl Runtime"
 			VALUE "FileVersion", "$AcfVersion:1987$"
-			VALUE "InternalName", "Puma Server"
+			VALUE "InternalName", "Puma Server Sl"
 			VALUE "LegalCopyright", "Copyright (C) 2017-1987 ImagingTools GmbH"
-			VALUE "OriginalFilename", "PumaServer.exe"
-			VALUE "ProductName", "Puma Server"
+			VALUE "OriginalFilename", "PumaServerSl.exe"
+			VALUE "ProductName", "Puma Server Sl"
 			VALUE "ProductVersion", "$AcfVersion:1987$"
         END
     END
@@ -42,4 +42,4 @@ BEGIN
     END
 END
 
-IDI_ICON1               ICON                    "..\\..\\PumaServer\\VC\\Logo.ico"
+IDI_ICON1               ICON                    "..\\..\\PumaServerSl\\VC\\Logo.ico"

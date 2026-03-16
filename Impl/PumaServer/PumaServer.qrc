@@ -1,8 +1,0 @@
-<RCC>
-    <qresource prefix="/Images">
-        <file alias="PumaSplashScreen">Resources/Images/PumaSplashScreen.svg</file>
-    </qresource>
-    <qresource prefix="/Icons">
-        <file alias="PumaIcon">Resources/Icons/PumaIcon.svg</file>
-    </qresource>
-</RCC>

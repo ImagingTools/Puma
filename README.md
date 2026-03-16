@@ -24,7 +24,8 @@ Puma enables applications to implement robust authentication and authorization m
 ### Core Components
 
 #### Server Components
-- **PumaServer** - Main authorization server application with Qt-based architecture
+- **PumaServerPg** - Authorization server application using PostgreSQL
+- **PumaServerSl** - Authorization server application using SQLite
 - **AuthServerSdk** - SDK for embedding authorization server functionality in external applications
 - **PumaServerConfigurator** - GUI tool for managing and configuring the authorization server
 - **PumaSettingsPlugin** - Plugin system for extensible server settings management
@@ -131,7 +132,8 @@ Puma/
 │   ├── AuthServerSdk/  # Server authentication SDK
 │   ├── Plugins/        # Plugin implementations
 │   ├── PumaClient/     # Client application
-│   ├── PumaServer/     # Server application
+│   ├── PumaServerPg/   # Server application (PostgreSQL)
+│   ├── PumaServerSl/   # Server application (SQLite)
 │   └── PumaServerConfigurator/ # Configuration tool
 ├── Include/            # Header files
 │   ├── puma/           # Core library headers
