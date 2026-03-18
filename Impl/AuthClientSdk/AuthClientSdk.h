@@ -173,6 +173,22 @@ struct Login
 struct User
 {
 	/**
+	* @brief User object UUID.
+	*
+	* Unique internal identifier for this user in the authorization system.
+	* This is the user's object UUID (without braces), used as the primary
+	* key for user management operations such as GetUser(), RemoveUser(),
+	* AddRolesToUser(), etc.
+	*
+	* @note This is an internal database identifier and is distinct from
+	*       the login identifier. Use it when calling methods that accept
+	*       a userId parameter.
+	*
+	* @see GetUserIds(), GetUserList()
+	*/
+	QByteArray uuid;
+
+	/**
 	* @brief User name.
 	*/
 	QString name;
@@ -745,6 +761,26 @@ public:
 	* @see GetUser(), GetUserByLogin()
 	*/
 	virtual QByteArrayList GetUserIds() const;
+
+	/**
+	* @brief Returns all users with their full details.
+	*
+	* Retrieves a list of all user accounts registered in the system,
+	* each populated with name, email, login, uuid, assigned roles, and
+	* group memberships. This is more efficient than calling GetUserIds()
+	* followed by individual GetUser() calls when the full user list is
+	* needed, as it avoids redundant interface lookups.
+	*
+	* @return List of User structures with all fields populated.
+	* @return Empty list if no users exist or operation failed.
+	*
+	* @note Requires appropriate administrative permissions.
+	*       Each User in the returned list has its uuid field set to the
+	*       corresponding internal object identifier.
+	*
+	* @see GetUserIds(), GetUser(), User
+	*/
+	virtual QList<User> GetUserList() const;
 
 	/**
 	* @brief Retrieves user data by user ID.
