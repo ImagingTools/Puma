@@ -17,6 +17,8 @@ int main(int argc, char *argv[])
 	Q_INIT_RESOURCE(imtauthdb);
 	Q_INIT_RESOURCE(imtbase);
 
+	Q_INIT_RESOURCE(PumaServerPg);
+
 	CPumaServerPg instance;
 
 	ibase::IApplication* applicationPtr = instance.GetInterface<ibase::IApplication>();
