@@ -264,30 +264,26 @@ public:
 			return QList<User>();
 		}
 
-		QByteArrayList userIds = userManagerPtr->GetUserIds();
-		QByteArray productId = GetProductId();
+		QList<User> retVal;
 
-		QList<User> userList;
-		userList.reserve(userIds.size());
+		QList<imtauth::IUserManager::User> userList = userManagerPtr->GetUserList();
 
-		for (const QByteArray& userId : userIds){
-			imtauth::IUserInfoUniquePtr userInfoPtr = userManagerPtr->GetUser(userId);
-			if (!userInfoPtr.IsValid()){
-				continue;
-			}
+		for (int i = 0; i < userList.size(); ++i){
+			imtauth::IUserManager::User externUser = userList[i];
 
-			User userData;
-			userData.uuid = userId;
-			userData.name = userInfoPtr->GetName();
-			userData.email = userInfoPtr->GetMail();
-			userData.login = userInfoPtr->GetId();
-			userData.roleIds = userInfoPtr->GetRoles(productId);
-			userData.groupIds = userInfoPtr->GetGroups();
+			User internUser;
 
-			userList.append(userData);
+			internUser.uuid = externUser.uuid;
+			internUser.name = externUser.name;
+			internUser.login = externUser.login;
+			internUser.email = externUser.email;
+			internUser.roleIds = externUser.roleIds;
+			internUser.groupIds = externUser.groupIds;
+
+			retVal << internUser;
 		}
 
-		return userList;
+		return retVal;
 	}
 
 	bool GetUser(const QByteArray& userId, User& userData) const
