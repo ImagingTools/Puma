@@ -256,6 +256,40 @@ public:
 		return QByteArrayList();
 	}
 
+	QList<User> GetUserList() const
+	{
+		imtauth::IUserManager* userManagerPtr = m_sdk.GetInterface<imtauth::IUserManager>();
+		if (userManagerPtr == nullptr){
+			qWarning() << "[GetUserList] Failed: imtauth::IUserManager interface not found";
+			return QList<User>();
+		}
+
+		QByteArrayList userIds = userManagerPtr->GetUserIds();
+		QByteArray productId = GetProductId();
+
+		QList<User> userList;
+		userList.reserve(userIds.size());
+
+		for (const QByteArray& userId : userIds){
+			imtauth::IUserInfoUniquePtr userInfoPtr = userManagerPtr->GetUser(userId);
+			if (!userInfoPtr.IsValid()){
+				continue;
+			}
+
+			User userData;
+			userData.uuid = userId;
+			userData.name = userInfoPtr->GetName();
+			userData.email = userInfoPtr->GetMail();
+			userData.login = userInfoPtr->GetId();
+			userData.roleIds = userInfoPtr->GetRoles(productId);
+			userData.groupIds = userInfoPtr->GetGroups();
+
+			userList.append(userData);
+		}
+
+		return userList;
+	}
+
 	bool GetUser(const QByteArray& userId, User& userData) const
 	{
 		imtauth::IUserManager* userManagerPtr = m_sdk.GetInterface<imtauth::IUserManager>();
@@ -267,6 +301,7 @@ public:
 
 			QByteArray productId = GetProductId();
 
+			userData.uuid = userId;
 			userData.name = userInfoPtr->GetName();
 			userData.email = userInfoPtr->GetMail();
 			userData.login = userInfoPtr->GetId();
@@ -293,6 +328,7 @@ public:
 
 			QByteArray productId = GetProductId();
 
+			userData.uuid = objectId;
 			userData.name = userInfoPtr->GetName();
 			userData.email = userInfoPtr->GetMail();
 			userData.login = userInfoPtr->GetId();
@@ -753,6 +789,16 @@ QByteArrayList CAuthorizationController::GetUserIds() const
 	}
 
 	return QByteArrayList();
+}
+
+
+QList<User> CAuthorizationController::GetUserList() const
+{
+	if (m_implPtr != nullptr){
+		return m_implPtr->GetUserList();
+	}
+
+	return QList<User>();
 }
 
 
