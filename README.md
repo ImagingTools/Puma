@@ -153,7 +153,7 @@ The project includes a comprehensive testing framework (`pumatest`) with test ca
 
 ## License
 
-Puma is licensed under the MIT License. See [LICENSE](LICENSE) for full license text.
+Puma is licensed under a commercial license. See [LICENSE](LICENSE) for full license text.
 
 For information about third-party dependencies and their licenses, see [Docs/Dependencies.md](Docs/Dependencies.md).
 
