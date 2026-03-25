@@ -326,7 +326,7 @@ public:
 
 			User internUser;
 
-			internUser.uuid = externUser.uuid;
+			internUser.id = externUser.uuid;
 			internUser.name = externUser.name;
 			internUser.login = externUser.login;
 			internUser.email = externUser.email;
