@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-Puma-Commercial
+// SPDX-License-Identifier: LicenseRef-Puma-Commercial
 /**
 * @file AuthClientSdk.cpp
 * @brief Implementation of the Authorization Client SDK.
@@ -304,6 +304,36 @@ public:
 		qWarning() << "[GetUserIds] Failed: imtauth::IUserManager interface not found";
 
 		return QByteArrayList();
+	}
+
+	QList<User> GetUserList() const
+	{
+		imtauth::IUserManager* userManagerPtr = m_sdk.GetInterface<imtauth::IUserManager>();
+		if (userManagerPtr == nullptr){
+			qWarning() << "[GetUserList] Failed: imtauth::IUserManager interface not found";
+			return QList<User>();
+		}
+
+		QList<User> retVal;
+
+		QList<imtauth::IUserManager::User> userList = userManagerPtr->GetUserList();
+
+		for (int i = 0; i < userList.size(); ++i){
+			imtauth::IUserManager::User externUser = userList[i];
+
+			User internUser;
+
+			internUser.uuid = externUser.uuid;
+			internUser.name = externUser.name;
+			internUser.login = externUser.login;
+			internUser.email = externUser.email;
+			internUser.roleIds = externUser.roleIds;
+			internUser.groupIds = externUser.groupIds;
+
+			retVal << internUser;
+		}
+
+		return retVal;
 	}
 
 	bool GetUser(const QByteArray& userId, User& userData) const
@@ -812,6 +842,16 @@ QByteArrayList CAuthorizationController::GetUserIds() const
 	}
 
 	return QByteArrayList();
+}
+
+
+QList<User> CAuthorizationController::GetUserList() const
+{
+	if (m_implPtr != nullptr){
+		return m_implPtr->GetUserList();
+	}
+
+	return QList<User>();
 }
 
 

@@ -18,9 +18,9 @@
       "versionInfo": "1.0.0",
       "downloadLocation": "https://github.com/ImagingTools/Puma",
       "filesAnalyzed": false,
-      "licenseConcluded": "NOASSERTION",
-      "licenseDeclared": "NOASSERTION",
-      "copyrightText": "NOASSERTION",
+      "licenseConcluded": "LicenseRef-Puma-Commercial",
+      "licenseDeclared": "LicenseRef-Puma-Commercial",
+      "copyrightText": "Copyright (c) 2024 ImagingTools",
       "description": "Cross-Platform Authentication and Authorization Framework",
       "comment": "Main Puma package including server, client, and SDK components"
     },

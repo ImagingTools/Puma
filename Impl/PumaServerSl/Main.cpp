@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-Puma-Commercial
+// SPDX-License-Identifier: LicenseRef-Puma-Commercial
 // Qt includes
 #include <QtCore/QDir>
 #include <QtCore/QCoreApplication>
@@ -51,6 +51,8 @@ int main(int argc, char *argv[])
 	Q_INIT_RESOURCE(imtdb);
 	Q_INIT_RESOURCE(imtauthdb);
 	Q_INIT_RESOURCE(imtbase);
+
+	Q_INIT_RESOURCE(PumaServerSl);
 
 	CPumaServerSl instance;
 

@@ -29,7 +29,7 @@
                         <Data IsEnabled="true" Value="PumaSettings/FileBasedSslConfiguration"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ThreadsLimit" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="100"/>
+                        <Data IsEnabled="true" Value="1"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaSettings/TracingConfiguration"/>
@@ -260,7 +260,7 @@
                         <Data IsEnabled="true" Value="PumaSettings/FileBasedSslConfiguration"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ThreadsLimit" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="100"/>
+                        <Data IsEnabled="true" Value="1"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaSettings/TracingConfiguration"/>

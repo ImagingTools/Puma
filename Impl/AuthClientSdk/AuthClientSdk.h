@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-Puma-Commercial
+// SPDX-License-Identifier: LicenseRef-Puma-Commercial
 #pragma once
 
 
@@ -801,6 +801,26 @@ public:
 	* @see GetUser(), GetUserByLogin()
 	*/
 	virtual QByteArrayList GetUserIds() const;
+
+	/**
+	* @brief Returns all users with their full details.
+	*
+	* Retrieves a list of all user accounts registered in the system,
+	* each populated with name, email, login, uuid, assigned roles, and
+	* group memberships. This is more efficient than calling GetUserIds()
+	* followed by individual GetUser() calls when the full user list is
+	* needed, as it avoids redundant interface lookups.
+	*
+	* @return List of User structures with all fields populated.
+	* @return Empty list if no users exist or operation failed.
+	*
+	* @note Requires appropriate administrative permissions.
+	*       Each User in the returned list has its uuid field set to the
+	*       corresponding internal object identifier.
+	*
+	* @see GetUserIds(), GetUser(), User
+	*/
+	virtual QList<User> GetUserList() const;
 
 	/**
 	* @brief Retrieves user data by user ID.
