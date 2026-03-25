@@ -306,7 +306,14 @@ CAuthorizableServer::CAuthorizableServer()
 
 CAuthorizableServer::~CAuthorizableServer()
 {
-	delete m_implPtr;
+	if (m_implPtr != nullptr){
+		// Attempt a graceful shutdown so that all network listeners are closed
+		// before the implementation object is destroyed.  Skipping this step
+		// can leave the underlying server components in an inconsistent state
+		// and may trigger debug-mode assertions.
+		m_implPtr->Stop();
+		delete m_implPtr;
+	}
 }
 
 

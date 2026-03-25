@@ -93,6 +93,13 @@ void CAuthClientSdkTest::LoginLogoutTest()
 	QVERIFY(!loginData.userName.isEmpty());
 	QVERIFY(loginData.permissions.isEmpty());
 
+	// Auto-logout: a second Login() call without an explicit Logout() must
+	// succeed because the SDK automatically terminates the previous session.
+	Login loginData2;
+	bool ok3 = m_authorizationController.Login("su", "1", loginData2);
+	QVERIFY2(ok3, "Re-login without prior Logout() failed (auto-logout not working)");
+	QVERIFY(!loginData2.accessToken.isEmpty());
+
 	bool logoutOk = m_authorizationController.Logout();
 	QVERIFY2(logoutOk, "Logout failed");
 	QVERIFY(m_authorizationController.GetToken().isEmpty());
@@ -157,16 +164,28 @@ void CAuthClientSdkTest::UserCrudTest()
 	User u;
 	bool got = m_authorizationController.GetUser(userId, u);
 	QVERIFY(got);
+	// The internal object identifier must be populated and must match the
+	// userId returned by CreateUser() / GetUserIds().
+	QCOMPARE(u.id, userId);
 	QCOMPARE(u.login, s_userNames[0]);
 	QCOMPARE(u.name, s_userNames[0]);
 	QCOMPARE(u.email, QString("test@example.com"));
 	QVERIFY(u.roleIds.isEmpty());
 	QVERIFY(u.groupIds.isEmpty());
 
+	// Verify GetUserByLogin also exposes the internal object id so that
+	// callers can use it directly with AddRolesToUser / RemoveUser etc.
+	User uByLogin;
+	QVERIFY(m_authorizationController.GetUserByLogin(s_userNames[0], uByLogin));
+	QCOMPARE(uByLogin.id, userId);
+	QCOMPARE(uByLogin.login, s_userNames[0]);
+
 	QByteArray roleId = m_authorizationController.CreateRole(s_roleNames[0], "", {"A", "B", "C"});
 	QVERIFY2(!roleId.isEmpty(), "Role was not created");
 
-	QVERIFY(m_authorizationController.AddRolesToUser(userId, {roleId}));
+	// Use the id from GetUserByLogin to add roles (simulates how a caller
+	// would manage an LDAP user whose objectId was obtained via GetUserByLogin).
+	QVERIFY(m_authorizationController.AddRolesToUser(uByLogin.id, {roleId}));
 
 	User u2;
 	bool got2 = m_authorizationController.GetUser(userId, u2);
