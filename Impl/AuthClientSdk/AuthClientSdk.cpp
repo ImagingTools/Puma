@@ -142,7 +142,10 @@ public:
 						// This is a stale local (non-LDAP) user record – remove it.
 						qWarning() << "[Login] Removing conflicting local user with login" << login
 								   << "to allow LDAP identity to take precedence.";
-						userManagerPtr->RemoveUser(uid);
+						if (!userManagerPtr->RemoveUser(uid)) {
+							qWarning() << "[Login] Failed to remove conflicting local user with id" << uid
+									   << "for login" << login << "- conflict may remain.";
+						}
 					}
 				}
 			}
