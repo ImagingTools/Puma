@@ -18,15 +18,10 @@
         <FilePath>../Impl/AuthClientSdk/AuthClientSdk.acc</FilePath>
         <FilePath>../Impl/AuthClientSdk/LoginWidget.acc</FilePath>
         <FilePath>../Impl/AuthServerSdk/AuthServerSdk.acc</FilePath>
-        <FilePath>../Impl/AuthServerSdk/VC/FileSubstitCopyApp.acc</FilePath>
         <FilePath>../Impl/Plugins/PumaSettingsPlugin/PumaSettingsPlugin.acc</FilePath>
         <FilePath>../Impl/PumaClient/PumaClient.acc</FilePath>
-        <FilePath>../Impl/PumaClient/VC/FileSubstitCopyApp.acc</FilePath>
         <FilePath>../Impl/PumaServerConfigurator/PumaServerConfigurator.acc</FilePath>
-        <FilePath>../Impl/PumaServerConfigurator/VC/FileSubstitCopyApp.acc</FilePath>
         <FilePath>../Impl/PumaServerPg/PumaServerPg.acc</FilePath>
-        <FilePath>../Impl/PumaServerPg/VC/FileSubstitCopyApp.acc</FilePath>
         <FilePath>../Impl/PumaServerSl/PumaServerSl.acc</FilePath>
-        <FilePath>../Impl/PumaServerSl/VC/FileSubstitCopyApp.acc</FilePath>
     </RegistryFiles>
 </Acf>
