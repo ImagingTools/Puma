@@ -1,0 +1,32 @@
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="1023" Number="328449" Description="Qt Framework"/>
+            <Version Id="0" Number="4016" Description="ACF"/>
+        </VersionInfos>
+    </AcfHeader>
+    <ConfigFiles>
+        <FilePath>$(IMTCOREDIR)/Config/ImtCore.awc</FilePath>
+    </ConfigFiles>
+    <PackageDirs>
+        <Dir>../Bin/$(ConfigurationName)</Dir>
+        <Dir>../Partitura</Dir>
+    </PackageDirs>
+    <PackageFiles/>
+    <RegistryFiles>
+        <FilePath>../Impl/AuthClientSdk/AdministrationWidget.acc</FilePath>
+        <FilePath>../Impl/AuthClientSdk/AuthClientSdk.acc</FilePath>
+        <FilePath>../Impl/AuthClientSdk/LoginWidget.acc</FilePath>
+        <FilePath>../Impl/AuthServerSdk/AuthServerSdk.acc</FilePath>
+        <FilePath>../Impl/AuthServerSdk/VC/FileSubstitCopyApp.acc</FilePath>
+        <FilePath>../Impl/Plugins/PumaSettingsPlugin/PumaSettingsPlugin.acc</FilePath>
+        <FilePath>../Impl/PumaClient/PumaClient.acc</FilePath>
+        <FilePath>../Impl/PumaClient/VC/FileSubstitCopyApp.acc</FilePath>
+        <FilePath>../Impl/PumaServerConfigurator/PumaServerConfigurator.acc</FilePath>
+        <FilePath>../Impl/PumaServerConfigurator/VC/FileSubstitCopyApp.acc</FilePath>
+        <FilePath>../Impl/PumaServerPg/PumaServerPg.acc</FilePath>
+        <FilePath>../Impl/PumaServerPg/VC/FileSubstitCopyApp.acc</FilePath>
+        <FilePath>../Impl/PumaServerSl/PumaServerSl.acc</FilePath>
+        <FilePath>../Impl/PumaServerSl/VC/FileSubstitCopyApp.acc</FilePath>
+    </RegistryFiles>
+</Acf>
