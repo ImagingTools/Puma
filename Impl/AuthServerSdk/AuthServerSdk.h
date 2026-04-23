@@ -27,7 +27,7 @@
 *
 * // Configure server settings
 * ServerConfig config;
-* config.host = "0.0.0.0";  // Listen on all interfaces
+* config.host = "localhost";
 * config.httpPort = 8080;
 * config.wsPort = 8081;
 *
@@ -332,15 +332,16 @@ struct ServerConfig
 	/**
 	* @brief Host address or interface to bind to.
 	*
-	* Specifies which network interface the server listens on:
-	* - "localhost" or "127.0.0.1": Only local connections (default)
-	* - "0.0.0.0": All IPv4 interfaces (public and local)
+	* Specifies which network interface the server binds to:
+	* - "localhost" or "127.0.0.1": Only local connections (default, recommended)
+	* - "0.0.0.0": All IPv4 interfaces — rarely needed, use only when
+	*   remote clients on other machines must connect directly
 	* - "::": All IPv6 interfaces
 	* - Specific IP: Only that interface (e.g., "192.168.1.100")
 	*
 	* @note Using "0.0.0.0" or "::" makes the server accessible from
-	*       other machines on the network. Ensure proper firewall
-	*       configuration and SSL when doing this.
+	*       other machines on the network. This is rarely required.
+	*       If used, ensure proper firewall configuration and SSL.
 	*/
 	QString host = "localhost";
 
@@ -408,7 +409,7 @@ struct ServerConfig
 * server.SetFeaturesFilePath("/etc/myapp/features.xml");
 * 
 * ServerConfig config;
-* config.host = "0.0.0.0";
+* config.host = "localhost";
 * config.httpPort = 8443;
 * config.wsPort = 8444;
 * 
@@ -502,7 +503,7 @@ public:
 	* @par Example:
 	* @code
 	* ServerConfig config;
-	* config.host = "0.0.0.0";
+	* config.host = "localhost";
 	* config.httpPort = 8080;
 	* config.wsPort = 8081;
 	*
@@ -712,7 +713,7 @@ private:
 * @subsection step3 Step 3: Configure Network and SSL
 * @code
 * ServerConfig config;
-* config.host = "0.0.0.0";
+* config.host = "localhost";
 * config.httpPort = 8443;
 * config.wsPort = 8444;
 *

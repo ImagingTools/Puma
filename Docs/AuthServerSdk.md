@@ -345,7 +345,7 @@ server.SetPumaConnectionParam(pumaBackend);
 
 // Then configure and start the external-facing server
 ServerConfig externalServer;
-externalServer.host = "0.0.0.0";
+externalServer.host = "localhost";
 externalServer.httpPort = 8080;
 externalServer.wsPort = 8090;
 server.Start(externalServer);
@@ -382,35 +382,35 @@ The `host` field in `ServerConfig` controls which network interface the server b
 
 | Value | Binds to | Accessible from | Typical use |
 |---|---|---|---|
-| `"localhost"` / `"127.0.0.1"` | Loopback interface only | **Same machine only** | Development, internal Puma backend connection |
-| `"0.0.0.0"` | All available IPv4 interfaces | **Any machine on the network** (local + remote) | External-facing server endpoints |
-| `"::"` | All available IPv6 interfaces | **Any machine on the network** (local + remote) | External-facing server endpoints (IPv6) |
+| `"localhost"` / `"127.0.0.1"` | Loopback interface only | **Same machine only** | Default — recommended for most deployments |
+| `"0.0.0.0"` | All available IPv4 interfaces | **Any machine on the network** (local + remote) | Rare — only when remote network access is required |
+| `"::"` | All available IPv6 interfaces | **Any machine on the network** (local + remote) | Rare — only when remote IPv6 access is required |
 | Specific IP (e.g. `"192.168.1.100"`) | That single interface | Machines that can reach that IP | Production deployments with controlled access |
 
 **Key differences in detail:**
 
-- **`"localhost"` / `"127.0.0.1"` (loopback only):** The server listens exclusively on the loopback network interface. Only processes running on the same machine can connect. Remote clients on other machines in the network **cannot** reach the server, even if no firewall is in place. This is the default value and the safest choice for internal connections such as the Puma backend (`SetPumaConnectionParam()`) when the backend runs on the same host.
+- **`"localhost"` / `"127.0.0.1"` (loopback only — default and recommended):** The server listens exclusively on the loopback network interface. Only processes running on the same machine can connect. Remote clients on other machines in the network **cannot** reach the server, even if no firewall is in place. This is the default value and the recommended choice for virtually all deployments — both for the external-facing server (`Start()`) and the Puma backend connection (`SetPumaConnectionParam()`), since clients and backend typically run on the same host.
 
-- **`"0.0.0.0"` (all interfaces):** The server listens on every available IPv4 network interface, including the loopback and all physical/virtual network adapters. This means the server is reachable from other machines on the network. Use this for the external-facing server configuration (`Start()`) when remote clients need to connect. **Security note:** Always combine `"0.0.0.0"` with SSL/TLS and firewall rules in production environments, as the server is exposed to the entire network.
+- **`"0.0.0.0"` (all interfaces — use only when necessary):** The server listens on every available IPv4 network interface, including the loopback and all physical/virtual network adapters. This means the server is reachable from other machines on the network. **This is rarely needed** and should only be used if remote clients on different machines must connect directly. **Security note:** Always combine `"0.0.0.0"` with SSL/TLS and firewall rules, as the server is exposed to the entire network.
 
-**Example – typical dual configuration:**
+**Example – typical configuration:**
 ```cpp
-// Internal Puma backend: use localhost because it runs on the same machine
+// Puma backend connection
 ServerConfig pumaConfig;
-pumaConfig.host = "localhost";   // loopback only → not reachable from outside
+pumaConfig.host = "localhost";
 pumaConfig.httpPort = 9080;
 pumaConfig.wsPort = 9090;
 server.SetPumaConnectionParam(pumaConfig);
 
-// External-facing server: use 0.0.0.0 so that remote clients can connect
+// External-facing server (localhost is sufficient when clients run on the same machine)
 ServerConfig externalConfig;
-externalConfig.host = "0.0.0.0"; // all interfaces → reachable from the network
+externalConfig.host = "localhost";
 externalConfig.httpPort = 8080;
 externalConfig.wsPort = 8090;
 server.Start(externalConfig);
 ```
 
-> **Rule of thumb:** Use `"localhost"` for any connection that should stay on the local machine (e.g. Puma backend on the same host). Use `"0.0.0.0"` only when external clients need to reach the server, and always secure it with SSL/TLS in production.
+> **Rule of thumb:** Use `"localhost"` (the default) for both the external server and the Puma backend connection. Only switch to `"0.0.0.0"` if remote clients on other machines need to connect, and always secure it with SSL/TLS in that case.
 
 #### `SslConfig`
 ```cpp
@@ -439,7 +439,7 @@ The AuthServerSdk uses a **dual configuration model** because it operates as a b
    - Defines the ports and host that **external clients** connect to
    - This is your application's public-facing authorization endpoint
    - Clients (AuthClientSdk instances) connect to these endpoints
-   - Example: `httpPort = 8080, wsPort = 8090, host = "0.0.0.0"`
+   - Example: `httpPort = 8080, wsPort = 8090, host = "localhost"`
 
 2. **Puma Backend Configuration** (via `SetPumaConnectionParam()`):
    - Defines where the **Puma authorization server** is running
@@ -481,7 +481,7 @@ When Puma server runs on a different machine:
 ServerConfig externalConfig;
 externalConfig.httpPort = 8080;
 externalConfig.wsPort = 8090;
-externalConfig.host = "0.0.0.0";  // Accept external connections
+externalConfig.host = "localhost";
 
 // Internal Puma backend configuration
 ServerConfig pumaConfig;
@@ -506,7 +506,7 @@ externalSsl.caCertificatePaths.append("certs/ca.crt");
 ServerConfig externalConfig;
 externalConfig.httpPort = 8443;
 externalConfig.wsPort = 8453;
-externalConfig.host = "0.0.0.0";
+externalConfig.host = "localhost";
 externalConfig.sslConfig = externalSsl;
 
 // Internal Puma SSL configuration
@@ -530,7 +530,7 @@ server.Start(externalConfig);
 ServerConfig config;
 config.httpPort = 8080;
 config.wsPort = 8090;
-config.host = "0.0.0.0";  // Listen on all interfaces
+config.host = "localhost";
 ```
 
 ### SSL/TLS Configuration
@@ -538,7 +538,7 @@ config.host = "0.0.0.0";  // Listen on all interfaces
 ServerConfig config;
 config.httpPort = 8443;  // HTTPS
 config.wsPort = 8453;    // Secure WebSocket
-config.host = "0.0.0.0";
+config.host = "localhost";
 
 // Configure SSL
 SslConfig sslConfig;
@@ -630,7 +630,7 @@ int main(int argc, char *argv[])
     ServerConfig config;
     config.httpPort = 8443;
     config.wsPort = 8453;
-    config.host = "0.0.0.0";
+    config.host = "localhost";
     config.sslConfig = sslConfig;
     
     // Start server
@@ -714,7 +714,7 @@ int main(int argc, char *argv[])
     ServerConfig externalConfig;
     externalConfig.httpPort = 8080;
     externalConfig.wsPort = 8090;
-    externalConfig.host = "0.0.0.0";  // Accept from all interfaces
+    externalConfig.host = "localhost";
     
     // STEP 3: Start the server
     // This starts the external endpoints and connects to Puma backend
@@ -839,7 +839,7 @@ private:
         // Configure external-facing auth endpoints
         // Clients will connect to these endpoints for authentication
         ServerConfig externalAuth;
-        externalAuth.host = "0.0.0.0";
+        externalAuth.host = "localhost";
         externalAuth.httpPort = 8080;  // Auth endpoint
         externalAuth.wsPort = 8090;
         
@@ -992,7 +992,7 @@ Supported protocols (in order of security):
 1. **Configure Puma backend first**: Always call `SetPumaConnectionParam()` before `Start()`
 2. **Verify Puma server availability**: Ensure Puma backend server is running before starting the SDK
 3. **Separate external and internal ports**: Use different port ranges for external clients and internal Puma communication
-4. **Bind to specific interfaces**: Use specific IPs instead of "0.0.0.0" in production
+4. **Use `"localhost"` by default**: Only bind to `"0.0.0.0"` if remote network access is explicitly required
 5. **Use non-standard ports**: Avoid default ports (80, 443) when possible
 6. **Separate environments**: Different ports/hosts for development, staging, production
 7. **Validate configuration**: Check return values of all configuration methods
@@ -1107,10 +1107,12 @@ sslConfig.privateKeyPassPhrase = "your-passphrase";
 
 **Solutions:**
 ```cpp
-// Bind to all interfaces for external access
-config.host = "0.0.0.0";  // IPv4 all interfaces
-// or
-config.host = "::";       // IPv6 all interfaces
+// Default: localhost (sufficient when clients run on the same machine)
+config.host = "localhost";
+
+// Only if remote clients on other machines need to connect:
+// config.host = "0.0.0.0";  // IPv4 all interfaces (requires SSL + firewall)
+// config.host = "::";       // IPv6 all interfaces (requires SSL + firewall)
 
 // Check firewall rules
 // Windows: netsh advfirewall firewall add rule ...
