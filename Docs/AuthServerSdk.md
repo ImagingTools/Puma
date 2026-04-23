@@ -371,10 +371,46 @@ Sets the product identifier for licensing and authorization purposes.
 struct ServerConfig {
     int httpPort = 80;                      // HTTP/HTTPS port
     int wsPort = 90;                        // WebSocket port
-    QString host = "localhost";             // Server host/interface
+    QString host = "localhost";             // Server host/interface (see Host Binding below)
     std::optional<SslConfig> sslConfig;     // Optional SSL configuration
 };
 ```
+
+##### Host Binding: `localhost` vs `0.0.0.0`
+
+The `host` field in `ServerConfig` controls which network interface the server binds to. Choosing the correct value is critical for both connectivity and security:
+
+| Value | Binds to | Accessible from | Typical use |
+|---|---|---|---|
+| `"localhost"` / `"127.0.0.1"` | Loopback interface only | **Same machine only** | Development, internal Puma backend connection |
+| `"0.0.0.0"` | All available IPv4 interfaces | **Any machine on the network** (local + remote) | External-facing server endpoints |
+| `"::"` | All available IPv6 interfaces | **Any machine on the network** (local + remote) | External-facing server endpoints (IPv6) |
+| Specific IP (e.g. `"192.168.1.100"`) | That single interface | Machines that can reach that IP | Production deployments with controlled access |
+
+**Key differences in detail:**
+
+- **`"localhost"` / `"127.0.0.1"` (loopback only):** The server listens exclusively on the loopback network interface. Only processes running on the same machine can connect. Remote clients on other machines in the network **cannot** reach the server, even if no firewall is in place. This is the default value and the safest choice for internal connections such as the Puma backend (`SetPumaConnectionParam()`) when the backend runs on the same host.
+
+- **`"0.0.0.0"` (all interfaces):** The server listens on every available IPv4 network interface, including the loopback and all physical/virtual network adapters. This means the server is reachable from other machines on the network. Use this for the external-facing server configuration (`Start()`) when remote clients need to connect. **Security note:** Always combine `"0.0.0.0"` with SSL/TLS and firewall rules in production environments, as the server is exposed to the entire network.
+
+**Example – typical dual configuration:**
+```cpp
+// Internal Puma backend: use localhost because it runs on the same machine
+ServerConfig pumaConfig;
+pumaConfig.host = "localhost";   // loopback only → not reachable from outside
+pumaConfig.httpPort = 9080;
+pumaConfig.wsPort = 9090;
+server.SetPumaConnectionParam(pumaConfig);
+
+// External-facing server: use 0.0.0.0 so that remote clients can connect
+ServerConfig externalConfig;
+externalConfig.host = "0.0.0.0"; // all interfaces → reachable from the network
+externalConfig.httpPort = 8080;
+externalConfig.wsPort = 8090;
+server.Start(externalConfig);
+```
+
+> **Rule of thumb:** Use `"localhost"` for any connection that should stay on the local machine (e.g. Puma backend on the same host). Use `"0.0.0.0"` only when external clients need to reach the server, and always secure it with SSL/TLS in production.
 
 #### `SslConfig`
 ```cpp
