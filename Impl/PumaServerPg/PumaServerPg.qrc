@@ -11,5 +11,6 @@
         <file alias="migration_2.sql">Resources/Migrations/migration_2.sql</file>
         <file alias="migration_3.sql">Resources/Migrations/migration_3.sql</file>
         <file alias="migration_5.sql">Resources/Migrations/migration_5.sql</file>
+        <file alias="migration_7.sql">Resources/Migrations/migration_7.sql</file>
     </qresource>
 </RCC>

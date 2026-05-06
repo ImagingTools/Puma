@@ -55,6 +55,9 @@
 #include <imtcom/IServerConnectionInterface.h>
 #include <imtcom/IServerDispatcher.h>
 #include <imtcom/ISslConfigurationApplier.h>
+#include <imtauth/IJwtTokenProvider.h>
+#include <imtauth/IOidcClient.h>
+#include <imtbase/IObjectCollection.h>
 
 // Local includes
 #include <GeneratedFiles/AuthServerSdk/CAuthServerSdk.h>
@@ -251,6 +254,83 @@ public:
 		return true;
 	}
 
+
+	bool ConfigureOidc(const Oidc::ServerConfig& oidcConfig)
+	{
+		imtauth::IJwtTokenProvider* jwtProviderPtr = m_sdk.GetInterface<imtauth::IJwtTokenProvider>();
+		if (jwtProviderPtr == nullptr){
+			qWarning() << "JWT token provider interface is not available";
+			return false;
+		}
+
+		if (oidcConfig.signingKeyPath.isEmpty()){
+			qWarning() << "OIDC signing key path is not configured";
+			return false;
+		}
+
+		if (oidcConfig.verificationKeyPath.isEmpty()){
+			qWarning() << "OIDC verification key path is not configured";
+			return false;
+		}
+
+		if (oidcConfig.issuer.isEmpty()){
+			qWarning() << "OIDC issuer URL is not configured";
+			return false;
+		}
+
+		if (!jwtProviderPtr->LoadSigningKey(oidcConfig.signingKeyPath)){
+			qWarning() << "Failed to load OIDC signing key from" << oidcConfig.signingKeyPath;
+			return false;
+		}
+		qDebug() << "Loaded OIDC signing key from" << oidcConfig.signingKeyPath;
+
+		if (!jwtProviderPtr->LoadVerificationKey(oidcConfig.verificationKeyPath)){
+			qWarning() << "Failed to load OIDC verification key from" << oidcConfig.verificationKeyPath;
+			return false;
+		}
+		qDebug() << "Loaded OIDC verification key from" << oidcConfig.verificationKeyPath;
+
+		jwtProviderPtr->SetIssuer(oidcConfig.issuer);
+		jwtProviderPtr->SetAccessTokenExpiry(oidcConfig.accessTokenExpirySeconds);
+		jwtProviderPtr->SetIdTokenExpiry(oidcConfig.idTokenExpirySeconds);
+		jwtProviderPtr->SetRefreshTokenExpiry(oidcConfig.refreshTokenExpirySeconds);
+
+		qDebug() << "OIDC provider configured with issuer:" << oidcConfig.issuer;
+
+		return true;
+	}
+
+
+	bool RegisterOidcClient(const Oidc::ClientRegistration& registration)
+	{
+		imtbase::IObjectCollection* clientCollectionPtr = m_sdk.GetInterface<imtbase::IObjectCollection>("OidcClientCollection");
+		if (clientCollectionPtr == nullptr){
+			qWarning() << "OIDC client collection is not available";
+			return false;
+		}
+
+		imtauth::IOidcClient* clientPtr = dynamic_cast<imtauth::IOidcClient*>(
+			clientCollectionPtr->CreateNewObject("OidcClient", registration.clientId.toUtf8(), registration.clientName, "").release());
+		if (clientPtr == nullptr){
+			qWarning() << "Failed to create OIDC client object";
+			return false;
+		}
+
+		clientPtr->SetClientId(registration.clientId);
+		clientPtr->SetClientSecret(registration.clientSecret);
+		clientPtr->SetClientName(registration.clientName);
+		clientPtr->SetRedirectUris(registration.redirectUris);
+		clientPtr->SetGrantTypes(registration.grantTypes);
+		clientPtr->SetResponseTypes(registration.responseTypes);
+		clientPtr->SetScopes(registration.scopes);
+		clientPtr->SetTokenEndpointAuthMethod(registration.tokenEndpointAuthMethod);
+		clientPtr->SetActive(registration.isActive);
+
+		qDebug() << "Registered OIDC client:" << registration.clientId << "(" << registration.clientName << ")";
+
+		return true;
+	}
+
 private:
 	/**
 	* @brief Helper method to configure connection parameters.
@@ -361,6 +441,26 @@ bool CAuthorizableServer::SetProductId(const QByteArray& productId) const
 {
 	if (m_implPtr != nullptr){
 		return m_implPtr->SetProductId(productId);
+	}
+
+	return false;
+}
+
+
+bool CAuthorizableServer::ConfigureOidc(const Oidc::ServerConfig& oidcConfig) const
+{
+	if (m_implPtr != nullptr){
+		return m_implPtr->ConfigureOidc(oidcConfig);
+	}
+
+	return false;
+}
+
+
+bool CAuthorizableServer::RegisterOidcClient(const Oidc::ClientRegistration& registration) const
+{
+	if (m_implPtr != nullptr){
+		return m_implPtr->RegisterOidcClient(registration);
 	}
 
 	return false;

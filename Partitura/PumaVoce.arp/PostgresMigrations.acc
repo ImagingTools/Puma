@@ -20,6 +20,7 @@
                                 <Value>ObjectCollectionMigrationController</Value>
                                 <Value>MigrationController_1</Value>
                                 <Value>ObjectCollectionMigrationController6</Value>
+                                <Value>MigrationController_Oidc</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -133,6 +134,30 @@
                     </AttributeInfo>
                     <AttributeInfo Id="To" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="6"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="MigrationController_Oidc" PackageId="ImtDatabasePck" ComponentId="MigrationController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="From" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="7"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MigrationFolderPath" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="MigrationFilePath"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="To" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="7"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
