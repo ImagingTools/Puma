@@ -310,7 +310,11 @@ public:
 		}
 
 		imtauth::IOidcClient* clientPtr = dynamic_cast<imtauth::IOidcClient*>(
-			clientCollectionPtr->CreateNewObject("OidcClient", registration.clientId.toUtf8(), registration.clientName, "").release());
+			clientCollectionPtr->CreateNewObject(
+				"OidcClient",
+				registration.clientId.toUtf8(),
+				registration.clientName,
+				/*objectDescription=*/ QString()).release());
 		if (clientPtr == nullptr){
 			qWarning() << "Failed to create OIDC client object";
 			return false;

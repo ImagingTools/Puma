@@ -27,6 +27,7 @@
 #include <openssl/bn.h>
 #include <openssl/rsa.h>
 #include <openssl/err.h>
+#include <openssl/rand.h>
 
 
 namespace Oidc
@@ -354,9 +355,10 @@ QString CJwtTokenProvider::GenerateRandomString(int length)
 		urandom.close();
 	}
 	else{
-		// Fallback: use QUuid-based generation
-		for (int i = 0; i < length; ++i){
-			randomData[i] = static_cast<char>(QUuid::createUuid().toByteArray().at(i % 38));
+		// Use OpenSSL RAND_bytes as cryptographically secure fallback
+		if (RAND_bytes(reinterpret_cast<unsigned char*>(randomData.data()), length) != 1){
+			qWarning() << "CJwtTokenProvider: Failed to generate cryptographically secure random bytes";
+			return {};
 		}
 	}
 
