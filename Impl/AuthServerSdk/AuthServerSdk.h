@@ -91,6 +91,9 @@
 #include <QtNetwork/QSslConfiguration>
 #include <QtNetwork/QSslSocket>
 
+// Puma includes
+#include <puma/oidc/OidcTypes.h>
+
 
 namespace AuthServerSdk
 {
@@ -611,6 +614,51 @@ public:
 	* @see SetFeaturesFilePath()
 	*/
 	virtual bool SetProductId(const QByteArray& productId) const;
+
+	/**
+	* @brief Configures and enables the OIDC provider.
+	*
+	* Sets up the OpenID Connect provider with the given configuration,
+	* including RSA signing keys, issuer URL, and token lifetimes.
+	* The OIDC provider exposes standard endpoints:
+	* - /.well-known/openid-configuration
+	* - /oauth/authorize
+	* - /oauth/token
+	* - /oauth/userinfo
+	* - /oauth/jwks
+	* - /oauth/revoke
+	* - /oauth/introspect
+	*
+	* @param oidcConfig OIDC provider configuration including issuer URL,
+	*                   signing key paths, and token lifetimes.
+	*
+	* @return true if the OIDC provider was configured successfully.
+	* @return false if configuration failed (missing keys, invalid config).
+	*
+	* @note This should be called before Start().
+	*
+	* @see Oidc::ServerConfig
+	*/
+	virtual bool ConfigureOidc(const Oidc::ServerConfig& oidcConfig) const;
+
+	/**
+	* @brief Registers an OIDC client application.
+	*
+	* Registers a client that can use the OIDC provider to authenticate
+	* users. Each client receives a unique client_id and optionally a
+	* client_secret.
+	*
+	* @param registration Client registration data including redirect URIs,
+	*                     grant types, and allowed scopes.
+	*
+	* @return true if the client was registered successfully.
+	* @return false if registration failed.
+	*
+	* @pre ConfigureOidc() must have been called successfully.
+	*
+	* @see Oidc::ClientRegistration
+	*/
+	virtual bool RegisterOidcClient(const Oidc::ClientRegistration& registration) const;
 
 private:
 	/**

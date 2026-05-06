@@ -26,6 +26,7 @@ target_link_libraries(${PROJECT_NAME} imtbase imtdesign imtdev imtgui imtdb imtd
 target_link_libraries(${PROJECT_NAME} imtlicgui imtauthgui imtclientgql imtgql imtbase imtauth imtauthgui imtauthdb imtauthgql imtcrypt imtlicgui imtlicgql imtapp imtcolorsdl imtserverapp)
 target_link_libraries(${PROJECT_NAME} imtqml imtdocguiqml imtauthguiqml imtlicguiqml imtcolguiqml imtguigqlqml imtguiqml imtcontrolsqml imtstylecontrolsqml imtcom imtauthsdl imtappsdl imtservergql imtbasesdl imtcol imtzip)
 target_link_libraries(${PROJECT_NAME} imtchat imtchatdb imtdesk imtdeskdb imtdeskgql imtchatgql imtchatsdl imtdesksdl imtdoc)
+target_link_libraries(${PROJECT_NAME} imtoidc)
 target_link_libraries(${PROJECT_NAME}  Qt${QT_VERSION_MAJOR}::QuickWidgets  Qt${QT_VERSION_MAJOR}::WebSockets)
 
 target_link_libraries(${PROJECT_NAME}
