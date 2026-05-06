@@ -23,12 +23,12 @@ The OIDC implementation spans two repositories:
 
 ### Components
 
-| Component | Description |
-|-----------|-------------|
-| `CJwtTokenProvider` | RS256 JWT token signing and verification using OpenSSL EVP API |
-| `OidcTypes` | Data structures: `ClientRegistration`, `TokenClaims`, `AuthorizationRequest`, `TokenRequest`, `TokenResponse`, `AuthorizationCode`, `ServerConfig`, `IntrospectionResponse` |
-| `COidcServletComp` | REST servlet handling all OAuth2/OIDC endpoints |
-| `COidcScopeMapperComp` | Maps OIDC scopes to user claims from the Puma RBAC model |
+| Component | Location | Description |
+|-----------|----------|-------------|
+| `CRs256JwtTokenProviderComp` | ImtCore | RS256 JWT token signing and verification using OpenSSL EVP API |
+| `COidcServletComp` | ImtCore | REST servlet handling all OAuth2/OIDC endpoints |
+| `COidcScopeMapperComp` | ImtCore | Maps OIDC scopes to user claims from the Puma RBAC model |
+| `OidcTypes` | Puma SDK | SDK-level configuration types: `ClientRegistration`, `ServerConfig` |
 
 ### REST Endpoints
 
@@ -97,37 +97,6 @@ openssl genrsa -out private_key.pem 2048
 openssl rsa -in private_key.pem -pubout -out public_key.pem
 ```
 
-### 4. Using the JWT Token Provider Directly
-
-```cpp
-#include <puma/oidc/CJwtTokenProvider.h>
-#include <puma/oidc/OidcTypes.h>
-
-Oidc::CJwtTokenProvider provider;
-provider.LoadSigningKey("/path/to/private_key.pem");
-provider.LoadVerificationKey("/path/to/public_key.pem");
-
-// Generate token
-Oidc::TokenClaims claims;
-claims.iss = "https://auth.example.com";
-claims.sub = "user-123";
-claims.aud = "my-client";
-claims.iat = QDateTime::currentSecsSinceEpoch();
-claims.exp = claims.iat + 3600;
-claims.name = "John Doe";
-claims.email = "john@example.com";
-
-QString token = provider.GenerateToken(claims);
-
-// Verify token
-Oidc::TokenClaims decoded;
-if (provider.VerifyToken(token, decoded)) {
-    qDebug() << "Token valid, subject:" << decoded.sub;
-}
-
-// Get JWKS for /.well-known/jwks.json
-QJsonObject jwks = provider.GetJwks();
-```
 
 ## Supported Scopes
 

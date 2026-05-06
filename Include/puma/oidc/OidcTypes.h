@@ -3,36 +3,23 @@
 
 /**
 * @file OidcTypes.h
-* @brief OpenID Connect data structures and type definitions.
+* @brief OpenID Connect SDK configuration types.
 *
-* This header defines the core data structures used throughout
-* the OIDC provider implementation, including client registrations,
-* token claims, authorization requests, and server configuration.
+* This header defines the SDK-level configuration structures for
+* OIDC client registration and server configuration. These types
+* are used by the AuthServerSdk to configure the underlying ImtCore
+* OIDC provider.
 *
-* @section oidc_overview OpenID Connect Overview
-*
-* OpenID Connect (OIDC) is an identity layer built on top of OAuth 2.0.
-* It allows clients to verify the identity of end-users and obtain
-* basic profile information in an interoperable and REST-like manner.
-*
-* @section supported_flows Supported Flows
-*
-* Currently supported:
-* - Authorization Code Flow with PKCE (recommended)
-* - Refresh Token Flow
+* @note Internal OIDC types (token claims, authorization codes,
+*       token responses, etc.) are managed by ImtCore's OIDC
+*       component framework (imtauth/imtoidc).
 *
 * @ingroup OidcProvider
 */
 
 // Qt includes
-#include <QtCore/QByteArray>
-#include <QtCore/QByteArrayList>
 #include <QtCore/QString>
 #include <QtCore/QStringList>
-#include <QtCore/QJsonObject>
-
-// STL includes
-#include <optional>
 
 
 namespace Oidc
@@ -47,7 +34,7 @@ namespace Oidc
 * flows. Registration includes specifying allowed redirect URIs,
 * grant types, and scopes.
 *
-* @see COidcAuthorizationEndpoint, COidcTokenEndpoint
+* @see CAuthorizableServer::RegisterOidcClient()
 */
 struct ClientRegistration
 {
@@ -125,288 +112,13 @@ struct ClientRegistration
 
 
 /**
-* @brief JWT token claims for ID tokens and access tokens.
-*
-* Contains both standard OIDC claims and Puma-specific claims
-* for roles, groups, and permissions.
-*
-* @section standard_claims Standard OIDC Claims
-* - iss, sub, aud, iat, exp, auth_time, nonce
-*
-* @section puma_claims Puma-Specific Claims
-* - name, email, preferred_username
-* - roles, groups, permissions
-*
-* @see CJwtTokenProvider
-*/
-struct TokenClaims
-{
-	/** @brief Issuer identifier (authorization server URL). */
-	QString iss;
-
-	/** @brief Subject identifier (unique user ID). */
-	QString sub;
-
-	/** @brief Audience (client_id the token is intended for). */
-	QString aud;
-
-	/** @brief Issued-at time (Unix timestamp). */
-	qint64 iat = 0;
-
-	/** @brief Expiration time (Unix timestamp). */
-	qint64 exp = 0;
-
-	/** @brief Time of user authentication (Unix timestamp). */
-	qint64 auth_time = 0;
-
-	/** @brief Nonce value from the authorization request. */
-	QString nonce;
-
-	// Profile claims
-
-	/** @brief User's display name. */
-	QString name;
-
-	/** @brief User's email address. */
-	QString email;
-
-	/** @brief User's preferred login identifier. */
-	QString preferred_username;
-
-	// Puma-specific claims
-
-	/** @brief User's assigned role names. */
-	QStringList roles;
-
-	/** @brief User's group memberships. */
-	QStringList groups;
-
-	/** @brief User's aggregated permission identifiers. */
-	QByteArrayList permissions;
-
-	/**
-	* @brief Converts claims to a JSON object for JWT payload.
-	* @return QJsonObject containing all non-empty claims.
-	*/
-	QJsonObject ToJson() const;
-
-	/**
-	* @brief Populates claims from a JSON object.
-	* @param json JSON object containing JWT payload.
-	*/
-	void FromJson(const QJsonObject& json);
-};
-
-
-/**
-* @brief OIDC authorization request parameters.
-*
-* Represents the parameters sent by a client to the authorization
-* endpoint. Includes PKCE parameters for public client security.
-*
-* @see COidcAuthorizationEndpoint
-*/
-struct AuthorizationRequest
-{
-	/** @brief Client identifier. */
-	QString clientId;
-
-	/**
-	* @brief Requested response type.
-	*
-	* Only "code" is supported (Authorization Code Flow).
-	*/
-	QString responseType;
-
-	/**
-	* @brief Requested scopes (space-separated in the original request).
-	*
-	* Must include "openid" for OIDC requests.
-	*/
-	QStringList scope;
-
-	/** @brief URI to redirect the user-agent after authorization. */
-	QString redirectUri;
-
-	/**
-	* @brief Opaque state value for CSRF protection.
-	*
-	* The authorization server returns this value unchanged in the
-	* redirect response. Clients should verify it matches their
-	* original value.
-	*/
-	QString state;
-
-	/**
-	* @brief Nonce for replay attack prevention.
-	*
-	* Included in the ID token so the client can verify the token
-	* was issued for this specific request.
-	*/
-	QString nonce;
-
-	// PKCE parameters
-
-	/**
-	* @brief PKCE code challenge.
-	*
-	* Base64url-encoded SHA-256 hash of the code_verifier, or the
-	* plain code_verifier value when code_challenge_method is "plain".
-	*/
-	QString codeChallenge;
-
-	/**
-	* @brief PKCE code challenge method.
-	*
-	* Supported values:
-	* - "S256" — SHA-256 hash (recommended)
-	* - "plain" — Plain text (less secure, not recommended)
-	*/
-	QString codeChallengeMethod;
-
-	/**
-	* @brief Optional prompt parameter.
-	*
-	* Supported values:
-	* - "none" — No user interaction
-	* - "login" — Force re-authentication
-	* - "consent" — Force consent screen
-	*/
-	QString prompt;
-
-	/** @brief Optional login hint to pre-fill the username. */
-	QString loginHint;
-};
-
-
-/**
-* @brief Token endpoint request parameters.
-*
-* Represents a request to exchange an authorization code for tokens,
-* or to refresh an existing token.
-*
-* @see COidcTokenEndpoint
-*/
-struct TokenRequest
-{
-	/**
-	* @brief Grant type being requested.
-	*
-	* Supported values:
-	* - "authorization_code" — Exchange code for tokens
-	* - "refresh_token" — Refresh access/ID tokens
-	*/
-	QString grantType;
-
-	/** @brief Authorization code (for authorization_code grant). */
-	QString code;
-
-	/** @brief Redirect URI used in the original authorization request. */
-	QString redirectUri;
-
-	/** @brief Client identifier. */
-	QString clientId;
-
-	/** @brief Client secret (for confidential clients). */
-	QString clientSecret;
-
-	/** @brief PKCE code verifier (for public clients). */
-	QString codeVerifier;
-
-	/** @brief Refresh token (for refresh_token grant). */
-	QString refreshToken;
-};
-
-
-/**
-* @brief Token endpoint response.
-*
-* Contains the tokens issued by the token endpoint after a
-* successful authorization code exchange or token refresh.
-*/
-struct TokenResponse
-{
-	/** @brief OAuth 2.0 access token (JWT). */
-	QString accessToken;
-
-	/** @brief Token type (always "Bearer"). */
-	QString tokenType = "Bearer";
-
-	/** @brief Access token lifetime in seconds. */
-	int expiresIn = 3600;
-
-	/** @brief Refresh token for obtaining new access tokens. */
-	QString refreshToken;
-
-	/** @brief OIDC ID token (JWT containing user identity claims). */
-	QString idToken;
-
-	/** @brief Granted scopes (space-separated). */
-	QString scope;
-
-	/**
-	* @brief Converts the response to a JSON object.
-	* @return QJsonObject suitable for HTTP response body.
-	*/
-	QJsonObject ToJson() const;
-};
-
-
-/**
-* @brief Stored authorization code data.
-*
-* Internal representation of an issued authorization code,
-* including all metadata needed to validate it during the
-* token exchange.
-*/
-struct AuthorizationCode
-{
-	/** @brief The authorization code value. */
-	QString code;
-
-	/** @brief Client that requested the code. */
-	QString clientId;
-
-	/** @brief Authenticated user's ID. */
-	QString userId;
-
-	/** @brief Redirect URI used in the request. */
-	QString redirectUri;
-
-	/** @brief Granted scopes. */
-	QStringList scopes;
-
-	/** @brief State parameter from the request. */
-	QString state;
-
-	/** @brief Nonce parameter from the request. */
-	QString nonce;
-
-	/** @brief PKCE code challenge for verification. */
-	QString codeChallenge;
-
-	/** @brief PKCE code challenge method. */
-	QString codeChallengeMethod;
-
-	/** @brief Unix timestamp when the code was created. */
-	qint64 createdAt = 0;
-
-	/** @brief Unix timestamp when the code expires. */
-	qint64 expiresAt = 0;
-
-	/** @brief Whether the code has already been used. */
-	bool isUsed = false;
-};
-
-
-/**
 * @brief OIDC provider server configuration.
 *
 * Configuration parameters for the OIDC provider, including
 * issuer URL, token lifetimes, signing key paths, and
 * supported authentication flows.
 *
-* @see CAuthorizableServer::StartOidcProvider()
+* @see CAuthorizableServer::ConfigureOidc()
 */
 struct ServerConfig
 {
@@ -488,51 +200,6 @@ struct ServerConfig
 	* Default: true
 	*/
 	bool requireSsl = true;
-};
-
-
-/**
-* @brief Token introspection response.
-*
-* Response from the token introspection endpoint containing
-* information about the validity and claims of a token.
-*
-* @see COidcIntrospectionEndpoint
-*/
-struct IntrospectionResponse
-{
-	/** @brief Whether the token is currently active/valid. */
-	bool active = false;
-
-	/** @brief Scopes associated with the token. */
-	QString scope;
-
-	/** @brief Client that the token was issued to. */
-	QString clientId;
-
-	/** @brief Username of the resource owner. */
-	QString username;
-
-	/** @brief Token type (e.g., "Bearer"). */
-	QString tokenType;
-
-	/** @brief Expiration time (Unix timestamp). */
-	qint64 exp = 0;
-
-	/** @brief Issued-at time (Unix timestamp). */
-	qint64 iat = 0;
-
-	/** @brief Subject identifier. */
-	QString sub;
-
-	/** @brief Issuer identifier. */
-	QString iss;
-
-	/**
-	* @brief Converts the response to a JSON object.
-	* @return QJsonObject suitable for HTTP response body.
-	*/
-	QJsonObject ToJson() const;
 };
 
 
