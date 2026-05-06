@@ -303,18 +303,18 @@ public:
 
 	bool RegisterOidcClient(const Oidc::ClientRegistration& registration)
 	{
-		imtbase::IObjectCollection* clientCollectionPtr = m_sdk.GetInterface<imtbase::IObjectCollection>("OidcClientCollection");
+		imtbase::IObjectCollection* clientCollectionPtr = m_sdk.GetInterface<imtbase::IObjectCollection>("OidcClientRepository");
 		if (clientCollectionPtr == nullptr){
 			qWarning() << "OIDC client collection is not available";
 			return false;
 		}
 
-		imtauth::IOidcClient* clientPtr = dynamic_cast<imtauth::IOidcClient*>(
-			clientCollectionPtr->CreateNewObject(
-				"OidcClient",
-				registration.clientId.toUtf8(),
-				registration.clientName,
-				/*objectDescription=*/ QString()).release());
+		auto clientObject = clientCollectionPtr->CreateNewObject(
+			"OidcClient",
+			registration.clientId.toUtf8(),
+			registration.clientName,
+			/*objectDescription=*/ QString());
+		imtauth::IOidcClient* clientPtr = dynamic_cast<imtauth::IOidcClient*>(clientObject.get());
 		if (clientPtr == nullptr){
 			qWarning() << "Failed to create OIDC client object";
 			return false;
