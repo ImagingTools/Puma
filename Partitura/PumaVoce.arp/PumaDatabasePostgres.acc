@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6318" Description="ACF"/>
-            <Version Id="1" Number="2296" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6390" Description="ACF"/>
+            <Version Id="1" Number="2306" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -122,6 +122,42 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="TenantMembershipSqlRepository" PackageId="ImtUserAdministrationVoce" ComponentId="TenantMembershipSqlRepository">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="DatabaseEngine"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="TenantSqlRepository" PackageId="ImtUserAdministrationVoce" ComponentId="TenantSqlRepository">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="DatabaseEngine"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="UserConnectionRepository" PackageId="ImtUserAdministrationVoce" ComponentId="UserConnectionRepository">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -207,6 +243,9 @@
         <Component ExportedId="DatabaseEngine" ComponentId="DatabaseEngine"/>
         <Component ExportedId="RoleDocumentSqlRepository" ComponentId="RoleDocumentSqlRepository"/>
         <Component ExportedId="SessionSqlRepository" ComponentId="SessionSqlRepository"/>
+        <Component ExportedId="TenantDatabaseDelegate" ComponentId="TenantSqlRepository/TenantDatabaseDelegate"/>
+        <Component ExportedId="TenantMembershipSqlRepository" ComponentId="TenantMembershipSqlRepository"/>
+        <Component ExportedId="TenantRepository" ComponentId="TenantSqlRepository/TenantRepository"/>
         <Component ExportedId="UserConnectionRepository" ComponentId="UserConnectionRepository"/>
         <Component ExportedId="UserGroupSqlRepository" ComponentId="UserGroupSqlRepository"/>
         <Component ExportedId="UserSqlRepository" ComponentId="UserSqlRepository"/>

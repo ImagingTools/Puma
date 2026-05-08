@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6318" Description="ACF"/>
-            <Version Id="1" Number="2296" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6390" Description="ACF"/>
+            <Version Id="1" Number="2306" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -122,6 +122,12 @@
                         <Data IsEnabled="true" Value="JwtSessionController"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MembershipManager" Type="Reference" ExportId="MembershipManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantManager" Type="Reference" ExportId="TenantManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
