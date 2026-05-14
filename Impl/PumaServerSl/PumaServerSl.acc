@@ -95,6 +95,9 @@
                     <AttributeInfo Id="GroupRepository" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaDatabaseSQLite/UserGroupRepository"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="InvitationRepository" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaDatabaseSQLite/SQLiteTenantInvitationRepository"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="Application/Log"/>
                     </AttributeInfo>

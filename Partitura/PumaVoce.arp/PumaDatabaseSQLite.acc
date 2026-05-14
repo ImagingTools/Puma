@@ -58,6 +58,7 @@
     <ExportedComponents>
         <Component ExportedId="DatabaseEngine" ComponentId="DatabaseEngine"/>
         <Component ExportedId="RoleRepository" ComponentId="UserLocalRepositories/RoleRepository"/>
+        <Component ExportedId="SQLiteTenantInvitationRepository" ComponentId="UserLocalRepositories/SQLiteTenantInvitationRepository"/>
         <Component ExportedId="SessionSqlRepository" ComponentId="UserLocalRepositories/SessionSqlRepository"/>
         <Component ExportedId="TenantMembershipRepository" ComponentId="UserLocalRepositories/SQLiteTenantMembershipRepository"/>
         <Component ExportedId="TenantRepository" ComponentId="UserLocalRepositories/SQLiteTenantRepository"/>
