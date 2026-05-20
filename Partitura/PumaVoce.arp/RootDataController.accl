@@ -8,10 +8,13 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="AuthorizationController" X="475" Y="375" Note=""/>
-        <Element ComponentName="Demultiplexer" X="575" Y="100" Note=""/>
-        <Element ComponentName="DocumentRevisionController" X="975" Y="375" Note=""/>
-        <Element ComponentName="Pages" X="250" Y="625" Note=""/>
+        <Element ComponentName="AuthorizationController" X="600" Y="600" Note=""/>
+        <Element ComponentName="Demultiplexer" X="600" Y="375" Note=""/>
+        <Element ComponentName="DocumentRevisionController" X="950" Y="600" Note=""/>
+        <Element ComponentName="GroupsFilterableSelectController" X="975" Y="150" Note=""/>
+        <Element ComponentName="Pages" X="225" Y="600" Note=""/>
+        <Element ComponentName="RolesFilterableSelectController" X="200" Y="150" Note=""/>
+        <Element ComponentName="UsersFilterableSelectController" X="575" Y="150" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
         <EmbededRegistry Id="Pages">
