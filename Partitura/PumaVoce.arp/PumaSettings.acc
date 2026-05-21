@@ -132,10 +132,10 @@
                     <AttributeInfo Id="HostName" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="localhost"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="Pasword" Type="Id" ExportId="">
+                    <AttributeInfo Id="Password" Type="Id" ExportId="Password">
                         <Data IsEnabled="true" Value="root"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="Port" Type="Integer" ExportId="">
+                    <AttributeInfo Id="Port" Type="Integer" ExportId="Port">
                         <Data IsEnabled="true" Value="5432"/>
                     </AttributeInfo>
                     <AttributeInfo Id="UserName" Type="Id" ExportId="">
