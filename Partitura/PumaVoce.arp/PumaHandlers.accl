@@ -2,12 +2,14 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6318" Description="ACF"/>
-            <Version Id="1" Number="2296" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6390" Description="ACF"/>
+            <Version Id="1" Number="2306" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
+        <Element ComponentName="GraphQLDemultiplexer" X="975" Y="175" Note=""/>
+        <Element ComponentName="ProfileController" X="900" Y="450" Note=""/>
         <Element ComponentName="RestoringDatabaseController" X="225" Y="450" Note=""/>
         <Element ComponentName="RootDataController" X="600" Y="450" Note=""/>
         <Element ComponentName="StandardGraphQlHandlers" X="575" Y="175" Note=""/>

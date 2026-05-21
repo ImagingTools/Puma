@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6318" Description="ACF"/>
-            <Version Id="1" Number="2296" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6390" Description="ACF"/>
+            <Version Id="1" Number="2306" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -101,6 +101,9 @@
                     <AttributeInfo Id="GroupRepository" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaDatabasePostgres/UserGroupSqlRepository"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="InvitationRepository" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaDatabasePostgres/TenantInvitationRepository"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="Application/Log"/>
                     </AttributeInfo>
@@ -118,6 +121,12 @@
                     </AttributeInfo>
                     <AttributeInfo Id="SessionCollection" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaDatabasePostgres/SessionSqlRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantMembershipRepository" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaDatabasePostgres/TenantMembershipSqlRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantRepository" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaDatabasePostgres/TenantRepository"/>
                     </AttributeInfo>
                     <AttributeInfo Id="UserCollection" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaDatabasePostgres/UserSqlRepository"/>

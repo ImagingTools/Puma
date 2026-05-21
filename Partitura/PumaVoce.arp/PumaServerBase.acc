@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6318" Description="ACF"/>
-            <Version Id="1" Number="2296" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6390" Description="ACF"/>
+            <Version Id="1" Number="2306" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -55,6 +55,13 @@
                     <AttributeInfo Id="DocumentRepositories" Type="Reference[]" ExportId="DocumentRepositories">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="ExternGqlRequestHandlers" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>TenantController</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
                     <AttributeInfo Id="LdapEnableableParam" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaSettings/LdapEnabled"/>
                     </AttributeInfo>
@@ -63,6 +70,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="LogPath" Type="Reference" ExportId="LogPath">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MembershipManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="TenantController/TenantMembershipManager"/>
                     </AttributeInfo>
                     <AttributeInfo Id="RoleInfoProvider" Type="Reference" ExportId="RoleInfoProvider">
                         <Data IsEnabled="false"/>
@@ -81,6 +91,12 @@
                     </AttributeInfo>
                     <AttributeInfo Id="SmtpFromParam" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaSettings/SmtpUsernameParam"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="TenantController/TenantManager"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantMembershipManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="TenantController/TenantMembershipManager"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaSettings/TracingConfiguration"/>
@@ -215,6 +231,39 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="TenantController" PackageId="ImtUserAdministrationVoce" ComponentId="TenantController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="InvitationRepository" Type="Reference" ExportId="InvitationRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RequestManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="WebSocketServerFramework"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantMembershipRepository" Type="Reference" ExportId="TenantMembershipRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantRepository" Type="Reference" ExportId="TenantRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaSettings/TracingConfiguration"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaLocalization"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserCollection" Type="Reference" ExportId="UserRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="UserVerification" PackageId="ImtAuthPck" ComponentId="UserVerification">
             <Data IsEnabled="true" Flags="2">
                 <AttributeInfoMap/>
@@ -247,6 +296,7 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>Subscriptions</Value>
+                                <Value>TenantController</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

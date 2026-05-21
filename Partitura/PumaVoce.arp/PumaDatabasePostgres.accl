@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6318" Description="ACF"/>
-            <Version Id="1" Number="2296" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6390" Description="ACF"/>
+            <Version Id="1" Number="2306" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -12,6 +12,9 @@
         <Element ComponentName="PostgresMigrations" X="1050" Y="575" Note=""/>
         <Element ComponentName="RoleDocumentSqlRepository" X="250" Y="325" Note=""/>
         <Element ComponentName="SessionSqlRepository" X="950" Y="125" Note=""/>
+        <Element ComponentName="TenantInvitationSqlRepository" X="640.638743755" Y="415.778787338" Note=""/>
+        <Element ComponentName="TenantMembershipSqlRepository" X="875" Y="700" Note=""/>
+        <Element ComponentName="TenantSqlRepository" X="225" Y="675" Note=""/>
         <Element ComponentName="UserConnectionRepository" X="225" Y="125" Note=""/>
         <Element ComponentName="UserGroupSqlRepository" X="575" Y="575" Note=""/>
         <Element ComponentName="UserSqlRepository" X="950" Y="300" Note=""/>
