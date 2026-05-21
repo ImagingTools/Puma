@@ -7,8 +7,8 @@
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
-    <Description>Surface inspection plugin</Description>
-    <Keywords>Contour Plugin Test Analyse Wortkflow Surface</Keywords>
+    <Description>Agentino Plugin for Puma server</Description>
+    <Keywords>Agentino Puma Plugin Settings</Keywords>
     <ElementsList>
         <Element Id="ApplicationInfo" PackageId="BasePck" ComponentId="ApplicationInfo">
             <Data IsEnabled="true" Flags="0">
