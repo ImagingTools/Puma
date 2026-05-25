@@ -2,13 +2,16 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6390" Description="ACF"/>
-            <Version Id="1" Number="2306" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6397" Description="ACF"/>
+            <Version Id="1" Number="2394" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
+        <Element ComponentName="AuthenticationManager" X="1000" Y="250" Note=""/>
+        <Element ComponentName="GqlContext" X="1025" Y="125" Note=""/>
         <Element ComponentName="HttpServerFramework" X="625" Y="75" Note=""/>
+        <Element ComponentName="JwtSessionController" X="975" Y="675" Note=""/>
         <Element ComponentName="PumaHandlers" X="650" Y="475" Note=""/>
         <Element ComponentName="PumaLocalization" X="975" Y="375" Note=""/>
         <Element ComponentName="PumaSettings" X="125" Y="375" Note=""/>
