@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6390" Description="ACF"/>
-            <Version Id="1" Number="2306" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6397" Description="ACF"/>
+            <Version Id="1" Number="2394" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -82,14 +82,14 @@
         <Element Id="RootDataController" PackageId="PumaVoce" ComponentId="RootDataController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="DatabaseConnectionChecker" Type="Reference" ExportId="DatabaseConnectionChecker">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="GqlRequestProvider" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="StandardGraphQlHandlers"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="JwtSessionController" Type="Reference" ExportId="JwtSessionController">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="LdapEnableableParam" Type="Reference" ExportId="LdapEnableableParam">
                         <Data IsEnabled="false"/>
@@ -107,9 +107,6 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="RoleRepository" Type="Reference" ExportId="RoleRepository">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="RuntimeStatus" Type="Reference" ExportId="RuntimeStatus">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SessionCollection" Type="Reference" ExportId="SessionCollection">
@@ -157,6 +154,12 @@
         <Element Id="StandardGraphQlHandlers" PackageId="ImtGraphQlVoce" ComponentId="StandardGraphQlHandlers">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="AuthenticationManager" Type="Reference" ExportId="AuthenticationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="BinaryDataControllers" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
@@ -186,9 +189,6 @@
                     <AttributeInfo Id="GraphQlCommandId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="Puma/graphql"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="JwtSessionController" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="RootDataController/JwtSessionController"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -199,9 +199,6 @@
                         <Data IsEnabled="true" Value="Puma/Views/html/index.html?item=Pages/StartPage.qml"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="UserCollection" Type="Reference" ExportId="UserCollection">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="WebCommandId" Type="Id" ExportId="">

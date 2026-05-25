@@ -2,14 +2,43 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6390" Description="ACF"/>
-            <Version Id="1" Number="2306" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6397" Description="ACF"/>
+            <Version Id="1" Number="2394" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
+        <Element Id="AuthenticationManager" PackageId="ImtServerGqlPck" ComponentId="AuthenticationManager">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="GqlContextFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="GqlContext"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SlaveJwtSessionController" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="JwtSessionController"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserCollection" Type="Reference" ExportId="UserCollection">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserSettingsCollection" Type="Reference" ExportId="UserSettingsCollection">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="GqlContext" PackageId="ImtGqlPck" ComponentId="GqlContext">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
         <Element Id="HttpServerFramework" PackageId="ImtHttpServerVoce" ComponentId="HttpServerFramework">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -37,11 +66,38 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="JwtSessionController" PackageId="ImtAuthVoce" ComponentId="JwtSessionController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DefaultPath" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="Puma/Puma Server/key.xml"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RuntimeStatus" Type="Reference" ExportId="RuntimeStatus">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SessionCollection" Type="Reference" ExportId="SessionCollection">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="PumaHandlers" PackageId="PumaVoce" ComponentId="PumaHandlers">
             <Data IsEnabled="true" Flags="2">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="AuthenticationManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="AuthenticationManager"/>
                     </AttributeInfo>
                     <AttributeInfo Id="BackupSettings" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaSettings/Backup"/>
@@ -62,6 +118,9 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
+                    <AttributeInfo Id="JwtSessionController" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="JwtSessionController"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="LdapEnableableParam" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaSettings/LdapEnabled"/>
                     </AttributeInfo>
@@ -78,9 +137,6 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="RoleRepository" Type="Reference" ExportId="RoleRepository">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="RuntimeStatus" Type="Reference" ExportId="RuntimeStatus">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SessionCollection" Type="Reference" ExportId="SessionCollection">
@@ -103,9 +159,6 @@
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaLocalization"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="UserCollection" Type="Reference" ExportId="UserCollection">
-                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="UserConnectionCollection" Type="Reference" ExportId="UserConnectionCollection">
                         <Data IsEnabled="false"/>
@@ -292,6 +345,9 @@
         <Element Id="WebSocketServerFramework" PackageId="ImtHttpServerVoce" ComponentId="WebSocketServerFramework">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="AuthenticationManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="AuthenticationManager"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="GqlSubscriberControllers" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
