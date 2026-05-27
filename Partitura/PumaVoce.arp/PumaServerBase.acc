@@ -10,33 +10,22 @@
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="AuthenticationManager" PackageId="ImtServerGqlPck" ComponentId="AuthenticationManager">
+        <Element Id="AuthenticationManager" PackageId="ImtAuthVoce" ComponentId="AuthenticationManager">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="GqlContextFactory" Type="Factory" ExportId="">
-                        <Data IsEnabled="true" Value="GqlContext"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SlaveJwtSessionController" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="JwtSessionController"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaSettings/TracingConfiguration"/>
                     </AttributeInfo>
                     <AttributeInfo Id="UserCollection" Type="Reference" ExportId="UserCollection">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="UserSettingsCollection" Type="Reference" ExportId="UserSettingsCollection">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
                 </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="GqlContext" PackageId="ImtGqlPck" ComponentId="GqlContext">
-            <Data IsEnabled="true" Flags="2">
-                <AttributeInfoMap/>
             </Data>
         </Element>
         <Element Id="HttpServerFramework" PackageId="ImtHttpServerVoce" ComponentId="HttpServerFramework">
@@ -115,6 +104,9 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>TenantController</Value>
+                                <Value>RoleCollectionDocumentService</Value>
+                                <Value>UserCollectionDocumentService</Value>
+                                <Value>UserGroupCollectionDocumentService</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -176,7 +168,7 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="UserVerificationCollection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="UserVerificationCollection"/>
+                        <Data IsEnabled="true" Value="UserVerificationRepository"/>
                     </AttributeInfo>
                     <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
                         <Data IsEnabled="false"/>
@@ -221,6 +213,27 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="RoleCollectionDocumentService" PackageId="ImtAuthVoce" ComponentId="RoleCollectionDocumentService">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RequestManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="WebSocketServerFramework"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RoleRepository" Type="Reference" ExportId="RoleRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaSettings/TracingConfiguration"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaLocalization"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="SmtpClient" PackageId="ImtMailPck" ComponentId="SmtpClient">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -244,18 +257,6 @@
                     </AttributeInfo>
                     <AttributeInfo Id="UserParam" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaSettings/SmtpUsernameParam"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="SslConfigurationManager" PackageId="ImtComPck" ComponentId="SslConfigurationManager">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="PumaSettings/TracingConfiguration"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -317,29 +318,63 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="UserVerification" PackageId="ImtAuthPck" ComponentId="UserVerification">
-            <Data IsEnabled="true" Flags="2">
-                <AttributeInfoMap/>
-            </Data>
-        </Element>
-        <Element Id="UserVerificationCollection" PackageId="ImtCorePck" ComponentId="ObjectCollection">
+        <Element Id="UserCollectionDocumentService" PackageId="ImtAuthVoce" ComponentId="UserCollectionDocumentService">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="ObjectFactories" Type="Factory[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>UserVerification</Value>
-                            </Values>
-                        </Data>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="TypeIds" Type="Id[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>UserVerification</Value>
-                            </Values>
-                        </Data>
+                    <AttributeInfo Id="RequestManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="WebSocketServerFramework"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RoleRepository" Type="Reference" ExportId="RoleRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaSettings/TracingConfiguration"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaLocalization"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserGroupRepository" Type="Reference" ExportId="UserGroupRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserRepository" Type="Reference" ExportId="UserRepository">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="UserGroupCollectionDocumentService" PackageId="ImtAuthVoce" ComponentId="UserGroupCollectionDocumentService">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RequestManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="WebSocketServerFramework"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RoleRepository" Type="Reference" ExportId="RoleRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaSettings/TracingConfiguration"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaLocalization"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserGroupRepository" Type="Reference" ExportId="UserGroupRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserRepository" Type="Reference" ExportId="UserRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="UserVerificationRepository" PackageId="ImtAuthVoce" ComponentId="UserVerificationRepository">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
             </Data>
         </Element>
         <Element Id="WebSocketServerFramework" PackageId="ImtHttpServerVoce" ComponentId="WebSocketServerFramework">
@@ -353,6 +388,9 @@
                             <Values>
                                 <Value>Subscriptions</Value>
                                 <Value>TenantController</Value>
+                                <Value>UserGroupCollectionDocumentService</Value>
+                                <Value>UserCollectionDocumentService</Value>
+                                <Value>RoleCollectionDocumentService</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

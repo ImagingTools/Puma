@@ -8,20 +8,20 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="AuthenticationManager" X="1000" Y="250" Note=""/>
-        <Element ComponentName="GqlContext" X="1025" Y="125" Note=""/>
-        <Element ComponentName="HttpServerFramework" X="625" Y="75" Note=""/>
-        <Element ComponentName="JwtSessionController" X="975" Y="675" Note=""/>
-        <Element ComponentName="PumaHandlers" X="650" Y="475" Note=""/>
+        <Element ComponentName="AuthenticationManager" X="1000" Y="100" Note=""/>
+        <Element ComponentName="HttpServerFramework" X="200" Y="100" Note=""/>
+        <Element ComponentName="JwtSessionController" X="1000" Y="625" Note=""/>
+        <Element ComponentName="PumaHandlers" X="675" Y="450" Note=""/>
         <Element ComponentName="PumaLocalization" X="975" Y="375" Note=""/>
         <Element ComponentName="PumaSettings" X="125" Y="375" Note=""/>
-        <Element ComponentName="SmtpClient" X="750" Y="325" Note=""/>
-        <Element ComponentName="SslConfigurationManager" X="250" Y="175" Note=""/>
+        <Element ComponentName="RoleCollectionDocumentService" X="225" Y="750" Note=""/>
+        <Element ComponentName="SmtpClient" X="650" Y="300" Note=""/>
         <Element ComponentName="Subscriptions" X="400" Y="375" Note=""/>
         <Element ComponentName="TenantController" X="200" Y="600" Note=""/>
-        <Element ComponentName="UserVerification" X="650" Y="775" Note=""/>
-        <Element ComponentName="UserVerificationCollection" X="650" Y="650" Note=""/>
-        <Element ComponentName="WebSocketServerFramework" X="625" Y="200" Note=""/>
+        <Element ComponentName="UserCollectionDocumentService" X="950" Y="750" Note=""/>
+        <Element ComponentName="UserGroupCollectionDocumentService" X="575" Y="750" Note=""/>
+        <Element ComponentName="UserVerificationRepository" X="625" Y="600" Note=""/>
+        <Element ComponentName="WebSocketServerFramework" X="600" Y="100" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
         <EmbededRegistry Id="Subscriptions">

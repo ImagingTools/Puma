@@ -88,6 +88,9 @@
                     <AttributeInfo Id="GqlRequestProvider" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="StandardGraphQlHandlers"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="GroupCollectionDocumentService" Type="Reference" ExportId="GroupCollectionDocumentService">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="JwtSessionController" Type="Reference" ExportId="JwtSessionController">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -101,6 +104,9 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ObjectCollections" Type="Reference[]" ExportId="DocumentRepositories">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RoleCollectionDocumentService" Type="Reference" ExportId="RoleCollectionDocumentService">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="RoleInfoProvider" Type="Reference" ExportId="RoleInfoProvider">
@@ -125,6 +131,9 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserCollectionDocumentService" Type="Reference" ExportId="UserCollectionDocumentService">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="UserConnectionCollection" Type="Reference" ExportId="UserConnectionCollection">
@@ -208,53 +217,7 @@
             </Data>
         </Element>
     </ElementsList>
-    <EmbeddedRegistriesList>
-        <EmbeddedRegistry Id="Observers">
-            <Data Description="" Keywords="">
-                <ElementsList>
-                    <Element Id="RoleCollectionObserver" PackageId="ImtAuthGqlPck" ComponentId="SessionModelObserver">
-                        <Data IsEnabled="true" Flags="1">
-                            <AttributeInfoMap>
-                                <AttributeInfo Id="Model" Type="Reference" ExportId="RoleCollectionModel">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="SessionChangeNotifier" Type="Reference" ExportId="RoleSessionChangeNotifier">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                            </AttributeInfoMap>
-                        </Data>
-                    </Element>
-                    <Element Id="UserCollectionObserver" PackageId="ImtAuthGqlPck" ComponentId="SessionModelObserver">
-                        <Data IsEnabled="true" Flags="1">
-                            <AttributeInfoMap>
-                                <AttributeInfo Id="Model" Type="Reference" ExportId="UserCollectionModel">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="SessionChangeNotifier" Type="Reference" ExportId="UserSessionChangeNotifier">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                            </AttributeInfoMap>
-                        </Data>
-                    </Element>
-                    <Element Id="UserGroupCollectionObserver" PackageId="ImtAuthGqlPck" ComponentId="SessionModelObserver">
-                        <Data IsEnabled="true" Flags="1">
-                            <AttributeInfoMap>
-                                <AttributeInfo Id="Model" Type="Reference" ExportId="UserGroupCollectionModel">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="SessionChangeNotifier" Type="Reference" ExportId="UserGroupSessionChangeNotifier">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                            </AttributeInfoMap>
-                        </Data>
-                    </Element>
-                </ElementsList>
-                <EmbeddedRegistriesList/>
-                <ExportedInterfaces/>
-                <ExportedComponents/>
-            </Data>
-        </EmbeddedRegistry>
-    </EmbeddedRegistriesList>
+    <EmbeddedRegistriesList/>
     <ExportedInterfaces>
         <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="RootDataController"/>
         <Interface InterfaceId="imtgql::IGqlRequestProvider" ComponentId="StandardGraphQlHandlers"/>

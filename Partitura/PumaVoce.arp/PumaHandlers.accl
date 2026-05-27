@@ -14,14 +14,5 @@
         <Element ComponentName="RootDataController" X="600" Y="450" Note=""/>
         <Element ComponentName="StandardGraphQlHandlers" X="575" Y="175" Note=""/>
     </PositionMap>
-    <EmbeddedRegistries>
-        <EmbededRegistry Id="Observers">
-            <PositionMap>
-                <Element ComponentName="RoleCollectionObserver" X="575" Y="75" Note=""/>
-                <Element ComponentName="UserCollectionObserver" X="575" Y="200" Note=""/>
-                <Element ComponentName="UserGroupCollectionObserver" X="575" Y="325" Note=""/>
-            </PositionMap>
-            <EmbeddedRegistries/>
-        </EmbededRegistry>
-    </EmbeddedRegistries>
+    <EmbeddedRegistries/>
 </Acf>
