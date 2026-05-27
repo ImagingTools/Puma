@@ -2,14 +2,59 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6318" Description="ACF"/>
-            <Version Id="1" Number="2296" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6397" Description="ACF"/>
+            <Version Id="1" Number="2394" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
+        <Element Id="GraphQLDemultiplexer" PackageId="ImtServerGqlPck" ComponentId="GraphQLDemultiplexer">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="GqlRequestHandlers" Type="Reference[]" ExportId="ExternGqlRequestHandlers">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ProfileController" PackageId="ImtGraphQlVoce" ComponentId="ProfileController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="GroupCollection" Type="Reference" ExportId="UserGroupRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RoleCollection" Type="Reference" ExportId="RoleRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantManager" Type="Reference" ExportId="TenantManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantMembershipManager" Type="Reference" ExportId="TenantMembershipManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserCollection" Type="Reference" ExportId="UserRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="RestoringDatabaseController" PackageId="ImtDatabasePck" ComponentId="RestoringDatabaseController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -37,14 +82,17 @@
         <Element Id="RootDataController" PackageId="PumaVoce" ComponentId="RootDataController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="DatabaseConnectionChecker" Type="Reference" ExportId="DatabaseConnectionChecker">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="GqlRequestProvider" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="StandardGraphQlHandlers"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="GroupCollectionDocumentService" Type="Reference" ExportId="GroupCollectionDocumentService">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="JwtSessionController" Type="Reference" ExportId="JwtSessionController">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="LdapEnableableParam" Type="Reference" ExportId="LdapEnableableParam">
                         <Data IsEnabled="false"/>
@@ -52,16 +100,19 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="MembershipManager" Type="Reference" ExportId="MembershipManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ObjectCollections" Type="Reference[]" ExportId="DocumentRepositories">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RoleCollectionDocumentService" Type="Reference" ExportId="RoleCollectionDocumentService">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="RoleInfoProvider" Type="Reference" ExportId="RoleInfoProvider">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="RoleRepository" Type="Reference" ExportId="RoleRepository">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="RuntimeStatus" Type="Reference" ExportId="RuntimeStatus">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SessionCollection" Type="Reference" ExportId="SessionCollection">
@@ -73,10 +124,16 @@
                     <AttributeInfo Id="SmtpFromParam" Type="Reference" ExportId="SmtpFromParam">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="TenantManager" Type="Reference" ExportId="TenantManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserCollectionDocumentService" Type="Reference" ExportId="UserCollectionDocumentService">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="UserConnectionCollection" Type="Reference" ExportId="UserConnectionCollection">
@@ -106,6 +163,12 @@
         <Element Id="StandardGraphQlHandlers" PackageId="ImtGraphQlVoce" ComponentId="StandardGraphQlHandlers">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="AuthenticationManager" Type="Reference" ExportId="AuthenticationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="BinaryDataControllers" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
@@ -127,14 +190,13 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>RootDataController</Value>
+                                <Value>ProfileController</Value>
+                                <Value>GraphQLDemultiplexer</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="GraphQlCommandId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="Puma/graphql"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="JwtSessionController" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="RootDataController/JwtSessionController"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
@@ -148,9 +210,6 @@
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="UserCollection" Type="Reference" ExportId="UserCollection">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="WebCommandId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="Puma/Views/*"/>
                     </AttributeInfo>
@@ -158,53 +217,7 @@
             </Data>
         </Element>
     </ElementsList>
-    <EmbeddedRegistriesList>
-        <EmbeddedRegistry Id="Observers">
-            <Data Description="" Keywords="">
-                <ElementsList>
-                    <Element Id="RoleCollectionObserver" PackageId="ImtAuthGqlPck" ComponentId="SessionModelObserver">
-                        <Data IsEnabled="true" Flags="1">
-                            <AttributeInfoMap>
-                                <AttributeInfo Id="Model" Type="Reference" ExportId="RoleCollectionModel">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="SessionChangeNotifier" Type="Reference" ExportId="RoleSessionChangeNotifier">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                            </AttributeInfoMap>
-                        </Data>
-                    </Element>
-                    <Element Id="UserCollectionObserver" PackageId="ImtAuthGqlPck" ComponentId="SessionModelObserver">
-                        <Data IsEnabled="true" Flags="1">
-                            <AttributeInfoMap>
-                                <AttributeInfo Id="Model" Type="Reference" ExportId="UserCollectionModel">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="SessionChangeNotifier" Type="Reference" ExportId="UserSessionChangeNotifier">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                            </AttributeInfoMap>
-                        </Data>
-                    </Element>
-                    <Element Id="UserGroupCollectionObserver" PackageId="ImtAuthGqlPck" ComponentId="SessionModelObserver">
-                        <Data IsEnabled="true" Flags="1">
-                            <AttributeInfoMap>
-                                <AttributeInfo Id="Model" Type="Reference" ExportId="UserGroupCollectionModel">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="SessionChangeNotifier" Type="Reference" ExportId="UserGroupSessionChangeNotifier">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                            </AttributeInfoMap>
-                        </Data>
-                    </Element>
-                </ElementsList>
-                <EmbeddedRegistriesList/>
-                <ExportedInterfaces/>
-                <ExportedComponents/>
-            </Data>
-        </EmbeddedRegistry>
-    </EmbeddedRegistriesList>
+    <EmbeddedRegistriesList/>
     <ExportedInterfaces>
         <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="RootDataController"/>
         <Interface InterfaceId="imtgql::IGqlRequestProvider" ComponentId="StandardGraphQlHandlers"/>

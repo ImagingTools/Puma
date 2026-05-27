@@ -14,5 +14,7 @@
     </PackageDirs>
     <PackageFiles/>
     <RegistryFiles>
+      <FilePath>../Impl/PumaServerPg/PumaServerPg.acc</FilePath>
+      <FilePath>../Impl/PumaServerSl/PumaServerSl.acc</FilePath>
     </RegistryFiles>
 </Acf>

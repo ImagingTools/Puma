@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6318" Description="ACF"/>
-            <Version Id="1" Number="2296" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6397" Description="ACF"/>
+            <Version Id="1" Number="2394" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -13,7 +13,7 @@
         <Element Id="AuthorizationController" PackageId="PumaVoce" ComponentId="Authorization">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
+                    <AttributeInfo Id="JwtSessionController" Type="Reference" ExportId="JwtSessionController">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="LdapEnableableParam" Type="Reference" ExportId="LdapEnableableParam">
@@ -22,13 +22,16 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="MembershipManager" Type="Reference" ExportId="MembershipManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="RoleCollection" Type="Reference" ExportId="RoleRepository">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="RuntimeStatus" Type="Reference" ExportId="RuntimeStatus">
+                    <AttributeInfo Id="SessionCollection" Type="Reference" ExportId="SessionCollection">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="SessionCollection" Type="Reference" ExportId="SessionCollection">
+                    <AttributeInfo Id="TenantManager" Type="Reference" ExportId="TenantManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
@@ -58,6 +61,9 @@
                                 <Value>AuthorizationController</Value>
                                 <Value>Pages</Value>
                                 <Value>DocumentRevisionController</Value>
+                                <Value>RolesFilterableSelectController</Value>
+                                <Value>UsersFilterableSelectController</Value>
+                                <Value>GroupsFilterableSelectController</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -92,6 +98,27 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ObjectCollections" Type="Reference[]" ExportId="ObjectCollections">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="GroupsFilterableSelectController" PackageId="ImtServerGqlPck" ComponentId="FilterableSelectController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CollectionId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Groups"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="UserGroupRepository">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
@@ -149,6 +176,48 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="RolesFilterableSelectController" PackageId="ImtServerGqlPck" ComponentId="FilterableSelectController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CollectionId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Roles"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="RoleRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="UsersFilterableSelectController" PackageId="ImtServerGqlPck" ComponentId="FilterableSelectController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CollectionId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Users"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="UserRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -297,141 +366,9 @@
                 </ExportedComponents>
             </Data>
         </EmbeddedRegistry>
-        <EmbeddedRegistry Id="Repositories">
-            <Data Description="" Keywords="">
-                <ElementsList>
-                    <Element Id="RoleDocumentSqlRepository" PackageId="ImtUserAdministrationVoce" ComponentId="RoleRepository">
-                        <Data IsEnabled="true" Flags="0">
-                            <AttributeInfoMap>
-                                <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                            </AttributeInfoMap>
-                        </Data>
-                    </Element>
-                    <Element Id="UserGroupSqlRepository" PackageId="ImtUserAdministrationVoce" ComponentId="UserGroupSqlRepository">
-                        <Data IsEnabled="true" Flags="0">
-                            <AttributeInfoMap>
-                                <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="RoleProvider" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="RoleDocumentSqlRepository/RoleCollectionAdapter"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="UserCollection" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="UserSqlRepository"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="UserDatabaseSqlDelegate" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="UserSqlRepository"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="UserProvider" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="UserSqlRepository/UserCollectionAdapter"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                            </AttributeInfoMap>
-                        </Data>
-                    </Element>
-                    <Element Id="UserSettingsDatabaseDelegate" PackageId="ImtCoreVoce" ComponentId="DatabaseUserSettings">
-                        <Data IsEnabled="true" Flags="0">
-                            <AttributeInfoMap>
-                                <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                            </AttributeInfoMap>
-                        </Data>
-                    </Element>
-                    <Element Id="UserSqlRepository" PackageId="ImtUserAdministrationVoce" ComponentId="UserSqlRepository">
-                        <Data IsEnabled="true" Flags="0">
-                            <AttributeInfoMap>
-                                <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="RoleProvider" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="RoleDocumentSqlRepository/RoleCollectionAdapter"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="UserGroupCollection" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="UserGroupSqlRepository"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="UserGroupDatabaseSqlDelegate" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="UserGroupSqlRepository/SqlDatabaseDocumentDelegate"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="UserGroupProvider" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="UserGroupSqlRepository/UserGroupInfoProvider"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                            </AttributeInfoMap>
-                        </Data>
-                    </Element>
-                    <Element Id="UserVerification" PackageId="ImtAuthPck" ComponentId="UserVerification">
-                        <Data IsEnabled="true" Flags="2">
-                            <AttributeInfoMap/>
-                        </Data>
-                    </Element>
-                    <Element Id="UserVerificationCollection" PackageId="ImtCorePck" ComponentId="ObjectCollection">
-                        <Data IsEnabled="true" Flags="0">
-                            <AttributeInfoMap>
-                                <AttributeInfo Id="ObjectFactories" Type="Factory[]" ExportId="">
-                                    <Data IsEnabled="true">
-                                        <Values>
-                                            <Value>UserVerification</Value>
-                                        </Values>
-                                    </Data>
-                                </AttributeInfo>
-                                <AttributeInfo Id="TypeIds" Type="Id[]" ExportId="">
-                                    <Data IsEnabled="true">
-                                        <Values>
-                                            <Value>UserVerification</Value>
-                                        </Values>
-                                    </Data>
-                                </AttributeInfo>
-                            </AttributeInfoMap>
-                        </Data>
-                    </Element>
-                </ElementsList>
-                <EmbeddedRegistriesList/>
-                <ExportedInterfaces/>
-                <ExportedComponents>
-                    <Component ExportedId="RoleCollectionAdapter" ComponentId="RoleDocumentSqlRepository/RoleCollectionAdapter"/>
-                    <Component ExportedId="RoleDocumentSqlRepository" ComponentId="RoleDocumentSqlRepository"/>
-                    <Component ExportedId="RoleRepository" ComponentId="RoleDocumentSqlRepository/RoleRepository"/>
-                    <Component ExportedId="UserCollectionAdapter" ComponentId="UserSqlRepository/UserCollectionAdapter"/>
-                    <Component ExportedId="UserGroupInfoProvider" ComponentId="UserGroupSqlRepository/UserGroupInfoProvider"/>
-                    <Component ExportedId="UserGroupSqlRepository" ComponentId="UserGroupSqlRepository"/>
-                    <Component ExportedId="UserSqlRepository" ComponentId="UserSqlRepository"/>
-                    <Component ExportedId="UserVerificationCollection" ComponentId="UserVerificationCollection"/>
-                </ExportedComponents>
-            </Data>
-        </EmbeddedRegistry>
     </EmbeddedRegistriesList>
     <ExportedInterfaces>
         <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="Demultiplexer"/>
     </ExportedInterfaces>
-    <ExportedComponents>
-        <Component ExportedId="JwtSessionController" ComponentId="AuthorizationController/JwtSessionController"/>
-    </ExportedComponents>
+    <ExportedComponents/>
 </Acf>
