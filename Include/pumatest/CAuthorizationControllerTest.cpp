@@ -19,7 +19,7 @@ static const QString s_usersTableName = "Users";
 
 void CAuthorizationControllerTest::AuthorizationTest()
 {
-	namespace authsdl = sdl::imtauth::Authorization;
+	namespace authsdl = sdl::V1_0::imtauth;
 	authsdl::AuthorizationRequestArguments arguments;
 
 	imtauth::CIdentifiableUserInfo userInfo;
@@ -35,11 +35,12 @@ void CAuthorizationControllerTest::AuthorizationTest()
 	bool ok = AddUser(userInfo);
 	QVERIFY(ok);
 
-	arguments.input.Version_1_0->login = "Test1";
-	arguments.input.Version_1_0->password = "Test1";
-	arguments.input.Version_1_0->productId = "Test";
+	arguments.input.emplace();
+	arguments.input->login = "Test1";
+	arguments.input->password = "Test1";
+	arguments.input->productId = "Test";
 
-	authsdl::CAuthorizationPayload::V1_0 response;
+	authsdl::CAuthorizationPayload response;
 
 	ok = SendRequest<
 		authsdl::CAuthorizationGqlRequest,
@@ -54,7 +55,7 @@ void CAuthorizationControllerTest::AuthorizationTest()
 
 void CAuthorizationControllerTest::AuthorizationFailedTest()
 {
-	namespace authsdl = sdl::imtauth::Authorization;
+	namespace authsdl = sdl::V1_0::imtauth;
 	authsdl::AuthorizationRequestArguments arguments;
 
 	imtauth::CIdentifiableUserInfo userInfo;
@@ -67,11 +68,12 @@ void CAuthorizationControllerTest::AuthorizationFailedTest()
 	QByteArray passwordHash = m_hashCalculator.GenerateHash("Test1");
 	userInfo.SetPasswordHash(passwordHash);
 
-	arguments.input.Version_1_0->login = "Test";
-	arguments.input.Version_1_0->password = "2";
-	arguments.input.Version_1_0->productId = "Test";
+	arguments.input.emplace();
+	arguments.input->login = "Test";
+	arguments.input->password = "2";
+	arguments.input->productId = "Test";
 
-	authsdl::CAuthorizationPayload::V1_0 response;
+	authsdl::CAuthorizationPayload response;
 
 	bool ok = SendRequest<
 		authsdl::CAuthorizationGqlRequest,
@@ -80,8 +82,8 @@ void CAuthorizationControllerTest::AuthorizationFailedTest()
 
 	QVERIFY(!ok);
 
-	arguments.input.Version_1_0->login = "Test344";
-	arguments.input.Version_1_0->password = "1";
+	arguments.input->login = "Test344";
+	arguments.input->password = "1";
 
 	ok = SendRequest<
 		authsdl::CAuthorizationGqlRequest,

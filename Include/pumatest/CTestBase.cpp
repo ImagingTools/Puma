@@ -10,6 +10,8 @@
 
 // ImtCore includes
 #include <imtauth/CUserInfo.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Users.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Roles.h>
 
 
 namespace pumatest
@@ -187,12 +189,12 @@ imtauth::IUserInfo* CTestBase::CreateUserInfo(
 }
 
 
-sdl::imtauth::Users::CUserData::V1_0* CTestBase::CreateUserDataFromUserInfo(
+sdl::V1_0::imtauth::CUserData* CTestBase::CreateUserDataFromUserInfo(
 			const imtauth::CIdentifiableUserInfo& userInfo,
 			 const QByteArray& productId) const
 {
-	istd::TDelPtr<sdl::imtauth::Users::CUserData::V1_0> userDataPtr;
-	userDataPtr.SetCastedOrRemove(new sdl::imtauth::Users::CUserData::V1_0);
+	istd::TDelPtr<sdl::V1_0::imtauth::CUserData> userDataPtr;
+	userDataPtr.SetCastedOrRemove(new sdl::V1_0::imtauth::CUserData);
 
 	userDataPtr->id = userInfo.GetObjectUuid();
 	userDataPtr->name = userInfo.GetName();
@@ -235,10 +237,10 @@ imtauth::IRole* CTestBase::CreateRoleInfo(
 }
 
 
-sdl::imtauth::Roles::CRoleData::V1_0* CTestBase::CreateRoleDataFromUserInfo(const imtauth::CIdentifiableRoleInfo& roleInfo) const
+sdl::V1_0::imtauth::CRoleData* CTestBase::CreateRoleDataFromUserInfo(const imtauth::CIdentifiableRoleInfo& roleInfo) const
 {
-	istd::TDelPtr<sdl::imtauth::Roles::CRoleData::V1_0> roleDataPtr;
-	roleDataPtr.SetCastedOrRemove(new sdl::imtauth::Roles::CRoleData::V1_0);
+	istd::TDelPtr<sdl::V1_0::imtauth::CRoleData> roleDataPtr;
+	roleDataPtr.SetCastedOrRemove(new sdl::V1_0::imtauth::CRoleData);
 
 	roleDataPtr->id = roleInfo.GetObjectUuid();
 	roleDataPtr->roleId = roleInfo.GetRoleId();
