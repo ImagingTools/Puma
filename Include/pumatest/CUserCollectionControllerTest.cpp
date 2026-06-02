@@ -356,11 +356,11 @@ void CUserCollectionControllerTest::GetUserListTest()
 	QVERIFY(response.items.has_value());
 	QVERIFY(response.items->size() == 5);
 
-	QList<istd::TSharedNullable<sdl::V1_0::imtauth::CUserItemData>> items = *response.items;
+	QList<istd::TNullableValue<sdl::V1_0::imtauth::CUserItemData>> items = *response.items;
 
 	QByteArrayList ids;
 	QStringList names;
-	for (const istd::TSharedNullable<sdl::V1_0::imtauth::CUserItemData>& item : items){
+	for (const istd::TNullableValue<sdl::V1_0::imtauth::CUserItemData>& item : items){
 		if (item.HasValue()){
 			ids << *item->id;
 			names << *item->name;

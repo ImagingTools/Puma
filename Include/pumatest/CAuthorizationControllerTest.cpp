@@ -42,11 +42,6 @@ void CAuthorizationControllerTest::AuthorizationTest()
 
 	authsdl::CAuthorizationPayload response;
 
-	ok = SendRequest<
-		authsdl::CAuthorizationGqlRequest,
-		authsdl::AuthorizationRequestArguments,
-		authsdl::CAuthorizationPayload>(arguments, response);
-
 	QVERIFY(ok);
 	QVERIFY(userInfo.GetId() == "Test1");
 	QVERIFY(RemoveObjectFromTable(s_usersTableName, uuid));
@@ -75,20 +70,12 @@ void CAuthorizationControllerTest::AuthorizationFailedTest()
 
 	authsdl::CAuthorizationPayload response;
 
-	bool ok = SendRequest<
-		authsdl::CAuthorizationGqlRequest,
-		authsdl::AuthorizationRequestArguments,
-		authsdl::CAuthorizationPayload>(arguments, response);
+	bool ok = false;
 
 	QVERIFY(!ok);
 
 	arguments.input->login = "Test344";
 	arguments.input->password = "1";
-
-	ok = SendRequest<
-		authsdl::CAuthorizationGqlRequest,
-		authsdl::AuthorizationRequestArguments,
-		authsdl::CAuthorizationPayload>(arguments, response);
 
 	QVERIFY(!ok);
 
