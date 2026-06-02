@@ -11,8 +11,8 @@
 #include <imtauth/CRole.h>
 #include <imtauth/CUserGroupInfo.h>
 #include <imtcrypt/CMD5HashCalculator.h>
-#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Users.h>
-#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Roles.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Users_fwd.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Roles_fwd.h>
 
 
 namespace pumatest
@@ -36,9 +36,9 @@ protected:
 	bool AddRole(const imtauth::CIdentifiableRoleInfo& roleData) const;
 	bool AddGroup(const imtauth::CIdentifiableUserGroupInfo& groupData) const;
 	imtauth::IUserInfo* CreateUserInfo(const QString& username, const QString& password, const QString& name, const QString& email) const;
-	sdl::imtauth::Users::CUserData::V1_0* CreateUserDataFromUserInfo(const imtauth::CIdentifiableUserInfo& userInfo, const QByteArray& productId = QByteArray()) const;
+	sdl::V1_0::imtauth::CUserData* CreateUserDataFromUserInfo(const imtauth::CIdentifiableUserInfo& userInfo, const QByteArray& productId = QByteArray()) const;
 	imtauth::IRole* CreateRoleInfo(const QString& roleId, const QString& roleName, const QString& productId, QByteArrayList features) const;
-	sdl::imtauth::Roles::CRoleData::V1_0* CreateRoleDataFromUserInfo(const imtauth::CIdentifiableRoleInfo& roleInfo) const;
+	sdl::V1_0::imtauth::CRoleData* CreateRoleDataFromUserInfo(const imtauth::CIdentifiableRoleInfo& roleInfo) const;
 
 protected:
 	imtcrypt::CMD5HashCalculator m_hashCalculator;

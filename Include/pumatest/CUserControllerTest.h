@@ -3,7 +3,7 @@
 
 
 // ImtCore includes
-#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Users.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Users_fwd.h>
 
 // Puma includes
 #include <pumatest/CTestBase.h>
