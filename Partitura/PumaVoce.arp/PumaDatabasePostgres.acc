@@ -2,14 +2,68 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6390" Description="ACF"/>
-            <Version Id="1" Number="2306" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6418" Description="ACF"/>
+            <Version Id="1" Number="2408" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
+        <Element Id="ContractSqlRepository" PackageId="ImtUserAdministrationVoce" ComponentId="ContractSqlRepository">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="DatabaseEngine"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="CrossOrgGrantSqlRepository" PackageId="ImtUserAdministrationVoce" ComponentId="CrossOrgGrantSqlRepository">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="DatabaseEngine"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="CrossTenantMessageSqlRepository" PackageId="ImtUserAdministrationVoce" ComponentId="CrossTenantMessageSqlRepository">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="DatabaseEngine"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="DatabaseEngine" PackageId="ImtCoreVoce" ComponentId="DatabaseEngine">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -107,6 +161,24 @@
                     <AttributeInfo Id="CreateTableScriptPath" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value=":/SQL/Postgres/CreateCollectionTable.sql"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="DatabaseEngine"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="TenantConnectionRequestSqlRepository" PackageId="ImtUserAdministrationVoce" ComponentId="TenantConnectionRequestSqlRepository">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
                     <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="DatabaseEngine"/>
                     </AttributeInfo>
@@ -258,9 +330,13 @@
         <Interface InterfaceId="imtdb::IDatabaseServerConnectionChecker" ComponentId="DatabaseEngine/PgSqlDatabaseEngine"/>
     </ExportedInterfaces>
     <ExportedComponents>
+        <Component ExportedId="ContractSqlRepository" ComponentId="ContractSqlRepository"/>
+        <Component ExportedId="CrossOrgGrantSqlRepository" ComponentId="CrossOrgGrantSqlRepository"/>
+        <Component ExportedId="CrossTenantMessageSqlRepository" ComponentId="CrossTenantMessageSqlRepository"/>
         <Component ExportedId="DatabaseEngine" ComponentId="DatabaseEngine"/>
         <Component ExportedId="RoleDocumentSqlRepository" ComponentId="RoleDocumentSqlRepository"/>
         <Component ExportedId="SessionSqlRepository" ComponentId="SessionSqlRepository"/>
+        <Component ExportedId="TenantConnectionRequestRepository" ComponentId="TenantConnectionRequestSqlRepository/TenantConnectionRequestRepository"/>
         <Component ExportedId="TenantDatabaseDelegate" ComponentId="TenantSqlRepository/TenantDatabaseDelegate"/>
         <Component ExportedId="TenantInvitationRepository" ComponentId="TenantInvitationSqlRepository"/>
         <Component ExportedId="TenantMembershipSqlRepository" ComponentId="TenantMembershipSqlRepository"/>

@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6397" Description="ACF"/>
-            <Version Id="1" Number="2394" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6418" Description="ACF"/>
+            <Version Id="1" Number="2408" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -288,6 +288,15 @@
         <Element Id="TenantController" PackageId="ImtUserAdministrationVoce" ComponentId="TenantController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="ContractRepository" Type="Reference" ExportId="ContractRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CrossOrgGrantRepository" Type="Reference" ExportId="CrossOrgGrantRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CrossTenantMessageRepository" Type="Reference" ExportId="CrossTenantMessageRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="InvitationRepository" Type="Reference" ExportId="InvitationRepository">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -296,6 +305,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="RequestManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="WebSocketServerFramework"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantConnectionRequestRepository" Type="Reference" ExportId="TenantConnectionRequestRepository">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TenantMembershipRepository" Type="Reference" ExportId="TenantMembershipRepository">
                         <Data IsEnabled="false"/>

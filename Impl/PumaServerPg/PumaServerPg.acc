@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6390" Description="ACF"/>
-            <Version Id="1" Number="2306" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6418" Description="ACF"/>
+            <Version Id="1" Number="2408" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -86,6 +86,15 @@
                     <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="Application/ApplicationInfo"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="ContractRepository" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaDatabasePostgres/ContractSqlRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CrossOrgGrantRepository" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaDatabasePostgres/CrossOrgGrantSqlRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CrossTenantMessageRepository" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaDatabasePostgres/CrossTenantMessageSqlRepository"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="DatabaseConnectionChecker" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaDatabasePostgres"/>
                     </AttributeInfo>
@@ -121,6 +130,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="SessionCollection" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaDatabasePostgres/SessionSqlRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantConnectionRequestRepository" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaDatabasePostgres/TenantConnectionRequestRepository"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TenantMembershipRepository" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaDatabasePostgres/TenantMembershipSqlRepository"/>

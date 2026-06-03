@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6390" Description="ACF"/>
-            <Version Id="1" Number="2306" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6418" Description="ACF"/>
+            <Version Id="1" Number="2408" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -80,6 +80,15 @@
                     <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="Application/ApplicationInfo"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="ContractRepository" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaDatabaseSQLite/SQLiteContractRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CrossOrgGrantRepository" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaDatabaseSQLite/SQLiteCrossOrgGrantRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CrossTenantMessageRepository" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaDatabaseSQLite/SQLiteCrossTenantMessageRepository"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="DatabaseConnectionChecker" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaDatabaseSQLite"/>
                     </AttributeInfo>
@@ -115,6 +124,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="SessionCollection" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaDatabaseSQLite/SessionSqlRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantConnectionRequestRepository" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaDatabaseSQLite/SQLiteTenantConnectionRequestRepository"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TenantMembershipRepository" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaDatabaseSQLite/TenantMembershipRepository"/>
