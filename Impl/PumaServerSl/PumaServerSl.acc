@@ -125,11 +125,23 @@
                     <AttributeInfo Id="SessionCollection" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaDatabaseSQLite/SessionSqlRepository"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="TenantConnectionCodeRepository" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaDatabaseSQLite/SQLiteTenantConnectionCodeRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantConnectionRepository" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaDatabaseSQLite/SQLiteTenantConnectionRepository"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="TenantConnectionRequestRepository" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaDatabaseSQLite/SQLiteTenantConnectionRequestRepository"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TenantMembershipRepository" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaDatabaseSQLite/TenantMembershipRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantRelationshipProposalRepository" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaDatabaseSQLite/SQLiteTenantRelationshipProposalRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantRelationshipRepository" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaDatabaseSQLite/SQLiteTenantRelationshipRepository"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TenantRepository" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaDatabaseSQLite/TenantRepository"/>

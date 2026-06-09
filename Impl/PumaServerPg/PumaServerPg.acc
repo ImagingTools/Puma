@@ -131,11 +131,23 @@
                     <AttributeInfo Id="SessionCollection" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaDatabasePostgres/SessionSqlRepository"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="TenantConnectionCodeRepository" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaDatabasePostgres/TenantConnectionCodeSqlRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantConnectionRepository" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaDatabasePostgres/TenantConnectionSqlRepository"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="TenantConnectionRequestRepository" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaDatabasePostgres/TenantConnectionRequestRepository"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TenantMembershipRepository" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaDatabasePostgres/TenantMembershipSqlRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantRelationshipProposalRepository" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaDatabasePostgres/TenantRelationshipProposalSqlRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantRelationshipRepository" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaDatabasePostgres/TenantRelationshipSqlRepository"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TenantRepository" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaDatabasePostgres/TenantRepository"/>

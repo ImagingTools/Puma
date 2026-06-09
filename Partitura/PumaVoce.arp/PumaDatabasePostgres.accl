@@ -11,13 +11,17 @@
         <Element ComponentName="ContractSqlRepository" X="975" Y="800" Note=""/>
         <Element ComponentName="CrossOrgGrantSqlRepository" X="625" Y="775" Note=""/>
         <Element ComponentName="CrossTenantMessageSqlRepository" X="200" Y="775" Note=""/>
-        <Element ComponentName="DatabaseEngine" X="600" Y="125" Note=""/>
+        <Element ComponentName="DatabaseEngine" X="625" Y="275" Note=""/>
         <Element ComponentName="PostgresMigrations" X="1050" Y="575" Note=""/>
         <Element ComponentName="RoleDocumentSqlRepository" X="250" Y="325" Note=""/>
         <Element ComponentName="SessionSqlRepository" X="950" Y="125" Note=""/>
+        <Element ComponentName="TenantConnectionCodeSqlRepository" X="225" Y="50" Note=""/>
         <Element ComponentName="TenantConnectionRequestSqlRepository" X="254" Y="488" Note=""/>
+        <Element ComponentName="TenantConnectionSqlRepository" X="600" Y="50" Note=""/>
         <Element ComponentName="TenantInvitationSqlRepository" X="640.638743755" Y="415.778787338" Note=""/>
         <Element ComponentName="TenantMembershipSqlRepository" X="875" Y="700" Note=""/>
+        <Element ComponentName="TenantRelationshipProposalSqlRepository" X="1000" Y="50" Note=""/>
+        <Element ComponentName="TenantRelationshipSqlRepository" X="250" Y="225" Note=""/>
         <Element ComponentName="TenantSqlRepository" X="225" Y="675" Note=""/>
         <Element ComponentName="UserConnectionRepository" X="225" Y="125" Note=""/>
         <Element ComponentName="UserGroupSqlRepository" X="575" Y="575" Note=""/>

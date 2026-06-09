@@ -61,8 +61,12 @@
         <Component ExportedId="SQLiteContractRepository" ComponentId="UserLocalRepositories/SQLiteContractRepository"/>
         <Component ExportedId="SQLiteCrossOrgGrantRepository" ComponentId="UserLocalRepositories/SQLiteCrossOrgGrantRepository"/>
         <Component ExportedId="SQLiteCrossTenantMessageRepository" ComponentId="UserLocalRepositories/SQLiteCrossTenantMessageRepository"/>
+        <Component ExportedId="SQLiteTenantConnectionCodeRepository" ComponentId="UserLocalRepositories/SQLiteTenantConnectionCodeRepository"/>
+        <Component ExportedId="SQLiteTenantConnectionRepository" ComponentId="UserLocalRepositories/SQLiteTenantConnectionRepository"/>
         <Component ExportedId="SQLiteTenantConnectionRequestRepository" ComponentId="UserLocalRepositories/SQLiteTenantConnectionRequestRepository"/>
         <Component ExportedId="SQLiteTenantInvitationRepository" ComponentId="UserLocalRepositories/SQLiteTenantInvitationRepository"/>
+        <Component ExportedId="SQLiteTenantRelationshipProposalRepository" ComponentId="UserLocalRepositories/SQLiteTenantRelationshipProposalRepository"/>
+        <Component ExportedId="SQLiteTenantRelationshipRepository" ComponentId="UserLocalRepositories/SQLiteTenantRelationshipRepository"/>
         <Component ExportedId="SessionSqlRepository" ComponentId="UserLocalRepositories/SessionSqlRepository"/>
         <Component ExportedId="TenantMembershipRepository" ComponentId="UserLocalRepositories/SQLiteTenantMembershipRepository"/>
         <Component ExportedId="TenantRepository" ComponentId="UserLocalRepositories/SQLiteTenantRepository"/>
