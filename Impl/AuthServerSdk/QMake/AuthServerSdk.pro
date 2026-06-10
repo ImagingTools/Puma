@@ -10,10 +10,10 @@ LIBS += -L$(ACFDIR)/Lib/$$COMPILER_DIR
 LIBS += -L$(ACFSLNDIR)/Lib/$$COMPILER_DIR
 
 LIBS += -L../../../Lib/$$COMPILER_DIR -licomm -limeas -lAcfSlnLoc -lAcfLoc
-LIBS += -L$(IMTCOREDIR)/Lib/$$COMPILER_DIR -limtbase -limtdev -limtdb -limtqml -limtlog -limtstyle -limtrest -limtlic -lImtCoreLoc -limtcrypt -limtauth -limtauthgql -limtauthdb -limtcom -limtlicgql -limtgql -limtrepo -limtdesign -limtapp -limtcol
+LIBS += -L$(IMTCOREDIR)/Lib/$$COMPILER_DIR -limtbase -limtdoc -limtdev -limtdb -limtqml -limtlog -limtstyle -limtrest -limtlic -lImtCoreLoc -limtcrypt -limtauth -limtauthgql -limtauthdb -limtcom -limtlicgql -limtgql -limtrepo -limtdesign -limtapp -limtcol
 LIBS += -limtguiqml -limtdocguiqml -limtauthguiqml -limtlicguiqml -limtcolguiqml -limtguigqlqml -limtcontrolsqml -limtstylecontrolsqml -limtdocguiqml
 LIBS += -limtauthsdl -limtappsdl -limtlicsdl -limtbasesdl -limtcolorsdl
-LIBS += -limtservergql -limtserverapp -limtclientgql
+LIBS += -limtservergql -limtserverapp -limtclientgql -limtchat -limtdesk -limtchatsdl -limtdesksdl -limtchatdb -limtdeskdb -limtchatgql -limtdeskgql
 
 # Set configuration of custom builds:
 # ARX Compiler:

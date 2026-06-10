@@ -332,6 +332,10 @@ public:
 			internUser.email = externUser.email;
 			internUser.roleIds = externUser.roleIds;
 			internUser.groupIds = externUser.groupIds;
+			imtauth::IUserInfo::SystemInfo systemInfo;
+			if (userManagerPtr->GetUserAuthSystem(externUser.login, systemInfo)) {
+				internUser.systemType = systemInfo.systemId.isEmpty() ? SystemType::Local : SystemType::Ldap;
+			}
 
 			retVal << internUser;
 		}
@@ -356,6 +360,11 @@ public:
 			userData.login = userInfoPtr->GetId();
 			userData.roleIds = userInfoPtr->GetRoles(productId);
 			userData.groupIds = userInfoPtr->GetGroups();
+
+			imtauth::IUserInfo::SystemInfo systemInfo;
+			if (userManagerPtr->GetUserAuthSystem(userData.login, systemInfo)) {
+				userData.systemType = systemInfo.systemId.isEmpty() ? SystemType::Local : SystemType::Ldap;
+			}
 	
 			return true;
 		}
@@ -383,6 +392,11 @@ public:
 			userData.login = userInfoPtr->GetId();
 			userData.roleIds = userInfoPtr->GetRoles(productId);
 			userData.groupIds = userInfoPtr->GetGroups();
+
+			imtauth::IUserInfo::SystemInfo systemInfo;
+			if (userManagerPtr->GetUserAuthSystem(login, systemInfo)) {
+				userData.systemType = systemInfo.systemId.isEmpty() ? SystemType::Local : SystemType::Ldap;
+			}
 	
 			return true;
 		}

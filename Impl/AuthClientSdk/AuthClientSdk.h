@@ -161,6 +161,21 @@ struct Login
 
 
 /**
+* @brief Authentication system type.
+*
+* Specifies the backend authentication mechanism used for a user account.
+* The system supports both local (database) authentication and external
+* LDAP directory integration.
+*/
+enum class SystemType
+{
+	Unknown, /**< Authentication system could not be determined*/
+	Local,   /**< Local database authentication*/
+	Ldap     /**< LDAP directory authentication (Active Directory, OpenLDAP, etc.)*/
+};
+
+
+/**
 * @brief User entity description.
 *
 * Represents a user account in the authorization system. Users can be
@@ -231,6 +246,18 @@ struct User
 	* @see AddUsersToGroup(), RemoveUsersFromGroup()
 	*/
 	QByteArrayList groupIds;
+
+	/**
+	* @brief Authentication system type used by this user.
+	*
+	* Indicates whether the user authenticates via the local database
+	* or an external LDAP directory. This field is populated automatically
+	* when retrieving user data via GetUser(), GetUserByLogin(), or
+	* GetUserList().
+	*
+	* @see SystemType, GetUserAuthSystem()
+	*/
+	SystemType systemType = SystemType::Unknown;
 };
 
 
@@ -328,21 +355,6 @@ enum class SuperuserStatus
 	Unknown,    /**< Status cannot be determined (e.g., server unreachable)*/
 	Exists,     /**< Superuser account exists and is active*/
 	NotExists   /**< Superuser account does not exist and needs to be created*/
-};
-
-
-/**
-* @brief Authentication system type.
-*
-* Specifies the backend authentication mechanism used for a user account.
-* The system supports both local (database) authentication and external
-* LDAP directory integration.
-*/
-enum class SystemType
-{
-	Unknown, /**< Authentication system could not be determined*/
-	Local,   /**< Local database authentication*/
-	Ldap     /**< LDAP directory authentication (Active Directory, OpenLDAP, etc.)*/
 };
 
 

@@ -172,6 +172,7 @@ void CAuthClientSdkTest::UserCrudTest()
 	QCOMPARE(u.email, QString("test@example.com"));
 	QVERIFY(u.roleIds.isEmpty());
 	QVERIFY(u.groupIds.isEmpty());
+	QCOMPARE(u.systemType, SystemType::Local);
 
 	// Verify GetUserByLogin also exposes the internal object id so that
 	// callers can use it directly with AddRolesToUser / RemoveUser etc.
@@ -179,6 +180,7 @@ void CAuthClientSdkTest::UserCrudTest()
 	QVERIFY(m_authorizationController.GetUserByLogin(s_userNames[0], uByLogin));
 	QCOMPARE(uByLogin.id, userId);
 	QCOMPARE(uByLogin.login, s_userNames[0]);
+	QCOMPARE(uByLogin.systemType, SystemType::Local);
 
 	QByteArray roleId = m_authorizationController.CreateRole(s_roleNames[0], "", {"A", "B", "C"});
 	QVERIFY2(!roleId.isEmpty(), "Role was not created");
