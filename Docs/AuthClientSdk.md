@@ -318,6 +318,7 @@ Retrieves user information by user ID.
 - `login`: User login identifier
 - `roleIds`: List of role IDs assigned to user
 - `groupIds`: List of group IDs user belongs to
+- `systemType`: Authentication system type (`SystemType::Local` or `SystemType::Ldap`)
 
 #### `GetUserByLogin()`
 ```cpp
