@@ -97,6 +97,9 @@
                     <AttributeInfo Id="DatabaseConnectionChecker" Type="Reference" ExportId="DatabaseConnectionChecker">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="DelegatedAccess" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="TenantController/DelegatedAccessResolver"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="DocumentRepositories" Type="Reference[]" ExportId="DocumentRepositories">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
