@@ -140,6 +140,9 @@
                     <AttributeInfo Id="TenantConnectionRequestRepository" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaDatabasePostgres/TenantConnectionRequestRepository"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="TenantEntityBindingRepository" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaDatabasePostgres/TenantEntityBindingSqlRepository"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="TenantMembershipRepository" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaDatabasePostgres/TenantMembershipSqlRepository"/>
                     </AttributeInfo>

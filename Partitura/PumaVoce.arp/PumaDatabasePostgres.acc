@@ -230,6 +230,24 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="TenantEntityBindingSqlRepository" PackageId="ImtUserAdministrationVoce" ComponentId="TenantEntityBindingSqlRepository">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="DatabaseEngine"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="TenantInvitationSqlRepository" PackageId="ImtUserAdministrationVoce" ComponentId="TenantInvitationSqlRepository">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -412,6 +430,7 @@
         <Component ExportedId="TenantConnectionRequestRepository" ComponentId="TenantConnectionRequestSqlRepository/TenantConnectionRequestRepository"/>
         <Component ExportedId="TenantConnectionSqlRepository" ComponentId="TenantConnectionSqlRepository"/>
         <Component ExportedId="TenantDatabaseDelegate" ComponentId="TenantSqlRepository/TenantDatabaseDelegate"/>
+        <Component ExportedId="TenantEntityBindingSqlRepository" ComponentId="TenantEntityBindingSqlRepository"/>
         <Component ExportedId="TenantInvitationRepository" ComponentId="TenantInvitationSqlRepository"/>
         <Component ExportedId="TenantMembershipSqlRepository" ComponentId="TenantMembershipSqlRepository"/>
         <Component ExportedId="TenantRelationshipProposalSqlRepository" ComponentId="TenantRelationshipProposalSqlRepository"/>

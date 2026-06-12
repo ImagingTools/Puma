@@ -18,6 +18,7 @@
         <Element ComponentName="TenantConnectionCodeSqlRepository" X="225" Y="50" Note=""/>
         <Element ComponentName="TenantConnectionRequestSqlRepository" X="254" Y="488" Note=""/>
         <Element ComponentName="TenantConnectionSqlRepository" X="600" Y="50" Note=""/>
+        <Element ComponentName="TenantEntityBindingSqlRepository" X="1000" Y="450" Note=""/>
         <Element ComponentName="TenantInvitationSqlRepository" X="640.638743755" Y="415.778787338" Note=""/>
         <Element ComponentName="TenantMembershipSqlRepository" X="875" Y="700" Note=""/>
         <Element ComponentName="TenantRelationshipProposalSqlRepository" X="1000" Y="50" Note=""/>

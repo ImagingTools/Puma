@@ -134,6 +134,9 @@
                     <AttributeInfo Id="TenantConnectionRequestRepository" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaDatabaseSQLite/SQLiteTenantConnectionRequestRepository"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="TenantEntityBindingRepository" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaDatabaseSQLite/SQLiteTenantEntityBindingRepository"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="TenantMembershipRepository" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaDatabaseSQLite/TenantMembershipRepository"/>
                     </AttributeInfo>
