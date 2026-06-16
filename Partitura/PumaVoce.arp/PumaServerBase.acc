@@ -91,6 +91,9 @@
                     <AttributeInfo Id="BackupSettings" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaSettings/Backup"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="CrossOrgGrantManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="TenantController/CrossOrgGrantManager"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="DatabaseAccessSettings" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaSettings/DatabaseAccessSettings"/>
                     </AttributeInfo>
@@ -279,6 +282,9 @@
                     <AttributeInfo Id="RoleRepository" Type="Reference" ExportId="RoleRepository">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="SessionCollection" Type="Reference" ExportId="SessionCollection">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaSettings/TracingConfiguration"/>
                     </AttributeInfo>
@@ -308,6 +314,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="RequestManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="WebSocketServerFramework"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RoleRepository" Type="Reference" ExportId="RoleRepository">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TenantConnectionCodeRepository" Type="Reference" ExportId="TenantConnectionCodeRepository">
                         <Data IsEnabled="false"/>
@@ -515,6 +524,7 @@
                                             <Value>RoleCollectionChangeNotifier</Value>
                                             <Value>UserCollectionChangeNotifier</Value>
                                             <Value>GroupCollectionChangeNotifier</Value>
+                                            <Value>UserSessionCollectionChangeNotifier</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -538,6 +548,31 @@
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="UserRepository">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="RequestManager" Type="Reference" ExportId="RequestManager">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="UserSessionCollectionChangeNotifier" PackageId="ImtServerGqlPck" ComponentId="ObjectCollectionChangeNotifier">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
+                                    <Data IsEnabled="true">
+                                        <Values>
+                                            <Value>OnUserSessionsCollectionChanged</Value>
+                                        </Values>
+                                    </Data>
+                                </AttributeInfo>
+                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="SessionCollection">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="RequestManager" Type="Reference" ExportId="RequestManager">

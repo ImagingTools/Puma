@@ -28,6 +28,12 @@
         <Element Id="ProfileController" PackageId="ImtGraphQlVoce" ComponentId="ProfileController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="CrossOrgGrantManager" Type="Reference" ExportId="CrossOrgGrantManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DelegatedAccess" Type="Reference" ExportId="DelegatedAccess">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="GroupCollection" Type="Reference" ExportId="UserGroupRepository">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

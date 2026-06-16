@@ -30,6 +30,7 @@
                 <Element ComponentName="RoleCollectionChangeNotifier" X="200" Y="275" Note=""/>
                 <Element ComponentName="SlaveSubscriberController" X="550" Y="75" Note=""/>
                 <Element ComponentName="UserCollectionChangeNotifier" X="550" Y="275" Note=""/>
+                <Element ComponentName="UserSessionCollectionChangeNotifier" X="550" Y="400" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>
