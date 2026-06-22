@@ -137,6 +137,48 @@ void CAuthClientSdkTest::LoginLogoutTest()
 }
 
 
+void CAuthClientSdkTest::GetTokenPermissionsTest()
+{
+	qDebug() << "=== [GetTokenPermissionsTest] ===";
+
+	// Login as superuser and create a user with permissions
+	Login loginData;
+	QVERIFY(m_authorizationController.Login("su", "1", loginData));
+
+	QByteArray userId = m_authorizationController.CreateUser("TokenTestUser", "tokentestuser", "1", "tokentest@example.com");
+	QVERIFY(!userId.isEmpty());
+
+	QByteArray roleId = m_authorizationController.CreateRole("TokenTestRole", "", {"ReadData", "WriteData"});
+	QVERIFY(!roleId.isEmpty());
+
+	QVERIFY(m_authorizationController.AddRolesToUser(userId, {roleId}));
+	QVERIFY(m_authorizationController.Logout());
+
+	// Login as the test user and retrieve the access token
+	QVERIFY(m_authorizationController.Login("tokentestuser", "1", loginData));
+	QByteArray token = loginData.accessToken;
+	QVERIFY(!token.isEmpty());
+
+	// Query permissions using the access token
+	QByteArrayList tokenPermissions = m_authorizationController.GetTokenPermissions(token);
+	QVERIFY(tokenPermissions.size() == 2);
+	QVERIFY(tokenPermissions.contains("ReadData"));
+	QVERIFY(tokenPermissions.contains("WriteData"));
+
+	// Empty token should return empty permissions (no crash)
+	QByteArrayList emptyTokenPermissions = m_authorizationController.GetTokenPermissions(QByteArray());
+	Q_UNUSED(emptyTokenPermissions);
+
+	QVERIFY(m_authorizationController.Logout());
+
+	// Cleanup
+	QVERIFY(m_authorizationController.Login("su", "1", loginData));
+	QVERIFY(m_authorizationController.RemoveUser(userId));
+	QVERIFY(m_authorizationController.RemoveRole(roleId));
+	QVERIFY(m_authorizationController.Logout());
+}
+
+
 void CAuthClientSdkTest::UserCrudTest()
 {
 	qDebug() << "=== [UserCrudTest] ===";

@@ -254,6 +254,19 @@ Checks if the current user has a specific permission.
 - `true` if user has permission
 - `false` if user lacks permission or not authenticated
 
+#### `GetTokenPermissions()`
+```cpp
+virtual QByteArrayList GetTokenPermissions(const QByteArray& accessToken) const;
+```
+Retrieves all permissions associated with a given access token.
+
+**Parameters:**
+- `accessToken`: The access token to query permissions for
+
+**Returns:**
+- List of permission IDs associated with the token
+- Empty list if the token is invalid, expired, or the interface is unavailable
+
 ### Superuser Management
 
 #### `SuperuserExists()`
