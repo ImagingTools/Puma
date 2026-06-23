@@ -21,6 +21,7 @@ private slots:
 
 	void SuperuserExistsTest();
 	void LoginLogoutTest();
+	void GetTokenPermissionsTest();
 	void UserCrudTest();
 	void RoleCrudTest();
 	void GroupCrudTest();
