@@ -1,0 +1,37 @@
+[
+  {
+    "scenario": "A owner visibility",
+    "actorTokenVar": "a_owner_token",
+    "expectRolesListAllowed": true,
+    "expectGroupsListAllowed": true,
+    "expectedPermissionsCsv": ""
+  },
+  {
+    "scenario": "B owner visibility",
+    "actorTokenVar": "b_owner_token",
+    "expectRolesListAllowed": true,
+    "expectGroupsListAllowed": true,
+    "expectedPermissionsCsv": ""
+  },
+  {
+    "scenario": "A member restricted visibility",
+    "actorTokenVar": "a_member_token",
+    "expectRolesListAllowed": false,
+    "expectGroupsListAllowed": false,
+    "expectedPermissionsCsv": ""
+  },
+  {
+    "scenario": "Outsider restricted visibility",
+    "actorTokenVar": "outsider_token",
+    "expectRolesListAllowed": false,
+    "expectGroupsListAllowed": false,
+    "expectedPermissionsCsv": ""
+  },
+  {
+    "scenario": "A member with expected permission sample",
+    "actorTokenVar": "a_member_token",
+    "expectRolesListAllowed": false,
+    "expectGroupsListAllowed": false,
+    "expectedPermissionsCsv": "{{permReadX}}"
+  }
+]
