@@ -41,7 +41,7 @@ newman run Tenant_System_Full.postman_collection.json -e Tenant_System_Full.post
 
 ## Scenario Coverage Summary
 
-Total request-level scenarios: 310
+Total request-level scenarios: 321
 
 - 00 System bootstrap: 1 requests
 - 00A Auth SU: 1 requests
@@ -62,8 +62,9 @@ Total request-level scenarios: 310
 - 11 Edge - Token and visibility probes: 2 requests
 - 12 Data-driven permission visibility matrix: 4 requests
 - 13 Coverage sweep - remaining tenant APIs: 38 requests
-- 13 Edge - No Organization isolation: 13 requests
+- 13 Edge - No Organization isolation: 17 requests
 - 14 Advanced Edge - Lifecycle and delegation depth: 81 requests
+- 14A Role permissions validation in-tenant: 7 requests
 - 99 Cleanup: 5 requests
 
 ## Full Scenario Catalog (All Request-Level Scenarios)
@@ -336,21 +337,25 @@ Total request-level scenarios: 310
 37. UserToken coverage
 38. Logout coverage
 
-### 13 Edge - No Organization isolation (13)
+### 13 Edge - No Organization isolation (17)
 
 1. Refresh auth A owner (No Organization)
 2. NoOrg test seeds
 3. Create role in No Organization
 4. Create group in No Organization
-5. NoOrg sees NoOrg role and not Tenant-A role
-6. NoOrg sees NoOrg group
-7. SelectTenant A owner context for isolation checks
-8. Tenant A cannot see NoOrg role
-9. Tenant A cannot see NoOrg group
-10. NoOrg cannot read Tenant B directly
-11. Tenant A cannot read Tenant B directly
-12. Tenant B cannot see NoOrg role
-13. Tenant B cannot see NoOrg group
+5. Create user in No Organization
+6. NoOrg sees NoOrg role and not Tenant-A role
+7. NoOrg sees NoOrg group
+8. NoOrg sees NoOrg user and not Tenant-A user
+9. SelectTenant A owner context for isolation checks
+10. Tenant A cannot see NoOrg user
+11. Tenant A cannot see NoOrg role
+12. Tenant A cannot see NoOrg group
+13. NoOrg cannot read Tenant B directly
+14. Tenant A cannot read Tenant B directly
+15. Tenant B cannot see NoOrg role
+16. Tenant B cannot see NoOrg user
+17. Tenant B cannot see NoOrg group
 
 ### 14 Advanced Edge - Lifecycle and delegation depth (81)
 
@@ -435,6 +440,16 @@ Total request-level scenarios: 310
 79. Advanced grant depth: A member select tenant B after all revokes
 80. Advanced grant depth: A member org list excludes A after all revokes
 81. Advanced grant depth: A member cannot select tenant A after all revokes
+
+### 14A Role permissions validation in-tenant (7)
+
+1. RolePerm: Authorization A owner (No Organization)
+2. RolePerm: GetProductPermissions all (NoOrg)
+3. RolePerm: SelectTenant A owner context
+4. RolePerm: GetTenantPermissions A
+5. RolePerm: GetProductPermissions tenant-scoped subset
+6. RolePerm: RoleUpdate with forbidden permission (negative)
+7. RolePerm: RoleUpdate with allowed permission (positive)
 
 ### 99 Cleanup (5)
 

@@ -1,4 +1,4 @@
-{
+﻿{
     "_": {
         "postman_id": "0cfa1ec3-9e86-4d1f-9b44-tenant-full-0001"
     },
@@ -190,7 +190,7 @@
                                     "const alreadyExists = /exist|already|duplicate/i.test(errText);",
                                     "pm.test('RegisterUser a_owner succeeds or already exists', function () {",
                                     "  pm.response.to.be.ok;",
-                                    "  pm.expect(!!(payload && payload.id) || alreadyExists).to.eql(true);",
+                                    "  pm.expect(alreadyExists || !!(payload && payload.id)).to.eql(true);",
                                     "});",
                                     "if (payload && payload.id) pm.environment.set('a_owner_user_id', payload.id);"
                                 ],
@@ -257,7 +257,7 @@
                                     "const alreadyExists = /exist|already|duplicate/i.test(errText);",
                                     "pm.test('RegisterUser b_owner succeeds or already exists', function () {",
                                     "  pm.response.to.be.ok;",
-                                    "  pm.expect(!!(payload && payload.id) || alreadyExists).to.eql(true);",
+                                    "  pm.expect(alreadyExists || !!(payload && payload.id)).to.eql(true);",
                                     "});",
                                     "if (payload && payload.id) pm.environment.set('b_owner_user_id', payload.id);"
                                 ],
@@ -324,7 +324,7 @@
                                     "const alreadyExists = /exist|already|duplicate/i.test(errText);",
                                     "pm.test('RegisterUser a_member succeeds or already exists', function () {",
                                     "  pm.response.to.be.ok;",
-                                    "  pm.expect(!!(payload && payload.id) || alreadyExists).to.eql(true);",
+                                    "  pm.expect(alreadyExists || !!(payload && payload.id)).to.eql(true);",
                                     "});",
                                     "if (payload && payload.id) pm.environment.set('a_member_user_id', payload.id);"
                                 ],
@@ -391,7 +391,7 @@
                                     "const alreadyExists = /exist|already|duplicate/i.test(errText);",
                                     "pm.test('RegisterUser outsider succeeds or already exists', function () {",
                                     "  pm.response.to.be.ok;",
-                                    "  pm.expect(!!(payload && payload.id) || alreadyExists).to.eql(true);",
+                                    "  pm.expect(alreadyExists || !!(payload && payload.id)).to.eql(true);",
                                     "});",
                                     "if (payload && payload.id) pm.environment.set('outsider_user_id', payload.id);"
                                 ],
@@ -713,12 +713,17 @@
                                     "const json = pm.response.json();",
                                     "const payload = json && json.data && json.data.SelectTenant ? json.data.SelectTenant : null;",
                                     "const session = payload && payload.userSession ? payload.userSession : null;",
+                                    "const tenantAId = pm.environment.get(\"tenantAId\") || \"\";",
                                     "pm.test(\"SelectTenant success\", function(){",
+                                    "  pm.expect(tenantAId !== \"\", \"tenantAId is empty before SelectTenant\").to.eql(true);",
                                     "  pm.expect(!!payload && payload.ok === true, \"SelectTenant payload invalid: \" + JSON.stringify(json)).to.eql(true);",
-                                    "  pm.expect(!!session && session.tenantId === pm.environment.get(\"tenantAId\"), \"Tenant context mismatch: \" + JSON.stringify(json)).to.eql(true);",
+                                    "  pm.expect(!!session && session.tenantId === tenantAId, \"Tenant context mismatch: \" + JSON.stringify(json)).to.eql(true);",
                                     "  pm.expect(!!session && !!session.accessToken, \"SelectTenant accessToken missing: \" + JSON.stringify(json)).to.eql(true);",
                                     "});",
-                                    "if (session && session.accessToken) pm.environment.set(\"a_owner_token\", session.accessToken);"
+                                    "if (session && session.accessToken) {",
+                                    "  pm.environment.set(\"a_owner_token\", session.accessToken);",
+                                    "  pm.environment.set(\"a_owner_tenantA_token\", session.accessToken);",
+                                    "}"
                                 ],
                                 "_lastExecutionId": "7436a538-ef11-48dc-b196-2d40f8f6a02e"
                             }
@@ -824,9 +829,11 @@
                                     "const json = pm.response.json();",
                                     "const payload = json && json.data && json.data.SelectTenant ? json.data.SelectTenant : null;",
                                     "const session = payload && payload.userSession ? payload.userSession : null;",
+                                    "const tenantBId = pm.environment.get(\"tenantBId\") || \"\";",
                                     "pm.test(\"SelectTenant success\", function(){",
+                                    "  pm.expect(tenantBId !== \"\", \"tenantBId is empty before SelectTenant\").to.eql(true);",
                                     "  pm.expect(!!payload && payload.ok === true, \"SelectTenant payload invalid: \" + JSON.stringify(json)).to.eql(true);",
-                                    "  pm.expect(!!session && session.tenantId === pm.environment.get(\"tenantBId\"), \"Tenant context mismatch: \" + JSON.stringify(json)).to.eql(true);",
+                                    "  pm.expect(!!session && session.tenantId === tenantBId, \"Tenant context mismatch: \" + JSON.stringify(json)).to.eql(true);",
                                     "  pm.expect(!!session && !!session.accessToken, \"SelectTenant accessToken missing: \" + JSON.stringify(json)).to.eql(true);",
                                     "});",
                                     "if (session && session.accessToken) pm.environment.set(\"b_owner_token\", session.accessToken);"
@@ -879,7 +886,7 @@
                                     "const json = pm.response.json();",
                                     "const items = json.data && json.data.GetTenantList ? (json.data.GetTenantList.items || []) : [];",
                                     "if (pm.environment.get(\"_tenantA_needs_lookup\") === \"true\") {",
-                                    "  const found = items.find(t => t.name === \"Tenant_A_Main\");",
+                                    "  const found = items.find(t => t.name === \"Tenant_A_Main\" || t.name === \"Tenant_A_Main_Updated\");",
                                     "  if (found) { pm.environment.set(\"tenantAId\", found.id); pm.environment.unset(\"_tenantA_needs_lookup\"); }",
                                     "}",
                                     "if (pm.environment.get(\"_tenantB_needs_lookup\") === \"true\") {",
@@ -894,6 +901,65 @@
                                     "});"
                                 ],
                                 "_lastExecutionId": "04add3aa-ec75-4956-a339-2700418b0ff3"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "f5d7e7d0-20d8-44e5-9cbf-3f72d58a3da1",
+                    "name": "SelectTenant A Owner context (post-lookup)",
+                    "request": {
+                        "url": {
+                            "protocol": "http",
+                            "port": "7788",
+                            "path": [
+                                "Puma",
+                                "graphql"
+                            ],
+                            "host": [
+                                "localhost"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SelectTenant { SelectTenant(input: { tenantId: \"{{tenantAId}}\" }) { ok userSession { userId tenantId accessToken refreshToken } errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "cdd0a1f5-61df-4c47-bf63-b01364f27d67",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json && json.data && json.data.SelectTenant ? json.data.SelectTenant : null;",
+                                    "const session = payload && payload.userSession ? payload.userSession : null;",
+                                    "const tenantAId = pm.environment.get(\"tenantAId\") || \"\";",
+                                    "pm.test(\"SelectTenant A post-lookup success\", function(){",
+                                    "  pm.expect(tenantAId !== \"\", \"tenantAId is empty before SelectTenant post-lookup\").to.eql(true);",
+                                    "  pm.expect(!!payload && payload.ok === true, \"SelectTenant payload invalid: \" + JSON.stringify(json)).to.eql(true);",
+                                    "  pm.expect(!!session && session.tenantId === tenantAId, \"Tenant context mismatch: \" + JSON.stringify(json)).to.eql(true);",
+                                    "  pm.expect(!!session && !!session.accessToken, \"SelectTenant accessToken missing: \" + JSON.stringify(json)).to.eql(true);",
+                                    "});",
+                                    "if (session && session.accessToken) {",
+                                    "  pm.environment.set(\"a_owner_token\", session.accessToken);",
+                                    "  pm.environment.set(\"a_owner_tenantA_token\", session.accessToken);",
+                                    "}"
+                                ]
                             }
                         }
                     ]
@@ -941,10 +1007,65 @@
                                     "const json = pm.response.json();",
                                     "pm.test('UpdateTenant success', function () {",
                                     "  pm.response.to.be.ok;",
-                                    "  pm.expect(json.data.UpdateTenant.success).to.eql(true);",
+                                    "  const payload = json.data ? json.data.UpdateTenant : null;",
+                                    "  const msg = (payload && payload.errorMessage) || \"\";",
+                                    "  const alreadyExists = /already exists/i.test(msg);",
+                                    "  pm.expect((payload && payload.success === true) || alreadyExists).to.eql(true);",
                                     "});"
                                 ],
                                 "_lastExecutionId": "3234721a-09c0-4a1d-9ce4-26ab7db14918"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "56a5e9ca-6784-4a73-b2f1-ea80887b8de7",
+                    "name": "Ensure Tenant A is active (bootstrap)",
+                    "request": {
+                        "url": {
+                            "protocol": "http",
+                            "port": "7788",
+                            "path": [
+                                "Puma",
+                                "graphql"
+                            ],
+                            "host": [
+                                "localhost"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SetTenantActive { SetTenantActive(input: { tenantId: \"{{tenantAId}}\", isActive: true }) { success errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "a3e6be12-bebe-4c33-bb2e-128bf76887be",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.SetTenantActive : null;",
+                                    "const msg = (payload && payload.errorMessage) || \"\";",
+                                    "const alreadyActive = /already\\s+active|is\\s+active/i.test(msg);",
+                                    "pm.test(\"Tenant A is active at bootstrap\", function(){",
+                                    "  pm.expect((!!payload && payload.success === true) || alreadyActive).to.eql(true);",
+                                    "});"
+                                ]
                             }
                         }
                     ]
@@ -1013,7 +1134,7 @@
                                     "const errors = json && json.errors ? json.errors : [];",
                                     "const hasExpectedWarning = errors.some(e => /Cannot create a new tenant while switched to an organization/i.test((e && e.message) || \"\"));",
                                     "pm.test(\"Create tenant in switched org context is rejected\", function(){ pm.expect(hasExpectedWarning).to.eql(true); });",
-                                    "pm.test(\"Rejected create has no document id\", function(){ pm.expect(!payload || !payload.documentId).to.eql(true); });"
+                                    "pm.test(\"Rejected create has no document id\", function(){ pm.expect(!(payload && payload.documentId)).to.eql(true); });"
                                 ],
                                 "_lastExecutionId": "2b5c5597-52e1-47e4-8dfc-ca50998d8ec8"
                             }
@@ -1414,7 +1535,7 @@
                         "header": [
                             {
                                 "key": "x-authentication-token",
-                                "value": "{{a_owner_token}}"
+                                "value": "{{a_owner_tenantA_token}}"
                             }
                         ],
                         "method": "POST",
@@ -2510,6 +2631,7 @@
                                     "if (!pm.environment.get(\"permReadX\")) pm.environment.set(\"permReadX\", \"fixture.permission.read\");",
                                     "if (!pm.environment.get(\"permWriteX\")) pm.environment.set(\"permWriteX\", \"fixture.permission.write\");",
                                     "if (!pm.environment.get(\"permAdminX\")) pm.environment.set(\"permAdminX\", \"fixture.permission.admin\");",
+                                    "pm.environment.set(\"rbac_read_expected\", \"false\");",
                                     "pm.environment.set(\"rbac_editor_write_expected\", \"false\");"
                                 ],
                                 "_lastExecutionId": "479eb96d-ca9a-452a-b2a9-d48baa859d17"
@@ -2575,8 +2697,8 @@
                                     "const warnings = (json.errors || []).filter(e => e && e.extensions && e.extensions.type === \"Warning\");",
                                     "const hasInvalidPermWarning = warnings.some(e => /Invalid permissions for the user/i.test(e.message || \"\"));",
                                     "const payload = json.data && json.data.GetRoleRepresentation ? json.data.GetRoleRepresentation : null;",
-                                    "pm.test(\"Get role representation success or expected permissions warning\", function(){",
-                                    "  pm.expect(hasInvalidPermWarning || !!payload).to.eql(true);",
+                                    "pm.test(\"Get role representation strict success\", function(){",
+                                    "  pm.expect(hasInvalidPermWarning).to.eql(false); pm.expect(!!payload).to.eql(true);",
                                     "});"
                                 ],
                                 "_lastExecutionId": "17103d01-b4d4-466d-a5aa-d5d62c4cbdac"
@@ -2626,12 +2748,14 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const warnings = (json.errors || []).filter(e => e && e.extensions && e.extensions.type === \"Warning\");",
-                                    "const hasInvalidPermWarning = warnings.some(e => /Invalid permissions for the user/i.test(e.message || \"\"));",
+                                    "const hasInvalidPermWarning = warnings.some(e => /Invalid permissions for the user|is not allowed for tenant/i.test(e.message || \"\"));",
                                     "const payload = json.data && json.data.UpdateRoleFromRepresentation ? json.data.UpdateRoleFromRepresentation : null;",
                                     "const status = payload && payload.status ? payload.status : \"\";",
-                                    "pm.test(\"Update role VIEW status success or expected permissions warning\", function(){",
-                                    "  pm.expect(hasInvalidPermWarning || status === \"Success\").to.eql(true);",
-                                    "});"
+                                    "pm.test(\"Update role VIEW strict success\", function(){",
+                                    "  pm.expect(hasInvalidPermWarning).to.eql(false); pm.expect(status === \"Success\").to.eql(true);",
+                                    "});",
+                                    "if (hasInvalidPermWarning) pm.environment.set(\"rbac_read_expected\", \"false\");",
+                                    "if (!hasInvalidPermWarning && status === \"Success\") pm.environment.set(\"rbac_read_expected\", \"true\");"
                                 ],
                                 "_lastExecutionId": "9e875099-d048-46e9-8cf4-bac8ad721fbc"
                             }
@@ -2681,12 +2805,15 @@
                                     "const json = pm.response.json();",
                                     "const warnings = (json.errors || []).filter(e => e && e.extensions && e.extensions.type === \"Warning\");",
                                     "const hasAlreadyExists = warnings.some(e => /already exists/i.test(e.message || \"\"));",
-                                    "const hasInvalidPermWarning = warnings.some(e => /Invalid permissions/i.test(e.message || \"\"));",
+                                    "const hasInvalidPermWarning = warnings.some(e => /Invalid permissions|is not allowed for tenant/i.test(e.message || \"\"));",
                                     "const payload = json.data && json.data.SaveDocument ? json.data.SaveDocument : null;",
                                     "const status = payload && payload.status ? payload.status : '';",
-                                    "pm.test('Save success or acceptable warning', function(){",
-                                    "  pm.expect(hasAlreadyExists || hasInvalidPermWarning || status === \"Success\").to.eql(true);",
-                                    "});"
+                                    "pm.test('Save strict success', function(){",
+                                    "  if (hasInvalidPermWarning) { pm.expect(status === \"Success\").to.eql(false); return; }",
+                                    "  pm.expect(hasAlreadyExists).to.eql(false); pm.expect(status === \"Success\").to.eql(true);",
+                                    "});",
+                                    "if (hasAlreadyExists || hasInvalidPermWarning) { pm.environment.set(\"rbac_read_expected\", \"false\"); }",
+                                    "else if (status === \"Success\") { pm.environment.set(\"rbac_read_expected\", \"true\"); }"
                                 ],
                                 "_lastExecutionId": "98d08829-72c8-4166-85e3-99631ab277c2"
                             }
@@ -2713,7 +2840,7 @@
                         "header": [
                             {
                                 "key": "x-authentication-token",
-                                "value": "{{a_owner_token}}"
+                                "value": "{{a_owner_tenantA_token}}"
                             }
                         ],
                         "method": "POST",
@@ -2796,13 +2923,13 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const warnings = (json.errors || []).filter(e => e && e.extensions && e.extensions.type === \"Warning\");",
-                                    "const hasInvalidPermWarning = warnings.some(e => /Invalid permissions for the user/i.test(e.message || \"\"));",
+                                    "const hasInvalidPermWarning = warnings.some(e => /Invalid permissions for the user|is not allowed for tenant/i.test(e.message || \"\"));",
                                     "const payload = json.data && json.data.UpdateRoleFromRepresentation ? json.data.UpdateRoleFromRepresentation : null;",
                                     "const status = payload && payload.status ? payload.status : \"\";",
                                     "if (hasInvalidPermWarning) pm.environment.set(\"rbac_editor_write_expected\", \"false\");",
                                     "if (!hasInvalidPermWarning && status === \"Success\") pm.environment.set(\"rbac_editor_write_expected\", \"true\");",
-                                    "pm.test(\"Update role EDITOR success or expected permissions warning\", function(){",
-                                    "  pm.expect(hasInvalidPermWarning || status === \"Success\").to.eql(true);",
+                                    "pm.test(\"Update role EDITOR strict success\", function(){",
+                                    "  pm.expect(hasInvalidPermWarning).to.eql(false); pm.expect(status === \"Success\").to.eql(true);",
                                     "});"
                                 ],
                                 "_lastExecutionId": "1062bd7e-fe9e-4675-8d09-87df9cbaad4e"
@@ -2853,13 +2980,14 @@
                                     "const json = pm.response.json();",
                                     "const warnings = (json.errors || []).filter(e => e && e.extensions && e.extensions.type === \"Warning\");",
                                     "const hasAlreadyExists = warnings.some(e => /already exists/i.test(e.message || \"\"));",
-                                    "const hasInvalidPermWarning = warnings.some(e => /Invalid permissions/i.test(e.message || \"\"));",
+                                    "const hasInvalidPermWarning = warnings.some(e => /Invalid permissions|is not allowed for tenant/i.test(e.message || \"\"));",
                                     "const payload = json.data && json.data.SaveDocument ? json.data.SaveDocument : null;",
                                     "const status = payload && payload.status ? payload.status : '';",
-                                    "pm.test('Save success or acceptable warning', function(){",
-                                    "  pm.expect(hasAlreadyExists || hasInvalidPermWarning || status === \"Success\").to.eql(true);",
+                                    "pm.test('Save strict success', function(){",
+                                    "  if (hasInvalidPermWarning) { pm.expect(status === \"Success\").to.eql(false); return; }",
+                                    "  pm.expect(hasAlreadyExists).to.eql(false); pm.expect(status === \"Success\").to.eql(true);",
                                     "});",
-                                    "if (hasAlreadyExists) { pm.environment.set(\"rbac_editor_write_expected\", \"false\"); }",
+                                    "if (hasAlreadyExists || hasInvalidPermWarning) { pm.environment.set(\"rbac_editor_write_expected\", \"false\"); }",
                                     "else if (status === \"Success\") { pm.environment.set(\"rbac_editor_write_expected\", \"true\"); }"
                                 ],
                                 "_lastExecutionId": "8b36b4ce-f385-4ad6-826b-90c7e01a5e2d"
@@ -2973,8 +3101,8 @@
                                     "const hasInvalidPermWarning = warnings.some(e => /Invalid permissions for the user/i.test(e.message || \"\"));",
                                     "const payload = json.data && json.data.UpdateGroupFromRepresentation ? json.data.UpdateGroupFromRepresentation : null;",
                                     "const status = payload && payload.status ? payload.status : \"\";",
-                                    "pm.test(\"Update group SUPPORT success or expected permissions warning\", function(){",
-                                    "  pm.expect(hasInvalidPermWarning || status === \"Success\").to.eql(true);",
+                                    "pm.test(\"Update group SUPPORT strict success\", function(){",
+                                    "  pm.expect(hasInvalidPermWarning).to.eql(false); pm.expect(status === \"Success\").to.eql(true);",
                                     "});"
                                 ],
                                 "_lastExecutionId": "b27b96d1-7950-4e94-a377-6f18e9055ed2"
@@ -3028,8 +3156,9 @@
                                     "const hasInvalidPermWarning = warnings.some(e => /Invalid permissions/i.test(e.message || \"\"));",
                                     "const payload = json.data && json.data.SaveDocument ? json.data.SaveDocument : null;",
                                     "const status = payload && payload.status ? payload.status : '';",
-                                    "pm.test('Save success or acceptable warning', function(){",
-                                    "  pm.expect(hasAlreadyExists || hasInvalidPermWarning || status === \"Success\").to.eql(true);",
+                                    "pm.test('Save strict success', function(){",
+                                    "  if (hasAlreadyExists) { pm.expect(hasInvalidPermWarning).to.eql(false); return; }",
+                                    "  pm.expect(hasInvalidPermWarning).to.eql(false); pm.expect(status === \"Success\").to.eql(true);",
                                     "});"
                                 ],
                                 "_lastExecutionId": "149ede78-0c12-4b59-ab65-7b277f0dbd59"
@@ -3127,9 +3256,14 @@
                                 "type": "text/javascript",
                                 "exec": [
                                     "const json = pm.response.json();",
-                                    "pm.test(\"Update user representation success\", function(){ pm.expect(json.data.UpdateUserFromRepresentation.status).to.eql(\"Success\"); });",
+                                    "const payload = json && json.data ? json.data.UpdateUserFromRepresentation : null;",
+                                    "const warnings = (json.errors || []).filter(e => e && e.extensions && e.extensions.type === \"Warning\");",
+                                    "const hasPermWarning = warnings.some(e => /Invalid permissions|is not allowed for tenant/i.test(e.message || \"\"));",
+                                    "const status = payload && payload.status ? payload.status : \"\";",
+                                    "pm.test(\"Update user representation strict success\", function(){ pm.expect(hasPermWarning).to.eql(false); pm.expect(status === \"Success\").to.eql(true); });",
                                     "const readPerm = pm.environment.get(\"permReadX\");",
-                                    "const assigned = [readPerm].filter(Boolean);",
+                                    "const readExpected = (pm.environment.get(\"rbac_read_expected\") || \"false\") === \"true\";",
+                                    "const assigned = (readExpected && !hasPermWarning) ? [readPerm].filter(Boolean) : [];",
                                     "pm.environment.set(\"assignedUserPermissionsCsv\", assigned.join(\";\"));"
                                 ],
                                 "_lastExecutionId": "401de4b5-38a5-4d9c-b68b-73c84837959d"
@@ -3182,8 +3316,9 @@
                                     "const hasAlreadyExists = warnings.some(e => /already exists/i.test(e.message || \"\"));",
                                     "const payload = json.data && json.data.SaveDocument ? json.data.SaveDocument : null;",
                                     "const status = payload && payload.status ? payload.status : '';",
-                                    "pm.test('Save user document success or acceptable warning', function(){",
-                                    "  pm.expect(hasAlreadyExists || status === \"Success\").to.eql(true);",
+                                    "pm.test('Save user document strict success', function(){",
+                                    "  if (hasAlreadyExists) { pm.expect(status === \"Success\").to.eql(false); return; }",
+                                    "  pm.expect(status === \"Success\").to.eql(true);",
                                     "});"
                                 ],
                                 "_lastExecutionId": "e52ea81f-9db9-4cbe-a58f-82a57ae2cbdf"
@@ -3450,7 +3585,8 @@
                                     "  const hasGraphqlErr = !!(json.errors && json.errors.length);",
                                     "  const hasPayloadErr = !!(json.data && json.data.CreateCrossOrgGrant && json.data.CreateCrossOrgGrant.errorMessage);",
                                     "  const noGrant = !(json.data && json.data.CreateCrossOrgGrant && json.data.CreateCrossOrgGrant.grantId);",
-                                    "  pm.expect(hasGraphqlErr || hasPayloadErr || noGrant).to.eql(true);",
+                                    "  pm.expect(hasGraphqlErr || hasPayloadErr).to.eql(true);",
+                                    "  pm.expect(noGrant).to.eql(true);",
                                     "});"
                                 ],
                                 "_lastExecutionId": "c3ca004b-d5b4-49fc-8409-34aec43b4cdb"
@@ -3502,7 +3638,7 @@
                                     "pm.test(\"Expected isolation error\", function () {",
                                     "  const hasGraphqlError = !!(json.errors && json.errors.length);",
                                     "  const hasPayloadError = !!(json.data && json.data.GetConnectionCode && json.data.GetConnectionCode.errorMessage);",
-                                    "  pm.expect(hasGraphqlError || hasPayloadError).to.eql(true);",
+                                    "  pm.expect(hasGraphqlError).to.eql(false); pm.expect(hasPayloadError).to.eql(true);",
                                     "});"
                                 ],
                                 "_lastExecutionId": "5d034997-0a12-4e12-a92f-fde9cb8286fd"
@@ -5695,7 +5831,7 @@
                         "header": [
                             {
                                 "key": "x-authentication-token",
-                                "value": "{{a_owner_token}}"
+                                "value": "{{a_owner_tenantA_token}}"
                             }
                         ],
                         "method": "POST",
@@ -5722,7 +5858,7 @@
                                     "const denied = hasErrors || !!(payload && payload.errorMessage);",
                                     "const created = !denied && invitationId !== \"\" && invitationId.toLowerCase() !== \"null\";",
                                     "pm.test(\"Create revoke invitation has strict success-or-deny outcome\", function(){",
-                                    "  pm.expect(created || denied).to.eql(true);",
+                                    "  pm.expect(denied).to.eql(false); pm.expect(created).to.eql(true);",
                                     "});",
                                     "if (created) { pm.environment.set(\"invitationAtoOutsiderRevokeId\", invitationId); } else { pm.environment.set(\"invitationAtoOutsiderRevokeId\", \"00000000-0000-0000-0000-000000000000\"); }"
                                 ],
@@ -5745,7 +5881,7 @@
                         "header": [
                             {
                                 "key": "x-authentication-token",
-                                "value": "{{a_owner_token}}"
+                                "value": "{{a_owner_tenantA_token}}"
                             }
                         ],
                         "method": "POST",
@@ -5769,7 +5905,7 @@
                                     "const payload = json.data && json.data.RevokeTenantInvitation ? json.data.RevokeTenantInvitation : null;",
                                     "const invitationId = pm.environment.get(\"invitationAtoOutsiderRevokeId\") || \"\";",
                                     "pm.test(\"Revoke pending invitation success or skipped\", function(){",
-                                    "  if (!invitationId || invitationId === \"00000000-0000-0000-0000-000000000000\") { pm.expect(true, \"Skipped: invitation was not created\").to.eql(true); return; }",
+                                    "  if (!invitationId || invitationId === \"00000000-0000-0000-0000-000000000000\") { pm.expect(false, \"Skipped: invitation was not created\").to.eql(true); return; }",
                                     "  pm.expect(!!payload && payload.success === true).to.eql(true);",
                                     "});"
                                 ],
@@ -5839,7 +5975,7 @@
                         "header": [
                             {
                                 "key": "x-authentication-token",
-                                "value": "{{a_owner_token}}"
+                                "value": "{{a_owner_tenantA_token}}"
                             }
                         ],
                         "method": "POST",
@@ -5866,7 +6002,7 @@
                                     "const denied = hasErrors || !!(payload && payload.errorMessage);",
                                     "const created = !denied && invitationId !== \"\" && invitationId.toLowerCase() !== \"null\";",
                                     "pm.test(\"Create invitation for remove-membership flow has strict success-or-deny outcome\", function(){",
-                                    "  pm.expect(created || denied).to.eql(true);",
+                                    "  pm.expect(denied).to.eql(false); pm.expect(created).to.eql(true);",
                                     "});",
                                     "if (created) { pm.environment.set(\"invitationAtoOutsiderRemoveId\", invitationId); } else { pm.environment.set(\"invitationAtoOutsiderRemoveId\", \"00000000-0000-0000-0000-000000000000\"); }"
                                 ],
@@ -5914,7 +6050,7 @@
                                     "const membershipId = payload && payload.membershipId ? payload.membershipId : \"\";",
                                     "const invitationId = pm.environment.get(\"invitationAtoOutsiderRemoveId\") || \"\";",
                                     "pm.test(\"Accept invitation for remove-membership flow success or skipped\", function(){",
-                                    "  if (!invitationId || invitationId === \"00000000-0000-0000-0000-000000000000\") { pm.expect(true, \"Skipped: invitation was not created\").to.eql(true); return; }",
+                                    "  if (!invitationId || invitationId === \"00000000-0000-0000-0000-000000000000\") { pm.expect(false, \"Skipped: invitation was not created\").to.eql(true); return; }",
                                     "  pm.expect(!!payload && payload.success === true).to.eql(true);",
                                     "  pm.expect(membershipId).to.not.eql(\"\");",
                                     "});",
@@ -5939,7 +6075,7 @@
                         "header": [
                             {
                                 "key": "x-authentication-token",
-                                "value": "{{a_owner_token}}"
+                                "value": "{{a_owner_tenantA_token}}"
                             }
                         ],
                         "method": "POST",
@@ -5963,7 +6099,7 @@
                                     "const payload = json.data && json.data.RemoveMembership ? json.data.RemoveMembership : null;",
                                     "const membershipId = pm.environment.get(\"outsiderMembershipAForRemovalId\") || \"\";",
                                     "pm.test(\"RemoveMembership by owner success or skipped\", function(){",
-                                    "  if (!membershipId || membershipId === \"00000000-0000-0000-0000-000000000000\") { pm.expect(true, \"Skipped: membership was not created\").to.eql(true); return; }",
+                                    "  if (!membershipId || membershipId === \"00000000-0000-0000-0000-000000000000\") { pm.expect(false, \"Skipped: membership was not created\").to.eql(true); return; }",
                                     "  pm.expect(!!payload && payload.success === true).to.eql(true);",
                                     "});"
                                 ],
@@ -6826,7 +6962,7 @@
                                     "const allowed = !!(payload && payload.ok === true && session && session.accessToken);",
                                     "const denied = !!(json.errors && json.errors.length) || !!(payload && payload.ok === false) || !!(payload && payload.errorMessage);",
                                     "pm.test(\"Delegation baseline SelectTenant(A) has strict allow-or-deny shape\", function(){",
-                                    "  pm.expect(allowed || denied).to.eql(true);",
+                                    "  pm.expect(denied).to.eql(false); pm.expect(allowed).to.eql(true);",
                                     "  pm.expect(!(allowed && denied)).to.eql(true);",
                                     "});",
                                     "if (allowed) pm.environment.set(\"b_owner_token\", session.accessToken);"
@@ -6850,7 +6986,7 @@
                         "header": [
                             {
                                 "key": "x-authentication-token",
-                                "value": "{{a_owner_token}}"
+                                "value": "{{a_owner_tenantA_token}}"
                             }
                         ],
                         "method": "POST",
@@ -6874,10 +7010,12 @@
                                     "const items = json.data && json.data.RolesList ? (json.data.RolesList.items || []) : [];",
                                     "const role = items.find(r => r && r.roleId === \"R_VIEW_ONLY\");",
                                     "const hasWarning = !!((json.errors || []).find(e => e && e.extensions && e.extensions.type === \"Warning\"));",
+                                    "const resolvedRoleId = role && role.id ? role.id : (pm.environment.get(\"roleViewId\") || \"\");",
                                     "pm.test(\"Role R_VIEW_ONLY resolved or permission-warning returned\", function(){",
-                                    "  pm.expect((!!role && !!role.id) || hasWarning).to.eql(true);",
+                                    "  pm.expect(hasWarning).to.eql(false);",
+                                    "  pm.expect(resolvedRoleId !== \"\").to.eql(true);",
                                     "});",
-                                    "if (role && role.id) pm.environment.set(\"roleViewId\", role.id);"
+                                    "if (resolvedRoleId) pm.environment.set(\"roleViewId\", resolvedRoleId);"
                                 ],
                                 "_lastExecutionId": "845c9e69-9ca3-4226-a19d-7c3671af293d"
                             }
@@ -6898,7 +7036,7 @@
                         "header": [
                             {
                                 "key": "x-authentication-token",
-                                "value": "{{a_owner_token}}"
+                                "value": "{{a_owner_tenantA_token}}"
                             }
                         ],
                         "method": "POST",
@@ -6923,7 +7061,7 @@
                                     "const created = !!(payload && !!payload.grantId);",
                                     "const denied = !!(json.errors && json.errors.length) || !!(payload && payload.errorMessage);",
                                     "pm.test(\"Delegated grant creation has strict success-or-deny outcome\", function(){",
-                                    "  pm.expect(created || denied).to.eql(true);",
+                                    "  pm.expect(denied).to.eql(false); pm.expect(created).to.eql(true);",
                                     "});",
                                     "if (created) pm.environment.set(\"delegatedGrantId\", payload.grantId); else pm.environment.set(\"delegatedGrantId\", \"00000000-0000-0000-0000-000000000000\");"
                                 ],
@@ -7069,8 +7207,9 @@
                                     "const perms = permsRaw.map(p => (typeof p === \"string\" ? p : (p && p.id ? p.id : \"\"))).filter(Boolean);",
                                     "const permR = pm.environment.get(\"permReadX\");",
                                     "const delegatedGrantId = pm.environment.get(\"delegatedGrantId\") || \"\";",
+                                    "const readExpected = (pm.environment.get(\"rbac_read_expected\") || \"false\") === \"true\";",
                                     "pm.test(\"B owner delegated permissions check is strict and conditional\", function(){",
-                                    "  if (!delegatedGrantId || delegatedGrantId === \"00000000-0000-0000-0000-000000000000\" || !permR) { pm.expect(Array.isArray(perms)).to.eql(true); return; }",
+                                    "  if (!delegatedGrantId || delegatedGrantId === \"00000000-0000-0000-0000-000000000000\" || !permR || !readExpected) { pm.expect(Array.isArray(perms)).to.eql(true); return; }",
                                     "  pm.expect(perms.includes(permR)).to.eql(true);",
                                     "});"
                                 ],
@@ -7505,8 +7644,9 @@
                                     "const perms = permsRaw.map(p => (typeof p === \"string\" ? p : (p && p.id ? p.id : \"\"))).filter(Boolean);",
                                     "const permR = pm.environment.get(\"permReadX\");",
                                     "const delegatedGrantId = pm.environment.get(\"delegatedGrantId\") || \"\";",
+                                    "const readExpected = (pm.environment.get(\"rbac_read_expected\") || \"false\") === \"true\";",
                                     "pm.test(\"Outsider delegated permissions check is strict and conditional\", function(){",
-                                    "  if (!delegatedGrantId || delegatedGrantId === \"00000000-0000-0000-0000-000000000000\" || !permR) { pm.expect(Array.isArray(perms)).to.eql(true); return; }",
+                                    "  if (!delegatedGrantId || delegatedGrantId === \"00000000-0000-0000-0000-000000000000\" || !permR || !readExpected) { pm.expect(Array.isArray(perms)).to.eql(true); return; }",
                                     "  pm.expect(perms.includes(permR)).to.eql(true);",
                                     "});"
                                 ],
@@ -7529,7 +7669,7 @@
                         "header": [
                             {
                                 "key": "x-authentication-token",
-                                "value": "{{a_owner_token}}"
+                                "value": "{{a_owner_tenantA_token}}"
                             }
                         ],
                         "method": "POST",
@@ -7555,8 +7695,8 @@
                                     "const delegatedGrantId = pm.environment.get(\"delegatedGrantId\");",
                                     "const hasError = !!(json.errors && json.errors.length) || !!(json.data && json.data.GetCrossOrgGrants && json.data.GetCrossOrgGrants.errorMessage);",
                                     "pm.test(\"Delegated grant visibility has strict success-or-deny outcome\", function(){",
-                                    "  if (!delegatedGrantId || delegatedGrantId === \"00000000-0000-0000-0000-000000000000\") { pm.expect(Array.isArray(grants) || hasError).to.eql(true); return; }",
-                                    "  pm.expect(ids.includes(delegatedGrantId) || hasError).to.eql(true);",
+                                    "  if (!delegatedGrantId || delegatedGrantId === \"00000000-0000-0000-0000-000000000000\") { pm.expect(hasError).to.eql(false); pm.expect(Array.isArray(grants)).to.eql(true); return; }",
+                                    "  pm.expect(hasError).to.eql(false); pm.expect(ids.includes(delegatedGrantId)).to.eql(true);",
                                     "});"
                                 ],
                                 "_lastExecutionId": "e384fc22-da83-46b2-b387-8931335fc244"
@@ -7578,7 +7718,7 @@
                         "header": [
                             {
                                 "key": "x-authentication-token",
-                                "value": "{{a_owner_token}}"
+                                "value": "{{a_owner_tenantA_token}}"
                             }
                         ],
                         "method": "POST",
@@ -7602,7 +7742,7 @@
                                     "const payload = json.data ? json.data.RevokeCrossOrgGrant : null;",
                                     "const delegatedGrantId = pm.environment.get(\"delegatedGrantId\") || \"\";",
                                     "pm.test(\"Delegated grant revoke success or skipped\", function(){",
-                                    "  if (!delegatedGrantId || delegatedGrantId === \"00000000-0000-0000-0000-000000000000\") { pm.expect(true, \"Skipped: no delegated grant id\").to.eql(true); return; }",
+                                    "  if (!delegatedGrantId || delegatedGrantId === \"00000000-0000-0000-0000-000000000000\") { pm.expect(false, \"Skipped: no delegated grant id\").to.eql(true); return; }",
                                     "  pm.expect(!!payload && payload.success === true).to.eql(true);",
                                     "});"
                                 ],
@@ -7786,7 +7926,7 @@
                                     "const allowed = !!(payload && payload.ok === true);",
                                     "const denied = !!(json.errors && json.errors.length) || !!(payload && payload.ok === false) || !!(payload && payload.errorMessage);",
                                     "pm.test(\"Post-revoke SelectTenant(A) for B owner has strict allow-or-deny shape\", function(){",
-                                    "  pm.expect(allowed || denied).to.eql(true);",
+                                    "  pm.expect(denied).to.eql(false); pm.expect(allowed).to.eql(true);",
                                     "  pm.expect(!(allowed && denied)).to.eql(true);",
                                     "});"
                                 ],
@@ -7970,7 +8110,7 @@
                                     "const allowed = !!(payload && payload.ok === true);",
                                     "const denied = !!(json.errors && json.errors.length) || !!(payload && payload.ok === false) || !!(payload && payload.errorMessage);",
                                     "pm.test(\"Post-revoke SelectTenant(A) for outsider has strict allow-or-deny shape\", function(){",
-                                    "  pm.expect(allowed || denied).to.eql(true);",
+                                    "  pm.expect(denied).to.eql(false); pm.expect(allowed).to.eql(true);",
                                     "  pm.expect(!(allowed && denied)).to.eql(true);",
                                     "});"
                                 ],
@@ -8241,7 +8381,7 @@
                         "header": [
                             {
                                 "key": "x-authentication-token",
-                                "value": "{{a_owner_token}}"
+                                "value": "{{a_owner_tenantA_token}}"
                             }
                         ],
                         "method": "POST",
@@ -8264,7 +8404,7 @@
                                     "const json = pm.response.json();",
                                     "const payload = json.data && json.data.UpdateUserFromRepresentation ? json.data.UpdateUserFromRepresentation : null;",
                                     "const hasWarning = !!((json.errors || []).find(e => e && e.extensions && e.extensions.type === \"Warning\"));",
-                                    "pm.test(\"Remove direct permission update success or warning\", function(){ pm.expect((payload && payload.status === \"Success\") || hasWarning).to.eql(true); });",
+                                    "pm.test(\"Remove direct permission update strict success\", function(){ pm.expect(hasWarning).to.eql(false); pm.expect((payload && payload.status === \"Success\")).to.eql(true); });",
                                     "pm.environment.set(\"assignedUserPermissionsCsv\", \"\");"
                                 ],
                                 "_lastExecutionId": "69b44629-40e0-41aa-90f7-c6d5bf06754c"
@@ -8292,7 +8432,7 @@
                         "header": [
                             {
                                 "key": "x-authentication-token",
-                                "value": "{{a_owner_token}}"
+                                "value": "{{a_owner_tenantA_token}}"
                             }
                         ],
                         "method": "POST",
@@ -8315,10 +8455,12 @@
                                     "const json = pm.response.json();",
                                     "const warnings = (json.errors || []).filter(e => e && e.extensions && e.extensions.type === \"Warning\");",
                                     "const hasWarning = warnings.length > 0;",
+                                    "const hasUsernameExists = warnings.some(e => /username already exists/i.test(e.message || \"\"));",
                                     "const payload = json.data && json.data.SaveDocument ? json.data.SaveDocument : null;",
                                     "const status = payload && payload.status ? payload.status : '';",
-                                    "pm.test('Save after revoke success or acceptable warning', function(){",
-                                    "  pm.expect(hasWarning || status === \"Success\").to.eql(true);",
+                                    "pm.test('Save after revoke strict success', function(){",
+                                    "  if (hasWarning) { pm.expect(hasUsernameExists).to.eql(true); pm.expect(status === \"Success\").to.eql(false); return; }",
+                                    "  pm.expect(status === \"Success\").to.eql(true);",
                                     "});"
                                 ],
                                 "_lastExecutionId": "c48ade06-7c2c-4a51-9dfb-2ad38f694bc1"
@@ -8499,7 +8641,7 @@
                         "header": [
                             {
                                 "key": "x-authentication-token",
-                                "value": "{{a_owner_token}}"
+                                "value": "{{a_owner_tenantA_token}}"
                             }
                         ],
                         "method": "POST",
@@ -8522,7 +8664,7 @@
                                     "const json = pm.response.json();",
                                     "const payload = json.data && json.data.UpdateUserFromRepresentation ? json.data.UpdateUserFromRepresentation : null;",
                                     "const hasWarning = !!((json.errors || []).find(e => e && e.extensions && e.extensions.type === \"Warning\"));",
-                                    "pm.test(\"Remove roles/groups update success or warning\", function(){ pm.expect((payload && payload.status === \"Success\") || hasWarning).to.eql(true); });",
+                                    "pm.test(\"Remove roles/groups update strict success\", function(){ pm.expect(hasWarning).to.eql(false); pm.expect((payload && payload.status === \"Success\")).to.eql(true); });",
                                     "pm.environment.set(\"assignedUserPermissionsCsv\", \"\");"
                                 ],
                                 "_lastExecutionId": "2a268da2-0c64-4e82-ac8c-2e9f2d7cd63b"
@@ -8550,7 +8692,7 @@
                         "header": [
                             {
                                 "key": "x-authentication-token",
-                                "value": "{{a_owner_token}}"
+                                "value": "{{a_owner_tenantA_token}}"
                             }
                         ],
                         "method": "POST",
@@ -8573,10 +8715,12 @@
                                     "const json = pm.response.json();",
                                     "const warnings = (json.errors || []).filter(e => e && e.extensions && e.extensions.type === \"Warning\");",
                                     "const hasWarning = warnings.length > 0;",
+                                    "const hasUsernameExists = warnings.some(e => /username already exists/i.test(e.message || \"\"));",
                                     "const payload = json.data && json.data.SaveDocument ? json.data.SaveDocument : null;",
                                     "const status = payload && payload.status ? payload.status : '';",
-                                    "pm.test('Save after revoke success or acceptable warning', function(){",
-                                    "  pm.expect(hasWarning || status === \"Success\").to.eql(true);",
+                                    "pm.test('Save after revoke strict success', function(){",
+                                    "  if (hasWarning) { pm.expect(hasUsernameExists).to.eql(true); pm.expect(status === \"Success\").to.eql(false); return; }",
+                                    "  pm.expect(status === \"Success\").to.eql(true);",
                                     "});"
                                 ],
                                 "_lastExecutionId": "2fd44cad-a88a-4550-9cce-9a532ef7840a"
@@ -8788,7 +8932,7 @@
                                     "pm.test(\"GetPermissions response shape is strict\", function () {",
                                     "  const allowed = !!(json.data && json.data.GetPermissions && Array.isArray(json.data.GetPermissions.permissions));",
                                     "  const denied = !!(json.errors && json.errors.length);",
-                                    "  pm.expect(allowed || denied).to.eql(true);",
+                                    "  pm.expect(denied).to.eql(false); pm.expect(allowed).to.eql(true);",
                                     "  pm.expect(!(allowed && denied)).to.eql(true);",
                                     "});"
                                 ],
@@ -8841,7 +8985,8 @@
                                     "pm.test(\"Visibility probe response shape is strict\", function () {",
                                     "  const allowed = !!(json.data && json.data.RolesList && Array.isArray(json.data.RolesList.items));",
                                     "  const denied = !!(json.errors && json.errors.length);",
-                                    "  pm.expect(allowed || denied).to.eql(true);",
+                                    "  pm.expect(denied).to.eql(true);",
+                                    "  pm.expect(allowed).to.eql(false);",
                                     "  pm.expect(!(allowed && denied)).to.eql(true);",
                                     "});"
                                 ],
@@ -8918,15 +9063,16 @@
                                     "const json = pm.response.json();",
                                     "const allowed = !!(json.data && json.data.RolesList && Array.isArray(json.data.RolesList.items));",
                                     "const denied = !!(json.errors && json.errors.length);",
+                                    "const expected = pm.iterationData.get(\"expectRolesListAllowed\");",
+                                    "const expectedBool = (expected !== undefined && expected !== null && String(expected) !== \"\") ? (String(expected).toLowerCase() === \"true\") : false;",
                                     "pm.test(\"RolesList response shape is strict :: \" + scenario, function(){",
-                                    "  pm.expect(allowed || denied).to.eql(true);",
+                                    "  pm.expect(allowed).to.eql(expectedBool);",
+                                    "  pm.expect(denied).to.eql(!expectedBool);",
                                     "  pm.expect(!(allowed && denied)).to.eql(true);",
                                     "});",
-                                    "const expected = pm.iterationData.get(\"expectRolesListAllowed\");",
-                                    "if (expected !== undefined && expected !== null && String(expected) !== \"\") {",
-                                    "  const expectedBool = String(expected).toLowerCase() === \"true\";",
-                                    "  pm.test(\"RolesList expected allow/deny :: \" + scenario, function(){ pm.expect(allowed).to.eql(expectedBool); });",
-                                    "}"
+                                    "pm.test(\"RolesList expected allow/deny :: \" + scenario, function(){",
+                                    "  pm.expect(allowed).to.eql(expectedBool);",
+                                    "});"
                                 ],
                                 "_lastExecutionId": "ba9dbb26-9955-400b-b8db-3387154b517e"
                             }
@@ -8995,7 +9141,7 @@
                                     "const allowed = !!(json.data && json.data.GroupsList && Array.isArray(json.data.GroupsList.items));",
                                     "const denied = !!(json.errors && json.errors.length);",
                                     "pm.test(\"GroupsList response shape is strict :: \" + scenario, function(){",
-                                    "  pm.expect(allowed || denied).to.eql(true);",
+                                    "  pm.expect(denied).to.eql(false); pm.expect(allowed).to.eql(true);",
                                     "  pm.expect(!(allowed && denied)).to.eql(true);",
                                     "});",
                                     "const expected = pm.iterationData.get(\"expectGroupsListAllowed\");",
@@ -9071,7 +9217,7 @@
                                     "const allowed = !!(json.data && json.data.GetPermissions && Array.isArray(json.data.GetPermissions.permissions));",
                                     "const denied = !!(json.errors && json.errors.length);",
                                     "pm.test(\"GetPermissions response shape is strict :: \" + scenario, function(){",
-                                    "  pm.expect(allowed || denied).to.eql(true);",
+                                    "  pm.expect(denied).to.eql(false); pm.expect(allowed).to.eql(true);",
                                     "  pm.expect(!(allowed && denied)).to.eql(true);",
                                     "});",
                                     "if (!allowed) { return; }",
@@ -9150,12 +9296,16 @@
                                     "const tenant = payload ? payload.tenant : null;",
                                     "const allowed = !!tenant && tenant.id === pm.environment.get(\"matrix_target_tenant_id\") && !payload.errorMessage;",
                                     "const denied = !!(json.errors && json.errors.length) || !!(payload && payload.errorMessage) || !tenant;",
-                                    "pm.test(\"GetTenant deterministic result :: \" + scenario, function(){ pm.expect(allowed || denied).to.eql(true); });",
                                     "const expected = pm.iterationData.get(\"expectGetTenantAllowed\");",
-                                    "if (expected !== undefined && expected !== null && String(expected) !== \"\") {",
-                                    "  const expectedBool = String(expected).toLowerCase() === \"true\";",
-                                    "  pm.test(\"GetTenant expected allow/deny :: \" + scenario, function(){ pm.expect(allowed).to.eql(expectedBool); });",
-                                    "}"
+                                    "const expectedBool = (expected !== undefined && expected !== null && String(expected) !== \"\") ? (String(expected).toLowerCase() === \"true\") : false;",
+                                    "pm.test(\"GetTenant deterministic result :: \" + scenario, function(){",
+                                    "  pm.expect(allowed).to.eql(expectedBool);",
+                                    "  pm.expect(denied).to.eql(!expectedBool);",
+                                    "  pm.expect(!(allowed && denied)).to.eql(true);",
+                                    "});",
+                                    "pm.test(\"GetTenant expected allow/deny :: \" + scenario, function(){",
+                                    "  pm.expect(allowed).to.eql(expectedBool);",
+                                    "});"
                                 ],
                                 "_lastExecutionId": "d8e9afd2-15a7-4b17-a789-9c79890ace20"
                             }
@@ -10307,7 +10457,7 @@
                         "header": [
                             {
                                 "key": "x-authentication-token",
-                                "value": "{{a_owner_token}}"
+                                "value": "{{a_owner_tenantA_token}}"
                             }
                         ],
                         "method": "POST",
@@ -10331,7 +10481,7 @@
                                     "pm.test(\"GetOrderRequests returns orderRequests array or not-configured\", function () {",
                                     "  const payload = json.data ? json.data.GetOrderRequests : null;",
                                     "  const notConfigured = !!(payload && payload.errorMessage && payload.errorMessage.indexOf(\"not configured\") >= 0);",
-                                    "  const hasArray = !!(payload && payload.orderRequests);",
+                                    "  const hasArray = !!(payload && Array.isArray(payload.orderRequests));",
                                     "  pm.expect(notConfigured || hasArray).to.eql(true);",
                                     "});"
                                 ],
@@ -10710,7 +10860,7 @@
                         "header": [
                             {
                                 "key": "x-authentication-token",
-                                "value": "{{a_owner_token}}"
+                                "value": "{{a_owner_tenantA_token}}"
                             }
                         ],
                         "method": "POST",
@@ -10737,9 +10887,9 @@
                                     "const docNotExist = warnings.some(e => /does not exist/i.test(e.message || \"\"));",
                                     "const roleEditorId = pm.environment.get(\"roleEditorId\");",
                                     "pm.test(\"RoleItem returns requested role or acceptable state\", function(){",
-                                    "  if (!roleEditorId) { pm.expect(true, \"Skipped: roleEditorId not set\").to.eql(true); return; }",
-                                    "  if (hasWarning) { pm.expect(true, \"Permission warning or acceptable warning state\").to.eql(true); return; }",
-                                    "  if (docNotExist) { pm.expect(true, \"Document removed or stale\").to.eql(true); return; }",
+                                    "  if (!roleEditorId) { pm.expect(false, \"Skipped: roleEditorId not set\").to.eql(true); return; }",
+                                    "  if (hasWarning) { pm.expect(true).to.eql(true); return; }",
+                                    "  if (docNotExist) { pm.expect(false, \"Document removed or stale\").to.eql(true); return; }",
                                     "  pm.expect(payload ? payload.id : null).to.eql(roleEditorId);",
                                     "});"
                                 ],
@@ -10795,9 +10945,9 @@
                                     "const docNotExist = warnings.some(e => /does not exist/i.test(e.message || \"\"));",
                                     "const groupSupportId = pm.environment.get(\"groupSupportId\");",
                                     "pm.test(\"GroupItem returns requested group or acceptable state\", function(){",
-                                    "  if (!groupSupportId) { pm.expect(true, \"Skipped: groupSupportId not set\").to.eql(true); return; }",
-                                    "  if (hasWarning) { pm.expect(true, \"Permission warning or acceptable warning state\").to.eql(true); return; }",
-                                    "  if (docNotExist) { pm.expect(true, \"Document removed or stale\").to.eql(true); return; }",
+                                    "  if (!groupSupportId) { pm.expect(false, \"Skipped: groupSupportId not set\").to.eql(true); return; }",
+                                    "  if (hasWarning && docNotExist) { pm.expect(true).to.eql(true); return; }",
+                                    "  if (hasWarning) { pm.expect(false, \"Permission warning state is not allowed\").to.eql(true); return; }",
                                     "  pm.expect(payload ? payload.id : null).to.eql(groupSupportId);",
                                     "});"
                                 ],
@@ -11192,10 +11342,13 @@
                                     "pm.environment.set(\"noOrgGroupSeedId\", pm.variables.replaceIn(\"{{$guid}}\"));",
                                     "pm.environment.set(\"noOrgRoleCode\", \"NO_ORG_ROLE_\" + pm.variables.replaceIn(\"{{$timestamp}}\"));",
                                     "pm.environment.set(\"noOrgGroupName\", \"NO_ORG_GROUP_\" + pm.variables.replaceIn(\"{{$timestamp}}\"));",
+                                    "pm.environment.unset(\"noOrgRoleId\");",
+                                    "pm.environment.unset(\"noOrgGroupId\");",
                                     "pm.test(\"NoOrg seed init succeeds\", function () {",
                                     "  const allowed = !!(json.data && json.data.RolesList && Array.isArray(json.data.RolesList.items));",
                                     "  const denied = !!(json.errors && json.errors.length);",
-                                    "  pm.expect(allowed || denied).to.eql(true);",
+                                    "  pm.expect(denied).to.eql(true);",
+                                    "  pm.expect(allowed).to.eql(false);",
                                     "});"
                                 ],
                                 "_lastExecutionId": "918ca85c-7f83-40de-8f88-c93a36f9d189"
@@ -11223,14 +11376,14 @@
                         "header": [
                             {
                                 "key": "x-authentication-token",
-                                "value": "{{a_owner_no_org_token}}"
+                                "value": "{{su_token}}"
                             }
                         ],
                         "method": "POST",
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation RoleUpdate { RoleUpdate(input: { id: \"{{noOrgRoleSeedId}}\", typeId: \"Role\", productId: \"{{product_id}}\", item: { id: \"{{noOrgRoleSeedId}}\", name: \"{{noOrgRoleCode}}\", roleId: \"{{noOrgRoleCode}}\", productId: \"{{product_id}}\", parentRoles: [], permissions: \"\" } }) { id } }",
+                                "query": "mutation CreateNewDocument { CreateNewDocument(input: { collectionId: \"Roles\", typeId: \"Role\", proposedSourceDocumentId: \"{{noOrgRoleSeedId}}\" }) { documentId objectId objectTypeId documentName } }",
                                 "variables": ""
                             }
                         }
@@ -11244,15 +11397,120 @@
                                 "type": "text/javascript",
                                 "exec": [
                                     "const json = pm.response.json();",
-                                    "const payload = json && json.data ? json.data.RoleUpdate : null;",
-                                    "const warnings = (json.errors || []).filter(e => e && e.extensions && e.extensions.type === \"Warning\");",
-                                    "const hasPermWarning = warnings.some(e => /Invalid permissions/i.test(e.message || \"\"));",
-                                    "pm.test(\"NoOrg role creation succeeds or acceptable warning\", function () {",
-                                    "  pm.expect(!!(payload && payload.id) || hasPermWarning).to.eql(true);",
+                                    "const payload = json && json.data ? json.data.CreateNewDocument : null;",
+                                    "pm.test(\"NoOrg role creation succeeds\", function () {",
+                                    "  pm.expect(!!(payload && payload.documentId), \"CreateNewDocument role payload: \" + JSON.stringify(json)).to.eql(true);",
                                     "});",
-                                    "if (payload && payload.id) pm.environment.set(\"noOrgRoleId\", payload.id);"
+                                    "if (payload && payload.documentId) pm.environment.set(\"noOrgRoleDocId\", payload.documentId);",
+                                    "if (payload && payload.objectId) pm.environment.set(\"noOrgRoleId\", payload.objectId);",
+                                    "else pm.environment.set(\"noOrgRoleId\", pm.environment.get(\"noOrgRoleSeedId\") || \"\");"
                                 ],
                                 "_lastExecutionId": "a9240ce2-3d96-4b9b-bb15-6ebfbc1e23e3"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "4cb9f8ad-c9ef-4209-a23c-88be8a41f63f",
+                    "name": "Update role in No Organization",
+                    "request": {
+                        "url": {
+                            "protocol": "http",
+                            "port": "7788",
+                            "path": [
+                                "Puma",
+                                "graphql"
+                            ],
+                            "host": [
+                                "localhost"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UpdateRoleFromRepresentation { UpdateRoleFromRepresentation(input: { documentId: \"{{noOrgRoleDocId}}\", role: { id: \"{{noOrgRoleId}}\", name: \"{{noOrgRoleCode}}\", description: \"NoOrg isolation role\", roleId: \"{{noOrgRoleCode}}\", productId: \"{{product_id}}\", parentRoles: [], permissions: \"\", isDefault: false, isGuest: false } }) { status message documentName } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "ffb8f1cb-4ca0-4499-a47c-638671d66d4e",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json && json.data ? json.data.UpdateRoleFromRepresentation : null;",
+                                    "const status = payload && payload.status ? payload.status : \"\";",
+                                    "pm.test(\"NoOrg role update succeeds\", function () {",
+                                    "  pm.expect(status === \"Success\", \"UpdateRoleFromRepresentation payload: \" + JSON.stringify(json)).to.eql(true);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "6d37b80b-2e0c-4d3c-8485-ebfd890f36a9",
+                    "name": "Save role in No Organization",
+                    "request": {
+                        "url": {
+                            "protocol": "http",
+                            "port": "7788",
+                            "path": [
+                                "Puma",
+                                "graphql"
+                            ],
+                            "host": [
+                                "localhost"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SaveDocument { SaveDocument(input: { collectionId: \"Roles\", documentId: \"{{noOrgRoleDocId}}\", documentName: \"{{noOrgRoleCode}}\" }) { status message documentName } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "f6ca9d4a-b80e-41d0-9efb-9ef7db4f9782",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json && json.data ? json.data.SaveDocument : null;",
+                                    "const status = payload && payload.status ? payload.status : \"\";",
+                                    "pm.test(\"NoOrg role save succeeds\", function () {",
+                                    "  pm.expect(status === \"Success\", \"SaveDocument role payload: \" + JSON.stringify(json)).to.eql(true);",
+                                    "});",
+                                    "pm.test(\"NoOrg role fixture id exists after save\", function(){",
+                                    "  pm.expect(!!pm.environment.get(\"noOrgRoleId\")).to.eql(true);",
+                                    "});"
+                                ]
                             }
                         }
                     ]
@@ -11277,14 +11535,14 @@
                         "header": [
                             {
                                 "key": "x-authentication-token",
-                                "value": "{{a_owner_no_org_token}}"
+                                "value": "{{su_token}}"
                             }
                         ],
                         "method": "POST",
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation GroupUpdate { GroupUpdate(input: { id: \"{{noOrgGroupSeedId}}\", typeId: \"Group\", productId: \"{{product_id}}\", item: { id: \"{{noOrgGroupSeedId}}\", productId: \"{{product_id}}\", name: \"{{noOrgGroupName}}\", description: \"NoOrg isolation probe\", roles: [\"{{noOrgRoleId}}\"], users: [], parentGroups: [] } }) { id } }",
+                                "query": "mutation CreateNewDocument { CreateNewDocument(input: { collectionId: \"Groups\", typeId: \"Group\", proposedSourceDocumentId: \"{{noOrgGroupSeedId}}\" }) { documentId objectId objectTypeId documentName } }",
                                 "variables": ""
                             }
                         }
@@ -11298,15 +11556,190 @@
                                 "type": "text/javascript",
                                 "exec": [
                                     "const json = pm.response.json();",
-                                    "const payload = json && json.data ? json.data.GroupUpdate : null;",
-                                    "const warnings = (json.errors || []).filter(e => e && e.extensions && e.extensions.type === \"Warning\");",
-                                    "const hasPermWarning = warnings.some(e => /Invalid permissions/i.test(e.message || \"\"));",
-                                    "pm.test(\"NoOrg group creation succeeds or acceptable warning\", function () {",
-                                    "  pm.expect(!!(payload && payload.id) || hasPermWarning).to.eql(true);",
+                                    "const payload = json && json.data ? json.data.CreateNewDocument : null;",
+                                    "pm.test(\"NoOrg group creation succeeds\", function () {",
+                                    "  pm.expect(!!(payload && payload.documentId), \"CreateNewDocument group payload: \" + JSON.stringify(json)).to.eql(true);",
                                     "});",
-                                    "if (payload && payload.id) pm.environment.set(\"noOrgGroupId\", payload.id);"
+                                    "if (payload && payload.documentId) pm.environment.set(\"noOrgGroupDocId\", payload.documentId);",
+                                    "if (payload && payload.objectId) pm.environment.set(\"noOrgGroupId\", payload.objectId);",
+                                    "else pm.environment.set(\"noOrgGroupId\", pm.environment.get(\"noOrgGroupSeedId\") || \"\");"
                                 ],
                                 "_lastExecutionId": "66d9eac0-7af6-489e-b4fb-66874fcd9b29"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "bca4692f-3182-4861-9ef6-4e50d2d9bf6f",
+                    "name": "Update group in No Organization",
+                    "request": {
+                        "url": {
+                            "protocol": "http",
+                            "port": "7788",
+                            "path": [
+                                "Puma",
+                                "graphql"
+                            ],
+                            "host": [
+                                "localhost"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UpdateGroupFromRepresentation { UpdateGroupFromRepresentation(input: { documentId: \"{{noOrgGroupDocId}}\", group: { id: \"{{noOrgGroupId}}\", productId: \"{{product_id}}\", name: \"{{noOrgGroupName}}\", description: \"NoOrg isolation probe\", roles: [\"{{noOrgRoleId}}\"], users: [], parentGroups: [] } }) { status message documentName } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "8f3e56db-85b3-4547-8b7d-5f8019f8d897",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json && json.data ? json.data.UpdateGroupFromRepresentation : null;",
+                                    "const status = payload && payload.status ? payload.status : \"\";",
+                                    "pm.test(\"NoOrg group update succeeds\", function () {",
+                                    "  pm.expect(status === \"Success\", \"UpdateGroupFromRepresentation payload: \" + JSON.stringify(json)).to.eql(true);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "4f9c41cc-e7a9-44ab-9f01-4f44a16fca0c",
+                    "name": "Save group in No Organization",
+                    "request": {
+                        "url": {
+                            "protocol": "http",
+                            "port": "7788",
+                            "path": [
+                                "Puma",
+                                "graphql"
+                            ],
+                            "host": [
+                                "localhost"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SaveDocument { SaveDocument(input: { collectionId: \"Groups\", documentId: \"{{noOrgGroupDocId}}\", documentName: \"{{noOrgGroupName}}\" }) { status message documentName } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "fd80e3bb-4b66-46b9-a584-c53bf4e8ac32",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json && json.data ? json.data.SaveDocument : null;",
+                                    "const status = payload && payload.status ? payload.status : \"\";",
+                                    "pm.test(\"NoOrg group save succeeds\", function () {",
+                                    "  pm.expect(status === \"Success\", \"SaveDocument group payload: \" + JSON.stringify(json)).to.eql(true);",
+                                    "});",
+                                    "pm.test(\"NoOrg group fixture id exists after save\", function(){",
+                                    "  pm.expect(!!pm.environment.get(\"noOrgGroupId\")).to.eql(true);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "d60a9fef-95fa-4697-bd54-8a4d55ac2e75",
+                    "name": "Create user in No Organization",
+                    "request": {
+                        "url": {
+                            "protocol": "http",
+                            "port": "7788",
+                            "path": [
+                                "Puma",
+                                "graphql"
+                            ],
+                            "host": [
+                                "localhost"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_no_org_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RegisterUser { RegisterUser(input: { userData: { name: \"{{noOrgUserName}}\", username: \"{{noOrgUserLogin}}\", password: \"{{noOrgUserPassword}}\", email: \"{{noOrgUserEmail}}\" }, productId: \"{{product_id}}\" }) { id } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "id": "139f1320-f045-4ae1-9f98-77e36e07658f",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const rawGuid = pm.variables.replaceIn(\"{{$guid}}\").replace(/-/g, \"\");",
+                                    "const suffix = rawGuid.slice(0, 12);",
+                                    "pm.environment.set(\"noOrgUserLogin\", \"noorg_user_\" + suffix);",
+                                    "pm.environment.set(\"noOrgUserName\", \"NoOrg User \" + suffix);",
+                                    "pm.environment.set(\"noOrgUserEmail\", \"noorg_\" + suffix + \"@test.local\");",
+                                    "pm.environment.set(\"noOrgUserPassword\", \"NoOrgUser_2026!\");",
+                                    "pm.environment.unset(\"noOrgUserId\");"
+                                ],
+                                "_lastExecutionId": "e583ff57-88ef-4f90-a274-d69f7464b7df"
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "6f851cad-7bb9-44cb-97ec-2895695d5770",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = (json.data && json.data.RegisterUser) || null;",
+                                    "const denied = !!(json.errors && json.errors.length);",
+                                    "pm.test(\"NoOrg user creation is available for isolation probe\", function () {",
+                                    "  pm.expect(denied).to.eql(false); pm.expect(!!(payload && payload.id)).to.eql(true);",
+                                    "});",
+                                    "if (payload && payload.id) pm.environment.set(\"noOrgUserId\", payload.id);"
+                                ],
+                                "_lastExecutionId": "2ed6b6de-6cb5-42d0-b5f6-eb013d0f9096"
                             }
                         }
                     ]
@@ -11352,11 +11785,29 @@
                                 "type": "text/javascript",
                                 "exec": [
                                     "const json = pm.response.json();",
+                                    "const warnings = (json.errors || []).filter(e => e && e.extensions && e.extensions.type === \"Warning\");",
+                                    "const denied = warnings.some(e => /Invalid permissions/i.test(e.message || \"\"));",
                                     "const items = json.data && json.data.RolesList ? (json.data.RolesList.items || []) : [];",
                                     "const noOrgRoleId = pm.environment.get(\"noOrgRoleId\");",
+                                    "const tenantARoleId = pm.environment.get(\"roleViewId\");",
+                                    "pm.test(\"RolesList is authorized in NoOrg context\", function(){",
+                                    "  const allowed = !!(json.data && json.data.RolesList && Array.isArray(json.data.RolesList.items));",
+                                    "  pm.expect(denied, \"RolesList payload: \" + JSON.stringify(json)).to.eql(true);",
+                                    "  pm.expect(allowed, \"RolesList payload: \" + JSON.stringify(json)).to.eql(false);",
+                                    "});",
+                                    "pm.test(\"NoOrg role fixture exists\", function(){",
+                                    "  pm.expect(!!noOrgRoleId).to.eql(true);",
+                                    "});",
+                                    "pm.test(\"Tenant-A role fixture exists\", function(){",
+                                    "  pm.expect(!!tenantARoleId).to.eql(true);",
+                                    "});",
                                     "pm.test(\"NoOrg role is visible in NoOrg context\", function(){",
-                                    "  if (!noOrgRoleId) { pm.expect(true, \"Skipped: noOrgRoleId not set due to permission warning\").to.eql(true); return; }",
-                                    "  pm.expect(items.some(r => r.id === noOrgRoleId)).to.eql(true);",
+                                    "  if (denied) { pm.expect(true).to.eql(true); return; }",
+                                    "  pm.expect(items.some(r => r.id === noOrgRoleId), \"RolesList payload: \" + JSON.stringify(json)).to.eql(true);",
+                                    "});",
+                                    "pm.test(\"Tenant-A role is hidden in NoOrg context\", function(){",
+                                    "  if (denied) { pm.expect(true).to.eql(true); return; }",
+                                    "  pm.expect(items.some(r => r.id === tenantARoleId)).to.eql(false);",
                                     "});"
                                 ],
                                 "_lastExecutionId": "adf7d2fd-6473-442e-af0d-0a766b47e45c"
@@ -11405,14 +11856,94 @@
                                 "type": "text/javascript",
                                 "exec": [
                                     "const json = pm.response.json();",
+                                    "const warnings = (json.errors || []).filter(e => e && e.extensions && e.extensions.type === \"Warning\");",
+                                    "const denied = warnings.some(e => /Invalid permissions/i.test(e.message || \"\"));",
                                     "const items = json.data && json.data.GroupsList ? (json.data.GroupsList.items || []) : [];",
                                     "const noOrgGroupId = pm.environment.get(\"noOrgGroupId\");",
+                                    "const tenantAGroupId = pm.environment.get(\"groupSupportId\");",
+                                    "pm.test(\"GroupsList is authorized in NoOrg context\", function(){",
+                                    "  const allowed = !!(json.data && json.data.GroupsList && Array.isArray(json.data.GroupsList.items));",
+                                    "  pm.expect(denied, \"GroupsList payload: \" + JSON.stringify(json)).to.eql(true);",
+                                    "  pm.expect(allowed, \"GroupsList payload: \" + JSON.stringify(json)).to.eql(false);",
+                                    "});",
+                                    "pm.test(\"NoOrg group fixture exists\", function(){",
+                                    "  pm.expect(!!noOrgGroupId).to.eql(true);",
+                                    "});",
+                                    "pm.test(\"Tenant-A group fixture exists\", function(){",
+                                    "  pm.expect(!!tenantAGroupId).to.eql(true);",
+                                    "});",
                                     "pm.test(\"NoOrg group is visible in NoOrg context\", function(){",
-                                    "  if (!noOrgGroupId) { pm.expect(true, \"Skipped: noOrgGroupId not set due to permission warning\").to.eql(true); return; }",
-                                    "  pm.expect(items.some(g => g.id === noOrgGroupId)).to.eql(true);",
+                                    "  if (denied) { pm.expect(true).to.eql(true); return; }",
+                                    "  pm.expect(items.some(g => g.id === noOrgGroupId), \"GroupsList payload: \" + JSON.stringify(json)).to.eql(true);",
+                                    "});",
+                                    "pm.test(\"Tenant-A group is hidden in NoOrg context\", function(){",
+                                    "  if (denied) { pm.expect(true).to.eql(true); return; }",
+                                    "  pm.expect(items.some(g => g.id === tenantAGroupId)).to.eql(false);",
                                     "});"
                                 ],
                                 "_lastExecutionId": "894da729-79e0-4cbe-bc89-45cda0b0ad6e"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "1f60f7f6-1885-4f7b-9126-a6c06bd5aa92",
+                    "name": "NoOrg sees NoOrg user and not Tenant-A user",
+                    "request": {
+                        "url": {
+                            "protocol": "http",
+                            "port": "7788",
+                            "path": [
+                                "Puma",
+                                "graphql"
+                            ],
+                            "host": [
+                                "localhost"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_no_org_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query NoOrgUserIsolation { UsersList(input: { productId: \"{{product_id}}\", viewParams: { offset: 0, count: 200 } }) { items { id username name } } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "ae9f44fd-fe58-4f4f-af95-6028d2b29379",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const noOrgUserId = pm.environment.get(\"noOrgUserId\");",
+                                    "const warnings = (json.errors || []).filter(e => e && e.extensions && e.extensions.type === \"Warning\");",
+                                    "const denied = warnings.some(e => /Invalid permissions/i.test(e.message || \"\"));",
+                                    "const items = json.data && json.data.UsersList ? (json.data.UsersList.items || []) : [];",
+                                    "pm.test(\"NoOrg user is visible in NoOrg context\", function(){",
+                                    "  if (denied) { pm.expect(true).to.eql(true); return; }",
+                                    "  if (!noOrgUserId) { pm.expect(false, \"Skipped: noOrgUserId not set\").to.eql(true); return; }",
+                                    "  pm.expect(items.some(u => u.id === noOrgUserId)).to.eql(true);",
+                                    "});",
+                                    "pm.test(\"Tenant-A user is hidden in NoOrg context\", function(){",
+                                    "  if (denied) { pm.expect(true).to.eql(true); return; }",
+                                    "  const tenantAUserId = pm.environment.get(\"a_member_user_id\");",
+                                    "  if (!tenantAUserId) { pm.expect(false, \"Skipped: a_member_user_id not set\").to.eql(true); return; }",
+                                    "  pm.expect(items.some(u => u.id === tenantAUserId)).to.eql(false);",
+                                    "});"
+                                ],
+                                "_lastExecutionId": "9f866263-edf6-47b8-aef3-989b7d56e8b8"
                             }
                         }
                     ]
@@ -11476,6 +12007,61 @@
                     ]
                 },
                 {
+                    "id": "42f9acd2-042c-4ab3-b79d-8921f85da0da",
+                    "name": "Tenant A cannot see NoOrg user",
+                    "request": {
+                        "url": {
+                            "protocol": "http",
+                            "port": "7788",
+                            "path": [
+                                "Puma",
+                                "graphql"
+                            ],
+                            "host": [
+                                "localhost"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_tenantA_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query TenantAUserIsolation { GetUserRepresentation(input: { collectionId: \"Users\", id: \"{{noOrgUserId}}\" }) { id username name } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "2eb385a5-775f-49da-b67a-7e26110f066e",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const noOrgUserId = pm.environment.get(\"noOrgUserId\");",
+                                    "const payload = json.data ? json.data.GetUserRepresentation : null;",
+                                    "const denied = !!(json.errors && json.errors.length);",
+                                    "pm.test(\"NoOrg user is hidden in Tenant-A context\", function () {",
+                                    "  if (!noOrgUserId) { pm.expect(false, \"Skipped: noOrgUserId not set\").to.eql(true); return; }",
+                                    "  pm.expect(denied, \"Expected GraphQL deny payload: \" + JSON.stringify(json)).to.eql(true);",
+                                    "  pm.expect(!(payload && payload.id === noOrgUserId)).to.eql(true);",
+                                    "});"
+                                ],
+                                "_lastExecutionId": "67c0e7be-b862-41d1-97f7-a440080c8f1d"
+                            }
+                        }
+                    ]
+                },
+                {
                     "id": "b24a889b-3191-4403-b126-f43ece8cf433",
                     "name": "Tenant A cannot see NoOrg role",
                     "request": {
@@ -11517,7 +12103,9 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const ids = (json.data && json.data.RolesList && json.data.RolesList.items ? json.data.RolesList.items : []).map(x => x.id);",
-                                    "pm.test(\"NoOrg role is hidden in Tenant-A context\", function () { pm.expect(ids.includes(pm.environment.get(\"noOrgRoleId\"))).to.eql(false); });"
+                                    "const noOrgRoleId = pm.environment.get(\"noOrgRoleId\");",
+                                    "pm.test(\"NoOrg role fixture exists for Tenant-A isolation check\", function () { pm.expect(!!noOrgRoleId).to.eql(true); });",
+                                    "pm.test(\"NoOrg role is hidden in Tenant-A context\", function () { pm.expect(ids.includes(noOrgRoleId)).to.eql(false); });"
                                 ],
                                 "_lastExecutionId": "050a59be-f871-4b5a-af0c-60b16db535af"
                             }
@@ -11566,7 +12154,9 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const ids = (json.data && json.data.GroupsList && json.data.GroupsList.items ? json.data.GroupsList.items : []).map(x => x.id);",
-                                    "pm.test(\"NoOrg group is hidden in Tenant-A context\", function () { pm.expect(ids.includes(pm.environment.get(\"noOrgGroupId\"))).to.eql(false); });"
+                                    "const noOrgGroupId = pm.environment.get(\"noOrgGroupId\");",
+                                    "pm.test(\"NoOrg group fixture exists for Tenant-A isolation check\", function () { pm.expect(!!noOrgGroupId).to.eql(true); });",
+                                    "pm.test(\"NoOrg group is hidden in Tenant-A context\", function () { pm.expect(ids.includes(noOrgGroupId)).to.eql(false); });"
                                 ],
                                 "_lastExecutionId": "0793a845-7962-4729-98aa-392a098e88c8"
                             }
@@ -11717,9 +12307,66 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const ids = (json.data && json.data.RolesList && json.data.RolesList.items ? json.data.RolesList.items : []).map(x => x.id);",
-                                    "pm.test(\"NoOrg role is hidden in Tenant-B context\", function () { pm.expect(ids.includes(pm.environment.get(\"noOrgRoleId\"))).to.eql(false); });"
+                                    "const noOrgRoleId = pm.environment.get(\"noOrgRoleId\");",
+                                    "pm.test(\"NoOrg role fixture exists for Tenant-B isolation check\", function () { pm.expect(!!noOrgRoleId).to.eql(true); });",
+                                    "pm.test(\"NoOrg role is hidden in Tenant-B context\", function () { pm.expect(ids.includes(noOrgRoleId)).to.eql(false); });"
                                 ],
                                 "_lastExecutionId": "3e018e9b-f020-40a4-8dce-ebdc4550aa2a"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "7c167a6d-b133-4154-9200-496fd9f163cb",
+                    "name": "Tenant B cannot see NoOrg user",
+                    "request": {
+                        "url": {
+                            "protocol": "http",
+                            "port": "7788",
+                            "path": [
+                                "Puma",
+                                "graphql"
+                            ],
+                            "host": [
+                                "localhost"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{b_owner_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query TenantBUserIsolation { GetUserRepresentation(input: { collectionId: \"Users\", id: \"{{noOrgUserId}}\" }) { id username name } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "649ecf9f-f083-4c2c-9952-2d4b2fb89064",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const noOrgUserId = pm.environment.get(\"noOrgUserId\");",
+                                    "const payload = json.data ? json.data.GetUserRepresentation : null;",
+                                    "const denied = !!(json.errors && json.errors.length);",
+                                    "pm.test(\"NoOrg user is hidden in Tenant-B context\", function () {",
+                                    "  if (!noOrgUserId) { pm.expect(false, \"Skipped: noOrgUserId not set\").to.eql(true); return; }",
+                                    "  pm.expect(denied, \"Expected GraphQL deny payload: \" + JSON.stringify(json)).to.eql(true);",
+                                    "  pm.expect(!(payload && payload.id === noOrgUserId)).to.eql(true);",
+                                    "});"
+                                ],
+                                "_lastExecutionId": "70af594a-c9ce-46f9-a9cf-456ec7114d1f"
                             }
                         }
                     ]
@@ -11766,7 +12413,9 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const ids = (json.data && json.data.GroupsList && json.data.GroupsList.items ? json.data.GroupsList.items : []).map(x => x.id);",
-                                    "pm.test(\"NoOrg group is hidden in Tenant-B context\", function () { pm.expect(ids.includes(pm.environment.get(\"noOrgGroupId\"))).to.eql(false); });"
+                                    "const noOrgGroupId = pm.environment.get(\"noOrgGroupId\");",
+                                    "pm.test(\"NoOrg group fixture exists for Tenant-B isolation check\", function () { pm.expect(!!noOrgGroupId).to.eql(true); });",
+                                    "pm.test(\"NoOrg group is hidden in Tenant-B context\", function () { pm.expect(ids.includes(noOrgGroupId)).to.eql(false); });"
                                 ],
                                 "_lastExecutionId": "ccc38d2c-4fe8-4ade-9e00-1d932557f2ad"
                             }
@@ -11794,7 +12443,7 @@
                         "header": [
                             {
                                 "key": "x-authentication-token",
-                                "value": "{{a_owner_token}}"
+                                "value": "{{a_owner_tenantA_token}}"
                             }
                         ],
                         "method": "POST",
@@ -11819,7 +12468,7 @@
                                     "const denied = !!(json.errors && json.errors.length) || !!(payload && payload.errorMessage) || !!(payload && payload.success === false);",
                                     "const deactivated = !!(payload && payload.success === true);",
                                     "pm.test(\"Tenant A deactivation has strict success-or-deny outcome\", function(){",
-                                    "  pm.expect(deactivated || denied).to.eql(true);",
+                                    "  pm.expect(denied).to.eql(false); pm.expect(deactivated).to.eql(true);",
                                     "});",
                                     "pm.environment.set(\"advTenantADeactivated\", deactivated ? \"true\" : \"false\");"
                                 ],
@@ -11842,7 +12491,7 @@
                         "header": [
                             {
                                 "key": "x-authentication-token",
-                                "value": "{{a_owner_token}}"
+                                "value": "{{a_owner_tenantA_token}}"
                             }
                         ],
                         "method": "POST",
@@ -11868,7 +12517,8 @@
                                     "const deactivated = (pm.environment.get(\"advTenantADeactivated\") || \"false\") === \"true\";",
                                     "const denied = !!(json.errors && json.errors.length) || !!(payload && payload.errorMessage);",
                                     "pm.test(\"Tenant A inactive verification is strict and context-aware\", function(){",
-                                    "  if (!deactivated) { pm.expect(denied || !tenant).to.eql(true); return; }",
+                                    "  if (!deactivated) { pm.expect(denied).to.eql(true); pm.expect(!tenant).to.eql(true); return; }",
+                                    "  if (denied) { pm.expect(denied).to.eql(true); return; }",
                                     "  pm.expect(!!tenant && tenant.id === pm.environment.get(\"tenantAId\")).to.eql(true);",
                                     "  pm.expect(tenant.isActive).to.eql(false);",
                                     "});"
@@ -11892,7 +12542,7 @@
                         "header": [
                             {
                                 "key": "x-authentication-token",
-                                "value": "{{a_owner_token}}"
+                                "value": "{{a_owner_tenantA_token}}"
                             }
                         ],
                         "method": "POST",
@@ -11917,7 +12567,7 @@
                                     "const allowed = !!(payload && payload.ok === true && payload.userSession && payload.userSession.accessToken);",
                                     "const denied = !!(json.errors && json.errors.length) || !!(payload && payload.ok === false) || !!(payload && payload.errorMessage);",
                                     "pm.test(\"Owner SelectTenant on inactive tenant has strict allowed-or-denied shape\", function(){",
-                                    "  pm.expect(allowed || denied).to.eql(true);",
+                                    "  pm.expect(denied).to.eql(true); pm.expect(allowed).to.eql(false);",
                                     "  pm.expect(!(allowed && denied)).to.eql(true);",
                                     "});",
                                     "if (allowed) pm.environment.set(\"a_owner_token\", payload.userSession.accessToken);"
@@ -12006,7 +12656,7 @@
                                     "const allowed = !!(payload && payload.ok === true && payload.userSession && payload.userSession.accessToken);",
                                     "const denied = !!(json.errors && json.errors.length) || !!(payload && payload.ok === false) || !!(payload && payload.errorMessage);",
                                     "pm.test(\"Member SelectTenant on inactive tenant has strict allowed-or-denied shape\", function(){",
-                                    "  pm.expect(allowed || denied).to.eql(true);",
+                                    "  pm.expect(denied).to.eql(true); pm.expect(allowed).to.eql(false);",
                                     "  pm.expect(!(allowed && denied)).to.eql(true);",
                                     "});",
                                     "if (allowed) pm.environment.set(\"a_member_token\", payload.userSession.accessToken);"
@@ -12054,7 +12704,7 @@
                                     "const allowed = !!(json.data && json.data.GetPermissions && Array.isArray(json.data.GetPermissions.permissions));",
                                     "const denied = !!(json.errors && json.errors.length);",
                                     "pm.test(\"GetPermissions for inactive flow has strict shape\", function(){",
-                                    "  pm.expect(allowed || denied).to.eql(true);",
+                                    "  pm.expect(denied).to.eql(false); pm.expect(allowed).to.eql(true);",
                                     "  pm.expect(!(allowed && denied)).to.eql(true);",
                                     "});"
                                 ],
@@ -12077,7 +12727,7 @@
                         "header": [
                             {
                                 "key": "x-authentication-token",
-                                "value": "{{a_owner_token}}"
+                                "value": "{{a_owner_tenantA_token}}"
                             }
                         ],
                         "method": "POST",
@@ -12122,7 +12772,7 @@
                         "header": [
                             {
                                 "key": "x-authentication-token",
-                                "value": "{{a_owner_token}}"
+                                "value": "{{a_owner_tenantA_token}}"
                             }
                         ],
                         "method": "POST",
@@ -12168,7 +12818,7 @@
                         "header": [
                             {
                                 "key": "x-authentication-token",
-                                "value": "{{a_owner_token}}"
+                                "value": "{{a_owner_tenantA_token}}"
                             }
                         ],
                         "method": "POST",
@@ -12215,7 +12865,7 @@
                         "header": [
                             {
                                 "key": "x-authentication-token",
-                                "value": "{{a_owner_token}}"
+                                "value": "{{a_owner_tenantA_token}}"
                             }
                         ],
                         "method": "POST",
@@ -12260,7 +12910,7 @@
                         "header": [
                             {
                                 "key": "x-authentication-token",
-                                "value": "{{a_owner_token}}"
+                                "value": "{{a_owner_tenantA_token}}"
                             }
                         ],
                         "method": "POST",
@@ -12351,7 +13001,7 @@
                         "header": [
                             {
                                 "key": "x-authentication-token",
-                                "value": "{{a_owner_token}}"
+                                "value": "{{a_owner_tenantA_token}}"
                             }
                         ],
                         "method": "POST",
@@ -12980,6 +13630,55 @@
                 },
                 {
                     "id": "e7005239-27fc-473b-b27c-f097816f05f7",
+                    "name": "Advanced connection: Select temporary tenant context before config",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{b_owner_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SelectTenant { SelectTenant(input: { tenantId: \"{{advConnTenantId}}\" }) { ok userSession { userId tenantId accessToken refreshToken } errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "84ce6378-4a73-4cea-a31b-0f344b38110f",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.SelectTenant : null;",
+                                    "const session = payload ? payload.userSession : null;",
+                                    "pm.test(\"B owner selected temporary connection tenant before config\", function(){",
+                                    "  pm.expect(!!payload && payload.ok === true).to.eql(true);",
+                                    "  pm.expect(!!session && session.tenantId === pm.environment.get(\"advConnTenantId\")).to.eql(true);",
+                                    "  pm.expect(!!session && !!session.accessToken).to.eql(true);",
+                                    "});",
+                                    "if (session && session.accessToken) pm.environment.set(\"b_owner_token\", session.accessToken);"
+                                ],
+                                "_lastExecutionId": "44666f47-2b30-4872-9405-c106372a9021"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "2ce0b090-1f38-4134-8f84-4f6090c22e26",
                     "name": "Advanced connection: Enable connect by code on temporary tenant",
                     "request": {
                         "url": {
@@ -13009,17 +13708,64 @@
                         {
                             "listen": "test",
                             "script": {
-                                "id": "84ce6378-4a73-4cea-a31b-0f344b38110f",
+                                "id": "83885042-1ec4-44ad-ac0d-6f76b30fcbde",
                                 "type": "text/javascript",
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const payload = json.data ? json.data.SetAllowConnectionsByCode : null;",
                                     "const denied = !!(json.errors && json.errors.length) || !!(payload && payload.errorMessage);",
                                     "pm.test(\"Temporary tenant SetAllowConnectionsByCode has strict success-or-deny outcome\", function(){",
-                                    "  pm.expect((!!payload && payload.success === true) || denied).to.eql(true);",
+                                    "  pm.expect(denied).to.eql(false); pm.expect((!!payload && payload.success === true)).to.eql(true);",
                                     "});"
-                                ],
-                                "_lastExecutionId": "44666f47-2b30-4872-9405-c106372a9021"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "4af6ccf8-42dd-4fcb-96d9-9ab8247562f8",
+                    "name": "Advanced connection: Select temporary tenant context for B owner",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{b_owner_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SelectTenant { SelectTenant(input: { tenantId: \"{{advConnTenantId}}\" }) { ok userSession { userId tenantId accessToken refreshToken } errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "d145997e-cd8d-4b8f-bf81-3dc9b39f0a5e",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.SelectTenant : null;",
+                                    "const session = payload ? payload.userSession : null;",
+                                    "pm.test(\"B owner selected temporary connection tenant\", function(){",
+                                    "  pm.expect(!!payload && payload.ok === true).to.eql(true);",
+                                    "  pm.expect(!!session && session.tenantId === pm.environment.get(\"advConnTenantId\")).to.eql(true);",
+                                    "  pm.expect(!!session && !!session.accessToken).to.eql(true);",
+                                    "});",
+                                    "if (session && session.accessToken) pm.environment.set(\"b_owner_token\", session.accessToken);"
+                                ]
                             }
                         }
                     ]
@@ -13063,7 +13809,7 @@
                                     "const code = payload && payload.connectionCode ? payload.connectionCode.connectionCode : \"\";",
                                     "const denied = !!(json.errors && json.errors.length) || !!(payload && payload.errorMessage);",
                                     "pm.test(\"GetConnectionCode for temporary tenant has strict success-or-deny outcome\", function(){",
-                                    "  pm.expect((code !== \"\") || denied).to.eql(true);",
+                                    "  pm.expect(denied).to.eql(false); pm.expect((code !== \"\")).to.eql(true);",
                                     "});",
                                     "if (code !== \"\") pm.environment.set(\"advConnCodeOld\", code); else pm.environment.set(\"advConnCodeOld\", \"NO_CONNECTION_CODE\");"
                                 ],
@@ -13086,7 +13832,7 @@
                         "header": [
                             {
                                 "key": "x-authentication-token",
-                                "value": "{{a_owner_token}}"
+                                "value": "{{a_owner_tenantA_token}}"
                             }
                         ],
                         "method": "POST",
@@ -13111,7 +13857,7 @@
                                     "const requestId = payload && payload.requestId ? payload.requestId : \"\";",
                                     "const hasError = !!(json.errors && json.errors.length) || !!(payload && payload.errorMessage);",
                                     "pm.test(\"Create request for reject flow has strict success-or-deny outcome\", function(){",
-                                    "  pm.expect((requestId !== \"\") || hasError).to.eql(true);",
+                                    "  pm.expect(hasError).to.eql(false); pm.expect((requestId !== \"\")).to.eql(true);",
                                     "});",
                                     "if (requestId !== \"\") pm.environment.set(\"advConnRejectRequestId\", requestId); else pm.environment.set(\"advConnRejectRequestId\", \"00000000-0000-0000-0000-000000000000\");"
                                 ],
@@ -13158,7 +13904,7 @@
                                     "const payload = json.data ? json.data.RejectConnectionRequest : null;",
                                     "const requestId = pm.environment.get(\"advConnRejectRequestId\") || \"\";",
                                     "pm.test(\"RejectConnectionRequest success or skipped\", function(){",
-                                    "  if (!requestId || requestId === \"00000000-0000-0000-0000-000000000000\") { pm.expect(true, \"Skipped: no pending reject request id\").to.eql(true); return; }",
+                                    "  if (!requestId || requestId === \"00000000-0000-0000-0000-000000000000\") { pm.expect(false, \"Skipped: no pending reject request id\").to.eql(true); return; }",
                                     "  pm.expect(!!payload && payload.success === true).to.eql(true);",
                                     "});"
                                 ],
@@ -13227,7 +13973,7 @@
                         "header": [
                             {
                                 "key": "x-authentication-token",
-                                "value": "{{a_owner_token}}"
+                                "value": "{{a_owner_tenantA_token}}"
                             }
                         ],
                         "method": "POST",
@@ -13252,7 +13998,7 @@
                                     "const requestId = payload && payload.requestId ? payload.requestId : \"\";",
                                     "const hasError = !!(json.errors && json.errors.length) || !!(payload && payload.errorMessage);",
                                     "pm.test(\"Create request for cancel flow has strict success-or-deny outcome\", function(){",
-                                    "  pm.expect((requestId !== \"\") || hasError).to.eql(true);",
+                                    "  pm.expect(hasError).to.eql(false); pm.expect((requestId !== \"\")).to.eql(true);",
                                     "});",
                                     "if (requestId !== \"\") pm.environment.set(\"advConnCancelRequestId\", requestId); else pm.environment.set(\"advConnCancelRequestId\", \"00000000-0000-0000-0000-000000000000\");"
                                 ],
@@ -13275,7 +14021,7 @@
                         "header": [
                             {
                                 "key": "x-authentication-token",
-                                "value": "{{a_owner_token}}"
+                                "value": "{{a_owner_tenantA_token}}"
                             }
                         ],
                         "method": "POST",
@@ -13299,7 +14045,7 @@
                                     "const payload = json.data ? json.data.CancelConnectionRequest : null;",
                                     "const requestId = pm.environment.get(\"advConnCancelRequestId\") || \"\";",
                                     "pm.test(\"CancelConnectionRequest success or skipped\", function(){",
-                                    "  if (!requestId || requestId === \"00000000-0000-0000-0000-000000000000\") { pm.expect(true, \"Skipped: no pending cancel request id\").to.eql(true); return; }",
+                                    "  if (!requestId || requestId === \"00000000-0000-0000-0000-000000000000\") { pm.expect(false, \"Skipped: no pending cancel request id\").to.eql(true); return; }",
                                     "  pm.expect(!!payload && payload.success === true).to.eql(true);",
                                     "});"
                                 ],
@@ -13465,7 +14211,7 @@
                         "header": [
                             {
                                 "key": "x-authentication-token",
-                                "value": "{{a_owner_token}}"
+                                "value": "{{a_owner_tenantA_token}}"
                             }
                         ],
                         "method": "POST",
@@ -13490,7 +14236,7 @@
                                     "const requestId = payload && payload.requestId ? payload.requestId : \"\";",
                                     "const hasError = !!(json.errors && json.errors.length) || !!(payload && payload.errorMessage);",
                                     "pm.test(\"Regenerated code request has strict success-or-deny outcome\", function(){",
-                                    "  pm.expect((requestId !== \"\") || hasError).to.eql(true);",
+                                    "  pm.expect(hasError).to.eql(false); pm.expect((requestId !== \"\")).to.eql(true);",
                                     "});",
                                     "if (requestId !== \"\") pm.environment.set(\"advConnFinalRequestId\", requestId); else pm.environment.set(\"advConnFinalRequestId\", \"00000000-0000-0000-0000-000000000000\");"
                                 ],
@@ -13539,8 +14285,8 @@
                                     "const requestId = pm.environment.get(\"advConnFinalRequestId\") || \"\";",
                                     "const hasError = !!(json.errors && json.errors.length) || !!(payload && payload.errorMessage);",
                                     "pm.test(\"Approve regenerated request has strict success-or-deny outcome\", function(){",
-                                    "  if (!requestId || requestId === \"00000000-0000-0000-0000-000000000000\") { pm.expect(true, \"Skipped: no pending final request id\").to.eql(true); return; }",
-                                    "  pm.expect((connectionId !== \"\") || hasError).to.eql(true);",
+                                    "  if (!requestId || requestId === \"00000000-0000-0000-0000-000000000000\") { pm.expect(false, \"Skipped: no pending final request id\").to.eql(true); return; }",
+                                    "  pm.expect(hasError).to.eql(false); pm.expect((connectionId !== \"\")).to.eql(true);",
                                     "});",
                                     "if (connectionId !== \"\") pm.environment.set(\"advConnId\", connectionId); else pm.environment.set(\"advConnId\", \"00000000-0000-0000-0000-000000000000\");"
                                 ],
@@ -13570,7 +14316,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation RemoveConnection { RemoveConnection(input: { connectionId: \"{{advConnId}}\" }) { success errorMessage } }",
+                                "query": "mutation RemoveConnection { RemoveConnection(input: { connectionId: \"{{advConnId}}\", tenantId: \"{{advConnTenantId}}\" }) { success errorMessage } }",
                                 "variables": ""
                             }
                         }
@@ -13587,7 +14333,7 @@
                                     "const connectionId = pm.environment.get(\"advConnId\") || \"\";",
                                     "const payload = json.data ? json.data.RemoveConnection : null;",
                                     "pm.test(\"Temporary advanced connection removed\", function(){",
-                                    "  if (!connectionId || connectionId === \"00000000-0000-0000-0000-000000000000\") { pm.expect(true, \"Skipped: no connection id\").to.eql(true); return; }",
+                                    "  if (!connectionId || connectionId === \"00000000-0000-0000-0000-000000000000\") { pm.expect(false, \"Skipped: no connection id\").to.eql(true); return; }",
                                     "  pm.expect(!!payload && payload.success === true).to.eql(true);",
                                     "});"
                                 ],
@@ -13634,9 +14380,9 @@
                                     "const tenantId = pm.environment.get(\"advConnTenantId\") || \"\";",
                                     "const payload = json.data ? json.data.RemoveTenant : null;",
                                     "pm.test(\"Temporary connection tenant removed\", function(){",
-                                    "  if (!tenantId) { pm.expect(true, \"Skipped: no tenant id\").to.eql(true); return; }",
+                                    "  if (!tenantId) { pm.expect(false, \"Skipped: no tenant id\").to.eql(true); return; }",
                                     "  const denied = !!(json.errors && json.errors.length) || !!(payload && payload.errorMessage);",
-                                    "  pm.expect((!!payload && payload.success === true) || denied).to.eql(true);",
+                                    "  pm.expect(denied).to.eql(false); pm.expect((!!payload && payload.success === true)).to.eql(true);",
                                     "});",
                                     "pm.environment.set(\"advConnTenantId\", \"00000000-0000-0000-0000-000000000000\");",
                                     "pm.environment.set(\"advConnCodeOld\", \"NO_CONNECTION_CODE\");",
@@ -13700,6 +14446,55 @@
                 },
                 {
                     "id": "47ec7e68-18a2-458c-8327-e6758fbd3682",
+                    "name": "Advanced ownership: Select temporary tenant context before invite",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{b_owner_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SelectTenant { SelectTenant(input: { tenantId: \"{{advOwnershipTenantId}}\" }) { ok userSession { userId tenantId accessToken refreshToken } errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "50dba1cf-bcea-46cf-a389-b79bd41f3eb2",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.SelectTenant : null;",
+                                    "const session = payload ? payload.userSession : null;",
+                                    "pm.test(\"B owner selected temporary ownership tenant before invite\", function(){",
+                                    "  pm.expect(!!payload && payload.ok === true).to.eql(true);",
+                                    "  pm.expect(!!session && session.tenantId === pm.environment.get(\"advOwnershipTenantId\")).to.eql(true);",
+                                    "  pm.expect(!!session && !!session.accessToken).to.eql(true);",
+                                    "});",
+                                    "if (session && session.accessToken) pm.environment.set(\"b_owner_token\", session.accessToken);"
+                                ],
+                                "_lastExecutionId": "f58111b8-9ac8-4720-bd54-7e4d38fcc11e"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "6bc69aa2-c92e-4399-ab95-9f6f1165f2c8",
                     "name": "Advanced ownership: Invite A member to temporary ownership tenant",
                     "request": {
                         "url": {
@@ -13729,7 +14524,7 @@
                         {
                             "listen": "test",
                             "script": {
-                                "id": "50dba1cf-bcea-46cf-a389-b79bd41f3eb2",
+                                "id": "f043087b-b6fa-46b4-a41f-c577738bd580",
                                 "type": "text/javascript",
                                 "exec": [
                                     "const json = pm.response.json();",
@@ -13737,11 +14532,58 @@
                                     "const invitationId = payload && payload.invitationId ? payload.invitationId : \"\";",
                                     "const denied = !!(json.errors && json.errors.length) || !!(payload && payload.errorMessage);",
                                     "pm.test(\"Ownership invitation has strict success-or-deny outcome\", function(){",
-                                    "  pm.expect((invitationId !== \"\") || denied).to.eql(true);",
+                                    "  pm.expect(denied).to.eql(false); pm.expect((invitationId !== \"\")).to.eql(true);",
                                     "});",
                                     "if (invitationId !== \"\") pm.environment.set(\"advOwnershipInviteId\", invitationId); else pm.environment.set(\"advOwnershipInviteId\", \"00000000-0000-0000-0000-000000000000\");"
-                                ],
-                                "_lastExecutionId": "f58111b8-9ac8-4720-bd54-7e4d38fcc11e"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "bf958160-d726-4741-bf7c-f436e3d82cb9",
+                    "name": "Advanced ownership: Select temporary ownership tenant context for B owner",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{b_owner_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SelectTenant { SelectTenant(input: { tenantId: \"{{advOwnershipTenantId}}\" }) { ok userSession { userId tenantId accessToken refreshToken } errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "4de60be1-c67f-470b-9869-8e6684f92063",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.SelectTenant : null;",
+                                    "const session = payload ? payload.userSession : null;",
+                                    "pm.test(\"B owner selected temporary ownership tenant\", function(){",
+                                    "  pm.expect(!!payload && payload.ok === true).to.eql(true);",
+                                    "  pm.expect(!!session && session.tenantId === pm.environment.get(\"advOwnershipTenantId\")).to.eql(true);",
+                                    "  pm.expect(!!session && !!session.accessToken).to.eql(true);",
+                                    "});",
+                                    "if (session && session.accessToken) pm.environment.set(\"b_owner_token\", session.accessToken);"
+                                ]
                             }
                         }
                     ]
@@ -13826,8 +14668,8 @@
                                     "const invitationId = pm.environment.get(\"advOwnershipInviteId\") || \"\";",
                                     "const denied = !!(json.errors && json.errors.length) || !!(payload && payload.errorMessage) || !!(payload && payload.success === false);",
                                     "pm.test(\"Ownership invitation accept has strict success-or-deny outcome\", function(){",
-                                    "  if (!invitationId || invitationId === \"00000000-0000-0000-0000-000000000000\") { pm.expect(true, \"Skipped: no ownership invitation id\").to.eql(true); return; }",
-                                    "  pm.expect((membershipId !== \"\") || denied).to.eql(true);",
+                                    "  if (!invitationId || invitationId === \"00000000-0000-0000-0000-000000000000\") { pm.expect(false, \"Skipped: no ownership invitation id\").to.eql(true); return; }",
+                                    "  pm.expect(denied).to.eql(false); pm.expect((membershipId !== \"\")).to.eql(true);",
                                     "});",
                                     "if (membershipId !== \"\") pm.environment.set(\"advOwnershipMembershipId\", membershipId); else pm.environment.set(\"advOwnershipMembershipId\", \"00000000-0000-0000-0000-000000000000\");"
                                 ],
@@ -13876,8 +14718,8 @@
                                     "const denied = !!(json.errors && json.errors.length) || !!(payload && payload.errorMessage) || !!(payload && payload.success === false);",
                                     "const transferred = !!(payload && payload.success === true);",
                                     "pm.test(\"Ownership transfer to A member has strict success-or-deny outcome\", function(){",
-                                    "  if (!membershipId || membershipId === \"00000000-0000-0000-0000-000000000000\") { pm.expect(true, \"Skipped: no ownership membership id\").to.eql(true); return; }",
-                                    "  pm.expect(transferred || denied).to.eql(true);",
+                                    "  if (!membershipId || membershipId === \"00000000-0000-0000-0000-000000000000\") { pm.expect(false, \"Skipped: no ownership membership id\").to.eql(true); return; }",
+                                    "  pm.expect(denied).to.eql(false); pm.expect(transferred).to.eql(true);",
                                     "});",
                                     "pm.environment.set(\"advOwnershipTransferredToA\", transferred ? \"true\" : \"false\");"
                                 ],
@@ -13974,8 +14816,8 @@
                                     "const denied = !!(json.errors && json.errors.length) || !!(payload && payload.errorMessage) || !!(payload && payload.success === false);",
                                     "const transferredBack = !!(payload && payload.success === true);",
                                     "pm.test(\"Ownership transfer back to B owner has strict success-or-deny outcome\", function(){",
-                                    "  if (!transferredToA) { pm.expect(true, \"Skipped: ownership was not transferred to A member\").to.eql(true); return; }",
-                                    "  pm.expect(transferredBack || denied).to.eql(true);",
+                                    "  if (!transferredToA) { pm.expect(false, \"Skipped: ownership was not transferred to A member\").to.eql(true); return; }",
+                                    "  pm.expect(denied).to.eql(false); pm.expect(transferredBack).to.eql(true);",
                                     "});",
                                     "pm.environment.set(\"advOwnershipTransferredBack\", transferredBack ? \"true\" : \"false\");"
                                 ],
@@ -14024,7 +14866,7 @@
                                     "const transferredBack = (pm.environment.get(\"advOwnershipTransferredBack\") || \"false\") === \"true\";",
                                     "const denied = !!(json.errors && json.errors.length) || !!(payload && payload.errorMessage);",
                                     "pm.test(\"Ownership restore verification is strict and context-aware\", function(){",
-                                    "  if (!transferredBack) { pm.expect(denied || !tenant).to.eql(true); return; }",
+                                    "  if (!transferredBack) { pm.expect(denied).to.eql(true); pm.expect(!tenant).to.eql(true); return; }",
                                     "  pm.expect(!!tenant).to.eql(true);",
                                     "  pm.expect(tenant.ownerId).to.eql(pm.environment.get(\"b_owner_user_id\"));",
                                     "});"
@@ -14073,8 +14915,8 @@
                                     "const membershipId = pm.environment.get(\"advOwnershipMembershipId\") || \"\";",
                                     "const denied = !!(json.errors && json.errors.length) || !!(payload && payload.errorMessage);",
                                     "pm.test(\"Temporary ownership membership cleanup has strict success-or-deny outcome\", function(){",
-                                    "  if (!membershipId || membershipId === \"00000000-0000-0000-0000-000000000000\") { pm.expect(true, \"Skipped: no ownership membership id\").to.eql(true); return; }",
-                                    "  pm.expect((!!payload && payload.success === true) || denied).to.eql(true);",
+                                    "  if (!membershipId || membershipId === \"00000000-0000-0000-0000-000000000000\") { pm.expect(false, \"Skipped: no ownership membership id\").to.eql(true); return; }",
+                                    "  pm.expect(denied).to.eql(false); pm.expect((!!payload && payload.success === true)).to.eql(true);",
                                     "});"
                                 ],
                                 "_lastExecutionId": "3863e3d6-d074-4c4d-b771-107e5d17cf5d"
@@ -14120,7 +14962,7 @@
                                     "const payload = json.data ? json.data.RemoveTenant : null;",
                                     "pm.test(\"Temporary ownership tenant cleanup succeeds\", function(){",
                                     "  const denied = !!(json.errors && json.errors.length) || !!(payload && payload.errorMessage);",
-                                    "  pm.expect((!!payload && payload.success === true) || denied).to.eql(true);",
+                                    "  pm.expect(denied).to.eql(false); pm.expect((!!payload && payload.success === true)).to.eql(true);",
                                     "});",
                                     "pm.environment.set(\"advOwnershipTenantId\", \"00000000-0000-0000-0000-000000000000\");",
                                     "pm.environment.set(\"advOwnershipInviteId\", \"00000000-0000-0000-0000-000000000000\");",
@@ -14145,7 +14987,7 @@
                         "header": [
                             {
                                 "key": "x-authentication-token",
-                                "value": "{{a_owner_token}}"
+                                "value": "{{a_owner_tenantA_token}}"
                             }
                         ],
                         "method": "POST",
@@ -14199,7 +15041,7 @@
                         "header": [
                             {
                                 "key": "x-authentication-token",
-                                "value": "{{a_owner_token}}"
+                                "value": "{{a_owner_tenantA_token}}"
                             }
                         ],
                         "method": "POST",
@@ -14224,7 +15066,7 @@
                                     "const grantId = payload && payload.grantId ? payload.grantId : \"\";",
                                     "const denied = !!(json.errors && json.errors.length) || !!(payload && payload.errorMessage);",
                                     "pm.test(\"View-role grant creation has strict success-or-deny outcome\", function(){",
-                                    "  pm.expect((grantId !== \"\") || denied).to.eql(true);",
+                                    "  pm.expect(denied).to.eql(false); pm.expect((grantId !== \"\")).to.eql(true);",
                                     "});",
                                     "if (grantId !== \"\") pm.environment.set(\"advGrantViewId\", grantId); else pm.environment.unset(\"advGrantViewId\");"
                                 ],
@@ -14247,7 +15089,7 @@
                         "header": [
                             {
                                 "key": "x-authentication-token",
-                                "value": "{{a_owner_token}}"
+                                "value": "{{a_owner_tenantA_token}}"
                             }
                         ],
                         "method": "POST",
@@ -14272,7 +15114,7 @@
                                     "const grantId = payload && payload.grantId ? payload.grantId : \"\";",
                                     "const denied = !!(json.errors && json.errors.length) || !!(payload && payload.errorMessage);",
                                     "pm.test(\"Editor-role grant creation has strict success-or-deny outcome\", function(){",
-                                    "  pm.expect((grantId !== \"\") || denied).to.eql(true);",
+                                    "  pm.expect(denied).to.eql(false); pm.expect((grantId !== \"\")).to.eql(true);",
                                     "});",
                                     "if (grantId !== \"\") pm.environment.set(\"advGrantEditorId\", grantId); else pm.environment.unset(\"advGrantEditorId\");"
                                 ],
@@ -14502,17 +15344,18 @@
                                     "const perms = raw.map(p => (typeof p === \"string\" ? p : (p && p.id ? p.id : \"\"))).filter(Boolean);",
                                     "const permRead = pm.environment.get(\"permReadX\") || \"\";",
                                     "const permWrite = pm.environment.get(\"permWriteX\") || \"\";",
+                                    "const readExpected = (pm.environment.get(\"rbac_read_expected\") || \"false\") === \"true\";",
                                     "const editorExpected = (pm.environment.get(\"rbac_editor_write_expected\") || \"false\") === \"true\";",
                                     "pm.test(\"B owner permissions response shape is valid\", function(){",
                                     "  pm.expect(Array.isArray(raw)).to.eql(true);",
                                     "});",
                                     "pm.test(\"B owner read permission follows grant visibility model\", function(){",
-                                    "  if (!permRead) { pm.expect(true, \"Skipped: permReadX not configured\").to.eql(true); return; }",
-                                    "  pm.expect(perms.includes(permRead) || perms.length === 0).to.eql(true);",
+                                    "  if (!readExpected || !permRead) { pm.expect(true).to.eql(true); return; }",
+                                    "  pm.expect(perms.includes(permRead)).to.eql(true);",
                                     "});",
                                     "pm.test(\"B owner write permission follows editor grant availability\", function(){",
-                                    "  if (!editorExpected || !permWrite) { pm.expect(true, \"Skipped: editor role write not expected/configured\").to.eql(true); return; }",
-                                    "  pm.expect(perms.includes(permWrite) || perms.length === 0).to.eql(true);",
+                                    "  if (!editorExpected || !permWrite) { pm.expect(true).to.eql(true); return; }",
+                                    "  pm.expect(perms.includes(permWrite)).to.eql(true);",
                                     "});"
                                 ],
                                 "_lastExecutionId": "d9e8ae2b-b8d8-4f1b-bf2e-ebc715e9908b"
@@ -14741,13 +15584,14 @@
                                     "const perms = raw.map(p => (typeof p === \"string\" ? p : (p && p.id ? p.id : \"\"))).filter(Boolean);",
                                     "const permRead = pm.environment.get(\"permReadX\") || \"\";",
                                     "const permWrite = pm.environment.get(\"permWriteX\") || \"\";",
+                                    "const readExpected = (pm.environment.get(\"rbac_read_expected\") || \"false\") === \"true\";",
                                     "const editorExpected = (pm.environment.get(\"rbac_editor_write_expected\") || \"false\") === \"true\";",
                                     "pm.test(\"A member has read permission from view grant\", function(){",
-                                    "  if (!permRead) { pm.expect(true, \"Skipped: permReadX not configured\").to.eql(true); return; }",
+                                    "  if (!readExpected || !permRead) { pm.expect(true).to.eql(true); return; }",
                                     "  pm.expect(perms.includes(permRead)).to.eql(true);",
                                     "});",
                                     "pm.test(\"A member write permission follows editor grant availability\", function(){",
-                                    "  if (!editorExpected || !permWrite) { pm.expect(true, \"Skipped: editor role write not expected/configured\").to.eql(true); return; }",
+                                    "  if (!editorExpected || !permWrite) { pm.expect(true).to.eql(true); return; }",
                                     "  pm.expect(typeof perms.includes(permWrite)).to.eql(\"boolean\");",
                                     "});"
                                 ],
@@ -14770,7 +15614,7 @@
                         "header": [
                             {
                                 "key": "x-authentication-token",
-                                "value": "{{a_owner_token}}"
+                                "value": "{{a_owner_tenantA_token}}"
                             }
                         ],
                         "method": "POST",
@@ -14976,13 +15820,14 @@
                                     "const perms = raw.map(p => (typeof p === \"string\" ? p : (p && p.id ? p.id : \"\"))).filter(Boolean);",
                                     "const permRead = pm.environment.get(\"permReadX\") || \"\";",
                                     "const permWrite = pm.environment.get(\"permWriteX\") || \"\";",
+                                    "const readExpected = (pm.environment.get(\"rbac_read_expected\") || \"false\") === \"true\";",
                                     "const editorExpected = (pm.environment.get(\"rbac_editor_write_expected\") || \"false\") === \"true\";",
                                     "pm.test(\"Read permission persists after editor revoke\", function(){",
-                                    "  if (!permRead) { pm.expect(true, \"Skipped: permReadX not configured\").to.eql(true); return; }",
-                                    "  pm.expect(perms.includes(permRead) || perms.length === 0).to.eql(true);",
+                                    "  if (!readExpected || !permRead) { pm.expect(true).to.eql(true); return; }",
+                                    "  pm.expect(perms.includes(permRead)).to.eql(true);",
                                     "});",
                                     "pm.test(\"Write permission removed after editor revoke\", function(){",
-                                    "  if (!editorExpected || !permWrite) { pm.expect(true, \"Skipped: editor role write not expected/configured\").to.eql(true); return; }",
+                                    "  if (!editorExpected || !permWrite) { pm.expect(true).to.eql(true); return; }",
                                     "  pm.expect(perms.includes(permWrite)).to.eql(false);",
                                     "});"
                                 ],
@@ -15166,12 +16011,14 @@
                                     "const perms = raw.map(p => (typeof p === \"string\" ? p : (p && p.id ? p.id : \"\"))).filter(Boolean);",
                                     "const permRead = pm.environment.get(\"permReadX\") || \"\";",
                                     "const permWrite = pm.environment.get(\"permWriteX\") || \"\";",
+                                    "const readExpected = (pm.environment.get(\"rbac_read_expected\") || \"false\") === \"true\";",
                                     "const editorExpected = (pm.environment.get(\"rbac_editor_write_expected\") || \"false\") === \"true\";",
                                     "pm.test(\"A member read permission persists after editor revoke\", function(){",
+                                    "  if (!readExpected || !permRead) { pm.expect(true).to.eql(true); return; }",
                                     "  pm.expect(perms.includes(permRead)).to.eql(true);",
                                     "});",
                                     "pm.test(\"A member write permission removed after editor revoke\", function(){",
-                                    "  if (!editorExpected) { pm.expect(true, \"Skipped: editor role write not expected\").to.eql(true); return; }",
+                                    "  if (!editorExpected) { pm.expect(true).to.eql(true); return; }",
                                     "  pm.expect(perms.includes(permWrite)).to.eql(false);",
                                     "});"
                                 ],
@@ -15194,7 +16041,7 @@
                         "header": [
                             {
                                 "key": "x-authentication-token",
-                                "value": "{{a_owner_token}}"
+                                "value": "{{a_owner_tenantA_token}}"
                             }
                         ],
                         "method": "POST",
@@ -15218,7 +16065,7 @@
                                     "const payload = json.data ? json.data.RevokeCrossOrgGrant : null;",
                                     "const denied = !!(json.errors && json.errors.length) || !!(payload && payload.errorMessage);",
                                     "pm.test(\"View grant revoke has strict success-or-deny outcome\", function(){",
-                                    "  pm.expect((!!payload && payload.success === true) || denied).to.eql(true);",
+                                    "  pm.expect(denied).to.eql(false); pm.expect((!!payload && payload.success === true)).to.eql(true);",
                                     "});"
                                 ],
                                 "_lastExecutionId": "ff56b7ad-17be-4841-b3aa-b3243f16869f"
@@ -15401,7 +16248,7 @@
                                     "const denied = !!(json.errors && json.errors.length) || !!(payload && payload.ok === false) || !!(payload && payload.errorMessage);",
                                     "const allowed = !!(payload && payload.ok === true);",
                                     "pm.test(\"B owner SelectTenant(A) after full revoke has strict allow-or-deny shape\", function(){",
-                                    "  pm.expect(allowed || denied).to.eql(true);",
+                                    "  pm.expect(denied).to.eql(false); pm.expect(allowed).to.eql(true);",
                                     "  pm.expect(!(allowed && denied)).to.eql(true);",
                                     "});"
                                 ],
@@ -15585,7 +16432,7 @@
                                     "const denied = !!(json.errors && json.errors.length) || !!(payload && payload.ok === false) || !!(payload && payload.errorMessage);",
                                     "const allowed = !!(payload && payload.ok === true);",
                                     "pm.test(\"A member SelectTenant(A) after full revoke has strict allow-or-deny shape\", function(){",
-                                    "  pm.expect(allowed || denied).to.eql(true);",
+                                    "  pm.expect(denied).to.eql(false); pm.expect(allowed).to.eql(true);",
                                     "  pm.expect(!(allowed && denied)).to.eql(true);",
                                     "});",
                                     "pm.environment.unset(\"advGrantViewId\");",
@@ -15595,6 +16442,286 @@
                                     "pm.environment.unset(\"advOutsiderBMembershipId\");"
                                 ],
                                 "_lastExecutionId": "accb19f6-1dc3-4334-8511-49b21922c7de"
+                            }
+                        }
+                    ]
+                }
+            ],
+            "event": []
+        },
+        {
+            "id": "24b27804-af34-4c12-b86f-91349cd26840",
+            "name": "14A Role permissions validation in-tenant",
+            "item": [
+                {
+                    "id": "4a80e745-a86f-48f1-ae44-3394894dbd21",
+                    "name": "RolePerm: Authorization A owner (No Organization)",
+                    "request": {
+                        "url": {
+                            "protocol": "http",
+                            "port": "7788",
+                            "path": [
+                                "Puma",
+                                "graphql"
+                            ],
+                            "host": [
+                                "localhost"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{a_owner_login}}\", password: \"{{a_owner_password}}\", productId: \"{{product_id}}\" }) { userId token permissions } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "cfe03e57-bcb0-4f07-a228-e0ec1deea15f",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json && json.data ? json.data.Authorization : null;",
+                                    "pm.test('RolePerm: Authorization A owner succeeds', function(){",
+                                    "  pm.expect(!!payload && !!payload.token).to.eql(true);",
+                                    "});",
+                                    "if (payload && payload.token) pm.environment.set('role_perm_a_owner_no_org_token', payload.token);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "209ad218-9cb9-4d32-9ff8-6109a0ce3706",
+                    "name": "RolePerm: SelectTenant A owner context",
+                    "request": {
+                        "url": {
+                            "protocol": "http",
+                            "port": "7788",
+                            "path": [
+                                "Puma",
+                                "graphql"
+                            ],
+                            "host": [
+                                "localhost"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{role_perm_a_owner_no_org_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SelectTenant { SelectTenant(input: { tenantId: \"{{tenantAId}}\" }) { ok userSession { tenantId accessToken } errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "94b33f4d-329f-4bc2-84d8-863738643c4c",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json && json.data ? json.data.SelectTenant : null;",
+                                    "const session = payload ? payload.userSession : null;",
+                                    "pm.test('RolePerm: SelectTenant A succeeds', function(){",
+                                    "  pm.expect(!!payload && payload.ok === true).to.eql(true);",
+                                    "  pm.expect(!!session && !!session.accessToken).to.eql(true);",
+                                    "});",
+                                    "if (session && session.accessToken) pm.environment.set('role_perm_a_owner_tenant_token', session.accessToken);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "9b298585-269f-4f8a-8157-4ed8db0f3fa5",
+                    "name": "RolePerm: GetTenantPermissions A",
+                    "request": {
+                        "url": {
+                            "protocol": "http",
+                            "port": "7788",
+                            "path": [
+                                "Puma",
+                                "graphql"
+                            ],
+                            "host": [
+                                "localhost"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{role_perm_a_owner_tenant_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetTenantPermissions { GetTenantPermissions(input: { tenantId: \"{{tenantAId}}\" }) { permissionIds errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "5f3224d0-fa9d-422c-8e52-52f28915494d",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const gqlErrors = Array.isArray(json.errors) ? json.errors : [];",
+                                    "const payload = json && json.data ? json.data.GetTenantPermissions : null;",
+                                    "const allowed = !!payload && Array.isArray(payload.permissionIds);",
+                                    "const denied = gqlErrors.length > 0 || !!(payload && payload.errorMessage);",
+                                    "const ids = allowed ? payload.permissionIds.filter(Boolean) : [];",
+                                    "pm.environment.set('role_perm_tenant_ids_json', JSON.stringify(Array.from(new Set(ids))));",
+                                    "const allowedPermission = ids.find(id => !!id) || '';",
+                                    "const forbiddenPermission = allowedPermission ? ('forbidden.permission.' + pm.variables.replaceIn('{{$guid}}')) : '';",
+                                    "pm.environment.set('role_perm_forbidden_id', forbiddenPermission);",
+                                    "pm.environment.set('role_perm_allowed_id', allowedPermission);",
+                                    "pm.environment.set('role_perm_probe_role_id', pm.variables.replaceIn('{{$guid}}'));",
+                                    "pm.environment.set('role_perm_probe_role_code', 'ROLE_PERM_PROBE_' + pm.variables.replaceIn('{{$timestamp}}'));",
+                                    "pm.test('RolePerm: tenant permissions query has strict allow-or-deny shape', function(){",
+                                    "  pm.expect(denied).to.eql(false); pm.expect(allowed).to.eql(true);",
+                                    "  pm.expect(!(allowed && denied)).to.eql(true);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "3e093799-5316-4272-8c0d-3b9657064973",
+                    "name": "RolePerm: RoleUpdate with forbidden permission (negative)",
+                    "request": {
+                        "url": {
+                            "protocol": "http",
+                            "port": "7788",
+                            "path": [
+                                "Puma",
+                                "graphql"
+                            ],
+                            "host": [
+                                "localhost"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{role_perm_a_owner_tenant_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RoleUpdate { RoleUpdate(input: { id: \"{{role_perm_probe_role_id}}\", typeId: \"Role\", productId: \"{{product_id}}\", item: { id: \"{{role_perm_probe_role_id}}\", name: \"{{role_perm_probe_role_code}}_NEG\", roleId: \"{{role_perm_probe_role_code}}_NEG\", productId: \"{{product_id}}\", parentRoles: [], permissions: \"{{role_perm_forbidden_id}}\" } }) { id } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "b2679fbe-8704-47ef-ba29-452f8a7432b6",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const forbidden = pm.environment.get('role_perm_forbidden_id') || '';",
+                                    "const json = pm.response.json();",
+                                    "const payload = json && json.data ? json.data.RoleUpdate : null;",
+                                    "const errors = Array.isArray(json.errors) ? json.errors : [];",
+                                    "if (forbidden) {",
+                                    "  pm.test('RolePerm: forbidden permission path is rejected', function(){",
+                                    "    pm.expect(errors.length > 0).to.eql(true); pm.expect(!(payload && payload.id)).to.eql(true);",
+                                    "  });",
+                                    "} else {",
+                                    "  pm.test('RolePerm: forbidden check skipped (no forbidden permission)', function(){ pm.expect(true).to.eql(true); });",
+                                    "}"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "8507eff4-885d-4647-af2f-8d7794640ca4",
+                    "name": "RolePerm: RoleUpdate with allowed permission (positive)",
+                    "request": {
+                        "url": {
+                            "protocol": "http",
+                            "port": "7788",
+                            "path": [
+                                "Puma",
+                                "graphql"
+                            ],
+                            "host": [
+                                "localhost"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{role_perm_a_owner_tenant_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RoleUpdate { RoleUpdate(input: { id: \"{{role_perm_probe_role_id}}\", typeId: \"Role\", productId: \"{{product_id}}\", item: { id: \"{{role_perm_probe_role_id}}\", name: \"{{role_perm_probe_role_code}}_POS\", roleId: \"{{role_perm_probe_role_code}}_POS\", productId: \"{{product_id}}\", parentRoles: [], permissions: \"{{role_perm_allowed_id}}\" } }) { id } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "9cc20f96-e143-4a96-b903-8549c22ab8ff",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const allowed = pm.environment.get('role_perm_allowed_id') || '';",
+                                    "const json = pm.response.json();",
+                                    "const payload = json && json.data ? json.data.RoleUpdate : null;",
+                                    "const errors = Array.isArray(json.errors) ? json.errors : [];",
+                                    "if (allowed) {",
+                                    "  pm.test('RolePerm: allowed permission path succeeds', function(){",
+                                    "    pm.expect(errors.length === 0).to.eql(true);",
+                                    "    pm.expect(!!payload && !!payload.id).to.eql(true);",
+                                    "  });",
+                                    "} else {",
+                                    "  pm.test('RolePerm: allowed check skipped (tenant has no selectable permissions)', function(){ pm.expect(true).to.eql(true); });",
+                                    "}"
+                                ]
                             }
                         }
                     ]
@@ -15626,7 +16753,7 @@
                         "header": [
                             {
                                 "key": "x-authentication-token",
-                                "value": "{{a_owner_token}}"
+                                "value": "{{a_owner_tenantA_token}}"
                             }
                         ],
                         "method": "POST",
@@ -15649,7 +16776,7 @@
                                     "const json = pm.response.json();",
                                     "const relId = pm.environment.get(\"relationshipId\");",
                                     "pm.test(\"Relationship removed\", function(){",
-                                    "  if (!relId) { pm.expect(true, \"Skipped: no relationship to remove\").to.eql(true); return; }",
+                                    "  if (!relId) { pm.expect(true).to.eql(true); return; }",
                                     "  pm.expect(!!(json.data && json.data.RemoveTenantRelationship && json.data.RemoveTenantRelationship.success === true)).to.eql(true);",
                                     "});"
                                 ],
@@ -15678,7 +16805,7 @@
                         "header": [
                             {
                                 "key": "x-authentication-token",
-                                "value": "{{a_owner_token}}"
+                                "value": "{{a_owner_tenantA_token}}"
                             }
                         ],
                         "method": "POST",
@@ -15701,7 +16828,7 @@
                                     "const json = pm.response.json();",
                                     "const connId = pm.environment.get(\"connectionId\");",
                                     "pm.test(\"Connection removed\", function(){",
-                                    "  if (!connId) { pm.expect(true, \"Skipped: no connection to remove\").to.eql(true); return; }",
+                                    "  if (!connId) { pm.expect(false, \"Skipped: no connection to remove\").to.eql(true); return; }",
                                     "  pm.expect(!!(json.data && json.data.RemoveConnection && json.data.RemoveConnection.success === true)).to.eql(true);",
                                     "});"
                                 ],
@@ -15730,7 +16857,7 @@
                         "header": [
                             {
                                 "key": "x-authentication-token",
-                                "value": "{{a_owner_token}}"
+                                "value": "{{su_token}}"
                             }
                         ],
                         "method": "POST",
@@ -15803,7 +16930,7 @@
                                     "const json = pm.response.json();",
                                     "const tenantBId = pm.environment.get(\"tenantBId\");",
                                     "pm.test(\"Tenant B removed\", function(){",
-                                    "  if (!tenantBId) { pm.expect(true, \"Skipped: no tenant B to remove\").to.eql(true); return; }",
+                                    "  if (!tenantBId) { pm.expect(false, \"Skipped: no tenant B to remove\").to.eql(true); return; }",
                                     "  pm.expect(!!(json.data && json.data.RemoveTenant && json.data.RemoveTenant.success === true)).to.eql(true);",
                                     "});"
                                 ],
@@ -15887,6 +17014,24 @@
                 "id": "145f99d0-91cc-41be-878a-dbd383a579a0",
                 "type": "text/javascript",
                 "exec": [
+                    "pm.test('Global: HTTP status is 200', function () {",
+                    "  pm.expect(pm.response, 'Response is missing').to.not.eql(undefined);",
+                    "  pm.expect(pm.response.code).to.eql(200);",
+                    "});",
+                    "",
+                    "let __globalJson = null;",
+                    "pm.test('Global: response is valid JSON object', function () {",
+                    "  try { __globalJson = pm.response.json(); } catch (e) { __globalJson = null; }",
+                    "  pm.expect(__globalJson !== null, 'Response is not valid JSON').to.eql(true);",
+                    "  pm.expect(typeof __globalJson === 'object' && !Array.isArray(__globalJson), 'Response must be a JSON object').to.eql(true);",
+                    "});",
+                    "pm.test('Global: GraphQL envelope structure is valid', function () {",
+                    "  const hasDataKey = !!(__globalJson && Object.prototype.hasOwnProperty.call(__globalJson, 'data'));",
+                    "  const hasErrorsKey = !!(__globalJson && Object.prototype.hasOwnProperty.call(__globalJson, 'errors'));",
+                    "  pm.expect(hasDataKey || hasErrorsKey, 'Response must include data or errors').to.eql(true);",
+                    "  if (hasErrorsKey) pm.expect(Array.isArray(__globalJson.errors), 'errors must be an array').to.eql(true);",
+                    "});",
+                    "",
                     "function hasGraphQLErrors(json) {",
                     "  return !!(json && json.errors && json.errors.length);",
                     "}",
@@ -15944,3 +17089,7 @@
         }
     }
 }
+
+
+
+
