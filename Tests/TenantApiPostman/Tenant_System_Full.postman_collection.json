@@ -16730,6 +16730,944 @@
             "event": []
         },
         {
+            "id": "9a4e8579-4d6a-4d3f-8e52-3bd4e6f9a2a0",
+            "name": "14B Scope isolation - Roles/Users/Groups",
+            "item": [
+                {
+                    "id": "e0672b0c-6504-4ca5-aef7-993af0b70b4e",
+                    "name": "Scope seed variables",
+                    "request": {
+                        "url": {
+                            "protocol": "http",
+                            "port": "7788",
+                            "path": [
+                                "Puma",
+                                "graphql"
+                            ],
+                            "host": [
+                                "localhost"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetTenantList { GetTenantList(input: { viewParams: { offset: 0, count: 5 } }) { items { id } } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "id": "7b2de9f1-f56f-482f-aa68-9292699b6f84",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.environment.set('scopeRoleAId', pm.variables.replaceIn('{{$guid}}'));",
+                                    "pm.environment.set('scopeRoleBId', pm.variables.replaceIn('{{$guid}}'));",
+                                    "pm.environment.set('scopeGroupAId', pm.variables.replaceIn('{{$guid}}'));",
+                                    "pm.environment.set('scopeGroupBId', pm.variables.replaceIn('{{$guid}}'));",
+                                    "pm.environment.set('scopeRoleACode', 'SCOPE_ROLE_A_' + pm.variables.replaceIn('{{$timestamp}}'));",
+                                    "pm.environment.set('scopeRoleBCode', 'SCOPE_ROLE_B_' + pm.variables.replaceIn('{{$timestamp}}'));",
+                                    "pm.environment.set('scopeGroupAName', 'SCOPE_GROUP_A_' + pm.variables.replaceIn('{{$timestamp}}'));",
+                                    "pm.environment.set('scopeGroupBName', 'SCOPE_GROUP_B_' + pm.variables.replaceIn('{{$timestamp}}'));"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "ed1b95d9-bd99-4f5c-a3bf-a03f76cab6e4",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Scope variables seeded', function(){",
+                                    "  pm.expect(!!pm.environment.get('scopeRoleAId')).to.eql(true);",
+                                    "  pm.expect(!!pm.environment.get('scopeRoleBId')).to.eql(true);",
+                                    "  pm.expect(!!pm.environment.get('scopeGroupAId')).to.eql(true);",
+                                    "  pm.expect(!!pm.environment.get('scopeGroupBId')).to.eql(true);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "efd5bb7f-9c12-4c8d-8a6f-f4b9cc85dcf9",
+                    "name": "Scope auth A owner (No Organization)",
+                    "request": {
+                        "url": {
+                            "protocol": "http",
+                            "port": "7788",
+                            "path": [
+                                "Puma",
+                                "graphql"
+                            ],
+                            "host": [
+                                "localhost"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{a_owner_login}}\", password: \"{{a_owner_password}}\", productId: \"{{product_id}}\" }) { userId token } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "f4a47932-85fd-47f6-a205-59f37b8e9438",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.Authorization : null;",
+                                    "pm.test('Scope auth A owner succeeds', function(){ pm.expect(!!payload && !!payload.token).to.eql(true); });",
+                                    "if (payload && payload.token) pm.environment.set('scopeAOwnerNoOrgToken', payload.token);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "0f8dd6f4-bd5e-4a55-a8f8-b933f08de238",
+                    "name": "Scope select tenant A",
+                    "request": {
+                        "url": {
+                            "protocol": "http",
+                            "port": "7788",
+                            "path": [
+                                "Puma",
+                                "graphql"
+                            ],
+                            "host": [
+                                "localhost"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{scopeAOwnerNoOrgToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SelectTenant { SelectTenant(input: { tenantId: \"{{tenantAId}}\" }) { ok userSession { tenantId accessToken } errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "fd4ffd63-d3f8-4400-86db-92f804278563",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.SelectTenant : null;",
+                                    "const session = payload ? payload.userSession : null;",
+                                    "pm.test('Scope select tenant A succeeds', function(){",
+                                    "  pm.expect(!!payload && payload.ok === true).to.eql(true);",
+                                    "  pm.expect(!!session && session.tenantId === pm.environment.get('tenantAId')).to.eql(true);",
+                                    "  pm.expect(!!session && !!session.accessToken).to.eql(true);",
+                                    "});",
+                                    "if (session && session.accessToken) pm.environment.set('scopeAOwnerTenantToken', session.accessToken);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "f6ae3273-d9f8-4226-8e4f-0fd44e2f7027",
+                    "name": "Scope create role in tenant A",
+                    "request": {
+                        "url": {
+                            "protocol": "http",
+                            "port": "7788",
+                            "path": [
+                                "Puma",
+                                "graphql"
+                            ],
+                            "host": [
+                                "localhost"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{scopeAOwnerTenantToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RoleAdd { RoleAdd(input: { id: \"{{scopeRoleAId}}\", typeId: \"Role\", productId: \"{{product_id}}\", item: { id: \"{{scopeRoleAId}}\", name: \"{{scopeRoleACode}}\", roleId: \"{{scopeRoleACode}}\", productId: \"{{product_id}}\", parentRoles: [], permissions: \"\" } }) { id } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "fee8bd72-8b7a-4f39-a386-f0870286efc3",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.RoleAdd : null;",
+                                    "pm.test('Scope role A created', function(){",
+                                    "  pm.expect(!!(payload && payload.id)).to.eql(true);",
+                                    "  pm.expect(payload.id).to.eql(pm.environment.get('scopeRoleAId'));",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "c60ca769-ffbf-4537-8b35-a966e4b7f588",
+                    "name": "Scope create group in tenant A",
+                    "request": {
+                        "url": {
+                            "protocol": "http",
+                            "port": "7788",
+                            "path": [
+                                "Puma",
+                                "graphql"
+                            ],
+                            "host": [
+                                "localhost"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{scopeAOwnerTenantToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation GroupAdd { GroupAdd(input: { id: \"{{scopeGroupAId}}\", typeId: \"Group\", productId: \"{{product_id}}\", item: { id: \"{{scopeGroupAId}}\", productId: \"{{product_id}}\", name: \"{{scopeGroupAName}}\", description: \"Scope group A\", roles: [], users: [], parentGroups: [] } }) { id } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "0ff5f69f-0f75-4c7d-8af7-87093ee48c75",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.GroupAdd : null;",
+                                    "pm.test('Scope group A created', function(){",
+                                    "  pm.expect(!!(payload && payload.id)).to.eql(true);",
+                                    "  pm.expect(payload.id).to.eql(pm.environment.get('scopeGroupAId'));",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "9c72a77e-6014-421a-9b7e-f76629884d67",
+                    "name": "Scope auth B owner (No Organization)",
+                    "request": {
+                        "url": {
+                            "protocol": "http",
+                            "port": "7788",
+                            "path": [
+                                "Puma",
+                                "graphql"
+                            ],
+                            "host": [
+                                "localhost"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{b_owner_login}}\", password: \"{{b_owner_password}}\", productId: \"{{product_id}}\" }) { userId token } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "6f5f9c35-459f-419e-aa74-8fc6c675f4f8",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.Authorization : null;",
+                                    "pm.test('Scope auth B owner succeeds', function(){ pm.expect(!!payload && !!payload.token).to.eql(true); });",
+                                    "if (payload && payload.token) pm.environment.set('scopeBOwnerNoOrgToken', payload.token);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "8fdd2438-db5f-4d5f-967f-01705f825d95",
+                    "name": "Scope select tenant B",
+                    "request": {
+                        "url": {
+                            "protocol": "http",
+                            "port": "7788",
+                            "path": [
+                                "Puma",
+                                "graphql"
+                            ],
+                            "host": [
+                                "localhost"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{scopeBOwnerNoOrgToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SelectTenant { SelectTenant(input: { tenantId: \"{{tenantBId}}\" }) { ok userSession { tenantId accessToken } errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "13098cd8-f5ad-4703-9f1d-50f99581e75f",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.SelectTenant : null;",
+                                    "const session = payload ? payload.userSession : null;",
+                                    "pm.test('Scope select tenant B succeeds', function(){",
+                                    "  pm.expect(!!payload && payload.ok === true).to.eql(true);",
+                                    "  pm.expect(!!session && session.tenantId === pm.environment.get('tenantBId')).to.eql(true);",
+                                    "  pm.expect(!!session && !!session.accessToken).to.eql(true);",
+                                    "});",
+                                    "if (session && session.accessToken) pm.environment.set('scopeBOwnerTenantToken', session.accessToken);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "20fbfd6f-28f7-47d8-a86b-d9ff90903f85",
+                    "name": "Scope create role in tenant B",
+                    "request": {
+                        "url": {
+                            "protocol": "http",
+                            "port": "7788",
+                            "path": [
+                                "Puma",
+                                "graphql"
+                            ],
+                            "host": [
+                                "localhost"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{scopeBOwnerTenantToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RoleAdd { RoleAdd(input: { id: \"{{scopeRoleBId}}\", typeId: \"Role\", productId: \"{{product_id}}\", item: { id: \"{{scopeRoleBId}}\", name: \"{{scopeRoleBCode}}\", roleId: \"{{scopeRoleBCode}}\", productId: \"{{product_id}}\", parentRoles: [], permissions: \"\" } }) { id } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "5312ec7f-c3df-4d61-8566-7d9d754fda36",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.RoleAdd : null;",
+                                    "pm.test('Scope role B created', function(){",
+                                    "  pm.expect(!!(payload && payload.id)).to.eql(true);",
+                                    "  pm.expect(payload.id).to.eql(pm.environment.get('scopeRoleBId'));",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "019b9251-e5f3-4fd0-8dbf-5a2b2b85422f",
+                    "name": "Scope create group in tenant B",
+                    "request": {
+                        "url": {
+                            "protocol": "http",
+                            "port": "7788",
+                            "path": [
+                                "Puma",
+                                "graphql"
+                            ],
+                            "host": [
+                                "localhost"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{scopeBOwnerTenantToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation GroupAdd { GroupAdd(input: { id: \"{{scopeGroupBId}}\", typeId: \"Group\", productId: \"{{product_id}}\", item: { id: \"{{scopeGroupBId}}\", productId: \"{{product_id}}\", name: \"{{scopeGroupBName}}\", description: \"Scope group B\", roles: [], users: [], parentGroups: [] } }) { id } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "f42f2a2b-9a08-4d41-8199-cba62b1f50e0",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.GroupAdd : null;",
+                                    "pm.test('Scope group B created', function(){",
+                                    "  pm.expect(!!(payload && payload.id)).to.eql(true);",
+                                    "  pm.expect(payload.id).to.eql(pm.environment.get('scopeGroupBId'));",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "37394855-1cdb-4e67-b0cd-1bc58db347eb",
+                    "name": "Scope RolesList in tenant A",
+                    "request": {
+                        "url": {
+                            "protocol": "http",
+                            "port": "7788",
+                            "path": [
+                                "Puma",
+                                "graphql"
+                            ],
+                            "host": [
+                                "localhost"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{scopeAOwnerTenantToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query RolesList { RolesList(input: { productId: \"{{product_id}}\", viewParams: { offset: 0, count: 500 } }) { items { id roleId roleName } } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "0db31f34-bf60-4b2c-bd82-84b35d978f75",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const items = json.data && json.data.RolesList ? (json.data.RolesList.items || []) : [];",
+                                    "const ids = items.map(x => x.id);",
+                                    "pm.test('Tenant A sees role created in A', function(){ pm.expect(ids.includes(pm.environment.get('scopeRoleAId'))).to.eql(true); });",
+                                    "pm.test('Tenant A does not see role created in B', function(){ pm.expect(ids.includes(pm.environment.get('scopeRoleBId'))).to.eql(false); });",
+                                    "pm.test('Tenant A does not see NoOrg role', function(){ pm.expect(ids.includes(pm.environment.get('noOrgRoleId'))).to.eql(false); });"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "bc6b7986-9035-4a16-adfe-e5bd0ca3ca76",
+                    "name": "Scope RolesList in tenant B",
+                    "request": {
+                        "url": {
+                            "protocol": "http",
+                            "port": "7788",
+                            "path": [
+                                "Puma",
+                                "graphql"
+                            ],
+                            "host": [
+                                "localhost"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{scopeBOwnerTenantToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query RolesList { RolesList(input: { productId: \"{{product_id}}\", viewParams: { offset: 0, count: 500 } }) { items { id roleId roleName } } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "ea54940e-b467-412f-b35d-1d12680f2f63",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const items = json.data && json.data.RolesList ? (json.data.RolesList.items || []) : [];",
+                                    "const ids = items.map(x => x.id);",
+                                    "pm.test('Tenant B sees role created in B', function(){ pm.expect(ids.includes(pm.environment.get('scopeRoleBId'))).to.eql(true); });",
+                                    "pm.test('Tenant B does not see role created in A', function(){ pm.expect(ids.includes(pm.environment.get('scopeRoleAId'))).to.eql(false); });",
+                                    "pm.test('Tenant B does not see NoOrg role', function(){ pm.expect(ids.includes(pm.environment.get('noOrgRoleId'))).to.eql(false); });"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "f74d487a-350f-4f7b-bd15-2a9cb726fc2a",
+                    "name": "Scope RolesList in No Organization",
+                    "request": {
+                        "url": {
+                            "protocol": "http",
+                            "port": "7788",
+                            "path": [
+                                "Puma",
+                                "graphql"
+                            ],
+                            "host": [
+                                "localhost"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{scopeAOwnerNoOrgToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query RolesList { RolesList(input: { productId: \"{{product_id}}\", viewParams: { offset: 0, count: 500 } }) { items { id roleId roleName } } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "19a37695-7ee8-4f98-b3b2-89f8396c12f8",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const items = json.data && json.data.RolesList ? (json.data.RolesList.items || []) : [];",
+                                    "const ids = items.map(x => x.id);",
+                                    "const denied = !!(json.errors && json.errors.length);",
+                                    "pm.test('NoOrg fixture role exists', function(){ pm.expect(!!pm.environment.get('noOrgRoleId')).to.eql(true); });",
+                                    "pm.test('No Organization RolesList is denied', function(){ pm.expect(denied).to.eql(true); });",
+                                    "pm.test('No Organization does not expose role from A', function(){ pm.expect(ids.includes(pm.environment.get('scopeRoleAId'))).to.eql(false); });",
+                                    "pm.test('No Organization does not expose role from B', function(){ pm.expect(ids.includes(pm.environment.get('scopeRoleBId'))).to.eql(false); });"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "df97f9fc-1917-46eb-980b-a42055de2f7c",
+                    "name": "Scope GroupsList in tenant A",
+                    "request": {
+                        "url": {
+                            "protocol": "http",
+                            "port": "7788",
+                            "path": [
+                                "Puma",
+                                "graphql"
+                            ],
+                            "host": [
+                                "localhost"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{scopeAOwnerTenantToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GroupsList { GroupsList(input: { productId: \"{{product_id}}\", viewParams: { offset: 0, count: 500 } }) { items { id name description } } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "e6ec176f-82ba-4b75-90f9-cce6ec86dc72",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const items = json.data && json.data.GroupsList ? (json.data.GroupsList.items || []) : [];",
+                                    "const ids = items.map(x => x.id);",
+                                    "pm.test('Tenant A sees group created in A', function(){ pm.expect(ids.includes(pm.environment.get('scopeGroupAId'))).to.eql(true); });",
+                                    "pm.test('Tenant A does not see group created in B', function(){ pm.expect(ids.includes(pm.environment.get('scopeGroupBId'))).to.eql(false); });",
+                                    "pm.test('Tenant A does not see NoOrg group', function(){ pm.expect(ids.includes(pm.environment.get('noOrgGroupId'))).to.eql(false); });"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "65fb8fc3-e7c1-4753-a469-a9ca8f82c670",
+                    "name": "Scope GroupsList in tenant B",
+                    "request": {
+                        "url": {
+                            "protocol": "http",
+                            "port": "7788",
+                            "path": [
+                                "Puma",
+                                "graphql"
+                            ],
+                            "host": [
+                                "localhost"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{scopeBOwnerTenantToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GroupsList { GroupsList(input: { productId: \"{{product_id}}\", viewParams: { offset: 0, count: 500 } }) { items { id name description } } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "6f2d228b-b248-4469-b18f-b57f62710800",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const items = json.data && json.data.GroupsList ? (json.data.GroupsList.items || []) : [];",
+                                    "const ids = items.map(x => x.id);",
+                                    "pm.test('Tenant B sees group created in B', function(){ pm.expect(ids.includes(pm.environment.get('scopeGroupBId'))).to.eql(true); });",
+                                    "pm.test('Tenant B does not see group created in A', function(){ pm.expect(ids.includes(pm.environment.get('scopeGroupAId'))).to.eql(false); });",
+                                    "pm.test('Tenant B does not see NoOrg group', function(){ pm.expect(ids.includes(pm.environment.get('noOrgGroupId'))).to.eql(false); });"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "12fcabfd-2ffe-4114-9258-d40cae8ba0ec",
+                    "name": "Scope GroupsList in No Organization",
+                    "request": {
+                        "url": {
+                            "protocol": "http",
+                            "port": "7788",
+                            "path": [
+                                "Puma",
+                                "graphql"
+                            ],
+                            "host": [
+                                "localhost"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{scopeAOwnerNoOrgToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GroupsList { GroupsList(input: { productId: \"{{product_id}}\", viewParams: { offset: 0, count: 500 } }) { items { id name description } } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "00f30f4f-e4f0-4204-8ce4-88e2f7ac69d7",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const items = json.data && json.data.GroupsList ? (json.data.GroupsList.items || []) : [];",
+                                    "const ids = items.map(x => x.id);",
+                                    "const denied = !!(json.errors && json.errors.length);",
+                                    "pm.test('NoOrg fixture group exists', function(){ pm.expect(!!pm.environment.get('noOrgGroupId')).to.eql(true); });",
+                                    "pm.test('No Organization GroupsList is denied', function(){ pm.expect(denied).to.eql(true); });",
+                                    "pm.test('No Organization does not expose group from A', function(){ pm.expect(ids.includes(pm.environment.get('scopeGroupAId'))).to.eql(false); });",
+                                    "pm.test('No Organization does not expose group from B', function(){ pm.expect(ids.includes(pm.environment.get('scopeGroupBId'))).to.eql(false); });"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "818dc0db-a6cc-4dcb-a00f-df26a54f08f8",
+                    "name": "Scope UsersList in tenant A",
+                    "request": {
+                        "url": {
+                            "protocol": "http",
+                            "port": "7788",
+                            "path": [
+                                "Puma",
+                                "graphql"
+                            ],
+                            "host": [
+                                "localhost"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{scopeAOwnerTenantToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query UsersList { UsersList(input: { productId: \"{{product_id}}\", viewParams: { offset: 0, count: 500 } }) { items { id username name } } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "e1377716-04db-442d-a903-57adf5f6f974",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const items = json.data && json.data.UsersList ? (json.data.UsersList.items || []) : [];",
+                                    "const ids = items.map(x => x.id);",
+                                    "pm.test('Tenant A sees A user fixture', function(){ pm.expect(ids.includes(pm.environment.get('a_member_user_id'))).to.eql(true); });",
+                                    "pm.test('Tenant A does not see B owner user', function(){ pm.expect(ids.includes(pm.environment.get('b_owner_user_id'))).to.eql(false); });",
+                                    "pm.test('Tenant A does not see NoOrg user', function(){ pm.expect(ids.includes(pm.environment.get('noOrgUserId'))).to.eql(false); });"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "3b17fe20-03cc-44b2-b33e-5948f3592c61",
+                    "name": "Scope UsersList in tenant B",
+                    "request": {
+                        "url": {
+                            "protocol": "http",
+                            "port": "7788",
+                            "path": [
+                                "Puma",
+                                "graphql"
+                            ],
+                            "host": [
+                                "localhost"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{scopeBOwnerTenantToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query UsersList { UsersList(input: { productId: \"{{product_id}}\", viewParams: { offset: 0, count: 500 } }) { items { id username name } } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "8cfbf89d-4bf6-48fd-a834-a4f438ab2f86",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const items = json.data && json.data.UsersList ? (json.data.UsersList.items || []) : [];",
+                                    "const ids = items.map(x => x.id);",
+                                    "pm.test('Tenant B sees B owner user', function(){ pm.expect(ids.includes(pm.environment.get('b_owner_user_id'))).to.eql(true); });",
+                                    "pm.test('Tenant B sees A user fixture only by membership model', function(){ pm.expect(ids.includes(pm.environment.get('a_member_user_id'))).to.eql(true); });",
+                                    "pm.test('Tenant B does not see NoOrg user', function(){ pm.expect(ids.includes(pm.environment.get('noOrgUserId'))).to.eql(false); });"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "43f15f71-37d2-4b53-a685-67724fbd546f",
+                    "name": "Scope UsersList in No Organization",
+                    "request": {
+                        "url": {
+                            "protocol": "http",
+                            "port": "7788",
+                            "path": [
+                                "Puma",
+                                "graphql"
+                            ],
+                            "host": [
+                                "localhost"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{scopeAOwnerNoOrgToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query UsersList { UsersList(input: { productId: \"{{product_id}}\", viewParams: { offset: 0, count: 500 } }) { items { id username name } } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "33428d8d-a4ea-4412-8a71-f2df602d9e03",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const items = json.data && json.data.UsersList ? (json.data.UsersList.items || []) : [];",
+                                    "const ids = items.map(x => x.id);",
+                                    "const denied = !!(json.errors && json.errors.length);",
+                                    "pm.test('NoOrg fixture user exists', function(){ pm.expect(!!pm.environment.get('noOrgUserId')).to.eql(true); });",
+                                    "pm.test('No Organization UsersList is denied', function(){ pm.expect(denied).to.eql(true); });",
+                                    "pm.test('No Organization does not expose A user fixture', function(){ pm.expect(ids.includes(pm.environment.get('a_member_user_id'))).to.eql(false); });",
+                                    "pm.test('No Organization does not expose B owner user', function(){ pm.expect(ids.includes(pm.environment.get('b_owner_user_id'))).to.eql(false); });"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ],
+            "event": []
+        },
+        {
             "id": "664f4f89-6520-4a63-94d6-f3f7e022c2f6",
             "name": "99 Cleanup",
             "item": [
