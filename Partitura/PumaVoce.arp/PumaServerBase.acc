@@ -94,6 +94,9 @@
                     <AttributeInfo Id="BackupSettings" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaSettings/Backup"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="BindingManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="TenantController/TenantEntityBindingManager"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="CrossOrgGrantManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="TenantController/CrossOrgGrantManager"/>
                     </AttributeInfo>
@@ -119,6 +122,9 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
+                    <AttributeInfo Id="InvitationCollection" Type="Reference" ExportId="InvitationRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="JwtSessionController" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="JwtSessionController"/>
                     </AttributeInfo>
@@ -129,6 +135,9 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="LogPath" Type="Reference" ExportId="LogPath">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MembershipCollection" Type="Reference" ExportId="TenantMembershipRepository">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="MembershipManager" Type="Reference" ExportId="">
