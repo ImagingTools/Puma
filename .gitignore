@@ -15,6 +15,8 @@ CTestTestfile.cmake
 Testing/
 _deps/
 Build/*/*.dir/
+**/CMake/build/
+.cmake/
 
 # Visual Studio artifacts
 # Note: We keep 3rdParty Visual Studio files tracked

@@ -126,7 +126,7 @@
         <Element Id="DatabaseAccessSettings" PackageId="ImtDatabasePck" ComponentId="DatabaseAccessSettings">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="DbName" Type="Id" ExportId="">
+                    <AttributeInfo Id="DbName" Type="Id" ExportId="DbName">
                         <Data IsEnabled="true" Value="puma"/>
                     </AttributeInfo>
                     <AttributeInfo Id="HostName" Type="Id" ExportId="">
@@ -150,7 +150,7 @@
                     <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="DefaultPath" Type="String" ExportId="">
+                    <AttributeInfo Id="DefaultPath" Type="String" ExportId="SettingsFilePath">
                         <Data IsEnabled="true" Value="Puma/Puma Server/PumaServerSettings.xml"/>
                     </AttributeInfo>
                     <AttributeInfo Id="LocationType" Type="Integer" ExportId="">
@@ -285,10 +285,10 @@
         <Element Id="Server" PackageId="ImtHttpServerVoce" ComponentId="ServerConnectionParams">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="DefaultHttpPort" Type="Integer" ExportId="">
+                    <AttributeInfo Id="DefaultHttpPort" Type="Integer" ExportId="DefaultHttpPort">
                         <Data IsEnabled="true" Value="7788"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="DefaultWebSocketPort" Type="Integer" ExportId="">
+                    <AttributeInfo Id="DefaultWebSocketPort" Type="Integer" ExportId="DefaultWebSocketPort">
                         <Data IsEnabled="true" Value="8788"/>
                     </AttributeInfo>
                 </AttributeInfoMap>

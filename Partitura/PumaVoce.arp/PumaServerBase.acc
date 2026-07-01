@@ -219,8 +219,20 @@
                     <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="DbName" Type="Id" ExportId="DbName">
+                        <Data IsEnabled="true" Value="puma"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DefaultHttpPort" Type="Integer" ExportId="HttpPort">
+                        <Data IsEnabled="true" Value="7788"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DefaultWebSocketPort" Type="Integer" ExportId="WebSocketPort">
+                        <Data IsEnabled="true" Value="8788"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SettingsFilePath" Type="String" ExportId="SettingsFilePath">
+                        <Data IsEnabled="true" Value="Puma/Puma Server/PumaServerSettings.xml"/>
                     </AttributeInfo>
                     <AttributeInfo Id="RuntimeStatus" Type="Reference" ExportId="RuntimeStatus">
                         <Data IsEnabled="false"/>
@@ -375,6 +387,12 @@
         <Element Id="UserCollectionDocumentService" PackageId="ImtAuthVoce" ComponentId="UserCollectionDocumentService">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="BindingManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="TenantController/TenantEntityBindingManager"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DelegatedAccess" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="TenantController/DelegatedAccessResolver"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -383,6 +401,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="RequestManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="WebSocketServerFramework"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RoleInfoProvider" Type="Reference" ExportId="RoleInfoProvider">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="RoleRepository" Type="Reference" ExportId="RoleRepository">
                         <Data IsEnabled="false"/>
