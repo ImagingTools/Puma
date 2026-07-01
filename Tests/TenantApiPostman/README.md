@@ -41,7 +41,7 @@ newman run Tenant_System_Full.postman_collection.json -e Tenant_System_Full.post
 
 ## Scenario Coverage Summary
 
-Total request-level scenarios: 321
+Total request-level scenarios: 323
 
 - 00 System bootstrap: 1 requests
 - 00A Auth SU: 1 requests
@@ -54,17 +54,19 @@ Total request-level scenarios: 321
 - 04 RBAC (members, roles, groups, permissions): 16 requests
 - 05 Isolation and negative checks: 4 requests
 - 05A Isolation matrix - cross-tenant boundaries: 15 requests
+- 05B User representation tenant isolation (roles/groups in repr): 4 requests
+- 05B User representation tenant isolation (roles in GetUserRepresentation): 4 requests
 - 06 Edge - Tenant lifecycle: 17 requests
 - 07 Edge - Memberships and invitations: 16 requests
 - 08 Edge - Connections and relationships: 6 requests
-- 09 Edge - Grants and delegation: 38 requests
+- 09 Edge - Grants and delegation: 40 requests  [detailed GetProfile for cross-tenant delegation visibility]
 - 10 Edge - RBAC source/revoke matrix: 11 requests
 - 11 Edge - Token and visibility probes: 2 requests
 - 12 Data-driven permission visibility matrix: 4 requests
 - 13 Coverage sweep - remaining tenant APIs: 38 requests
-- 13 Edge - No Organization isolation: 17 requests
-- 14 Advanced Edge - Lifecycle and delegation depth: 81 requests
-- 14A Role permissions validation in-tenant: 7 requests
+- 13 Edge - No Organization isolation: 19 requests
+- 14 Advanced Edge - Lifecycle and delegation depth: 82 requests  [GetProfile for dual grants and revoke]
+- 14A Role permissions validation in-tenant: 5 requests
 - 99 Cleanup: 5 requests
 
 ## Full Scenario Catalog (All Request-Level Scenarios)
@@ -162,6 +164,12 @@ Total request-level scenarios: 321
 2. A member cannot create cross-org grant
 3. A owner cannot fetch B connection code
 4. B owner cannot fetch A relationships as foreign tenant
+
+### 05B User representation tenant isolation (roles in GetUserRepresentation) (4)
+1. SelectTenant A owner (user repr isolation setup)
+2. GetUserRepresentation under tenant A (roles must be tenant-scoped)
+3. SelectTenant B owner (cross tenant repr probe)
+4. GetUserRepresentation under B (must not return A-tenant role IDs for shared users)
 
 ### 05A Isolation matrix - cross-tenant boundaries (15)
 
@@ -296,7 +304,7 @@ Total request-level scenarios: 321
 3. Matrix GetPermissions probe
 4. Matrix GetTenant isolation probe
 
-### 13 Coverage sweep - remaining tenant APIs (38)
+### 13 Coverage sweep - remaining tenant APIs (40+)
 
 1. GetMembershipsByTenant coverage
 2. GetMembershipsByUser coverage
@@ -306,36 +314,39 @@ Total request-level scenarios: 321
 6. AddMembership coverage
 7. ResendTenantInvitation coverage
 8. UpdateMembershipRole coverage
-9. TransferTenantOwnership coverage
-10. GetConnectionRequests coverage
-11. RegenerateConnectionCode coverage
-12. RejectConnectionRequest coverage
-13. CancelConnectionRequest coverage
-14. EnsureSystemTenant coverage
-15. CreateContract coverage
-16. GetContracts coverage
-17. UpdateContractStatus coverage
-18. TerminateContract coverage
-19. SendCrossTenantMessage coverage
-20. GetCrossTenantMessages coverage
-21. GetCrossTenantMessage coverage
-22. UpdateCrossTenantMessageStatus coverage
-23. GetOrderRequests coverage
-24. GetOrderRequest coverage
-25. ConfirmOrderRequest coverage
-26. RejectOrderRequest coverage
-27. UpdateOrderRequestStatus coverage
-28. GetRelationshipRepresentation coverage
-29. GetUserRepresentation coverage
-30. GetGroupRepresentation coverage
-31. RoleItem coverage
-32. GroupItem coverage
-33. RoleAdd coverage
-34. RoleUpdate coverage
-35. GroupAdd coverage
-36. GroupUpdate coverage
-37. UserToken coverage
-38. Logout coverage
+9. GetOrganizationPermissions coverage — verifies 6-group org permission tree (EditOrganization, MemberManagement, RoleManagement, GroupManagement, PermissionManagement, ConnectionManagement); asserts stale groups absent (OrganizationManagement, ContractManagement, MessageManagement); verifies EditOrganizationMemberPermissions in PermissionManagement
+10. UpdateMembershipPermissions coverage — assigns ViewOrganizationMembers, EditOrganizationMember, EditOrganizationMemberPermissions; verifies success
+11. Verify organizationPermissions in GetMembership — confirms all 3 permissions from step 10 are returned by GetMembership
+12. TransferTenantOwnership coverage
+13. GetConnectionRequests coverage
+14. RegenerateConnectionCode coverage
+15. RejectConnectionRequest coverage
+16. CancelConnectionRequest coverage
+17. EnsureSystemTenant coverage
+18. CreateContract coverage
+19. GetContracts coverage
+20. UpdateContractStatus coverage
+21. TerminateContract coverage
+22. SendCrossTenantMessage coverage
+23. GetCrossTenantMessages coverage
+24. GetCrossTenantMessage coverage
+25. UpdateCrossTenantMessageStatus coverage
+26. GetOrderRequests coverage
+27. GetOrderRequest coverage
+28. ConfirmOrderRequest coverage
+29. RejectOrderRequest coverage
+30. UpdateOrderRequestStatus coverage
+31. GetRelationshipRepresentation coverage
+32. GetUserRepresentation coverage
+33. GetGroupRepresentation coverage
+34. RoleItem coverage
+35. GroupItem coverage
+36. RoleAdd coverage
+37. RoleUpdate coverage
+38. GroupAdd coverage
+39. GroupUpdate coverage
+40. UserToken coverage
+41. Logout coverage
 
 ### 13 Edge - No Organization isolation (17)
 
@@ -441,15 +452,13 @@ Total request-level scenarios: 321
 80. Advanced grant depth: A member org list excludes A after all revokes
 81. Advanced grant depth: A member cannot select tenant A after all revokes
 
-### 14A Role permissions validation in-tenant (7)
+### 14A Role permissions validation in-tenant (5)
 
 1. RolePerm: Authorization A owner (No Organization)
-2. RolePerm: GetProductPermissions all (NoOrg)
-3. RolePerm: SelectTenant A owner context
-4. RolePerm: GetTenantPermissions A
-5. RolePerm: GetProductPermissions tenant-scoped subset
-6. RolePerm: RoleUpdate with forbidden permission (negative)
-7. RolePerm: RoleUpdate with allowed permission (positive)
+2. RolePerm: SelectTenant A owner context
+3. RolePerm: GetTenantPermissions A
+4. RolePerm: RoleUpdate with forbidden permission (negative)
+5. RolePerm: RoleUpdate with allowed permission (positive)
 
 ### 99 Cleanup (5)
 
