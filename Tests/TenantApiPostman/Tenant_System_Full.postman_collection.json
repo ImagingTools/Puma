@@ -17685,7 +17685,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation Sel { SelectTenant(input: { tenantId: \"{{tenantAId}}\" }) { tenantId currentUserId } }",
+                                "query": "mutation SelectTenant { SelectTenant(input: { tenantId: \"{{tenantAId}}\" }) { ok userSession { userId tenantId accessToken refreshToken } errorMessage } }",
                                 "variables": ""
                             }
                         }
@@ -17699,10 +17699,227 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const payload = json.data && json.data.SelectTenant ? json.data.SelectTenant : null;",
-                                    "pm.test('Switched to tenant A for user repr isolation probe', function(){ pm.expect(!!payload && !!payload.userSession && !!payload.userSession.tenantId).to.eql(true); });"
+                                    "const session = payload && payload.userSession ? payload.userSession : null;",
+                                    "pm.test('Switched to tenant A for user repr isolation probe', function(){ pm.expect(!!payload && payload.ok === true && !!session && !!session.tenantId).to.eql(true); });",
+                                    "if (session && session.accessToken) { pm.environment.set('a_owner_token', session.accessToken); }"
                                 ]
                             }
                         }
+                    ]
+                },
+                {
+                    "id": "urti-create-role",
+                    "name": "Isolation probe: Create role bound to tenant A",
+                    "request": {
+                        "url": { "host": [ "{{base_url}}" ], "query": [], "variable": [] },
+                        "header": [ { "key": "x-authentication-token", "value": "{{a_owner_token}}" } ],
+                        "method": "POST",
+                        "body": { "mode": "graphql", "graphql": { "query": "mutation CreateNewDocument { CreateNewDocument(input: { collectionId: \"Roles\", typeId: \"Role\", proposedSourceDocumentId: \"{{urtiRoleId}}\" }) { documentId objectId } }", "variables": "" } }
+                    },
+                    "response": [],
+                    "event": [
+                        { "listen": "prerequest", "script": { "type": "text/javascript", "exec": [
+                            "pm.environment.set('urtiRoleId', pm.variables.replaceIn('{{$guid}}'));",
+                            "pm.environment.set('urtiRoleCode', 'R_URTI_' + pm.variables.replaceIn('{{$timestamp}}'));",
+                            "pm.environment.set('urtiGroupId', pm.variables.replaceIn('{{$guid}}'));",
+                            "pm.environment.set('urtiGroupName', 'G_URTI_' + pm.variables.replaceIn('{{$timestamp}}'));"
+                        ] } },
+                        { "listen": "test", "script": { "type": "text/javascript", "exec": [
+                            "const json = pm.response.json();",
+                            "const payload = json.data ? json.data.CreateNewDocument : null;",
+                            "pm.test('Isolation probe role document created', function(){ pm.expect(!!(payload && payload.documentId)).to.eql(true); });",
+                            "if (payload && payload.documentId) pm.environment.set('urtiRoleDocId', payload.documentId);",
+                            "if (payload && payload.objectId) pm.environment.set('urtiRoleId', payload.objectId);"
+                        ] } }
+                    ]
+                },
+                {
+                    "id": "urti-update-role",
+                    "name": "Isolation probe: Update role permissions",
+                    "request": {
+                        "url": { "host": [ "{{base_url}}" ], "query": [], "variable": [] },
+                        "header": [ { "key": "x-authentication-token", "value": "{{a_owner_token}}" } ],
+                        "method": "POST",
+                        "body": { "mode": "graphql", "graphql": { "query": "mutation UpdateRoleFromRepresentation { UpdateRoleFromRepresentation(input: { documentId: \"{{urtiRoleDocId}}\", role: { id: \"{{urtiRoleId}}\", name: \"{{urtiRoleCode}}\", description: \"Tenant A isolation probe role\", roleId: \"{{urtiRoleCode}}\", productId: \"{{product_id}}\", parentRoles: [], permissions: \"ViewUsers\", isDefault: false, isGuest: false } }) { status message } }", "variables": "" } }
+                    },
+                    "response": [],
+                    "event": [
+                        { "listen": "test", "script": { "type": "text/javascript", "exec": [
+                            "const json = pm.response.json();",
+                            "const payload = json.data ? json.data.UpdateRoleFromRepresentation : null;",
+                            "pm.test('Isolation probe role representation updated', function(){ pm.expect(payload && payload.status === 'Success').to.eql(true); });"
+                        ] } }
+                    ]
+                },
+                {
+                    "id": "urti-save-role",
+                    "name": "Isolation probe: Save role document",
+                    "request": {
+                        "url": { "host": [ "{{base_url}}" ], "query": [], "variable": [] },
+                        "header": [ { "key": "x-authentication-token", "value": "{{a_owner_token}}" } ],
+                        "method": "POST",
+                        "body": { "mode": "graphql", "graphql": { "query": "mutation SaveDocument { SaveDocument(input: { collectionId: \"Roles\", documentId: \"{{urtiRoleDocId}}\", documentName: \"{{urtiRoleCode}}\" }) { status message } }", "variables": "" } }
+                    },
+                    "response": [],
+                    "event": [
+                        { "listen": "test", "script": { "type": "text/javascript", "exec": [
+                            "const json = pm.response.json();",
+                            "const payload = json.data ? json.data.SaveDocument : null;",
+                            "pm.test('Isolation probe role document saved', function(){ pm.expect(payload && payload.status === 'Success').to.eql(true); });"
+                        ] } }
+                    ]
+                },
+                {
+                    "id": "urti-get-role-id",
+                    "name": "Isolation probe: Resolve real role objectId",
+                    "request": {
+                        "url": { "host": [ "{{base_url}}" ], "query": [], "variable": [] },
+                        "header": [ { "key": "x-authentication-token", "value": "{{a_owner_token}}" } ],
+                        "method": "POST",
+                        "body": { "mode": "graphql", "graphql": { "query": "query RolesList { RolesList(input: { productId: \"{{product_id}}\", viewParams: { offset: 0, count: 500 } }) { items { id roleId roleName } } }", "variables": "" } }
+                    },
+                    "response": [],
+                    "event": [
+                        { "listen": "test", "script": { "type": "text/javascript", "exec": [
+                            "const json = pm.response.json();",
+                            "const items = (json.data && json.data.RolesList && json.data.RolesList.items) || [];",
+                            "const urtiRoleCode = pm.environment.get('urtiRoleCode');",
+                            "const found = items.find(function(it){ return it.roleId === urtiRoleCode; });",
+                            "pm.test('Isolation probe role real ID resolved', function(){ pm.expect(!!(found && found.id)).to.eql(true); });",
+                            "if (found && found.id) pm.environment.set('urtiRoleId', found.id);"
+                        ] } }
+                    ]
+                },
+                {
+                    "id": "urti-create-group",
+                    "name": "Isolation probe: Create group bound to tenant A",
+                    "request": {
+                        "url": { "host": [ "{{base_url}}" ], "query": [], "variable": [] },
+                        "header": [ { "key": "x-authentication-token", "value": "{{a_owner_token}}" } ],
+                        "method": "POST",
+                        "body": { "mode": "graphql", "graphql": { "query": "mutation CreateNewDocument { CreateNewDocument(input: { collectionId: \"Groups\", typeId: \"Group\", proposedSourceDocumentId: \"{{urtiGroupId}}\" }) { documentId objectId } }", "variables": "" } }
+                    },
+                    "response": [],
+                    "event": [
+                        { "listen": "test", "script": { "type": "text/javascript", "exec": [
+                            "const json = pm.response.json();",
+                            "const payload = json.data ? json.data.CreateNewDocument : null;",
+                            "pm.test('Isolation probe group document created', function(){ pm.expect(!!(payload && payload.documentId)).to.eql(true); });",
+                            "if (payload && payload.documentId) pm.environment.set('urtiGroupDocId', payload.documentId);",
+                            "if (payload && payload.objectId) pm.environment.set('urtiGroupId', payload.objectId);"
+                        ] } }
+                    ]
+                },
+                {
+                    "id": "urti-update-group",
+                    "name": "Isolation probe: Update group",
+                    "request": {
+                        "url": { "host": [ "{{base_url}}" ], "query": [], "variable": [] },
+                        "header": [ { "key": "x-authentication-token", "value": "{{a_owner_token}}" } ],
+                        "method": "POST",
+                        "body": { "mode": "graphql", "graphql": { "query": "mutation UpdateGroupFromRepresentation { UpdateGroupFromRepresentation(input: { documentId: \"{{urtiGroupDocId}}\", group: { id: \"{{urtiGroupId}}\", productId: \"{{product_id}}\", name: \"{{urtiGroupName}}\", description: \"Tenant A isolation probe group\", roles: [], users: [], parentGroups: [] } }) { status message } }", "variables": "" } }
+                    },
+                    "response": [],
+                    "event": [
+                        { "listen": "test", "script": { "type": "text/javascript", "exec": [
+                            "const json = pm.response.json();",
+                            "const payload = json.data ? json.data.UpdateGroupFromRepresentation : null;",
+                            "pm.test('Isolation probe group representation updated', function(){ pm.expect(payload && payload.status === 'Success').to.eql(true); });"
+                        ] } }
+                    ]
+                },
+                {
+                    "id": "urti-save-group",
+                    "name": "Isolation probe: Save group document",
+                    "request": {
+                        "url": { "host": [ "{{base_url}}" ], "query": [], "variable": [] },
+                        "header": [ { "key": "x-authentication-token", "value": "{{a_owner_token}}" } ],
+                        "method": "POST",
+                        "body": { "mode": "graphql", "graphql": { "query": "mutation SaveDocument { SaveDocument(input: { collectionId: \"Groups\", documentId: \"{{urtiGroupDocId}}\", documentName: \"{{urtiGroupName}}\" }) { status message } }", "variables": "" } }
+                    },
+                    "response": [],
+                    "event": [
+                        { "listen": "test", "script": { "type": "text/javascript", "exec": [
+                            "const json = pm.response.json();",
+                            "const payload = json.data ? json.data.SaveDocument : null;",
+                            "pm.test('Isolation probe group document saved', function(){ pm.expect(payload && payload.status === 'Success').to.eql(true); });"
+                        ] } }
+                    ]
+                },
+                {
+                    "id": "urti-get-group-id",
+                    "name": "Isolation probe: Resolve real group objectId",
+                    "request": {
+                        "url": { "host": [ "{{base_url}}" ], "query": [], "variable": [] },
+                        "header": [ { "key": "x-authentication-token", "value": "{{a_owner_token}}" } ],
+                        "method": "POST",
+                        "body": { "mode": "graphql", "graphql": { "query": "query GroupsList { GroupsList(input: { productId: \"{{product_id}}\", viewParams: { offset: 0, count: 500 } }) { items { id name description } } }", "variables": "" } }
+                    },
+                    "response": [],
+                    "event": [
+                        { "listen": "test", "script": { "type": "text/javascript", "exec": [
+                            "const json = pm.response.json();",
+                            "const items = (json.data && json.data.GroupsList && json.data.GroupsList.items) || [];",
+                            "const urtiGroupName = pm.environment.get('urtiGroupName');",
+                            "const found = items.find(function(it){ return it.name === urtiGroupName; });",
+                            "pm.test('Isolation probe group real ID resolved', function(){ pm.expect(!!(found && found.id)).to.eql(true); });",
+                            "if (found && found.id) pm.environment.set('urtiGroupId', found.id);"
+                        ] } }
+                    ]
+                },
+                {
+                    "id": "urti-open-member",
+                    "name": "Isolation probe: Open a_member user document",
+                    "request": {
+                        "url": { "host": [ "{{base_url}}" ], "query": [], "variable": [] },
+                        "header": [ { "key": "x-authentication-token", "value": "{{a_owner_token}}" } ],
+                        "method": "POST",
+                        "body": { "mode": "graphql", "graphql": { "query": "mutation OpenDocument { OpenDocument(input: { collectionId: \"Users\", id: \"{{a_member_user_id}}\" }) { documentId } }", "variables": "" } }
+                    },
+                    "response": [],
+                    "event": [
+                        { "listen": "test", "script": { "type": "text/javascript", "exec": [
+                            "const json = pm.response.json();",
+                            "const payload = json.data ? json.data.OpenDocument : null;",
+                            "pm.test('Isolation probe: a_member document opened', function(){ pm.expect(!!(payload && payload.documentId)).to.eql(true); });",
+                            "if (payload && payload.documentId) pm.environment.set('urtiMemberDocId', payload.documentId);"
+                        ] } }
+                    ]
+                },
+                {
+                    "id": "urti-assign-member",
+                    "name": "Isolation probe: Assign role+group to a_member (tenant A binding)",
+                    "request": {
+                        "url": { "host": [ "{{base_url}}" ], "query": [], "variable": [] },
+                        "header": [ { "key": "x-authentication-token", "value": "{{a_owner_token}}" } ],
+                        "method": "POST",
+                        "body": { "mode": "graphql", "graphql": { "query": "mutation UpdateUserFromRepresentation { UpdateUserFromRepresentation(input: { documentId: \"{{urtiMemberDocId}}\", tenantId: \"{{tenantAId}}\", user: { id: \"{{a_member_user_id}}\", productId: \"{{product_id}}\", name: \"A Member\", username: \"{{a_member_login}}\", password: \"\", email: \"\", groups: [\"{{urtiGroupId}}\"], roles: [\"{{urtiRoleId}}\"], permissions: [], systemInfos: [] } }) { status message } }", "variables": "" } }
+                    },
+                    "response": [],
+                    "event": [
+                        { "listen": "test", "script": { "type": "text/javascript", "exec": [
+                            "const json = pm.response.json();",
+                            "const payload = json.data ? json.data.UpdateUserFromRepresentation : null;",
+                            "pm.test('Isolation probe role+group assigned to a_member', function(){ pm.expect(payload && payload.status === 'Success').to.eql(true); });"
+                        ] } }
+                    ]
+                },
+                {
+                    "id": "urti-save-member",
+                    "name": "Isolation probe: Save a_member document",
+                    "request": {
+                        "url": { "host": [ "{{base_url}}" ], "query": [], "variable": [] },
+                        "header": [ { "key": "x-authentication-token", "value": "{{a_owner_token}}" } ],
+                        "method": "POST",
+                        "body": { "mode": "graphql", "graphql": { "query": "mutation SaveDocument { SaveDocument(input: { collectionId: \"Users\", documentId: \"{{urtiMemberDocId}}\", documentName: \"Member A\" }) { status message } }", "variables": "" } }
+                    },
+                    "response": [],
+                    "event": [
+                        { "listen": "test", "script": { "type": "text/javascript", "exec": [
+                            "const json = pm.response.json();",
+                            "const payload = json.data ? json.data.SaveDocument : null;",
+                            "pm.test('Isolation probe: a_member document saved', function(){ pm.expect(payload && payload.status === 'Success').to.eql(true); });"
+                        ] } }
                     ]
                 },
                 {
@@ -17726,7 +17943,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "query GetUserReprIso { GetUserRepresentation(input: { collectionId: \"Users\", id: \"{{aMemberUserDocId}}\" }) { id username roles groups permissions } }",
+                                "query": "query GetUserReprIso { GetUserRepresentation(input: { collectionId: \"Users\", id: \"{{urtiMemberDocId}}\" }) { id username roles groups permissions } }",
                                 "variables": ""
                             }
                         }
@@ -17742,8 +17959,18 @@
                                     "const payload = json.data ? json.data.GetUserRepresentation : null;",
                                     "const hasErr = !!(json.errors && json.errors.length);",
                                     "pm.test('GetUserRepresentation under tenant returns data', function(){ if (hasErr) { pm.expect(true).to.eql(true); return; } pm.expect(!!payload && !!payload.id).to.eql(true); });",
-                                    "pm.test('Roles array present (tenant filtered by CUserCollectionDocumentServiceComp)', function(){ if (hasErr || !payload) return; pm.expect(Array.isArray(payload.roles)).to.eql(true); });",
-                                    "pm.test('Groups array present (tenant filtered)', function(){ if (hasErr || !payload) return; pm.expect(Array.isArray(payload.groups)).to.eql(true); });"
+                                    "pm.test('Roles array includes tenant-A-bound isolation probe role (tenant filtered by CUserCollectionDocumentServiceComp)', function(){",
+                                    "  if (hasErr || !payload) return;",
+                                    "  pm.expect(Array.isArray(payload.roles)).to.eql(true);",
+                                    "  const urtiRoleId = pm.environment.get('urtiRoleId');",
+                                    "  if (urtiRoleId) pm.expect(payload.roles.includes(urtiRoleId), 'expected roles to include ' + urtiRoleId + ' but got ' + JSON.stringify(payload.roles)).to.eql(true);",
+                                    "});",
+                                    "pm.test('Groups array includes tenant-A-bound isolation probe group (tenant filtered)', function(){",
+                                    "  if (hasErr || !payload) return;",
+                                    "  pm.expect(Array.isArray(payload.groups)).to.eql(true);",
+                                    "  const urtiGroupId = pm.environment.get('urtiGroupId');",
+                                    "  if (urtiGroupId) pm.expect(payload.groups.includes(urtiGroupId), 'expected groups to include ' + urtiGroupId + ' but got ' + JSON.stringify(payload.groups)).to.eql(true);",
+                                    "});"
                                 ]
                             }
                         }
@@ -17770,7 +17997,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation SelB { SelectTenant(input: { tenantId: \"{{tenantBId}}\" }) { tenantId } }",
+                                "query": "mutation SelB { SelectTenant(input: { tenantId: \"{{tenantBId}}\" }) { ok userSession { userId tenantId accessToken refreshToken } errorMessage } }",
                                 "variables": ""
                             }
                         }
@@ -17783,7 +18010,10 @@
                                 "type": "text/javascript",
                                 "exec": [
                                     "const json = pm.response.json();",
-                                    "pm.test('Switched to tenant B', function(){ const p = json.data && json.data.SelectTenant; pm.expect(!!p && !!p.userSession && !!p.userSession.tenantId).to.eql(true); });"
+                                    "const p = json.data && json.data.SelectTenant;",
+                                    "const session = p && p.userSession ? p.userSession : null;",
+                                    "pm.test('Switched to tenant B', function(){ pm.expect(!!p && p.ok === true && !!session && !!session.tenantId).to.eql(true); });",
+                                    "if (session && session.accessToken) { pm.environment.set('b_owner_token', session.accessToken); }"
                                 ]
                             }
                         }
@@ -17810,7 +18040,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "query GetUserReprIsoB { GetUserRepresentation(input: { collectionId: \"Users\", id: \"{{aMemberUserDocId}}\" }) { id username roles groups } }",
+                                "query": "query GetUserReprIsoB { GetUserRepresentation(input: { collectionId: \"Users\", id: \"{{urtiMemberDocId}}\" }) { id username roles groups } }",
                                 "variables": ""
                             }
                         }
@@ -17826,7 +18056,18 @@
                                     "const payload = json.data ? json.data.GetUserRepresentation : null;",
                                     "const hasErr = !!(json.errors && json.errors.length);",
                                     "pm.test('GetUserRepresentation under other tenant succeeds (or access handled)', function(){ pm.expect(hasErr || !!payload).to.eql(true); });",
-                                    "pm.test('User repr roles under foreign tenant context must not leak non-bound role IDs (core fix verification)', function(){ if (hasErr || !payload || !payload.roles) { pm.expect(true).to.eql(true); return; } /* post-fix: only roles bound to B (or none if user not sharing) */ pm.expect(Array.isArray(payload.roles)).to.eql(true); });"
+                                    "pm.test('User repr roles under foreign tenant context must not leak non-bound role IDs (core fix verification)', function(){",
+                                    "  if (hasErr || !payload || !payload.roles) { pm.expect(true).to.eql(true); return; }",
+                                    "  pm.expect(Array.isArray(payload.roles)).to.eql(true);",
+                                    "  const urtiRoleId = pm.environment.get('urtiRoleId');",
+                                    "  if (urtiRoleId) pm.expect(payload.roles.includes(urtiRoleId), 'tenant-A-bound role leaked into tenant B view: ' + JSON.stringify(payload.roles)).to.eql(false);",
+                                    "});",
+                                    "pm.test('User repr groups under foreign tenant context must not leak non-bound group IDs', function(){",
+                                    "  if (hasErr || !payload || !payload.groups) { pm.expect(true).to.eql(true); return; }",
+                                    "  pm.expect(Array.isArray(payload.groups)).to.eql(true);",
+                                    "  const urtiGroupId = pm.environment.get('urtiGroupId');",
+                                    "  if (urtiGroupId) pm.expect(payload.groups.includes(urtiGroupId), 'tenant-A-bound group leaked into tenant B view: ' + JSON.stringify(payload.groups)).to.eql(false);",
+                                    "});"
                                 ]
                             }
                         }
