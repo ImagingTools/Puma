@@ -189,18 +189,45 @@ function Start-TestServer {
     Write-Host "Server is accepting connections on port $HttpPort"
 }
 
+function Install-NewmanIfNeeded {
+    # newman is pinned as a local devDependency in this folder's package.json
+    # rather than assumed to be installed globally on the agent - a fresh or
+    # pooled/reprovisioned TeamCity agent otherwise has no way to run it.
+    $newmanCmd = Join-Path $ScriptDir "node_modules\.bin\newman.cmd"
+    if (Test-Path $newmanCmd) {
+        return $newmanCmd
+    }
+
+    Write-Step "Installing newman (npm install in $ScriptDir)"
+    Push-Location $ScriptDir
+    try {
+        & npm install --no-audit --no-fund | Out-Host
+        if ($LASTEXITCODE -ne 0) { throw "npm install failed (exit $LASTEXITCODE)" }
+    }
+    finally {
+        Pop-Location
+    }
+
+    if (-not (Test-Path $newmanCmd)) {
+        throw "npm install completed but newman binary still not found at: $newmanCmd"
+    }
+    return $newmanCmd
+}
+
 function Invoke-NewmanSuite {
+    $newmanCmd = Install-NewmanIfNeeded
+
     Write-Step "Running newman suite"
     $baseUrl = "http://localhost:$HttpPort/Puma/graphql"
     $newmanArgs = @(
-        "--no-install", "newman", "run", $CollectionPath,
+        "run", $CollectionPath,
         "-e", $EnvironmentPath,
         "--env-var", "base_url=$baseUrl",
         "--reporters", "cli,junit,json",
         "--reporter-junit-export", $JUnitReportPath,
         "--reporter-json-export", $JsonReportPath
     )
-    & npx @newmanArgs | Out-Host
+    & $newmanCmd @newmanArgs | Out-Host
     return $LASTEXITCODE
 }
 
