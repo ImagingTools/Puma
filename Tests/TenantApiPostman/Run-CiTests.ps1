@@ -50,7 +50,16 @@
 
 [CmdletBinding()]
 param(
-    [string]$RepoRoot = $(if ($env:PUMADIR) { $env:PUMADIR } else { (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path }),
+    # $PSScriptRoot is not reliably populated by every CI runner (observed
+    # empty under TeamCity's PowerShell step even with -File), so fall back
+    # through the other script-path automatic variables before giving up.
+    [string]$ScriptDir = $(
+        if ($PSScriptRoot) { $PSScriptRoot }
+        elseif ($PSCommandPath) { Split-Path -Parent $PSCommandPath }
+        elseif ($MyInvocation.MyCommand.Path) { Split-Path -Parent $MyInvocation.MyCommand.Path }
+        else { throw "Unable to determine this script's own directory; pass -ScriptDir explicitly." }
+    ),
+    [string]$RepoRoot = $(if ($env:PUMADIR) { $env:PUMADIR } else { (Resolve-Path (Join-Path $ScriptDir "..\..")).Path }),
     [string]$BuildConfig = "Release_Qt6_VC17_x64",
     [string]$ServerExePath = "",
     [int]$HttpPort = 17788,
@@ -60,10 +69,10 @@ param(
     [string]$DbUser = "postgres",
     [string]$DbPassword = "root",
     [string]$PsqlPath = "",
-    [string]$CollectionPath = (Join-Path $PSScriptRoot "Tenant_System_Full.postman_collection.json"),
-    [string]$EnvironmentPath = (Join-Path $PSScriptRoot "Tenant_System_Full.postman_environment.json"),
-    [string]$JUnitReportPath = (Join-Path $PSScriptRoot "junit-report.xml"),
-    [string]$JsonReportPath = (Join-Path $PSScriptRoot "run-report.json"),
+    [string]$CollectionPath = (Join-Path $ScriptDir "Tenant_System_Full.postman_collection.json"),
+    [string]$EnvironmentPath = (Join-Path $ScriptDir "Tenant_System_Full.postman_environment.json"),
+    [string]$JUnitReportPath = (Join-Path $ScriptDir "junit-report.xml"),
+    [string]$JsonReportPath = (Join-Path $ScriptDir "run-report.json"),
     [int]$StartupTimeoutSeconds = 60
 )
 
