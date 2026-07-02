@@ -124,3 +124,7 @@ Thumbs.db
 Desktop.ini
 $RECYCLE.BIN/
 Partitura/PumaVoce.arp/VersionInfo.acc
+
+# Tenant API Postman CI test artifacts
+Tests/TenantApiPostman/junit-report.xml
+Tests/TenantApiPostman/run-report.json
