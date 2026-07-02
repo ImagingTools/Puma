@@ -136,18 +136,30 @@ function Stop-TestServer {
 }
 
 function Reset-TestDatabase {
+    # Only drops the database if present. PumaServerPgTest.exe creates it
+    # (and runs migrations 0-5 via its CompositeMigrationController) on
+    # startup when it doesn't already exist, so there's nothing else to do
+    # here - a stray leftover DB is the only thing that would make a run
+    # start from non-empty state.
     Write-Step "Resetting database '$DbName'"
     $psql = Resolve-PsqlPath
     Write-Host "Using psql: $psql"
     $env:PGPASSWORD = $DbPassword
+    # psql writes routine NOTICEs (e.g. "database does not exist, skipping")
+    # to stderr. Under $ErrorActionPreference = "Stop" (set globally in this
+    # script), PowerShell 5.1 turns *any* stderr line from a native command
+    # into a terminating NativeCommandError regardless of the process's own
+    # exit code - so this must run under "Continue" and be judged solely by
+    # $LASTEXITCODE.
+    $previousEap = $ErrorActionPreference
+    $ErrorActionPreference = "Continue"
     try {
         & $psql -h $DbHost -p $DbPort -U $DbUser -d postgres -v ON_ERROR_STOP=1 -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '$DbName' AND pid <> pg_backend_pid();" 2>&1 | Write-Host
         & $psql -h $DbHost -p $DbPort -U $DbUser -d postgres -v ON_ERROR_STOP=1 -c "DROP DATABASE IF EXISTS $DbName;" 2>&1 | Write-Host
         if ($LASTEXITCODE -ne 0) { throw "Failed to drop database '$DbName' (exit $LASTEXITCODE)" }
-        & $psql -h $DbHost -p $DbPort -U $DbUser -d postgres -v ON_ERROR_STOP=1 -c "CREATE DATABASE $DbName;" 2>&1 | Write-Host
-        if ($LASTEXITCODE -ne 0) { throw "Failed to create database '$DbName' (exit $LASTEXITCODE)" }
     }
     finally {
+        $ErrorActionPreference = $previousEap
         Remove-Item Env:\PGPASSWORD -ErrorAction SilentlyContinue
     }
 }
