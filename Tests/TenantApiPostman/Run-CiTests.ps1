@@ -50,16 +50,38 @@
 
 [CmdletBinding()]
 param(
-    # $PSScriptRoot is not reliably populated by every CI runner (observed
-    # empty under TeamCity's PowerShell step even with -File), so fall back
-    # through the other script-path automatic variables before giving up.
-    [string]$ScriptDir = $(
-        if ($PSScriptRoot) { $PSScriptRoot }
-        elseif ($PSCommandPath) { Split-Path -Parent $PSCommandPath }
-        elseif ($MyInvocation.MyCommand.Path) { Split-Path -Parent $MyInvocation.MyCommand.Path }
-        else { throw "Unable to determine this script's own directory; pass -ScriptDir explicitly." }
+    # Resolving the repo root purely from PowerShell's automatic script-path
+    # variables ($PSScriptRoot / $PSCommandPath / $MyInvocation) is NOT
+    # reliable across every CI runner - observed all three empty under
+    # TeamCity's PowerShell step despite -File being passed explicitly.
+    # TeamCity does reliably set the working directory to the checkout root
+    # for build steps (confirmed from agent logs), so that's tried first,
+    # self-validated against a file we know must exist at a fixed relative
+    # location. PUMADIR (this org's own checkout-location convention) is
+    # tried before that; the fragile automatic variables are the last resort,
+    # kept for convenience when invoking the script directly during local dev.
+    [string]$RepoRoot = $(
+        $collectionRelPath = "Tests\TenantApiPostman\Tenant_System_Full.postman_collection.json"
+        if ($env:PUMADIR -and (Test-Path (Join-Path $env:PUMADIR $collectionRelPath))) {
+            $env:PUMADIR
+        }
+        elseif (Test-Path (Join-Path (Get-Location).Path $collectionRelPath)) {
+            (Get-Location).Path
+        }
+        else {
+            $sd = if ($PSScriptRoot) { $PSScriptRoot }
+                  elseif ($PSCommandPath) { Split-Path -Parent $PSCommandPath }
+                  elseif ($MyInvocation.MyCommand.Path) { Split-Path -Parent $MyInvocation.MyCommand.Path }
+                  else { $null }
+            if ($sd) {
+                (Resolve-Path (Join-Path $sd "..\..")).Path
+            }
+            else {
+                throw "Unable to determine the repo checkout root (PUMADIR unset/stale, working directory isn't the checkout root, and this script's own path could not be determined). Pass -RepoRoot explicitly."
+            }
+        }
     ),
-    [string]$RepoRoot = $(if ($env:PUMADIR) { $env:PUMADIR } else { (Resolve-Path (Join-Path $ScriptDir "..\..")).Path }),
+    [string]$ScriptDir = (Join-Path $RepoRoot "Tests\TenantApiPostman"),
     [string]$BuildConfig = "Release_Qt6_VC17_x64",
     [string]$ServerExePath = "",
     [int]$HttpPort = 17788,
@@ -170,8 +192,14 @@ function Invoke-NewmanSuite {
     return $LASTEXITCODE
 }
 
+$repoRootSource = if ($PSBoundParameters.ContainsKey('RepoRoot')) { 'explicit -RepoRoot' }
+    elseif ($env:PUMADIR -eq $RepoRoot) { 'PUMADIR env var' }
+    elseif ((Get-Location).Path -eq $RepoRoot) { 'working directory' }
+    else { 'script-relative fallback' }
+
 Write-Step "Resolved paths"
-Write-Host "RepoRoot:       $RepoRoot  (source: $(if ($env:PUMADIR) { 'PUMADIR env var' } else { 'script-relative fallback' }))"
+Write-Host "RepoRoot:       $RepoRoot  (source: $repoRootSource)"
+Write-Host "ScriptDir:      $ScriptDir"
 Write-Host "ServerExePath:  $ServerExePath"
 Write-Host "CollectionPath: $CollectionPath"
 Write-Host "EnvironmentPath: $EnvironmentPath"
