@@ -14,13 +14,15 @@ if(NOT DEFINED IMTCOREDIR)
 	set(IMTCOREDIR "$ENV{IMTCOREDIR}")
 endif()
 
+if(NOT DEFINED IMTCOREDIR_BUILD)
+	set(IMTCOREDIR_BUILD "${IMTCOREDIR}")
+endif()
+
 if(NOT DEFINED BUILDDIR)
 	set(BUILDDIR "${CMAKE_CURRENT_LIST_DIR}/../../..")
 endif()
 
 include(${IMTCOREDIR}/Config/CMake/ImtCoreEnv.cmake)
-include(${IMTCOREDIR}/Config/CMake/PartituraUpgrade.cmake)
-imt_core_upgrade_partitura("${CMAKE_CURRENT_LIST_DIR}/../..")
 
 set(INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Include")
 set(IMPL_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Impl")
@@ -29,6 +31,7 @@ set(AUX_INCLUDE_DIR "${BUILDDIR}/Puma/AuxInclude/${TARGETNAME}/GeneratedFiles")
 
 include_directories("${AUX_INCLUDE_DIR}/../")
 include_directories("${AUX_INCLUDE_DIR}/")
+include_directories("${IMTCOREDIR}/Include")
 
 # Include
 add_subdirectory("${INCLUDE_DIR}/pumaqml/CMake" "${AUX_INCLUDE_DIR}/pumaqml")
