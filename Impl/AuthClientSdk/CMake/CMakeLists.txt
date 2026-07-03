@@ -36,7 +36,7 @@ target_link_libraries(${PROJECT_NAME}
 	imeas iproc iqtgui iauth icomp idoc i2d icomm
 	imtbase imtbasesdl imtauthsdl imtgql imtcom imtservergql imtserverapp imtauthgql imtclientgql imtlic imtcol imtdb imtrest imtauth imtapp imtappsdl
 	imtstyle imtcontrolsqml imtguiqml imtauthguiqml imtguigqlqml imtstylecontrolsqml imtlicguiqml imtdocguiqml imtcolguiqml imtlicgui imtgui imtcolorsdl imt2dsdl
-	imtauthgui imtqml imtauthdb
+	imtauthgui imtqml imtauthdb imtchatdb imtdeskdb
 )
 
 target_link_libraries(${PROJECT_NAME}

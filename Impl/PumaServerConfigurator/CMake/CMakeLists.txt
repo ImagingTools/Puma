@@ -17,16 +17,48 @@ if(APPLE)
 endif()
 
 include(${ACFDIR}/Config/CMake/CustomBuild.cmake)
-
 include(${ACFDIR}/Config/CMake/ApplicationConfig.cmake)
 
-target_link_libraries(${PROJECT_NAME} imtrest imtgui imtqml imtcom imtdb imtfile imtauthdb imtguigql imtservice imtguiqml imtauthsdl imtappsdl imtcolorsdl imtgql imt2dsdl)
-target_link_libraries(${PROJECT_NAME} imtstylecontrolsqml imtcontrolsqml imtguigqlqml imtauthguiqml imtcolguiqml imtdocguiqml imtlicguiqml imtauthgui imtstyle imtlicgui)
-target_link_libraries(${PROJECT_NAME} pumaqml)
-target_link_libraries(${PROJECT_NAME} ImtCoreLoc AcfLoc AcfSlnLoc)
-target_link_libraries(${PROJECT_NAME} imtbase imtbasesdl imtserverapp imtapp imtgql)
-target_link_libraries(${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::QuickWidgets Qt${QT_VERSION_MAJOR}::WebSockets)
-target_link_libraries(${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::Sql)
+target_link_libraries(${PROJECT_NAME}
+	pumaqml
+	ImtCoreLoc
+	AcfLoc
+	AcfSlnLoc
+	imtrest
+	imtgui
+	imtqml
+	imtcom
+	imtdb
+	imtfile
+	imtguigql
+	imtservice
+	imtguiqml
+	imtauthsdl
+	imtappsdl
+	imtcolorsdl
+	imt2dsdl
+	imtstylecontrolsqml
+	imtcontrolsqml
+	imtguigqlqml
+	imtauthguiqml
+	imtcolguiqml
+	imtdocguiqml
+	imtchatdb
+	imtdeskdb
+	imtlicguiqml
+	imtauthgui
+	imtauthdb
+	imtstyle
+	imtlicgui
+	imtbase
+	imtbasesdl
+	imtserverapp
+	imtapp
+	imtgql
+	Qt${QT_VERSION_MAJOR}::QuickWidgets
+	Qt${QT_VERSION_MAJOR}::WebSockets
+	Qt${QT_VERSION_MAJOR}::Sql
+)
 
 include(${ACFDIR}/Config/CMake/AcfQt.cmake)
 include(${ACFDIR}/Config/CMake/AcfStd.cmake)
