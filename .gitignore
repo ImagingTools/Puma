@@ -15,7 +15,8 @@ CTestTestfile.cmake
 Testing/
 _deps/
 Build/*/*.dir/
-Build/CMake/build/
+**/CMake/build/
+.cmake/
 
 # Visual Studio artifacts
 # Note: We keep 3rdParty Visual Studio files tracked
@@ -123,3 +124,10 @@ Thumbs.db
 Desktop.ini
 $RECYCLE.BIN/
 Partitura/PumaVoce.arp/VersionInfo.acc
+
+# Tenant API Postman CI test artifacts
+Tests/TenantApiPostman/junit-report.xml
+Tests/TenantApiPostman/run-report.json
+Tests/TenantApiPostman/junit-report-sqlite.xml
+Tests/TenantApiPostman/run-report-sqlite.json
+Tests/TenantApiPostman/node_modules/

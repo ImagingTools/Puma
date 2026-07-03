@@ -16,5 +16,7 @@
     <RegistryFiles>
       <FilePath>../Impl/PumaServerPg/PumaServerPg.acc</FilePath>
       <FilePath>../Impl/PumaServerSl/PumaServerSl.acc</FilePath>
+      <FilePath>../Impl/PumaServerPgTest/PumaServerPgTest.acc</FilePath>
+      <FilePath>../Impl/PumaServerSlTest/PumaServerSlTest.acc</FilePath>
     </RegistryFiles>
 </Acf>

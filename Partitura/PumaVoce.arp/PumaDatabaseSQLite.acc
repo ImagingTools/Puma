@@ -16,7 +16,7 @@
                     <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="DatabaseSqlFilePath" Type="String" ExportId="">
+                    <AttributeInfo Id="DatabaseSqlFilePath" Type="String" ExportId="DatabaseSqlFilePath">
                         <Data IsEnabled="true" Value="Puma/Puma Server/puma.sqlite"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">

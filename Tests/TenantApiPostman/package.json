@@ -1,0 +1,8 @@
+{
+    "name": "tenant-api-postman-tests",
+    "private": true,
+    "description": "Newman dependency pin for the Tenant API Postman CI suite (see Run-CiTests.ps1)",
+    "devDependencies": {
+        "newman": "6.2.2"
+    }
+}
