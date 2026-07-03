@@ -43,6 +43,8 @@ target_link_libraries(${PROJECT_NAME}
 	imtauthguiqml
 	imtcolguiqml
 	imtdocguiqml
+	imtchatdb
+	imtdeskdb
 	imtlicguiqml
 	imtauthgui
 	imtauthdb
