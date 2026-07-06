@@ -34,7 +34,7 @@ find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Widgets Core Gui Network WebSock
 target_link_libraries(${PROJECT_NAME}
 	AcfSlnLoc AcfLoc ImtCoreLoc
 	imeas iproc iqtgui iauth icomp idoc i2d icomm
-	imtbase imtbasesdl imtauthsdl imtgql imtcom imtservergql imtserverapp imtauthgql imtclientgql imtlic imtcol imtdb imtrest imtauth imtapp imtappsdl
+	imtbasesdl imtbase imtauthsdl imtgql imtcom imtservergql imtserverapp imtauthgql imtclientgql imtlic imtcol imtdb imtrest imtauth imtapp imtappsdl
 	imtstyle imtcontrolsqml imtguiqml imtauthguiqml imtguigqlqml imtstylecontrolsqml imtlicguiqml imtdocguiqml imtcolguiqml imtlicgui imtgui imtcolorsdl imt2dsdl
 	imtauthgui imtqml imtauthdb imtchatdb imtdeskdb
 )
