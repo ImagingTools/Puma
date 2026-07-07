@@ -50,8 +50,8 @@ target_link_libraries(${PROJECT_NAME}
 	imtauthdb
 	imtstyle
 	imtlicgui
-	imtbase
 	imtbasesdl
+	imtbase
 	imtserverapp
 	imtapp
 	imtgql

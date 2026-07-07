@@ -12,7 +12,7 @@ target_link_libraries(
 	Qt${QT_VERSION_MAJOR}::Core
 	Qt${QT_VERSION_MAJOR}::Widgets)
 
-target_link_libraries(${PROJECT_NAME} itest ipackage imtbase imtauth imtcrypt imtservergql imtdb imtgql imtgqltest imtauthgql ifile iser imtbasesdl imtauthsdl imtcol)
+target_link_libraries(${PROJECT_NAME} itest ipackage imtbasesdl imtbase imtauth imtcrypt imtservergql imtdb imtgql imtgqltest imtauthgql ifile iser imtauthsdl imtcol)
 target_link_libraries(${PROJECT_NAME} imtserverapp)
 target_link_libraries(${PROJECT_NAME} AuthClientSdk AuthServerSdk)
 
