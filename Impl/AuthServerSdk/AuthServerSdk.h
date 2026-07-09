@@ -630,7 +630,7 @@ public:
 	*       session tokens and PATs.
 	*
 	* @note This feature requires the PersonalAccessTokens database
-	*       table (created by migration_6.sql) and the
+	*       table (auto-created by the ImtCore database delegate) and the
 	*       IPersonalAccessTokenManager interface from ImtCore.
 	*
 	* @see Start(), SetProductId()

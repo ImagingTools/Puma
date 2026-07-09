@@ -373,7 +373,7 @@ Enables or disables Personal Access Token (PAT) validation on the server.
 
 When enabled, the server accepts PATs for authentication in addition to
 session-based JWT tokens. PATs are validated against the `PersonalAccessTokens`
-database table (created by `migration_6.sql`).
+database table (auto-created by the ImtCore database delegate).
 
 **Parameters:**
 - `enabled`: `true` to enable PAT validation, `false` to disable
