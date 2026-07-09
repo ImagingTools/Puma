@@ -48,6 +48,7 @@ The SDK is designed for:
 ### Core Capabilities
 - **Puma-Based User Management**: Complete user lifecycle management (create, read, update, delete)
 - **Role-Based Access Control**: Comprehensive role and permission management via Puma
+- **Personal Access Token Validation**: Server-side PAT validation for programmatic API access
 - **Dual Protocol Support**: HTTP and WebSocket server capabilities
 - **SSL/TLS Security**: Comprehensive SSL/TLS configuration with certificate management
 - **Certificate Management**: Support for server certificates, CA certificates, and private keys
@@ -363,6 +364,26 @@ Sets the product identifier for licensing and authorization purposes.
 **Returns:**
 - `true` if product ID set successfully
 - `false` if application info controller unavailable
+
+#### `SetPersonalAccessTokenValidationEnabled()`
+```cpp
+virtual bool SetPersonalAccessTokenValidationEnabled(bool enabled) const;
+```
+Enables or disables Personal Access Token (PAT) validation on the server.
+
+When enabled, the server accepts PATs for authentication in addition to
+session-based JWT tokens. PATs are validated against the `PersonalAccessTokens`
+database table (created by `migration_6.sql`).
+
+**Parameters:**
+- `enabled`: `true` to enable PAT validation, `false` to disable
+
+**Returns:**
+- `true` if the setting was applied successfully
+- `false` if the required interface is unavailable
+
+**Note:** Call before `Start()`. Requires the `PersonalAccessTokens` database table
+and the `IPersonalAccessTokenManager` interface from ImtCore.
 
 ### Configuration Structures
 
