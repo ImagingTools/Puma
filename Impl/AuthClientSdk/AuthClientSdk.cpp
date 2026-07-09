@@ -732,6 +732,62 @@ public:
 		return false;
 	}
 
+
+	QByteArray CreatePersonalAccessToken(
+		const QByteArray& userId,
+		const QByteArray& productId,
+		const QString& name,
+		const QByteArrayList& permissions,
+		const QString& expirationDate)
+	{
+		Q_UNUSED(userId);
+		Q_UNUSED(productId);
+		Q_UNUSED(name);
+		Q_UNUSED(permissions);
+		Q_UNUSED(expirationDate);
+
+		// PAT creation requires the IPersonalAccessTokenManager interface
+		// which will be provided by ImtCore. This is a placeholder until
+		// the server-side implementation is available.
+		qWarning() << "[CreatePersonalAccessToken] Not yet implemented: "
+				   << "requires IPersonalAccessTokenManager interface from ImtCore";
+
+		return QByteArray();
+	}
+
+	bool RevokePersonalAccessToken(const QByteArray& tokenId)
+	{
+		Q_UNUSED(tokenId);
+
+		qWarning() << "[RevokePersonalAccessToken] Not yet implemented: "
+				   << "requires IPersonalAccessTokenManager interface from ImtCore";
+
+		return false;
+	}
+
+	QList<PersonalAccessToken> ListPersonalAccessTokens(
+		const QByteArray& userId,
+		const QByteArray& productId)
+	{
+		Q_UNUSED(userId);
+		Q_UNUSED(productId);
+
+		qWarning() << "[ListPersonalAccessTokens] Not yet implemented: "
+				   << "requires IPersonalAccessTokenManager interface from ImtCore";
+
+		return QList<PersonalAccessToken>();
+	}
+
+	PersonalAccessTokenValidation ValidatePersonalAccessToken(const QByteArray& token)
+	{
+		Q_UNUSED(token);
+
+		qWarning() << "[ValidatePersonalAccessToken] Not yet implemented: "
+				   << "requires IPersonalAccessTokenManager interface from ImtCore";
+
+		return PersonalAccessTokenValidation();
+	}
+
 private:
 	/**
 		\brief Helper method to retrieve the current product ID.
@@ -1134,6 +1190,54 @@ bool CAuthorizationController::RemoveRolesFromGroup(const QByteArray& groupId, c
 	}
 
 	return false;
+}
+
+
+QByteArray CAuthorizationController::CreatePersonalAccessToken(
+	const QByteArray& userId,
+	const QByteArray& productId,
+	const QString& name,
+	const QByteArrayList& permissions,
+	const QString& expirationDate) const
+{
+	if (m_implPtr != nullptr){
+		return m_implPtr->CreatePersonalAccessToken(userId, productId, name, permissions, expirationDate);
+	}
+
+	return QByteArray();
+}
+
+
+bool CAuthorizationController::RevokePersonalAccessToken(const QByteArray& tokenId) const
+{
+	if (m_implPtr != nullptr){
+		return m_implPtr->RevokePersonalAccessToken(tokenId);
+	}
+
+	return false;
+}
+
+
+QList<PersonalAccessToken> CAuthorizationController::ListPersonalAccessTokens(
+	const QByteArray& userId,
+	const QByteArray& productId) const
+{
+	if (m_implPtr != nullptr){
+		return m_implPtr->ListPersonalAccessTokens(userId, productId);
+	}
+
+	return QList<PersonalAccessToken>();
+}
+
+
+PersonalAccessTokenValidation CAuthorizationController::ValidatePersonalAccessToken(
+	const QByteArray& token) const
+{
+	if (m_implPtr != nullptr){
+		return m_implPtr->ValidatePersonalAccessToken(token);
+	}
+
+	return PersonalAccessTokenValidation();
 }
 
 
