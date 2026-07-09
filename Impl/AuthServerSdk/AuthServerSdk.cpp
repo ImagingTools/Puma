@@ -251,6 +251,26 @@ public:
 		return true;
 	}
 
+	bool SetPersonalAccessTokenValidationEnabled(bool enabled)
+	{
+		Q_UNUSED(enabled);
+
+		// PAT validation configuration requires the IPersonalAccessTokenManager
+		// interface which will be provided by ImtCore. This is a placeholder
+		// until the server-side implementation is available.
+		qWarning() << "[SetPersonalAccessTokenValidationEnabled] Not yet implemented: "
+				   << "requires IPersonalAccessTokenManager interface from ImtCore";
+
+		m_patValidationEnabled = enabled;
+
+		return true;
+	}
+
+	bool IsPatValidationEnabled() const
+	{
+		return m_patValidationEnabled;
+	}
+
 private:
 	/**
 	* @brief Helper method to configure connection parameters.
@@ -292,6 +312,7 @@ private:
 	* during construction to ensure availability of server infrastructure.
 	*/
 	mutable CAuthServerSdk m_sdk;
+	bool m_patValidationEnabled = false;
 };
 
 
@@ -361,6 +382,16 @@ bool CAuthorizableServer::SetProductId(const QByteArray& productId) const
 {
 	if (m_implPtr != nullptr){
 		return m_implPtr->SetProductId(productId);
+	}
+
+	return false;
+}
+
+
+bool CAuthorizableServer::SetPersonalAccessTokenValidationEnabled(bool enabled) const
+{
+	if (m_implPtr != nullptr){
+		return m_implPtr->SetPersonalAccessTokenValidationEnabled(enabled);
 	}
 
 	return false;

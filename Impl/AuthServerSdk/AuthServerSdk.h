@@ -612,6 +612,31 @@ public:
 	*/
 	virtual bool SetProductId(const QByteArray& productId) const;
 
+	/**
+	* @brief Enables or disables Personal Access Token validation.
+	*
+	* When enabled, the server will accept Personal Access Tokens
+	* for authentication in addition to session-based JWT tokens.
+	* PATs are validated against the PersonalAccessTokens database
+	* table.
+	*
+	* @param enabled true to enable PAT validation, false to disable.
+	*
+	* @return true if the setting was applied successfully.
+	* @return false if the required interface is unavailable.
+	*
+	* @note This should be called before Start(). When enabled, the
+	*       server's GetPermissions handler will check both JWT
+	*       session tokens and PATs.
+	*
+	* @note This feature requires the PersonalAccessTokens database
+	*       table (created by migration_6.sql) and the
+	*       IPersonalAccessTokenManager interface from ImtCore.
+	*
+	* @see Start(), SetProductId()
+	*/
+	virtual bool SetPersonalAccessTokenValidationEnabled(bool enabled) const;
+
 private:
 	/**
 	* @brief Pointer to the internal implementation.
