@@ -11,6 +11,7 @@
         <Element ComponentName="AuthenticationManager" X="1000" Y="100" Note=""/>
         <Element ComponentName="HttpServerFramework" X="200" Y="100" Note=""/>
         <Element ComponentName="JwtSessionController" X="1000" Y="625" Note=""/>
+        <Element ComponentName="PersonalAccessTokenController" X="375" Y="225" Note=""/>
         <Element ComponentName="PumaHandlers" X="675" Y="450" Note=""/>
         <Element ComponentName="PumaLocalization" X="975" Y="375" Note=""/>
         <Element ComponentName="PumaSettings" X="125" Y="375" Note=""/>
