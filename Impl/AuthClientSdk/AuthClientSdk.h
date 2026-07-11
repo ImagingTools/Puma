@@ -89,6 +89,22 @@ class CAuthorizationControllerImpl;
 
 
 /**
+	\brief Token type classification.
+
+	Specifies the type of an access token, allowing the system to
+	distinguish between different authentication mechanisms and apply
+	appropriate validation logic.
+
+	\see Login, ValidatePersonalAccessToken()
+*/
+enum class TokenType
+{
+	Session, /**< Session-based JWT token from Login()*/
+	PersonalAccessToken /**< Personal Access Token (PAT) for API access*/
+};
+
+
+/**
 	\brief Login session data.
 
 	Contains authentication and authorization information
@@ -350,22 +366,6 @@ struct Group
 		\see AddRolesToGroup(), RemoveRolesFromGroup()
 	*/
 	QByteArrayList roleIds;
-};
-
-
-/**
-	\brief Token type classification.
-
-	Specifies the type of an access token, allowing the system to
-	distinguish between different authentication mechanisms and apply
-	appropriate validation logic.
-
-	\see Login, ValidatePersonalAccessToken()
-*/
-enum class TokenType
-{
-	Session, /**< Session-based JWT token from Login()*/
-	PersonalAccessToken /**< Personal Access Token (PAT) for API access*/
 };
 
 
