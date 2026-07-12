@@ -373,7 +373,7 @@
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="PersonalAccessTokenManager" Type="Reference" ExportId="PersonalAccessTokenManager">
-                                    <Data IsEnabled="true"/>
+                                    <Data IsEnabled="false"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="RoleInfoProvider" Type="Reference" ExportId="RoleInfoProvider">
                                     <Data IsEnabled="false"/>

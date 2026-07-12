@@ -98,6 +98,9 @@
                     <AttributeInfo Id="DatabaseConnectionChecker" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaDatabasePostgres"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaDatabasePostgres/DatabaseEngine"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="DocumentRepositories" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>

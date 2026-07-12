@@ -92,6 +92,9 @@
                     <AttributeInfo Id="DatabaseConnectionChecker" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaDatabaseSQLite"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaDatabaseSQLite/DatabaseEngine"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="DocumentRepositories" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
