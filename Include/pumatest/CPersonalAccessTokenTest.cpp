@@ -19,7 +19,6 @@ void CPersonalAccessTokenTest::initTestCase()
 
 	m_authorizableServer.SetPumaConnectionParam(pumaConfig);
 	m_authorizableServer.SetProductId("Test");
-	m_authorizableServer.SetPersonalAccessTokenValidationEnabled(true);
 
 	AuthServerSdk::ServerConfig config;
 	config.wsPort = 8889;

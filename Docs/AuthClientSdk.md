@@ -96,6 +96,7 @@ The SDK is designed for:
 │  │ IRoleManager                  │   │
 │  │ IUserGroupManager             │   │
 │  │ ISuperuserController          │   │
+│  │ IPersonalAccessTokenManager   │   │
 │  │ IServerConnectionInterface    │   │
 │  └───────────────────────────────┘   │
 └──────────────────────────────────────┘
@@ -936,6 +937,11 @@ Validates a raw token string and returns associated permissions.
 **Returns:**
 - `PersonalAccessTokenValidation` with `isValid=true` and populated fields if valid
 - `PersonalAccessTokenValidation` with `isValid=false` if invalid, expired, or revoked
+
+**Note:** The underlying ImtCore `ValidateToken` GraphQL query does not return the
+token's product scope, so `productId` is left empty in the result. Use
+`ListPersonalAccessTokens()` (or `GetToken()` server-side) if the product scope
+is required.
 
 ## Usage Examples
 

@@ -586,6 +586,10 @@ public:
 	*       ServerConfig structure as the main server but applies to
 	*       outbound connections to Puma.
 	*
+	* @note Authentication delegated to Puma through this connection covers
+	*       both session-based JWT tokens and Personal Access Tokens (PATs) -
+	*       there is no separate switch to enable PAT support once this is set.
+	*
 	* @see SetConnectionParam(), ServerConfig
 	*/
 	virtual bool SetPumaConnectionParam(const ServerConfig& serverConfig) const;
@@ -611,31 +615,6 @@ public:
 	* @see SetFeaturesFilePath()
 	*/
 	virtual bool SetProductId(const QByteArray& productId) const;
-
-	/**
-	* @brief Enables or disables Personal Access Token validation.
-	*
-	* When enabled, the server will accept Personal Access Tokens
-	* for authentication in addition to session-based JWT tokens.
-	* PATs are validated against the PersonalAccessTokens database
-	* table.
-	*
-	* @param enabled true to enable PAT validation, false to disable.
-	*
-	* @return true if the setting was applied successfully.
-	* @return false if the required interface is unavailable.
-	*
-	* @note This should be called before Start(). When enabled, the
-	*       server's GetPermissions handler will check both JWT
-	*       session tokens and PATs.
-	*
-	* @note This feature requires the PersonalAccessTokens database
-	*       table (auto-created by the ImtCore database delegate) and the
-	*       IPersonalAccessTokenManager interface from ImtCore.
-	*
-	* @see Start(), SetProductId()
-	*/
-	virtual bool SetPersonalAccessTokenValidationEnabled(bool enabled) const;
 
 private:
 	/**

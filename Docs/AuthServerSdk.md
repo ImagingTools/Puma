@@ -335,6 +335,10 @@ Configures connection parameters for the backend Puma authorization server.
 - Use this to specify where the Puma authorization backend is running
 - Typically called before `Start()` to establish the backend connection
 
+**Note:** Once configured, authentication delegated to Puma covers both
+session-based JWT tokens and Personal Access Tokens (PATs) automatically —
+there is no separate setting to enable PAT support.
+
 **Example**:
 ```cpp
 // Configure connection to Puma backend server
@@ -364,26 +368,6 @@ Sets the product identifier for licensing and authorization purposes.
 **Returns:**
 - `true` if product ID set successfully
 - `false` if application info controller unavailable
-
-#### `SetPersonalAccessTokenValidationEnabled()`
-```cpp
-virtual bool SetPersonalAccessTokenValidationEnabled(bool enabled) const;
-```
-Enables or disables Personal Access Token (PAT) validation on the server.
-
-When enabled, the server accepts PATs for authentication in addition to
-session-based JWT tokens. PATs are validated against the `PersonalAccessTokens`
-database table (auto-created by the ImtCore database delegate).
-
-**Parameters:**
-- `enabled`: `true` to enable PAT validation, `false` to disable
-
-**Returns:**
-- `true` if the setting was applied successfully
-- `false` if the required interface is unavailable
-
-**Note:** Call before `Start()`. Requires the `PersonalAccessTokens` database table
-and the `IPersonalAccessTokenManager` interface from ImtCore.
 
 ### Configuration Structures
 

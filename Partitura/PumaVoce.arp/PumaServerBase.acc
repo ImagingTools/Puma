@@ -144,7 +144,6 @@
                                 <Value>RoleCollectionDocumentService</Value>
                                 <Value>UserCollectionDocumentService</Value>
                                 <Value>UserGroupCollectionDocumentService</Value>
-                                <Value>PersonalAccessTokenController</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
