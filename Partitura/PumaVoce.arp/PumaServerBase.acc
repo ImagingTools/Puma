@@ -139,6 +139,7 @@
                     <AttributeInfo Id="ExternGqlRequestHandlers" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
+                                <Value>PersonalAccessTokenController</Value>
                                 <Value>TenantController</Value>
                                 <Value>RoleCollectionDocumentService</Value>
                                 <Value>UserCollectionDocumentService</Value>
@@ -259,11 +260,11 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="SettingsFilePath" Type="String" ExportId="SettingsFilePath">
-                        <Data IsEnabled="true" Value="Puma/Puma Server/PumaServerSettings.xml"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="RuntimeStatus" Type="Reference" ExportId="RuntimeStatus">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SettingsFilePath" Type="String" ExportId="SettingsFilePath">
+                        <Data IsEnabled="true" Value="Puma/Puma Server/PumaServerSettings.xml"/>
                     </AttributeInfo>
                     <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
                         <Data IsEnabled="false"/>

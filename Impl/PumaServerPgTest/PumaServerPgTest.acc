@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6418" Description="ACF"/>
-            <Version Id="1" Number="2408" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6435" Description="ACF"/>
+            <Version Id="1" Number="2410" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -86,18 +86,6 @@
                     <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="Application/ApplicationInfo"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="DbName" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="puma_test"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="HttpPort" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="17788"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="SettingsFilePath" Type="String" ExportId="">
-                        <Data IsEnabled="true" Value="Puma/Puma Server/PumaServerPgTestSettings.xml"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="WebSocketPort" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="18788"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="ContractRepository" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaDatabasePostgres/ContractSqlRepository"/>
                     </AttributeInfo>
@@ -110,6 +98,12 @@
                     <AttributeInfo Id="DatabaseConnectionChecker" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaDatabasePostgres"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaDatabasePostgres"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DbName" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="puma_test"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="DocumentRepositories" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
@@ -121,6 +115,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="GroupRepository" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaDatabasePostgres/UserGroupSqlRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="HttpPort" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="17788"/>
                     </AttributeInfo>
                     <AttributeInfo Id="InvitationRepository" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaDatabasePostgres/TenantInvitationRepository"/>
@@ -142,6 +139,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="SessionCollection" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaDatabasePostgres/SessionSqlRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SettingsFilePath" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="Puma/Puma Server/PumaServerPgTestSettings.xml"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TenantConnectionCodeRepository" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaDatabasePostgres/TenantConnectionCodeSqlRepository"/>
@@ -187,6 +187,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="VersionInfo"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="WebSocketPort" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="18788"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
