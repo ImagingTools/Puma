@@ -17,11 +17,10 @@
 	including creation, listing, validation, and revocation of
 	Personal Access Tokens.
 
-	\note These tests require a running Puma server with PAT support
-	      enabled (IPersonalAccessTokenManager interface from ImtCore).
-	      Tests are designed to verify the SDK API surface and will
-	      pass with placeholder implementations (returning empty/false)
-	      until the server-side support is available.
+	\note These tests connect to a real Puma backend through
+	      AuthServerSdk::SetPumaConnectionParam() (default host/port
+	      7788/8788) and assert on real PAT create/list/validate/revoke
+	      behavior; they are not satisfied by placeholder/no-op returns.
 
 	\ingroup AuthClientSdk
 */
@@ -34,6 +33,7 @@ private slots:
 	void CreateTokenTest();
 	void ListTokensTest();
 	void ValidateTokenTest();
+	void PatOwnershipAuthorizationTest();
 	void RevokeTokenTest();
 	void ExpiredTokenTest();
 	void GetPermissionsWithPatTest();

@@ -2,6 +2,9 @@
 #include "CAuthClientSdkTest.h"
 
 
+// STL includes
+#include <algorithm>
+
 // ACF includes
 #include <itest/CStandardTestExecutor.h>
 
@@ -18,10 +21,13 @@ void CAuthClientSdkTest::initTestCase()
 {
 	qDebug() << "=== [Init] AuthClientSdk tests start ===";
 
+	// Ports match PumaServerSlTest.acc (isolated, disposable-DB test server),
+	// not the plain PumaServerSl.exe (17789/18789 vs. 7788/8788) - this suite
+	// must never touch a developer's persistent local Puma database.
 	AuthServerSdk::ServerConfig pumaConfig;
-	pumaConfig.wsPort = 8788;
-	pumaConfig.httpPort = 7788;
-	
+	pumaConfig.wsPort = 18789;
+	pumaConfig.httpPort = 17789;
+
 	m_authorizableServer.SetPumaConnectionParam(pumaConfig);
 	m_authorizableServer.SetProductId("Test");
 
@@ -224,6 +230,21 @@ void CAuthClientSdkTest::UserCrudTest()
 	QCOMPARE(uByLogin.login, s_userNames[0]);
 	QCOMPARE(uByLogin.systemType, SystemType::Local);
 
+	// GetUserAuthSystem() must independently agree with the systemType
+	// already exposed via GetUser()/GetUserByLogin().
+	QCOMPARE(m_authorizationController.GetUserAuthSystem(s_userNames[0]), SystemType::Local);
+
+	// GetUserList() must include the same user with the same fields as
+	// the single-user accessors.
+	QList<User> userList = m_authorizationController.GetUserList();
+	auto listedIter = std::find_if(userList.begin(), userList.end(), [&userId](const User& candidate){
+		return candidate.id == userId;
+	});
+	QVERIFY2(listedIter != userList.end(), "GetUserList() did not include the newly created user");
+	QCOMPARE(listedIter->login, s_userNames[0]);
+	QCOMPARE(listedIter->name, s_userNames[0]);
+	QCOMPARE(listedIter->systemType, SystemType::Local);
+
 	QByteArray roleId = m_authorizationController.CreateRole(s_roleNames[0], "", {"A", "B", "C"});
 	QVERIFY2(!roleId.isEmpty(), "Role was not created");
 
@@ -298,6 +319,13 @@ void CAuthClientSdkTest::RoleCrudTest()
 	QVERIFY(role.permissionIds.isEmpty());
 
 	QVERIFY(m_authorizationController.AddPermissionsToRole(roleId, {"AddOrder", "RemoveOrder"}));
+
+	// GetRolePermissions() must agree with the permissionIds embedded in
+	// GetRole()'s Role structure.
+	QByteArrayList standalonePermissions = m_authorizationController.GetRolePermissions(roleId);
+	QCOMPARE(standalonePermissions.size(), 2);
+	QVERIFY(standalonePermissions.contains("AddOrder"));
+	QVERIFY(standalonePermissions.contains("RemoveOrder"));
 
 	Role role2;
 	QVERIFY(m_authorizationController.GetRole(roleId, role2));
