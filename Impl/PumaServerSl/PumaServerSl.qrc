@@ -12,4 +12,7 @@
         <file>Resources/Migrations/migration_3.sql</file>
         <file>Resources/Migrations/migration_5.sql</file>
     </qresource>
+    <qresource prefix="/Puma/SQL/SQLite">
+        <file alias="CreatePersonalAccessTokenTable.sql">../../Include/puma/Resources/SQL/SQLite/CreatePersonalAccessTokenTable.sql</file>
+    </qresource>
 </RCC>

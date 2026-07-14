@@ -85,9 +85,12 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="PersonalAccessTokenController" PackageId="ImtAuthVoce" ComponentId="PersonalAccessTokenController">
+        <Element Id="PersonalAccessTokenController" PackageId="PumaVoce" ComponentId="PumaPersonalAccessTokenController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="CreateTableScriptPath" Type="Id" ExportId="CreatePersonalAccessTokenTableScriptPath">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

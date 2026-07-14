@@ -92,6 +92,9 @@
                     <AttributeInfo Id="CrossTenantMessageRepository" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaDatabaseSQLite/SQLiteCrossTenantMessageRepository"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="CreatePersonalAccessTokenTableScriptPath" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value=":/Puma/SQL/SQLite/CreatePersonalAccessTokenTable.sql"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="DatabaseConnectionChecker" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaDatabaseSQLite"/>
                     </AttributeInfo>

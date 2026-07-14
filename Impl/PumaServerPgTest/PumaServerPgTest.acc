@@ -95,6 +95,9 @@
                     <AttributeInfo Id="CrossTenantMessageRepository" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaDatabasePostgres/CrossTenantMessageSqlRepository"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="CreatePersonalAccessTokenTableScriptPath" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value=":/Puma/SQL/Postgres/CreatePersonalAccessTokenTable.sql"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="DatabaseConnectionChecker" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaDatabasePostgres"/>
                     </AttributeInfo>
