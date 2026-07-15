@@ -40,6 +40,8 @@ flowchart LR
     AUTH --> AD[Windows domain]
 ```
 
+*Figure 1: Overview of the Puma system architecture.*
+
 Puma separates four responsibilities:
 
 1. **Identity:** Who is accessing the system?
@@ -71,6 +73,35 @@ flowchart TB
     PG --> POST[(PostgreSQL)]
 ```
 
+*Figure 2: Shared server base and database-specific variants.*
+
+### 2.2 Interplay Between Puma and the Application
+
+The application embeds Puma administration as a page in its client UI. On this
+administration page, authorized administrators set up users, roles, groups, and
+permission assignments. The page accesses the Puma server through the SDK; the
+data is not managed separately in the application. After login, Puma returns the
+effective permissions to the application. The application uses them to enable
+functions in its business UI.
+
+```mermaid
+flowchart LR
+    ADM[Administrator] --> PAGE[Administration page in the client UI]
+    PAGE -->|Users, roles, groups, and assignments| SDK[AuthClientSdk]
+    SDK --> P[Puma server]
+    P --> DB[(SQLite or PostgreSQL)]
+    USER[User] --> UI[Business client UI]
+    UI -->|Login| SDK
+    P -->|effective permissions| SDK
+    SDK -->|HasPermission| UI
+```
+
+*Figure 3: Central administration and use of permissions in the application.*
+
+Embedding and permission-dependent display of the administration page is the
+responsibility of the application. Puma still enforces the permissions for
+administrative operations; hiding the page alone is not access control.
+
 ## 3. Role and Permission Model
 
 Puma does not manage permissions as freely editable user properties, but
@@ -85,6 +116,8 @@ flowchart LR
     P -->|apply to| PROD[Product ID]
 ```
 
+*Figure 4: Relationships between users, groups, roles, and permissions.*
+
 - **Users** have an internal, stable object ID and a login name.
 - **Roles** bundle permissions and are product-specific.
 - **Groups** bundle users and are assigned roles.
@@ -96,10 +129,27 @@ A user receives the union of:
 - permissions from directly assigned roles and
 - permissions from the roles of their groups.
 
+When there are multiple direct roles, multiple groups, or multiple roles per
+group, all contained permissions are combined. Duplicate permissions take
+effect only once; one assignment does not subtract a permission from another
+assignment.
+
 > **Important:** Administrative operations use the internal user ID, not the
 > login name. An application sets its product ID before login.
 
-### 3.1 Recommended Administration Model
+### 3.1 Mandatory and Optional Elements
+
+| Element | Mandatory or optional? |
+|---|---|
+| Product ID | **Mandatory:** The application sets it before login; roles and permissions apply in this product context. |
+| Permission ID | **Mandatory for protected functions:** The application defines and checks it. |
+| Role | **Mandatory for granting a permission:** Permissions are granted through roles, not directly to users. A user may exist without a role but then has no role-based permission. |
+| Direct role assignment | **Optional:** Suitable for individual tasks. |
+| Group | **Optional:** Suitable for bundling recurring team assignments. |
+| Group role | **Optional:** Alternative or supplement to direct role assignment. |
+| Multiple roles or groups | **Optional:** Their permissions jointly form the union. |
+
+### 3.2 Recommended Administration Model
 
 ```mermaid
 flowchart TD
@@ -111,6 +161,8 @@ flowchart TD
     SU --> EMG[Bootstrap / emergency use only]
 ```
 
+*Figure 5: Recommended model for bootstrap and daily administration.*
+
 The superuser is used for initial setup. For day-to-day work, personalized
 administrator accounts with an appropriate administrator role should be used.
 This avoids the need to share superuser credentials.
@@ -120,11 +172,15 @@ This avoids the need to share superuser credentials.
 ### 4.1 Preparation
 
 1. Select the server variant.
-2. For PostgreSQL, prepare the database, database user, and connectivity.
-3. Define the HTTP and WebSocket ports.
-4. Provide a server certificate and a private key for production systems.
-5. Open the firewall only for the required ports.
-6. Verify write permissions for settings, the database, and logs.
+2. For `PumaServerPg`, prepare the PostgreSQL database, database user, and
+   connectivity.
+3. For `PumaServerSl`, no separate database server and no database preparation
+   are required. The server creates the SQLite database; the service account
+   needs write permissions at the designated location.
+4. Define the HTTP and WebSocket ports.
+5. Provide a server certificate and a private key for production systems.
+6. Open the firewall only for the required ports.
+7. Verify write permissions for settings, the database, and logs.
 
 By default, persistent Puma settings are stored in
 `Puma/Puma Server/PumaServerSettings.xml` under the application-specific
@@ -144,6 +200,8 @@ sequenceDiagram
     P-->>O: Ready for operation or error in log
 ```
 
+*Figure 6: Technical startup sequence of the Puma server.*
+
 After startup, verify in particular that:
 
 - the database connection was successful,
@@ -157,19 +215,25 @@ After startup, verify in particular that:
 ```mermaid
 flowchart TD
     A[SDK connects] --> B{Superuser exists?}
-    B -->|No| C[Create superuser]
+    B -->|No| C[Set password and contact email]
+    C --> H[Create superuser]
     B -->|Yes| D[Log in as administrator]
-    C --> D
+    H --> D
     D --> E[Define roles and groups]
     E --> F[Create users or allow domain login]
     F --> G[Test permissions]
 ```
 
+*Figure 7: Initial setup from superuser to permission test.*
+
 The SDK sequence consists of `SuperuserExists()`, followed by
 `CreateSuperuser()` if necessary, then login and creation of the role model.
-The Puma tests use the login `su` for the initial account; production
-credentials must be chosen securely, must differ from it, and must be kept
-safe.
+During initialization, the superuser's password and contact email are set.
+`CreateSuperuser()` takes the password; the contact email is configured in the
+client composition as `SuperuserMail` of the `RemoteSuperuserController` and is
+transmitted when the account is created. The Puma tests use the login `su` for
+the initial account; production credentials and a reachable contact email must
+be chosen securely and kept safe.
 
 ### 4.4 Transport Encryption
 
@@ -184,6 +248,8 @@ flowchart LR
     P --> D[(Database)]
     CERT[Certificate + private key] --> RP
 ```
+
+*Figure 8: TLS-protected transport between the client and Puma.*
 
 Production rules:
 
@@ -223,6 +289,8 @@ sequenceDiagram
     SDK->>P: Set group membership
 ```
 
+*Figure 9: Creating a local user with role and group assignment.*
+
 **Result:** The user receives permissions from direct roles and group roles.
 A user who is already logged in may need to log in again for the application
 to receive updated session permissions.
@@ -246,6 +314,8 @@ flowchart LR
     R --> P1[Read measurement]
     R --> P2[Approve inspection]
 ```
+
+*Figure 10: Shared permission assignment through a group.*
 
 **Benefit:** Role changes apply centrally to all group members.
 
@@ -278,6 +348,8 @@ sequenceDiagram
     A->>S: Logout()
     S->>P: End session
 ```
+
+*Figure 11: Login, permission check, and logout of an application.*
 
 Invalid credentials, a locked account, a missing connection, or missing
 server components are reported as a failed login.
@@ -313,6 +385,8 @@ flowchart TD
     Q --> F[Execute function]
     F --> O[Logout]
 ```
+
+*Figure 12: Minimal sequence of an SDK-based client integration.*
 
 The minimum sequence in the C++ client is:
 
@@ -358,6 +432,8 @@ flowchart LR
     P -->|Token and permissions| ASDK
     ASDK -->|Access allowed / denied| APP
 ```
+
+*Figure 13: Puma integration of a custom authorizable server.*
 
 The application server sets:
 
@@ -430,6 +506,8 @@ sequenceDiagram
     P-->>A: Session + permissions
 ```
 
+*Figure 14: Login of a Windows domain user through Puma.*
+
 After a successful first domain login, Puma:
 
 - creates an internal user record,
@@ -483,6 +561,8 @@ flowchart LR
     P -->|User + scopes| API
 ```
 
+*Figure 15: Creation, storage, and use of a PAT.*
+
 ### 8.2 Life Cycle
 
 ```mermaid
@@ -497,6 +577,8 @@ stateDiagram-v2
     Widerrufen --> [*]
     Abgelaufen --> [*]
 ```
+
+*Figure 16: States in the life cycle of a PAT.*
 
 A token is valid if it exists, is active, has not been revoked, and has not
 expired. Revoked records remain visible in the list and are reported as
@@ -537,6 +619,8 @@ sequenceDiagram
     A-->>J: Result or access denied
 ```
 
+*Figure 17: Validation of a PAT for automated access.*
+
 ### 8.5 Revoke a PAT
 
 1. Identify the token by name, product, creation time, and last use.
@@ -565,6 +649,8 @@ flowchart TB
     DEV[Developer] --> PERM[Permission checks]
     DEV --> SEC[Handle tokens securely]
 ```
+
+*Figure 18: Division of operational security responsibility.*
 
 ### 9.2 Regular Checks
 
@@ -598,6 +684,8 @@ flowchart TD
     P -->|No| RBAC[Product ID, role, group, scope]
     P -->|Yes| LOG[Check server and application logs]
 ```
+
+*Figure 19: Decision tree for error diagnosis.*
 
 | Problem | Probable cause | Action |
 |---|---|---|
@@ -653,3 +741,70 @@ flowchart TD
 - [Dependencies](../Dependencies.md)
 - [Puma security policy](../../SECURITY.md)
 - [Compact presentation](Puma_Kompakt_DE.pptx)
+
+## 13. Developer Integration
+
+An application can integrate Puma in two ways:
+
+| Variant | Suitable for | Abstraction |
+|---|---|---|
+| `AuthClientSdk` | Applications that need a stable C++ facade | `AuthClientSdk::CAuthorizationController` |
+| Partitura | ACF/ImtCore applications with an authorizable server | `AuthorizableServerFramework.acc` from ImtCore |
+
+In both variants, the application needs the address of the Puma server, a
+unique product ID, and the permissions defined for the product. The product ID
+must match the administered application. TLS must be used for production
+connections.
+
+### 13.1 Integration via the SDK
+
+1. Build `AuthClientSdk` and link it to the application. The CMake example at
+   `Impl/AuthClientSdk/CMake/CMakeLists.txt` shows the required Qt and ImtCore
+   dependencies.
+2. Include `AuthClientSdk/AuthClientSdk.h`.
+3. Create a `CAuthorizationController`, use `SetConnectionParam()` to set the
+   HTTP/WebSocket endpoint and the TLS configuration, and then use
+   `SetProductId()` to set the product context.
+4. Log in with `Login()` and enable functions only after a successful check by
+   `HasPermission()`.
+5. For the administration page, use the user, role, and group operations of the
+   same facade. The application decides, based on the administration
+   permission, whether it offers the page in the client UI.
+6. Call `Logout()` at the end of the session.
+
+A minimal C++ example is in [UC-06](#uc-06-integrate-a-custom-application); the
+complete API is described in the
+[AuthClientSdk reference](../AuthClientSdk.md). In the current CMake build, the
+SDK is only integrated on Windows.
+
+### 13.2 Integration via Partitura
+
+Under `Partitura/ImtHttpServerVoce.arp/AuthorizableServerFramework.acc`, ImtCore
+already provides a ready-made base composition for an authorizable server. It
+bundles, among other things, the HTTP and WebSocket server, the connection to
+Puma, the authentication manager, and the user, role, and group caches. The
+application should use this base instead of rebuilding the components
+individually.
+
+Integration is carried out in these steps:
+
+1. Make the ImtCore packages and registries known in the application's ACF
+   configuration.
+2. Instantiate `AuthorizableServerFramework` from the `ImtHttpServerVoce`
+   package.
+3. Connect the application-specific components for application and version
+   information, database, Puma connection, server interfaces, and TLS
+   configuration via `Type="Reference"`. Custom request handlers are attached
+   as `Type="Factory"`.
+4. Configure the product ID and the connection to the central Puma server. The
+   product ID must match the application administered in Puma.
+5. Connect your own GraphQL handlers to the framework and integrate the HTTP and
+   WebSocket servers exported by the framework into the application's server
+   controller.
+6. After the build, test login, PAT and session validation, and allowed and
+   denied permissions against a test instance of Puma.
+
+`Impl/AuthServerSdk/AuthServerSdk.acc` shows a concrete integration of this
+ImtCore base composition. The Partitura variant wires it declaratively into the
+application, while the SDK variant encapsulates the integration behind a C++
+facade.
