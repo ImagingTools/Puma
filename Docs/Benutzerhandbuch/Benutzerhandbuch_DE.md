@@ -766,7 +766,7 @@ Eine Anwendung kann Puma auf zwei Arten einbinden:
 | Variante | Geeignet für | Abstraktion |
 |---|---|---|
 | `AuthClientSdk` | Anwendungen, die eine stabile C++-Fassade benötigen | `AuthClientSdk::CAuthorizationController` |
-| Partitura | ACF-/ImtCore-Anwendungen, die Authentifizierung und UI deklarativ verdrahten | exportierte ACF-Schnittstellen und GUI-Komponenten |
+| Partitura | ACF-/ImtCore-Anwendungen mit einem autorisierbaren Server | `AuthorizableServerFramework.acc` aus ImtCore |
 
 In beiden Varianten benötigt die Anwendung die Adresse des Puma-Servers, eine
 eindeutige Produkt-ID und die für das Produkt definierten Berechtigungen. Die
@@ -796,42 +796,33 @@ CMake-Build nur unter Windows eingebunden.
 
 ### 13.2 Einbindung über Partitura
 
-Für eine ACF-/ImtCore-Anwendung dienen die Kompositionen unter
-`Impl/AuthClientSdk` als Vorlagen:
-
-- `AuthClientSdk.acc` verdrahtet die Puma-Verbindung und exportiert unter
-  anderem `iauth::ILogin`, `iauth::IRightsProvider`,
-  `imtauth::IPermissionChecker`, `imtauth::IUserManager`,
-  `imtauth::IRoleManager` und `imtauth::IUserGroupManager`.
-- `LoginWidget.acc` stellt den Anmeldedialog als `iqtgui::IGuiObject` bereit.
-- `AdministrationWidget.acc` stellt die Administrationsseite als
-  `iqtgui::IGuiObject` bereit.
+ImtCore stellt unter
+`Partitura/ImtHttpServerVoce.arp/AuthorizableServerFramework.acc` bereits eine
+fertige Basiskomposition für einen autorisierbaren Server bereit. Sie bündelt
+unter anderem den HTTP- und WebSocket-Server, die Verbindung zu Puma, den
+Authentifizierungsmanager sowie die Benutzer-, Rollen- und Gruppen-Caches. Die
+Anwendung soll diese Basis verwenden, statt die Komponenten einzeln
+nachzubauen.
 
 Die Integration erfolgt in diesen Schritten:
 
-1. Die Puma- und ImtCore-Paketverzeichnisse sowie die benötigten
-   Registry-Dateien in der ACF-Konfiguration der Anwendung bekannt machen.
-   `Config/Puma.awc` ist die Referenz für die Puma-Registry-Dateien.
-2. Die benötigten `.acc`-Dateien durch den ARX-Compiler verarbeiten. Die
-   CMake-Einbindung in `Impl/AuthClientSdk/CMake/CMakeLists.txt` zeigt die
-   Generierung und Aufnahme der erzeugten C++-Dateien in das Ziel.
-3. In der Anwendungskomposition genau eine Authentifizierungskomposition
-   instanziieren und deren exportierte Schnittstellen per
-   `Type="Reference"` an die fachlichen Komponenten weiterreichen. So nutzen
-   Anmeldung, Berechtigungsprüfung und Administration dieselbe Sitzung.
-4. Produktidentität, Puma-Endpunkte und TLS am
-   `imtbase::IApplicationInfoController` beziehungsweise
-   `imtcom::IServerConnectionInterface` der Komposition konfigurieren.
-5. `LoginWidget` und bei Bedarf `AdministrationWidget` in das Seitenmodell der
-   Client-UI aufnehmen. Die Administrationsseite nur bei vorhandener
-   Administrationsberechtigung anzeigen; serverseitige Prüfungen bleiben
-   trotzdem verbindlich.
-6. Nach dem Build Anmeldung, Sitzungsende, erlaubte und verweigerte
-   Berechtigungen sowie die Benutzer-, Rollen- und Gruppenverwaltung gegen
-   eine Testinstanz von Puma prüfen.
+1. Die ImtCore-Pakete und -Registries in der ACF-Konfiguration der Anwendung
+   bekannt machen.
+2. `AuthorizableServerFramework` aus dem Paket `ImtHttpServerVoce`
+   instanziieren.
+3. Die anwendungsspezifischen Komponenten für Anwendungs- und
+   Versionsinformationen, Datenbank, Puma-Verbindung, eigene Request-Handler,
+   Server-Schnittstellen und TLS-Konfiguration per `Type="Reference"`
+   anschließen.
+4. Produkt-ID und Verbindung zum zentralen Puma-Server konfigurieren. Die
+   Produkt-ID muss mit der in Puma administrierten Anwendung übereinstimmen.
+5. Die eigenen GraphQL-Handler mit dem Framework verbinden und die vom
+   Framework exportierten HTTP- und WebSocket-Server in den Server-Controller
+   der Anwendung einbinden.
+6. Nach dem Build Anmeldung, PAT- und Sitzungsprüfung sowie erlaubte und
+   verweigerte Berechtigungen gegen eine Testinstanz von Puma prüfen.
 
-Die Partitura-Variante bietet direkten Zugriff auf ImtCore-Schnittstellen,
-während die SDK-Variante diese hinter einer C++-Fassade kapselt. Beide
-Varianten verwenden dieselben Puma-Endpunkte und dasselbe serverseitige
-Berechtigungsmodell; sie dürfen nicht als zwei unabhängige Sitzungen parallel
-für dieselbe Client-Funktion verdrahtet werden.
+`Impl/AuthServerSdk/AuthServerSdk.acc` zeigt eine konkrete Einbindung dieser
+ImtCore-Basiskomposition. Die Partitura-Variante verdrahtet sie deklarativ in
+der Anwendung, während die SDK-Variante die Integration hinter einer
+C++-Fassade kapselt.
