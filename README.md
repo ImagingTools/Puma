@@ -102,12 +102,12 @@ Puma includes an automated Git-based version management system. See [Build/Git/R
 
 ### SDK Documentation
 
-- **Deutsches Benutzerhandbuch** - [Docs/Benutzerhandbuch/Benutzerhandbuch_DE.md](Docs/Benutzerhandbuch/Benutzerhandbuch_DE.md) - Serverbetrieb, Use Cases, SDK, LDAP und PAT
-- **Chinese User Manual** - [Docs/Benutzerhandbuch/Benutzerhandbuch_ZH.md](Docs/Benutzerhandbuch/Benutzerhandbuch_ZH.md) - Simplified Chinese translation
-- **English User Manual** - [Docs/Benutzerhandbuch/Benutzerhandbuch_EN.md](Docs/Benutzerhandbuch/Benutzerhandbuch_EN.md) - English translation
-- **Romanian User Manual** - [Docs/Benutzerhandbuch/Benutzerhandbuch_RO.md](Docs/Benutzerhandbuch/Benutzerhandbuch_RO.md) - Romanian translation
-- **Russian User Manual** - [Docs/Benutzerhandbuch/Benutzerhandbuch_RU.md](Docs/Benutzerhandbuch/Benutzerhandbuch_RU.md) - Russian translation
-- **Swedish User Manual** - [Docs/Benutzerhandbuch/Benutzerhandbuch_SV.md](Docs/Benutzerhandbuch/Benutzerhandbuch_SV.md) - Swedish translation
+- **Deutsches Benutzerhandbuch** - [Markdown](Docs/Benutzerhandbuch/Benutzerhandbuch_DE.md) · [PDF](Docs/Benutzerhandbuch/Benutzerhandbuch_DE.pdf) - Serverbetrieb, Use Cases, SDK, LDAP und PAT
+- **Chinese User Manual** - [Markdown](Docs/Benutzerhandbuch/Benutzerhandbuch_ZH.md) · [PDF](Docs/Benutzerhandbuch/Benutzerhandbuch_ZH.pdf) - Simplified Chinese translation
+- **English User Manual** - [Markdown](Docs/Benutzerhandbuch/Benutzerhandbuch_EN.md) · [PDF](Docs/Benutzerhandbuch/Benutzerhandbuch_EN.pdf) - English translation
+- **Romanian User Manual** - [Markdown](Docs/Benutzerhandbuch/Benutzerhandbuch_RO.md) · [PDF](Docs/Benutzerhandbuch/Benutzerhandbuch_RO.pdf) - Romanian translation
+- **Russian User Manual** - [Markdown](Docs/Benutzerhandbuch/Benutzerhandbuch_RU.md) · [PDF](Docs/Benutzerhandbuch/Benutzerhandbuch_RU.pdf) - Russian translation
+- **Swedish User Manual** - [Markdown](Docs/Benutzerhandbuch/Benutzerhandbuch_SV.md) · [PDF](Docs/Benutzerhandbuch/Benutzerhandbuch_SV.pdf) - Swedish translation
 - **Deutsche Kompaktpräsentation** - [Docs/Benutzerhandbuch/Puma_Kompakt_DE.pptx](Docs/Benutzerhandbuch/Puma_Kompakt_DE.pptx) - Visualisierte Zusammenfassung des Benutzerhandbuchs
 - **AuthServerSdk** - [Docs/AuthServerSdk.md](Docs/AuthServerSdk.md) - Complete guide for embedding authorization server functionality
 - **AuthClientSdk** - [Docs/AuthClientSdk.md](Docs/AuthClientSdk.md) - Complete guide for client authentication and user management
