@@ -96,7 +96,7 @@ param(
             }
         }
     ),
-    [string]$BuildConfig = "Debug_Qt6_VC17_x64",
+    [string]$BuildConfig = "Release_Qt6_VC17_x64",
     [string]$ServerExePath = "",
     [string]$TestExePath = "",
     [int]$HttpPort = 17789,
