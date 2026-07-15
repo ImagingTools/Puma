@@ -41,6 +41,8 @@ flowchart LR
     AUTH --> AD[Windows-domän]
 ```
 
+*Figur 1: Översikt över Pumas systemarkitektur.*
+
 Puma skiljer mellan fyra uppgifter:
 
 1. **Identitet:** Vem begär åtkomst?
@@ -73,6 +75,36 @@ flowchart TB
     PG --> POST[(PostgreSQL)]
 ```
 
+*Figur 2: Gemensam serverbas och databasspecifika varianter.*
+
+### 2.2 Samspel mellan Puma och applikationen
+
+Applikationen bäddar in Puma-administrationen som en sida i sitt klient-UI. På
+den här administrationssidan konfigurerar behöriga administratörer användare,
+roller, grupper och behörighetstilldelningar. Sidan når Puma-servern via SDK:t;
+data hanteras inte separat i applikationen. Efter inloggningen returnerar Puma
+de effektiva behörigheterna till applikationen. Applikationen använder dem för
+att aktivera funktioner i sitt verksamhets-UI.
+
+```mermaid
+flowchart LR
+    ADM[Administratör] --> PAGE[Administrationssida i klient-UI:t]
+    PAGE -->|Användare, roller, grupper och tilldelningar| SDK[AuthClientSdk]
+    SDK --> P[Puma-server]
+    P --> DB[(SQLite eller PostgreSQL)]
+    USER[Användare] --> UI[Verksamhets-UI i klienten]
+    UI -->|Inloggning| SDK
+    P -->|effektiva behörigheter| SDK
+    SDK -->|HasPermission| UI
+```
+
+*Figur 3: Central administration och användning av behörigheterna i
+applikationen.*
+
+Att bädda in och behörighetsberoende visa administrationssidan är applikationens
+uppgift. Puma tillämpar fortfarande behörigheterna för administrativa åtgärder;
+att enbart dölja sidan är ingen åtkomstkontroll.
+
 ## 3. Roll- och behörighetsmodell
 
 Puma hanterar inte behörigheter som fritt redigerbara egenskaper hos en
@@ -87,6 +119,8 @@ flowchart LR
     P -->|gäller för| PROD[Produkt-ID]
 ```
 
+*Figur 4: Relationer mellan användare, grupper, roller och behörigheter.*
+
 - **Användare** har ett internt, beständigt objekt-ID och ett inloggningsnamn.
 - **Roller** samlar behörigheter och är produktspecifika.
 - **Grupper** samlar användare och tilldelas roller.
@@ -98,10 +132,26 @@ En användare får unionen av:
 - behörigheter från direkt tilldelade roller och
 - behörigheter från rollerna för användarens grupper.
 
+Vid flera direkta roller, flera grupper eller flera roller per grupp förenas
+alla ingående behörigheter. Dubbletter av behörigheter får verkan endast en
+gång; en tilldelning drar inte bort någon behörighet från en annan tilldelning.
+
 > **Viktigt:** Administrativa åtgärder använder det interna användar-ID:t, inte
 > inloggningsnamnet. En applikation anger sitt produkt-ID före inloggningen.
 
-### 3.1 Rekommenderad administrationsmodell
+### 3.1 Obligatoriska och valfria element
+
+| Element | Obligatoriskt eller valfritt? |
+|---|---|
+| Produkt-ID | **Obligatoriskt:** Applikationen anger det före inloggningen; roller och behörigheter gäller i detta produktsammanhang. |
+| Behörighets-ID | **Obligatoriskt för skyddade funktioner:** Applikationen definierar och kontrollerar det. |
+| Roll | **Obligatoriskt för att tilldela en behörighet:** Behörigheter tilldelas via roller och inte direkt till användare. En användare får finnas utan roll men har då ingen rollbaserad behörighet. |
+| Direkt rolltilldelning | **Valfritt:** Lämpligt för individuella uppgifter. |
+| Grupp | **Valfritt:** Lämpligt för att samla återkommande teamtilldelningar. |
+| Grupproll | **Valfritt:** Alternativ eller komplement till direkt rolltilldelning. |
+| Flera roller eller grupper | **Valfritt:** Deras behörigheter bildar tillsammans unionen. |
+
+### 3.2 Rekommenderad administrationsmodell
 
 ```mermaid
 flowchart TD
@@ -113,6 +163,8 @@ flowchart TD
     SU --> EMG[Endast för initiering / nödsituationer]
 ```
 
+*Figur 5: Rekommenderad modell för initiering och daglig administration.*
+
 Superanvändaren används för den initiala konfigurationen. För den dagliga
 driften bör individuella administratörskonton med en lämplig administratörsroll
 användas. På så sätt behöver superanvändarens inloggningsuppgifter inte delas.
@@ -122,11 +174,15 @@ användas. På så sätt behöver superanvändarens inloggningsuppgifter inte de
 ### 4.1 Förberedelser
 
 1. Välj servervariant.
-2. Förbered databas, databasanvändare och databasåtkomst för PostgreSQL.
-3. Ange HTTP- och WebSocket-port.
-4. Tillhandahåll ett servercertifikat och en privat nyckel för produktionssystem.
-5. Öppna endast de portar som behövs i brandväggen.
-6. Kontrollera skrivbehörighet för inställningar, databas och loggar.
+2. Förbered PostgreSQL-databas, databasanvändare och databasåtkomst för
+   `PumaServerPg`.
+3. För `PumaServerSl` krävs ingen separat databasserver och ingen förberedelse
+   av databasen. Servern skapar SQLite-databasen; tjänstekontot behöver
+   skrivbehörighet på den avsedda lagringsplatsen.
+4. Ange HTTP- och WebSocket-port.
+5. Tillhandahåll ett servercertifikat och en privat nyckel för produktionssystem.
+6. Öppna endast de portar som behövs i brandväggen.
+7. Kontrollera skrivbehörighet för inställningar, databas och loggar.
 
 De beständiga Puma-inställningarna lagras som standard under den
 applikationsspecifika systemsökvägen i
@@ -146,6 +202,8 @@ sequenceDiagram
     P-->>O: Driftklar eller fel i loggen
 ```
 
+*Figur 6: Tekniskt startförlopp för Puma-servern.*
+
 Efter starten ska framför allt följande kontrolleras:
 
 - databasanslutningen lyckades,
@@ -159,18 +217,25 @@ Efter starten ska framför allt följande kontrolleras:
 ```mermaid
 flowchart TD
     A[SDK ansluter] --> B{Finns en superanvändare?}
-    B -->|Nej| C[Skapa superanvändare]
+    B -->|Nej| C[Ange lösenord och kontakt-e-post]
+    C --> H[Skapa superanvändare]
     B -->|Ja| D[Logga in som administratör]
-    C --> D
+    H --> D
     D --> E[Definiera roller och grupper]
     E --> F[Skapa användare eller tillåt domäninloggning]
     F --> G[Testa behörigheter]
 ```
 
+*Figur 7: Initial konfiguration från superanvändare till behörighetstest.*
+
 SDK-förloppet består av `SuperuserExists()`, vid behov
-`CreateSuperuser()`, därefter inloggning och uppbyggnad av rollmodellen. Puma-
-testerna använder inloggningsnamnet `su` för det initiala kontot; i produktion
-måste andra, säkra inloggningsuppgifter väljas och förvaras säkert.
+`CreateSuperuser()`, därefter inloggning och uppbyggnad av rollmodellen. Vid
+initieringen anges superanvändarens lösenord och dess kontakt-e-post.
+`CreateSuperuser()` tar över lösenordet; kontakt-e-posten konfigureras i
+klientkompositionen som `SuperuserMail` för `RemoteSuperuserController` och
+överförs vid skapandet. Puma-testerna använder inloggningsnamnet `su` för det
+initiala kontot; inloggningsuppgifter för produktion och en nåbar kontakt-e-post
+måste väljas säkert och förvaras säkert.
 
 ### 4.4 Transportkryptering
 
@@ -184,6 +249,8 @@ flowchart LR
     P --> D[(Databas)]
     CERT[Certifikat + privat nyckel] --> RP
 ```
+
+*Figur 8: TLS-skyddad transport mellan klienten och Puma.*
 
 Produktionsregler:
 
@@ -223,6 +290,8 @@ sequenceDiagram
     SDK->>P: Ange gruppmedlemskap
 ```
 
+*Figur 9: Skapande av en lokal användare med roll- och grupptilldelning.*
+
 **Resultat:** Användaren får behörigheter från direkt tilldelade roller och
 grupproller. En användare som redan är inloggad kan behöva logga in igen
 så att applikationen får uppdaterade sessionsbehörigheter.
@@ -246,6 +315,8 @@ flowchart LR
     R --> P1[Läsa mätning]
     R --> P2[Godkänna granskning]
 ```
+
+*Figur 10: Gemensam behörighetstilldelning via en grupp.*
 
 **Fördel:** Rolländringar slår igenom centralt för alla gruppmedlemmar.
 
@@ -278,6 +349,8 @@ sequenceDiagram
     A->>S: Logout()
     S->>P: Avsluta session
 ```
+
+*Figur 11: Inloggning, behörighetskontroll och utloggning för en applikation.*
 
 Fel på grund av ogiltiga inloggningsuppgifter, låst konto, saknad anslutning
 eller saknade serverkomponenter rapporteras som misslyckad inloggning.
@@ -314,6 +387,8 @@ flowchart TD
     Q --> F[Utför funktion]
     F --> O[Logout]
 ```
+
+*Figur 12: Minimalt förlopp för en SDK-baserad klientintegrering.*
 
 Den minsta sekvensen i C++-klienten är:
 
@@ -360,6 +435,8 @@ flowchart LR
     P -->|Token och behörigheter| ASDK
     ASDK -->|Åtkomst tillåten / nekad| APP
 ```
+
+*Figur 13: Puma-integrering av en egen auktoriserbar server.*
 
 Applikationsservern anger:
 
@@ -433,6 +510,8 @@ sequenceDiagram
     P-->>A: Session + behörigheter
 ```
 
+*Figur 14: Inloggning av en Windows-domänanvändare via Puma.*
+
 Vid en lyckad första domäninloggning:
 
 - skapar Puma en intern användarpost,
@@ -488,6 +567,8 @@ flowchart LR
     P -->|Användare + behörighetsomfång| API
 ```
 
+*Figur 15: Skapande, lagring och användning av en PAT.*
+
 ### 8.2 Livscykel
 
 ```mermaid
@@ -501,6 +582,8 @@ stateDiagram-v2
     Widerrufen --> [*]
     Abgelaufen --> [*]
 ```
+
+*Figur 16: Tillstånd i en PAT:s livscykel.*
 
 En token är giltig om den finns, är aktiv, inte har återkallats och inte har
 löpt ut. Återkallade poster förblir synliga i listan och rapporteras som
@@ -543,6 +626,8 @@ sequenceDiagram
     A-->>J: Resultat eller nekad åtkomst
 ```
 
+*Figur 17: Validering av en PAT för en automatiserad åtkomst.*
+
 ### 8.5 Återkalla PAT
 
 1. Identifiera tokenen utifrån namn, produkt, tidpunkt för skapande och senaste
@@ -575,6 +660,8 @@ flowchart TB
     DEV[Utvecklare] --> PERM[Behörighetskontroller]
     DEV --> SEC[Hantera token på ett säkert sätt]
 ```
+
+*Figur 18: Fördelning av det operativa säkerhetsansvaret.*
 
 ### 9.2 Regelbundna kontroller
 
@@ -609,6 +696,8 @@ flowchart TD
     P -->|Nej| RBAC[Produkt-ID, roll, grupp, behörighetsomfång]
     P -->|Ja| LOG[Kontrollera server- och applikationsloggarna]
 ```
+
+*Figur 19: Beslutsträd för feldiagnos.*
 
 | Problem | Trolig orsak | Åtgärd |
 |---|---|---|
@@ -664,3 +753,69 @@ flowchart TD
 - [Beroenden](../Dependencies.md)
 - [Pumas säkerhetspolicy](../../SECURITY.md)
 - [Kompakt presentation](Puma_Kompakt_DE.pptx)
+
+## 13. Utvecklarintegrering
+
+En applikation kan integrera Puma på två sätt:
+
+| Variant | Lämplig för | Abstraktion |
+|---|---|---|
+| `AuthClientSdk` | Applikationer som behöver en stabil C++-fasad | `AuthClientSdk::CAuthorizationController` |
+| Partitura | ACF-/ImtCore-applikationer med en auktoriserbar server | `AuthorizableServerFramework.acc` från ImtCore |
+
+I båda varianterna behöver applikationen adressen till Puma-servern, ett unikt
+produkt-ID och de behörigheter som definierats för produkten. Produkt-ID:t
+måste stämma överens med den administrerade applikationen. TLS ska användas för
+produktionsanslutningar.
+
+### 13.1 Integrering via SDK:t
+
+1. Bygg `AuthClientSdk` och länka det till applikationen. CMake-exemplet i
+   `Impl/AuthClientSdk/CMake/CMakeLists.txt` visar de Qt- och ImtCore-beroenden
+   som krävs.
+2. Inkludera `AuthClientSdk/AuthClientSdk.h`.
+3. Skapa en `CAuthorizationController`, ange HTTP-/WebSocket-slutpunkten och
+   TLS-konfigurationen med `SetConnectionParam()` och ange därefter
+   produktsammanhanget med `SetProductId()`.
+4. Logga in med `Login()` och aktivera funktioner först efter en lyckad
+   kontroll med `HasPermission()`.
+5. Använd samma fasads användar-, roll- och gruppåtgärder för
+   administrationssidan. Applikationen avgör utifrån administrationsbehörigheten
+   om den erbjuder sidan i klient-UI:t.
+6. Anropa `Logout()` när sessionen avslutas.
+
+Ett minimalt C++-exempel finns i
+[UC-06](#uc-06-ansluta-en-egen-applikation); hela API:t beskrivs i
+[AuthClientSdk-referensen](../AuthClientSdk.md). I den aktuella CMake-byggnaden
+integreras SDK:t endast under Windows.
+
+### 13.2 Integrering via Partitura
+
+Under `Partitura/ImtHttpServerVoce.arp/AuthorizableServerFramework.acc`
+tillhandahåller ImtCore redan en färdig baskomposition för en auktoriserbar
+server. Den samlar bland annat HTTP- och WebSocket-servern, anslutningen till
+Puma, autentiseringshanteraren samt användar-, roll- och gruppcacharna.
+Applikationen bör använda denna bas i stället för att bygga upp komponenterna
+var för sig.
+
+Integreringen sker i följande steg:
+
+1. Gör ImtCore-paketen och -registren kända i applikationens ACF-konfiguration.
+2. Instansiera `AuthorizableServerFramework` från paketet `ImtHttpServerVoce`.
+3. Anslut de applikationsspecifika komponenterna för applikations- och
+   versionsinformation, databas, Puma-anslutning, servergränssnitt och
+   TLS-konfiguration via `Type="Reference"`. Egna begäranhanterare ansluts som
+   `Type="Factory"`.
+4. Konfigurera produkt-ID:t och anslutningen till den centrala Puma-servern.
+   Produkt-ID:t måste stämma överens med den applikation som administreras i
+   Puma.
+5. Anslut dina egna GraphQL-hanterare till ramverket och integrera de HTTP- och
+   WebSocket-servrar som ramverket exporterar i applikationens
+   server-controller.
+6. Testa efter byggnaden inloggning, PAT- och sessionsvalidering samt tillåtna
+   och nekade behörigheter mot en testinstans av Puma.
+
+`Impl/AuthServerSdk/AuthServerSdk.acc` visar en konkret integrering av denna
+ImtCore-baskomposition. Partitura-varianten kopplar in den deklarativt i
+applikationen, medan SDK-varianten kapslar in integreringen bakom en
+C++-fasad.

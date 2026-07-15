@@ -41,6 +41,8 @@ flowchart LR
     AUTH --> AD[Domeniu Windows]
 ```
 
+*Figura 1: Prezentare generală a arhitecturii de sistem Puma.*
+
 Puma separă patru sarcini:
 
 1. **Identitate:** Cine accesează?
@@ -74,6 +76,36 @@ flowchart TB
     PG --> POST[(PostgreSQL)]
 ```
 
+*Figura 2: Baza comună de server și variantele specifice bazei de date.*
+
+### 2.2 Interacțiunea dintre Puma și aplicație
+
+Aplicația integrează administrarea Puma ca pagină în interfața sa client. Pe
+această pagină de administrare, administratorii autorizați configurează
+utilizatori, roluri, grupuri și atribuiri de autorizări. Pagina accesează
+serverul Puma prin SDK; datele nu sunt gestionate separat în aplicație. După
+autentificare, Puma returnează autorizările efective către aplicație. Aplicația
+le folosește pentru a activa funcții în interfața sa de business.
+
+```mermaid
+flowchart LR
+    ADM[Administrator] --> PAGE[Pagină de administrare în interfața client]
+    PAGE -->|Utilizatori, roluri, grupuri și atribuiri| SDK[AuthClientSdk]
+    SDK --> P[Server Puma]
+    P --> DB[(SQLite sau PostgreSQL)]
+    USER[Utilizator] --> UI[Interfață client de business]
+    UI -->|Autentificare| SDK
+    P -->|autorizări efective| SDK
+    SDK -->|HasPermission| UI
+```
+
+*Figura 3: Administrare centralizată și utilizarea autorizărilor în aplicație.*
+
+Integrarea și afișarea paginii de administrare în funcție de autorizări este
+sarcina aplicației. Puma impune în continuare autorizările pentru operațiunile
+de administrare; simpla ascundere a paginii nu constituie un control al
+accesului.
+
 ## 3. Modelul de roluri și autorizări
 
 Puma nu gestionează autorizările ca proprietăți liber editabile ale unui
@@ -88,6 +120,8 @@ flowchart LR
     P -->|se aplică pentru| PROD[ID produs]
 ```
 
+*Figura 4: Relațiile dintre utilizatori, grupuri, roluri și autorizări.*
+
 - **Utilizatorii** au un ID de obiect intern și stabil și un nume de autentificare.
 - **Rolurile** grupează autorizările și sunt specifice produsului.
 - **Grupurile** grupează utilizatorii și primesc roluri.
@@ -100,10 +134,26 @@ Un utilizator primește reuniunea dintre:
 - autorizările rolurilor atribuite direct și
 - autorizările rolurilor grupurilor sale.
 
+În cazul mai multor roluri directe, mai multor grupuri sau mai multor roluri per
+grup, toate autorizările conținute se reunesc. Autorizările duplicate au efect o
+singură dată; o atribuire nu scade nicio autorizare dintr-o altă atribuire.
+
 > **Important:** Operațiunile de administrare folosesc ID-ul intern al utilizatorului, nu
 > numele de autentificare. O aplicație își setează ID-ul produsului înainte de autentificare.
 
-### 3.1 Model de administrare recomandat
+### 3.1 Elemente obligatorii și opționale
+
+| Element | Obligatoriu sau opțional? |
+|---|---|
+| ID produs | **Obligatoriu:** Aplicația îl setează înainte de autentificare; rolurile și autorizările se aplică în acest context de produs. |
+| ID autorizare | **Obligatoriu pentru funcțiile protejate:** Aplicația îl definește și îl verifică. |
+| Rol | **Obligatoriu pentru acordarea unei autorizări:** Autorizările se acordă prin roluri, nu direct utilizatorilor. Un utilizator poate exista fără rol, dar atunci nu are nicio autorizare bazată pe roluri. |
+| Atribuire directă a rolului | **Opțional:** Potrivit pentru sarcini individuale. |
+| Grup | **Opțional:** Potrivit pentru a grupa atribuiri recurente de echipă. |
+| Rol de grup | **Opțional:** Alternativă sau completare la atribuirea directă a rolului. |
+| Mai multe roluri sau grupuri | **Opțional:** Autorizările lor formează împreună reuniunea. |
+
+### 3.2 Model de administrare recomandat
 
 ```mermaid
 flowchart TD
@@ -115,6 +165,8 @@ flowchart TD
     SU --> EMG[Numai pentru inițializare / urgență]
 ```
 
+*Figura 5: Model recomandat pentru inițializare și administrare zilnică.*
+
 Superutilizatorul servește la configurarea inițială. Pentru activitatea zilnică trebuie
 folosite conturi de administrator personalizate, cu un rol de administrator
 adecvat. Astfel, datele de acces ale superutilizatorului nu trebuie partajate.
@@ -124,12 +176,16 @@ adecvat. Astfel, datele de acces ale superutilizatorului nu trebuie partajate.
 ### 4.1 Pregătire
 
 1. Selectați varianta de server.
-2. Pentru PostgreSQL, pregătiți baza de date, utilizatorul bazei de date și accesibilitatea.
-3. Stabiliți porturile HTTP și WebSocket.
-4. Pentru sistemele de producție, furnizați un certificat de server și
+2. Pentru `PumaServerPg`, pregătiți baza de date PostgreSQL, utilizatorul bazei
+   de date și accesibilitatea.
+3. Pentru `PumaServerSl` nu sunt necesare un server de bază de date separat și
+   nicio pregătire a bazei de date. Serverul creează baza de date SQLite; contul
+   de serviciu are nevoie de drepturi de scriere în locația prevăzută.
+4. Stabiliți porturile HTTP și WebSocket.
+5. Pentru sistemele de producție, furnizați un certificat de server și
    o cheie privată.
-5. Deschideți în firewall numai porturile necesare.
-6. Verificați drepturile de scriere pentru setări, baza de date și jurnale.
+6. Deschideți în firewall numai porturile necesare.
+7. Verificați drepturile de scriere pentru setări, baza de date și jurnale.
 
 Setările persistente Puma sunt salvate implicit în calea de sistem
 specifică aplicației, în
@@ -149,6 +205,8 @@ sequenceDiagram
     P-->>O: Pregătit pentru operare sau eroare în jurnal
 ```
 
+*Figura 6: Secvența tehnică de pornire a serverului Puma.*
+
 După pornire trebuie verificate în special:
 
 - conexiunea la baza de date a reușit,
@@ -162,18 +220,26 @@ După pornire trebuie verificate în special:
 ```mermaid
 flowchart TD
     A[SDK se conectează] --> B{Există superutilizator?}
-    B -->|Nu| C[Crearea superutilizatorului]
+    B -->|Nu| C[Setarea parolei și a e-mailului de contact]
+    C --> H[Crearea superutilizatorului]
     B -->|Da| D[Autentificare ca administrator]
-    C --> D
+    H --> D
     D --> E[Definirea rolurilor și grupurilor]
     E --> F[Crearea utilizatorilor sau permiterea autentificării în domeniu]
     F --> G[Testarea autorizărilor]
 ```
 
+*Figura 7: Configurarea inițială de la superutilizator până la testarea
+autorizărilor.*
+
 Secvența SDK constă din `SuperuserExists()`, dacă este necesar
-`CreateSuperuser()`, apoi autentificarea și construirea modelului de roluri. Testele
-Puma folosesc pentru contul inițial numele de autentificare `su`; datele de acces
-pentru producție trebuie alese diferit, în mod sigur, și păstrate în siguranță.
+`CreateSuperuser()`, apoi autentificarea și construirea modelului de roluri. La
+inițializare se stabilesc parola superutilizatorului și e-mailul său de contact.
+`CreateSuperuser()` preia parola; e-mailul de contact este configurat în
+compoziția clientului drept `SuperuserMail` al `RemoteSuperuserController` și
+este transmis la creare. Testele Puma folosesc pentru contul inițial numele de
+autentificare `su`; datele de acces pentru producție și un e-mail de contact
+accesibil trebuie alese în mod sigur și păstrate în siguranță.
 
 ### 4.4 Criptarea transportului
 
@@ -188,6 +254,8 @@ flowchart LR
     P --> D[(Bază de date)]
     CERT[Certificat + cheie privată] --> RP
 ```
+
+*Figura 8: Transport protejat prin TLS între client și Puma.*
 
 Reguli pentru producție:
 
@@ -227,6 +295,8 @@ sequenceDiagram
     SDK->>P: Setarea apartenenței la grup
 ```
 
+*Figura 9: Crearea unui utilizator local cu atribuirea de roluri și grup.*
+
 **Rezultat:** Utilizatorul primește autorizări din rolurile directe și din
 rolurile grupurilor. Este posibil ca un utilizator deja autentificat să trebuiască să se
 autentifice din nou pentru ca aplicația să primească autorizările actualizate ale sesiunii.
@@ -250,6 +320,8 @@ flowchart LR
     R --> P1[Citirea măsurătorii]
     R --> P2[Aprobarea verificării]
 ```
+
+*Figura 10: Atribuirea comună a autorizărilor printr-un grup.*
 
 **Beneficiu:** Modificările rolurilor se aplică centralizat tuturor membrilor grupului.
 
@@ -282,6 +354,9 @@ sequenceDiagram
     A->>S: Logout()
     S->>P: Încheierea sesiunii
 ```
+
+*Figura 11: Autentificarea, verificarea autorizărilor și deconectarea unei
+aplicații.*
 
 Erorile cauzate de date de acces nevalide, un cont blocat, lipsa conexiunii
 sau lipsa componentelor serverului sunt raportate ca autentificare eșuată.
@@ -318,6 +393,8 @@ flowchart TD
     Q --> F[Executarea funcției]
     F --> O[Logout]
 ```
+
+*Figura 12: Secvența minimă a unei integrări de client bazate pe SDK.*
 
 Secvența minimă în clientul C++ este:
 
@@ -363,6 +440,8 @@ flowchart LR
     P -->|Token și autorizări| ASDK
     ASDK -->|Acces permis / refuzat| APP
 ```
+
+*Figura 13: Integrarea în Puma a unui server propriu autorizabil.*
 
 Serverul de aplicație setează:
 
@@ -436,6 +515,8 @@ sequenceDiagram
     P-->>A: Sesiune + autorizări
 ```
 
+*Figura 14: Autentificarea unui utilizator de domeniu Windows prin Puma.*
+
 La prima autentificare reușită în domeniu:
 
 - Puma creează o înregistrare internă pentru utilizator,
@@ -491,6 +572,8 @@ flowchart LR
     P -->|Utilizator + scope-uri| API
 ```
 
+*Figura 15: Crearea, stocarea și utilizarea unui PAT.*
+
 ### 8.2 Ciclul de viață
 
 ```mermaid
@@ -502,6 +585,8 @@ stateDiagram-v2
     Widerrufen --> [*]
     Abgelaufen --> [*]
 ```
+
+*Figura 16: Stările din ciclul de viață al unui PAT.*
 
 Un token este valid dacă există, este activ, nu este revocat și nu este
 expirat. Înregistrările revocate rămân vizibile în listă și
@@ -544,6 +629,8 @@ sequenceDiagram
     A-->>J: Rezultat sau acces refuzat
 ```
 
+*Figura 17: Validarea unui PAT pentru un acces automatizat.*
+
 ### 8.5 Revocarea unui PAT
 
 1. Identificați tokenul pe baza numelui, produsului, momentului creării
@@ -574,6 +661,8 @@ flowchart TB
     DEV[Dezvoltator] --> PERM[Verificarea autorizărilor]
     DEV --> SEC[Gestionarea sigură a tokenurilor]
 ```
+
+*Figura 18: Repartizarea responsabilității operaționale de securitate.*
 
 ### 9.2 Verificări periodice
 
@@ -608,6 +697,8 @@ flowchart TD
     P -->|Nu| RBAC[ID produs, rol, grup, scope]
     P -->|Da| LOG[Verificarea jurnalului serverului și aplicației]
 ```
+
+*Figura 19: Arbore de decizie pentru diagnosticarea erorilor.*
 
 | Problemă | Cauză probabilă | Măsură |
 |---|---|---|
@@ -663,3 +754,68 @@ flowchart TD
 - [Dependențe](../Dependencies.md)
 - [Politica de securitate Puma](../../SECURITY.md)
 - [Prezentare compactă](Puma_Kompakt_DE.pptx)
+
+## 13. Integrarea pentru dezvoltatori
+
+O aplicație poate integra Puma în două moduri:
+
+| Variantă | Potrivită pentru | Abstracție |
+|---|---|---|
+| `AuthClientSdk` | aplicații care au nevoie de o fațadă C++ stabilă | `AuthClientSdk::CAuthorizationController` |
+| Partitura | aplicații ACF/ImtCore cu un server autorizabil | `AuthorizableServerFramework.acc` din ImtCore |
+
+În ambele variante, aplicația are nevoie de adresa serverului Puma, de un ID de
+produs unic și de autorizările definite pentru produs. ID-ul produsului trebuie
+să coincidă cu aplicația administrată. Pentru conexiunile de producție trebuie
+folosit TLS.
+
+### 13.1 Integrarea prin SDK
+
+1. Construiți `AuthClientSdk` și legați-l la aplicație. Exemplul CMake din
+   `Impl/AuthClientSdk/CMake/CMakeLists.txt` arată dependențele Qt și ImtCore
+   necesare.
+2. Includeți `AuthClientSdk/AuthClientSdk.h`.
+3. Creați un `CAuthorizationController`, setați cu `SetConnectionParam()`
+   punctul final HTTP/WebSocket și configurația TLS, apoi stabiliți cu
+   `SetProductId()` contextul de produs.
+4. Autentificați-vă cu `Login()` și activați funcții numai după o verificare
+   reușită cu `HasPermission()`.
+5. Pentru pagina de administrare, folosiți operațiunile cu utilizatori, roluri
+   și grupuri ale aceleiași fațade. Aplicația decide, pe baza autorizării de
+   administrare, dacă oferă pagina în interfața client.
+6. La încheierea sesiunii, apelați `Logout()`.
+
+Un exemplu C++ minim se află în
+[UC-06](#uc-06-integrarea-propriei-aplicații); API-ul complet este descris în
+[referința AuthClientSdk](../AuthClientSdk.md). În build-ul CMake actual, SDK-ul
+este integrat numai pe Windows.
+
+### 13.2 Integrarea prin Partitura
+
+În `Partitura/ImtHttpServerVoce.arp/AuthorizableServerFramework.acc`, ImtCore
+pune deja la dispoziție o compoziție de bază gata făcută pentru un server
+autorizabil. Aceasta reunește, printre altele, serverul HTTP și WebSocket,
+conexiunea la Puma, managerul de autentificare, precum și cache-urile de
+utilizatori, roluri și grupuri. Aplicația ar trebui să folosească această bază
+în loc să reconstruiască componentele individual.
+
+Integrarea se realizează în următorii pași:
+
+1. Faceți cunoscute pachetele și registrele ImtCore în configurația ACF a
+   aplicației.
+2. Instanțiați `AuthorizableServerFramework` din pachetul `ImtHttpServerVoce`.
+3. Conectați componentele specifice aplicației pentru informațiile despre
+   aplicație și versiune, baza de date, conexiunea la Puma, interfețele de
+   server și configurația TLS prin `Type="Reference"`. Handlerele proprii de
+   cereri se conectează ca `Type="Factory"`.
+4. Configurați ID-ul produsului și conexiunea la serverul Puma central. ID-ul
+   produsului trebuie să coincidă cu aplicația administrată în Puma.
+5. Conectați propriile handlere GraphQL la framework și integrați serverele HTTP
+   și WebSocket exportate de framework în controlerul de server al aplicației.
+6. După build, testați autentificarea, validarea PAT și a sesiunii, precum și
+   autorizările permise și refuzate față de o instanță de test a Puma.
+
+`Impl/AuthServerSdk/AuthServerSdk.acc` arată o integrare concretă a acestei
+compoziții de bază ImtCore. Varianta Partitura o conectează declarativ în
+aplicație, în timp ce varianta SDK încapsulează integrarea în spatele unei
+fațade C++.
