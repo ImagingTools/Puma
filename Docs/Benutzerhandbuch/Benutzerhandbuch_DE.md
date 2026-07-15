@@ -811,9 +811,9 @@ Die Integration erfolgt in diesen Schritten:
 2. `AuthorizableServerFramework` aus dem Paket `ImtHttpServerVoce`
    instanziieren.
 3. Die anwendungsspezifischen Komponenten für Anwendungs- und
-   Versionsinformationen, Datenbank, Puma-Verbindung, eigene Request-Handler,
-   Server-Schnittstellen und TLS-Konfiguration per `Type="Reference"`
-   anschließen.
+   Versionsinformationen, Datenbank, Puma-Verbindung, Server-Schnittstellen
+   und TLS-Konfiguration per `Type="Reference"` anschließen. Eigene
+   Request-Handler werden als `Type="Factory"` angebunden.
 4. Produkt-ID und Verbindung zum zentralen Puma-Server konfigurieren. Die
    Produkt-ID muss mit der in Puma administrierten Anwendung übereinstimmen.
 5. Die eigenen GraphQL-Handler mit dem Framework verbinden und die vom
