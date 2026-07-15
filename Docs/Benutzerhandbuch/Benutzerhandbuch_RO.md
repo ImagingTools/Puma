@@ -1,7 +1,7 @@
 # Manual de utilizare Puma
 
 **Limba:** Română  
-**Public-țintă:** Administratori, dezvoltatori de aplicații și operatori
+**Public-țintă:** Administratori și operatori
 
 ## 1. Scop și domeniu de aplicare
 

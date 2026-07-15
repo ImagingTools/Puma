@@ -1,7 +1,7 @@
 # Puma-användarhandbok
 
 **Språk:** Svenska  
-**Målgrupp:** Administratörer, applikationsutvecklare och driftansvariga
+**Målgrupp:** Administratörer och driftansvariga
 
 ## 1. Syfte och omfattning
 

@@ -1,7 +1,7 @@
 # Puma-Benutzerhandbuch
 
 **Sprache:** Deutsch  
-**Zielgruppe:** Administratoren, Anwendungsentwickler und Betreiber
+**Zielgruppe:** Administratoren und Betreiber
 
 ## 1. Zweck und Geltungsbereich
 

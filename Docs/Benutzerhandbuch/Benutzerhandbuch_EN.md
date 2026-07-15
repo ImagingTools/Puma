@@ -1,7 +1,7 @@
 # Puma User Manual
 
 **Language:** English  
-**Target audience:** Administrators, application developers, and operators
+**Target audience:** Administrators and operators
 
 ## 1. Purpose and Scope
 
