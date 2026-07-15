@@ -102,6 +102,8 @@ Puma includes an automated Git-based version management system. See [Build/Git/R
 
 ### SDK Documentation
 
+- **Deutsches Benutzerhandbuch** - [Docs/Benutzerhandbuch/Benutzerhandbuch_DE.md](Docs/Benutzerhandbuch/Benutzerhandbuch_DE.md) - Serverbetrieb, Use Cases, SDK, LDAP und PAT
+- **Deutsche Kompaktpräsentation** - [Docs/Benutzerhandbuch/Puma_Kompakt_DE.pptx](Docs/Benutzerhandbuch/Puma_Kompakt_DE.pptx) - Visualisierte Zusammenfassung des Benutzerhandbuchs
 - **AuthServerSdk** - [Docs/AuthServerSdk.md](Docs/AuthServerSdk.md) - Complete guide for embedding authorization server functionality
 - **AuthClientSdk** - [Docs/AuthClientSdk.md](Docs/AuthClientSdk.md) - Complete guide for client authentication and user management
 
