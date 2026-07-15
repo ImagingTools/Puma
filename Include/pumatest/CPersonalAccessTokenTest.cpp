@@ -401,8 +401,9 @@ void CPersonalAccessTokenTest::GetPermissionsWithPatTest()
 		"PatPermUser", "patpermuser", "1", "patperm@example.com");
 	QVERIFY(!userId.isEmpty());
 
+	QByteArray roleName = QByteArrayLiteral("PatPermissionRole_") + userId;
 	QByteArray roleId = m_authorizationController.CreateRole(
-		"PatPermissionRole", "", {"AdminAccess", "ReadOnly", "NotInTokenScope"});
+		roleName, "", {"AdminAccess", "ReadOnly", "NotInTokenScope"});
 	QVERIFY(!roleId.isEmpty());
 	QVERIFY(m_authorizationController.AddRolesToUser(userId, {roleId}));
 
