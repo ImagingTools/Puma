@@ -48,6 +48,7 @@ The SDK is designed for:
 ### Core Capabilities
 - **Puma-Based User Management**: Complete user lifecycle management (create, read, update, delete)
 - **Role-Based Access Control**: Comprehensive role and permission management via Puma
+- **Personal Access Token Validation**: Server-side PAT validation for programmatic API access
 - **Dual Protocol Support**: HTTP and WebSocket server capabilities
 - **SSL/TLS Security**: Comprehensive SSL/TLS configuration with certificate management
 - **Certificate Management**: Support for server certificates, CA certificates, and private keys
@@ -333,6 +334,10 @@ Configures connection parameters for the backend Puma authorization server.
 - When your AuthServerSdk instance needs to connect to a separate Puma server
 - Use this to specify where the Puma authorization backend is running
 - Typically called before `Start()` to establish the backend connection
+
+**Note:** Once configured, authentication delegated to Puma covers both
+session-based JWT tokens and Personal Access Tokens (PATs) automatically —
+there is no separate setting to enable PAT support.
 
 **Example**:
 ```cpp

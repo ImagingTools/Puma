@@ -89,6 +89,22 @@ class CAuthorizationControllerImpl;
 
 
 /**
+	\brief Token type classification.
+
+	Specifies the type of an access token, allowing the system to
+	distinguish between different authentication mechanisms and apply
+	appropriate validation logic.
+
+	\see Login, ValidatePersonalAccessToken()
+*/
+enum class TokenType
+{
+	Session, /**< Session-based JWT token from Login()*/
+	PersonalAccessToken /**< Personal Access Token (PAT) for API access*/
+};
+
+
+/**
 	\brief Login session data.
 
 	Contains authentication and authorization information
@@ -141,6 +157,17 @@ struct Login
 	QByteArrayList permissions;
 
 	/**
+		\brief Type of the access token.
+	
+		Indicates whether the session was established through interactive
+		login (Session) or via a Personal Access Token (PersonalAccessToken).
+		Defaults to Session for backward compatibility.
+	
+		\see TokenType
+	*/
+	TokenType tokenType = TokenType::Session;
+
+	/**
 		\brief Clears all stored login data.
 	
 		Resets all fields to their default empty state. This is typically
@@ -156,6 +183,7 @@ struct Login
 		userName.clear();
 		productId.clear();
 		permissions.clear();
+		tokenType = TokenType::Session;
 	}
 };
 
@@ -338,6 +366,141 @@ struct Group
 		\see AddRolesToGroup(), RemoveRolesFromGroup()
 	*/
 	QByteArrayList roleIds;
+};
+
+
+/**
+	\brief Personal Access Token (PAT) entity description.
+
+	Represents a personal access token that can be used for
+	programmatic API access without interactive login. PATs are
+	scoped to a specific user and product, and carry their own
+	set of permissions.
+
+	\note PATs provide long-lived authentication for automation,
+	      CI/CD pipelines, and service-to-service communication.
+	      They should be treated as sensitive credentials and stored
+	      securely.
+
+	\see CAuthorizationController::CreatePersonalAccessToken(),
+	     CAuthorizationController::ListPersonalAccessTokens()
+*/
+struct PersonalAccessToken
+{
+	/**
+		\brief Token identifier.
+
+		Unique internal identifier for the PAT. Used for management
+		operations such as revocation and updates.
+
+		\see RevokePersonalAccessToken()
+	*/
+	QByteArray id;
+
+	/**
+		\brief User identifier.
+
+		The ID of the user who owns this token.
+	*/
+	QByteArray userId;
+
+	/**
+		\brief Product identifier.
+
+		The product/service scope for which this token is valid.
+		Permissions are evaluated in the context of this product.
+	*/
+	QByteArray productId;
+
+	/**
+		\brief Descriptive token name.
+
+		A human-readable name for identifying the token
+		(e.g., "CI Pipeline", "Monitoring Service").
+	*/
+	QString name;
+
+	/**
+		\brief Optional token description.
+
+		Additional context about the token's purpose or usage.
+	*/
+	QString description;
+
+	/**
+		\brief Permissions assigned to the token.
+
+		List of permission identifiers that this token grants.
+		These are independent of the user's session permissions
+		and are evaluated directly from the token record.
+	*/
+	QByteArrayList permissions;
+
+	/**
+		\brief Token creation timestamp.
+
+		ISO 8601 formatted string representing when the token
+		was created.
+	*/
+	QString creationDate;
+
+	/**
+		\brief Optional expiration timestamp.
+
+		ISO 8601 formatted string representing when the token
+		expires. Empty if the token does not expire.
+	*/
+	QString expirationDate;
+
+	/**
+		\brief Last usage timestamp.
+
+		ISO 8601 formatted string representing the last time
+		the token was used for authentication. Empty if never used.
+	*/
+	QString lastUsedDate;
+
+	/**
+		\brief Token active state.
+
+		Indicates whether the token is currently active and can
+		be used for authentication.
+	*/
+	bool isActive = false;
+};
+
+
+/**
+	\brief PAT validation result.
+
+	Contains the result of validating a Personal Access Token,
+	including the associated permissions and product scope.
+
+	\see CAuthorizationController::ValidatePersonalAccessToken()
+*/
+struct PersonalAccessTokenValidation
+{
+	/**
+		\brief Whether the token is valid.
+
+		A token is valid if it exists, is active, and has not expired.
+	*/
+	bool isValid = false;
+
+	/**
+		\brief User identifier associated with the token.
+	*/
+	QByteArray userId;
+
+	/**
+		\brief Product scope of the token.
+	*/
+	QByteArray productId;
+
+	/**
+		\brief Permissions granted by the token.
+	*/
+	QByteArrayList permissions;
 };
 
 
@@ -1320,6 +1483,109 @@ public:
 		const QByteArray& groupId,
 		const QByteArrayList& roleIds) const;
 
+
+	// ---- Personal Access Token (PAT) Management ----
+
+	/**
+		\brief Creates a new Personal Access Token.
+	
+		Creates a PAT for the specified user, scoped to a product, with
+		the given permissions. The raw token value is returned only once
+		at creation time and cannot be retrieved later.
+	
+		\param userId User object identifier (owner of the token).
+		\param productId Product scope for the token.
+		\param name Human-readable token name (e.g., "CI Pipeline").
+		\param permissions List of permission IDs to assign to the token.
+		\param expirationDate Optional expiration date (ISO 8601 format).
+		                      Empty string means the token does not expire.
+	
+		\return The raw token string on success. This is the only time
+		        the raw token is available — store it securely.
+		\return Empty QByteArray if creation failed.
+	
+		\note Requires administrative permissions or ownership of the user account.
+		      The token value is hashed before storage and cannot be recovered.
+	
+		\warning The returned token must be stored securely by the caller.
+		         It cannot be retrieved again after this call.
+	
+		\see RevokePersonalAccessToken(), ListPersonalAccessTokens()
+	*/
+	virtual QByteArray CreatePersonalAccessToken(
+		const QByteArray& userId,
+		const QByteArray& productId,
+		const QString& name,
+		const QByteArrayList& permissions,
+		const QString& expirationDate = QString()) const;
+
+	/**
+		\brief Revokes a Personal Access Token.
+	
+		Permanently disables a PAT so it can no longer be used for
+		authentication. The token record is retained for audit purposes
+		but its state is set to Disabled.
+	
+		\param tokenId Token identifier (from ListPersonalAccessTokens()).
+	
+		\return true if the token was successfully revoked.
+		\return false if revocation failed (token not found, insufficient
+		        permissions, etc.).
+	
+		\note Requires administrative permissions or ownership of the token.
+	
+		\see CreatePersonalAccessToken(), ListPersonalAccessTokens()
+	*/
+	virtual bool RevokePersonalAccessToken(const QByteArray& tokenId) const;
+
+	/**
+		\brief Lists Personal Access Tokens for a user.
+	
+		Retrieves metadata for all PATs belonging to a user, optionally
+		filtered by product ID. The raw token values are never returned.
+	
+		\param userId User object identifier.
+		\param productId Optional product filter. If empty, returns tokens
+		                 for all products.
+	
+		\return List of PersonalAccessToken structures (without raw token values).
+		\return Empty list if no tokens exist or operation failed.
+	
+		\note Requires administrative permissions or ownership of the user account.
+	
+		\see CreatePersonalAccessToken(), PersonalAccessToken
+	*/
+	virtual QList<PersonalAccessToken> ListPersonalAccessTokens(
+		const QByteArray& userId,
+		const QByteArray& productId = QByteArray()) const;
+
+	/**
+		\brief Validates a Personal Access Token.
+	
+		Checks whether a raw token string is valid and returns the
+		associated permissions and product scope. Also updates the
+		token's LastUsedDate.
+	
+		This method can be used as an alternative to session-based
+		authentication for API access. The token is validated against
+		the database, checking for existence, active state, and
+		expiration.
+	
+		\param token The raw token string to validate.
+	
+		\return PersonalAccessTokenValidation with isValid=true and
+		        populated fields if the token is valid.
+		\return PersonalAccessTokenValidation with isValid=false if
+		        the token is invalid, expired, or revoked.
+	
+		\note This method does not require a prior Login() call.
+		      It directly validates the token against the PAT database.
+	
+		\see CreatePersonalAccessToken(), PersonalAccessTokenValidation
+	*/
+	virtual PersonalAccessTokenValidation ValidatePersonalAccessToken(
+		const QByteArray& token) const;
+
 private:
 	/**
 		\brief Pointer to the internal implementation.
@@ -1352,6 +1618,7 @@ private:
 	- **User Management**: Create, modify, and delete user accounts
 	- **Role Management**: Define roles with specific permissions
 	- **Group Management**: Organize users and assign roles collectively
+	- **Personal Access Tokens**: Create and manage PATs for programmatic API access
 	- **Secure Communication**: Optional SSL/TLS encryption
 
 	The SDK uses a client-server architecture where this library acts as
@@ -1365,6 +1632,7 @@ private:
 	- **Groups**: Collections of users that inherit role permissions
 	- **Permissions**: Granular capabilities (e.g., "admin.users.create")
 	- **Product ID**: Scope for product-specific authorization rules
+	- **Personal Access Tokens (PATs)**: Long-lived tokens for programmatic access
 
 	\section getting_started Getting Started
 
@@ -1373,7 +1641,7 @@ private:
 	3. Set the product identifier
 	4. Authenticate users with Login()
 	5. Check permissions with HasPermission()
-	6. Manage users, roles, and groups as needed
+	6. Manage users, roles, groups, and PATs as needed
 
-	\see CAuthorizationController, Login, User, Role, Group
+	\see CAuthorizationController, Login, User, Role, Group, PersonalAccessToken
 */

@@ -11,6 +11,7 @@
 - [User Management](#user-management)
 - [Role Management](#role-management)
 - [Group Management](#group-management)
+- [Personal Access Token Management](#personal-access-token-management)
 - [Usage Examples](#usage-examples)
 - [Best Practices](#best-practices)
 - [Troubleshooting](#troubleshooting)
@@ -40,6 +41,7 @@ The SDK is designed for:
 - **Permission Checking**: Real-time permission verification
 - **Superuser Management**: Initial superuser account setup
 - **Multi-Auth Support**: Local and LDAP authentication systems
+- **Personal Access Tokens (PATs)**: Long-lived tokens for programmatic API access
 
 ### User Management
 - **User CRUD**: Create, read, update, delete user accounts
@@ -59,6 +61,13 @@ The SDK is designed for:
 - **User Grouping**: Add/remove users to/from groups
 - **Group Roles**: Assign roles to groups
 - **Group Hierarchy**: Organize users into logical groups
+
+### Personal Access Token (PAT) Management
+- **Token Creation**: Create PATs with specific permissions and optional expiration
+- **Token Listing**: List PATs for a user, optionally filtered by product
+- **Token Validation**: Validate PATs and retrieve associated permissions
+- **Token Revocation**: Revoke PATs to disable programmatic access
+- **Product Scoping**: PATs are scoped to specific products via ProductId
 
 ### Security
 - **SSL/TLS Support**: Encrypted client-server communication
@@ -87,6 +96,7 @@ The SDK is designed for:
 │  │ IRoleManager                  │   │
 │  │ IUserGroupManager             │   │
 │  │ ISuperuserController          │   │
+│  │ IPersonalAccessTokenManager   │   │
 │  │ IServerConnectionInterface    │   │
 │  └───────────────────────────────┘   │
 └──────────────────────────────────────┘
@@ -820,6 +830,119 @@ for (const auto& perm : userPermissions) {
 }
 ```
 
+### Personal Access Token Management
+
+#### Data Types
+
+##### `TokenType` enum
+```cpp
+enum class TokenType
+{
+    Session,             // Session-based JWT token
+    PersonalAccessToken  // Personal Access Token (PAT)
+};
+```
+
+##### `PersonalAccessToken` struct
+```cpp
+struct PersonalAccessToken
+{
+    QByteArray id;              // Token identifier
+    QByteArray userId;          // Owner user ID
+    QByteArray productId;       // Product scope
+    QString name;               // Descriptive name
+    QString description;        // Optional description
+    QByteArrayList permissions; // Assigned permissions
+    QString creationDate;       // ISO 8601 creation timestamp
+    QString expirationDate;     // ISO 8601 expiration (empty = no expiry)
+    QString lastUsedDate;       // ISO 8601 last usage timestamp
+    bool isActive;              // Active state
+};
+```
+
+##### `PersonalAccessTokenValidation` struct
+```cpp
+struct PersonalAccessTokenValidation
+{
+    bool isValid;               // Whether the token is valid
+    QByteArray userId;          // Associated user ID
+    QByteArray productId;       // Product scope
+    QByteArrayList permissions; // Granted permissions
+};
+```
+
+#### `CreatePersonalAccessToken()`
+```cpp
+virtual QByteArray CreatePersonalAccessToken(
+    const QByteArray& userId,
+    const QByteArray& productId,
+    const QString& name,
+    const QByteArrayList& permissions,
+    const QString& expirationDate = QString()) const;
+```
+Creates a new Personal Access Token for programmatic API access.
+
+**Parameters:**
+- `userId`: User object identifier (token owner)
+- `productId`: Product scope for the token
+- `name`: Human-readable token name
+- `permissions`: List of permission IDs to assign
+- `expirationDate`: Optional ISO 8601 expiration date
+
+**Returns:**
+- Raw token string on success (store securely — cannot be retrieved later)
+- Empty QByteArray on failure
+
+**Warning:** The raw token value is returned only once at creation time. It is hashed before storage and cannot be recovered.
+
+#### `RevokePersonalAccessToken()`
+```cpp
+virtual bool RevokePersonalAccessToken(const QByteArray& tokenId) const;
+```
+Permanently disables a PAT so it can no longer be used for authentication.
+
+**Parameters:**
+- `tokenId`: Token identifier (from `ListPersonalAccessTokens()`)
+
+**Returns:**
+- `true` if revoked successfully
+- `false` on failure
+
+#### `ListPersonalAccessTokens()`
+```cpp
+virtual QList<PersonalAccessToken> ListPersonalAccessTokens(
+    const QByteArray& userId,
+    const QByteArray& productId = QByteArray()) const;
+```
+Lists PAT metadata for a user. Raw token values are never returned.
+
+**Parameters:**
+- `userId`: User object identifier
+- `productId`: Optional product filter (empty = all products)
+
+**Returns:**
+- List of `PersonalAccessToken` structures
+- Empty list if none exist or on failure
+
+#### `ValidatePersonalAccessToken()`
+```cpp
+virtual PersonalAccessTokenValidation ValidatePersonalAccessToken(
+    const QByteArray& token) const;
+```
+Validates a raw token string and returns associated permissions.
+
+**Parameters:**
+- `token`: Raw token string to validate
+
+**Returns:**
+- `PersonalAccessTokenValidation` with `isValid=true` and populated fields if valid
+- `PersonalAccessTokenValidation` with `isValid=false` if invalid, expired, or revoked
+
+**Note:** The underlying ImtCore `ValidateToken` GraphQL query does not return the
+token's product scope, so `productId` is left empty in the result. Use
+`ListPersonalAccessTokens()` (or `GetToken()` server-side) if the product scope
+is required.
+
 ## Usage Examples
 
 ### Example 1: Basic Authentication
@@ -1076,6 +1199,61 @@ void manageUsers(CAuthorizationController& auth) {
             qInfo() << "  Permissions:" << perms.size();
         }
     }
+}
+```
+
+### Example 5: Personal Access Token Management
+```cpp
+#include <AuthClientSdk/AuthClientSdk.h>
+
+using namespace AuthClientSdk;
+
+void managePats()
+{
+    CAuthorizationController controller;
+    
+    // Configure and login as admin
+    ServerConfig config;
+    config.host = "localhost";
+    config.httpPort = 7788;
+    config.wsPort = 8788;
+    controller.SetConnectionParam(config);
+    controller.SetProductId("MyApp");
+    
+    Login loginData;
+    controller.Login("su", "password", loginData);
+    
+    // Create a PAT for a user
+    QByteArray userId = /* ... get user ID ... */;
+    QByteArray rawToken = controller.CreatePersonalAccessToken(
+        userId,
+        "MyApp",
+        "CI Pipeline",
+        {"build.trigger", "deploy.staging"},
+        "2025-12-31T23:59:59Z");  // Optional expiration
+    
+    // IMPORTANT: Store rawToken securely — it cannot be retrieved later!
+    qDebug() << "Store this token securely:" << rawToken;
+    
+    // List user's tokens
+    QList<PersonalAccessToken> tokens = controller.ListPersonalAccessTokens(userId, "MyApp");
+    for (const auto& token : tokens) {
+        qDebug() << token.name << "- Active:" << token.isActive;
+    }
+    
+    // Validate a token (e.g., in a service receiving API requests)
+    PersonalAccessTokenValidation result = controller.ValidatePersonalAccessToken(rawToken);
+    if (result.isValid) {
+        qDebug() << "Token valid for product:" << result.productId;
+        qDebug() << "Permissions:" << result.permissions;
+    }
+    
+    // Revoke a token
+    if (!tokens.isEmpty()) {
+        controller.RevokePersonalAccessToken(tokens.first().id);
+    }
+    
+    controller.Logout();
 }
 ```
 

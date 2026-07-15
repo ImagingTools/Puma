@@ -1,5 +1,10 @@
 TARGET = pumatest
 
+# Console subsystem: without this, QTest's output goes to OutputDebugString on
+# Windows and is invisible when the process is launched with stdout/stderr
+# redirected to a file (the normal way to capture a CI/CLI test run).
+CONFIG += console
+
 include($(ACFDIR)/Config/QMake/ApplicationConfig.pri)
 include($(IMTCOREDIR)/Config/QMake/ImtCore.pri)
 include($(PUMADIR)/Config/QMake/Puma.pri)

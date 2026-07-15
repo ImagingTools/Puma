@@ -586,6 +586,10 @@ public:
 	*       ServerConfig structure as the main server but applies to
 	*       outbound connections to Puma.
 	*
+	* @note Authentication delegated to Puma through this connection covers
+	*       both session-based JWT tokens and Personal Access Tokens (PATs) -
+	*       there is no separate switch to enable PAT support once this is set.
+	*
 	* @see SetConnectionParam(), ServerConfig
 	*/
 	virtual bool SetPumaConnectionParam(const ServerConfig& serverConfig) const;

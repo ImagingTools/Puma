@@ -37,6 +37,7 @@
 
 // Qt includes
 #include <QDebug>
+#include <QDateTime>
 
 // ACF includes
 #include <ibase/IApplicationInfo.h>
@@ -52,6 +53,7 @@
 #include <imtauth/IUserManager.h>
 #include <imtauth/IRoleManager.h>
 #include <imtauth/IUserGroupManager.h>
+#include <imtauth/IPersonalAccessTokenManager.h>
 #include <imtcom/IServerConnectionInterface.h>
 
 // Local includes
@@ -732,6 +734,107 @@ public:
 		return false;
 	}
 
+
+	QByteArray CreatePersonalAccessToken(
+		const QByteArray& userId,
+		const QByteArray& productId,
+		const QString& name,
+		const QByteArrayList& permissions,
+		const QString& expirationDate)
+	{
+		imtauth::IPersonalAccessTokenManager* patManagerPtr = m_sdk.GetInterface<imtauth::IPersonalAccessTokenManager>();
+		if (patManagerPtr == nullptr){
+			qWarning() << "[CreatePersonalAccessToken] Failed: imtauth::IPersonalAccessTokenManager interface not found";
+			return QByteArray();
+		}
+
+		QDateTime expiresAt;
+		if (!expirationDate.isEmpty()){
+			expiresAt = QDateTime::fromString(expirationDate, Qt::ISODate);
+		}
+
+		imtauth::IPersonalAccessTokenManager::TokenCreationResult result = patManagerPtr->CreateToken(
+			userId, productId, name, QString(), permissions, expiresAt);
+		if (!result.success){
+			qWarning() << "[CreatePersonalAccessToken] Failed: token creation was rejected by the server";
+			return QByteArray();
+		}
+
+		return result.rawToken;
+	}
+
+	bool RevokePersonalAccessToken(const QByteArray& tokenId)
+	{
+		imtauth::IPersonalAccessTokenManager* patManagerPtr = m_sdk.GetInterface<imtauth::IPersonalAccessTokenManager>();
+		if (patManagerPtr != nullptr){
+			return patManagerPtr->RevokeToken(tokenId);
+		}
+
+		qWarning() << "[RevokePersonalAccessToken] Failed: imtauth::IPersonalAccessTokenManager interface not found";
+
+		return false;
+	}
+
+	QList<PersonalAccessToken> ListPersonalAccessTokens(
+		const QByteArray& userId,
+		const QByteArray& productId)
+	{
+		imtauth::IPersonalAccessTokenManager* patManagerPtr = m_sdk.GetInterface<imtauth::IPersonalAccessTokenManager>();
+		if (patManagerPtr == nullptr){
+			qWarning() << "[ListPersonalAccessTokens] Failed: imtauth::IPersonalAccessTokenManager interface not found";
+			return QList<PersonalAccessToken>();
+		}
+
+		QList<PersonalAccessToken> retVal;
+
+		QByteArrayList tokenIds = patManagerPtr->GetTokenIds(userId);
+		for (const QByteArray& tokenId : tokenIds){
+			imtauth::IPersonalAccessTokenSharedPtr tokenPtr = patManagerPtr->GetToken(tokenId);
+			if (!tokenPtr.IsValid()){
+				continue;
+			}
+
+			if (!productId.isEmpty() && tokenPtr->GetProductId() != productId){
+				continue;
+			}
+
+			retVal << ToPersonalAccessToken(*tokenPtr);
+		}
+
+		return retVal;
+	}
+
+	PersonalAccessTokenValidation ValidatePersonalAccessToken(const QByteArray& token)
+	{
+		PersonalAccessTokenValidation retVal;
+
+		imtauth::IPersonalAccessTokenManager* patManagerPtr = m_sdk.GetInterface<imtauth::IPersonalAccessTokenManager>();
+		if (patManagerPtr == nullptr){
+			qWarning() << "[ValidatePersonalAccessToken] Failed: imtauth::IPersonalAccessTokenManager interface not found";
+			return retVal;
+		}
+
+		QByteArray userId;
+		QByteArray tokenId;
+		QByteArrayList scopes;
+		if (!patManagerPtr->ValidateToken(token, userId, tokenId, scopes)){
+			return retVal;
+		}
+
+		retVal.isValid = true;
+		retVal.userId = userId;
+		retVal.permissions = scopes;
+
+		if (!tokenId.isEmpty()){
+			imtauth::IPersonalAccessTokenSharedPtr tokenPtr = patManagerPtr->GetToken(tokenId);
+			if (tokenPtr.IsValid()){
+				retVal.productId = tokenPtr->GetProductId();
+			}
+		}
+
+		return retVal;
+	}
+
 private:
 	/**
 		\brief Helper method to retrieve the current product ID.
@@ -751,6 +854,27 @@ private:
 		}
 
 		return applicationInfoPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
+	}
+
+	/**
+		\brief Helper method to convert an ImtCore PAT record to the public API struct.
+	*/
+	static PersonalAccessToken ToPersonalAccessToken(const imtauth::IPersonalAccessToken& token)
+	{
+		PersonalAccessToken retVal;
+
+		retVal.id = token.GetId();
+		retVal.userId = token.GetUserId();
+		retVal.productId = token.GetProductId();
+		retVal.name = token.GetName();
+		retVal.description = token.GetDescription();
+		retVal.permissions = token.GetScopes();
+		retVal.creationDate = token.GetCreatedAt().isValid() ? token.GetCreatedAt().toString(Qt::ISODate) : QString();
+		retVal.expirationDate = token.GetExpiresAt().isValid() ? token.GetExpiresAt().toString(Qt::ISODate) : QString();
+		retVal.lastUsedDate = token.GetLastUsedAt().isValid() ? token.GetLastUsedAt().toString(Qt::ISODate) : QString();
+		retVal.isActive = token.IsValid();
+
+		return retVal;
 	}
 
 	/**
@@ -1134,6 +1258,54 @@ bool CAuthorizationController::RemoveRolesFromGroup(const QByteArray& groupId, c
 	}
 
 	return false;
+}
+
+
+QByteArray CAuthorizationController::CreatePersonalAccessToken(
+	const QByteArray& userId,
+	const QByteArray& productId,
+	const QString& name,
+	const QByteArrayList& permissions,
+	const QString& expirationDate) const
+{
+	if (m_implPtr != nullptr){
+		return m_implPtr->CreatePersonalAccessToken(userId, productId, name, permissions, expirationDate);
+	}
+
+	return QByteArray();
+}
+
+
+bool CAuthorizationController::RevokePersonalAccessToken(const QByteArray& tokenId) const
+{
+	if (m_implPtr != nullptr){
+		return m_implPtr->RevokePersonalAccessToken(tokenId);
+	}
+
+	return false;
+}
+
+
+QList<PersonalAccessToken> CAuthorizationController::ListPersonalAccessTokens(
+	const QByteArray& userId,
+	const QByteArray& productId) const
+{
+	if (m_implPtr != nullptr){
+		return m_implPtr->ListPersonalAccessTokens(userId, productId);
+	}
+
+	return QList<PersonalAccessToken>();
+}
+
+
+PersonalAccessTokenValidation CAuthorizationController::ValidatePersonalAccessToken(
+	const QByteArray& token) const
+{
+	if (m_implPtr != nullptr){
+		return m_implPtr->ValidatePersonalAccessToken(token);
+	}
+
+	return PersonalAccessTokenValidation();
 }
 
 

@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5445" Description="ACF"/>
-            <Version Id="1" Number="2256" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6435" Description="ACF"/>
+            <Version Id="1" Number="2410" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -47,6 +47,15 @@
                     </AttributeInfo>
                     <AttributeInfo Id="UserProvider" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="UserRequests"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="PatRequests" PackageId="" ComponentId="PatRequests">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="GraphQLClientEngine"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -234,6 +243,34 @@
                 <ExportedComponents/>
             </Data>
         </EmbeddedRegistry>
+        <EmbeddedRegistry Id="PatRequests">
+            <Data Description="" Keywords="">
+                <ElementsList>
+                    <Element Id="ClientRequestPersonalAccessTokenManager" PackageId="ImtAuthGqlPck" ComponentId="ClientRequestPersonalAccessTokenManager">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="ApiClient" Type="Reference" ExportId="ApiClient">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="PersonalAccessTokenFactory" Type="Factory" ExportId="">
+                                    <Data IsEnabled="true" Value="PersonalAccessToken"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="PersonalAccessToken" PackageId="ImtAuthPck" ComponentId="PersonalAccessToken">
+                        <Data IsEnabled="true" Flags="2">
+                            <AttributeInfoMap/>
+                        </Data>
+                    </Element>
+                </ElementsList>
+                <EmbeddedRegistriesList/>
+                <ExportedInterfaces>
+                    <Interface InterfaceId="imtauth::IPersonalAccessTokenManager" ComponentId="ClientRequestPersonalAccessTokenManager"/>
+                </ExportedInterfaces>
+                <ExportedComponents/>
+            </Data>
+        </EmbeddedRegistry>
         <EmbeddedRegistry Id="RoleRequests">
             <Data Description="" Keywords="">
                 <ElementsList>
@@ -381,6 +418,7 @@
         <Interface InterfaceId="ibase::IApplicationInfo" ComponentId="ApplicationInfoController"/>
         <Interface InterfaceId="imtauth::IAccessTokenProvider" ComponentId="SimpleLoginWrap"/>
         <Interface InterfaceId="imtauth::IPermissionChecker" ComponentId="CheckPermissionOr"/>
+        <Interface InterfaceId="imtauth::IPersonalAccessTokenManager" ComponentId="PatRequests"/>
         <Interface InterfaceId="imtauth::IRoleInfoProvider" ComponentId="RoleRequests"/>
         <Interface InterfaceId="imtauth::IRoleManager" ComponentId="RoleRequests"/>
         <Interface InterfaceId="imtauth::ISuperuserController" ComponentId="UserRequests"/>
