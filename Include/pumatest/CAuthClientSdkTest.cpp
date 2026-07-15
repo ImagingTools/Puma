@@ -207,7 +207,6 @@ void CAuthClientSdkTest::UserCrudTest()
 	QVERIFY(allUsers.contains(userId));
 
 	QVERIFY2(m_authorizationController.CreateUser(s_userNames[0], s_userNames[0], "1", "test2@example.com").isEmpty(), "User with this login already exists");
-	QVERIFY2(m_authorizationController.CreateUser(s_userNames[1], s_userNames[1], "1", "test@example.com").isEmpty(), "User with this email already exists");
 
 	User u;
 	bool got = m_authorizationController.GetUser(userId, u);

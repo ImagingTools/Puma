@@ -16,6 +16,9 @@
                     <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ApplicationInfoController"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="AuthenticationManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="AuthorizableServerFramework/AuthenticationManager"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ServerConnectionInterface" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ServerConnectionInterfaceParam"/>
                     </AttributeInfo>

@@ -138,6 +138,27 @@ function Reset-TestDatabase {
     }
 }
 
+function Disable-TestLdapAuth {
+    # LdapEnabled defaults to true (Partitura/PumaVoce.arp/PumaSettings.acc) so that
+    # production Puma installs can authenticate domain accounts out of the box - but
+    # PumaServerSlTest only ever has DB-only test users, so every single login first
+    # tries (and fails) a Windows LogonUser() call before falling back to the local
+    # DB check. That's ~20+ failed LogonUser attempts per test run, pure noise. Only
+    # patches an existing settings file (first-ever run on a machine still gets the
+    # product default of enabled; rerun this script once and it will be disabled from
+    # then on).
+    $settingsPath = Join-Path (Split-Path -Parent $SqliteDbPath) "PumaServerSlTestSettings.xml"
+    if (-not (Test-Path $settingsPath)) {
+        return
+    }
+    $content = Get-Content -Path $settingsPath -Raw
+    $patched = $content -replace '(<Parameter Id="LdapEnabled" IsEnabled=")true(")', '${1}false${2}'
+    if ($patched -ne $content) {
+        Write-Host "Disabling LdapEnabled in '$settingsPath' (avoids per-login LogonUser noise in test runs)"
+        Set-Content -Path $settingsPath -Value $patched -NoNewline
+    }
+}
+
 function Start-PumaServer {
     Write-Step "Starting PumaServerSlTest.exe"
     if (-not (Test-Path $ServerExePath)) {
@@ -146,6 +167,7 @@ function Start-PumaServer {
     if ($ResetDatabase) {
         Reset-TestDatabase
     }
+    Disable-TestLdapAuth
     $workDir = Split-Path -Parent $ServerExePath
     $script:serverProcess = Start-Process -FilePath $ServerExePath -WorkingDirectory $workDir -PassThru -WindowStyle Hidden
     $script:ownsServerProcess = $true
@@ -166,11 +188,34 @@ function Start-PumaServer {
     Write-Host "Server is accepting connections on port $HttpPort"
 }
 
+function Sync-PluginDlls {
+    # Known packaging gap (see Docs/GQL_CONTEXT_THREAD_PROPAGATION_BUG.md): AuthClientSdk.dll/
+    # AuthServerSdk.dll build into Bin\<config>\Plugins\, but pumatest.exe's import table
+    # needs them next to itself (Windows default DLL search order excludes Plugins\).
+    # Without this, pumatest.exe silently loads a stale copy left over from a previous
+    # build/copy, which looks exactly like a regression.
+    $testDir = Split-Path -Parent $TestExePath
+    $pluginsDir = Join-Path $testDir "Plugins"
+    foreach ($dllName in @("AuthClientSdk.dll", "AuthServerSdk.dll")) {
+        $sourcePath = Join-Path $pluginsDir $dllName
+        $destPath = Join-Path $testDir $dllName
+        if (-not (Test-Path $sourcePath)) {
+            continue
+        }
+        if ((Test-Path $destPath) -and (Get-Item $destPath).LastWriteTimeUtc -ge (Get-Item $sourcePath).LastWriteTimeUtc) {
+            continue
+        }
+        Write-Host "Copying newer $dllName from Plugins\ to $testDir"
+        Copy-Item -Path $sourcePath -Destination $destPath -Force
+    }
+}
+
 function Invoke-PumaTest {
     Write-Step "Running pumatest.exe"
     if (-not (Test-Path $TestExePath)) {
         throw "Test executable not found: $TestExePath (build it, or pass -TestExePath / -BuildConfig)"
     }
+    Sync-PluginDlls
     & $TestExePath @TestArgs | Out-Host
     return $LASTEXITCODE
 }
