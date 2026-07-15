@@ -41,6 +41,8 @@ flowchart LR
     AUTH --> AD[Windows-Domäne]
 ```
 
+*Abbildung 1: Überblick über die Puma-Systemarchitektur.*
+
 Puma trennt vier Aufgaben:
 
 1. **Identität:** Wer greift zu?
@@ -74,6 +76,38 @@ flowchart TB
     PG --> POST[(PostgreSQL)]
 ```
 
+*Abbildung 2: Gemeinsame Serverbasis und datenbankspezifische Varianten.*
+
+### 2.2 Zusammenspiel von Puma und Anwendung
+
+Die Anwendung bindet die Puma-Administration als Seite in ihre Client-UI ein.
+Auf dieser Administrationsseite richten berechtigte Administratoren Benutzer,
+Rollen, Gruppen und Berechtigungszuordnungen ein. Die Seite greift über das SDK
+auf den Puma-Server zu; die Daten werden nicht separat in der Anwendung
+verwaltet. Nach der Anmeldung liefert Puma die effektiven Berechtigungen an die
+Anwendung zurück. Die Anwendung verwendet sie, um Funktionen in ihrer
+fachlichen UI freizugeben.
+
+```mermaid
+flowchart LR
+    ADM[Administrator] --> PAGE[Administrationsseite in der Client-UI]
+    PAGE -->|Benutzer, Rollen, Gruppen und Zuordnungen| SDK[AuthClientSdk]
+    SDK --> P[Puma-Server]
+    P --> DB[(SQLite oder PostgreSQL)]
+    USER[Benutzer] --> UI[Fachliche Client-UI]
+    UI -->|Anmeldung| SDK
+    P -->|effektive Berechtigungen| SDK
+    SDK -->|HasPermission| UI
+```
+
+*Abbildung 3: Zentrale Administration und Nutzung der Berechtigungen in der
+Anwendung.*
+
+Das Einbinden und berechtigungsabhängige Anzeigen der Administrationsseite ist
+Aufgabe der Anwendung. Puma erzwingt weiterhin die Berechtigungen für
+Verwaltungsoperationen; das Ausblenden der Seite allein ist keine
+Zugriffskontrolle.
+
 ## 3. Rollen- und Berechtigungsmodell
 
 Puma verwaltet Berechtigungen nicht als frei editierbare Eigenschaften eines
@@ -88,6 +122,9 @@ flowchart LR
     P -->|gelten für| PROD[Produkt-ID]
 ```
 
+*Abbildung 4: Beziehungen zwischen Benutzern, Gruppen, Rollen und
+Berechtigungen.*
+
 - **Benutzer** besitzen eine interne, stabile Objekt-ID und einen Login-Namen.
 - **Rollen** bündeln Berechtigungen und sind produktspezifisch.
 - **Gruppen** bündeln Benutzer und erhalten Rollen.
@@ -100,10 +137,27 @@ Ein Benutzer erhält die Vereinigungsmenge aus:
 - Berechtigungen direkt zugeordneter Rollen und
 - Berechtigungen der Rollen seiner Gruppen.
 
+Bei mehreren direkten Rollen, mehreren Gruppen oder mehreren Rollen pro Gruppe
+werden alle enthaltenen Berechtigungen vereinigt. Doppelte Berechtigungen
+wirken dabei nur einmal; eine Zuordnung zieht keine Berechtigung aus einer
+anderen Zuordnung ab.
+
 > **Wichtig:** Verwaltungsoperationen verwenden die interne Benutzer-ID, nicht
 > den Login-Namen. Eine Anwendung setzt ihre Produkt-ID vor der Anmeldung.
 
-### 3.1 Empfohlenes Administrationsmodell
+### 3.1 Verbindliche und optionale Elemente
+
+| Element | Verbindlich oder optional? |
+|---|---|
+| Produkt-ID | **Verbindlich:** Die Anwendung setzt sie vor der Anmeldung; Rollen und Berechtigungen gelten in diesem Produktkontext. |
+| Berechtigungs-ID | **Verbindlich für geschützte Funktionen:** Die Anwendung definiert und prüft sie. |
+| Rolle | **Verbindlich für die Vergabe einer Berechtigung:** Berechtigungen werden über Rollen und nicht direkt an Benutzer vergeben. Ein Benutzer darf ohne Rolle bestehen, hat dann aber keine rollenbasierte Berechtigung. |
+| Direkte Rollenzuordnung | **Optional:** Geeignet für individuelle Aufgaben. |
+| Gruppe | **Optional:** Geeignet, um wiederkehrende Teamzuordnungen zu bündeln. |
+| Gruppenrolle | **Optional:** Alternative oder Ergänzung zur direkten Rollenzuordnung. |
+| Mehrere Rollen oder Gruppen | **Optional:** Ihre Berechtigungen bilden gemeinsam die Vereinigungsmenge. |
+
+### 3.2 Empfohlenes Administrationsmodell
 
 ```mermaid
 flowchart TD
@@ -115,6 +169,8 @@ flowchart TD
     SU --> EMG[Nur für Bootstrap / Notfall]
 ```
 
+*Abbildung 5: Empfohlenes Modell für Bootstrap und tägliche Administration.*
+
 Der Superuser dient zum initialen Aufbau. Für den Alltag sollten
 personalisierte Administratorkonten mit einer passenden Administratorrolle
 verwendet werden. So müssen Superuser-Zugangsdaten nicht geteilt werden.
@@ -124,12 +180,16 @@ verwendet werden. So müssen Superuser-Zugangsdaten nicht geteilt werden.
 ### 4.1 Vorbereitung
 
 1. Servervariante auswählen.
-2. Für PostgreSQL Datenbank, Datenbankbenutzer und Erreichbarkeit vorbereiten.
-3. HTTP- und WebSocket-Port festlegen.
-4. Für produktive Systeme ein Serverzertifikat und einen privaten Schlüssel
+2. Bei `PumaServerPg` PostgreSQL-Datenbank, Datenbankbenutzer und
+   Erreichbarkeit vorbereiten.
+3. Bei `PumaServerSl` ist kein separater Datenbankserver und keine
+   Datenbankvorbereitung erforderlich. Der Server legt die SQLite-Datenbank an;
+   das Dienstkonto benötigt Schreibrechte am vorgesehenen Speicherort.
+4. HTTP- und WebSocket-Port festlegen.
+5. Für produktive Systeme ein Serverzertifikat und einen privaten Schlüssel
    bereitstellen.
-5. Firewall nur für die benötigten Ports öffnen.
-6. Schreibrechte für Einstellungen, Datenbank und Protokolle prüfen.
+6. Firewall nur für die benötigten Ports öffnen.
+7. Schreibrechte für Einstellungen, Datenbank und Protokolle prüfen.
 
 Die persistenten Puma-Einstellungen werden standardmäßig unter dem
 anwendungsbezogenen Systempfad in
@@ -149,6 +209,8 @@ sequenceDiagram
     P-->>O: Betriebsbereit oder Fehler im Protokoll
 ```
 
+*Abbildung 6: Technischer Startablauf des Puma-Servers.*
+
 Nach dem Start sind insbesondere zu prüfen:
 
 - Datenbankverbindung erfolgreich,
@@ -162,18 +224,26 @@ Nach dem Start sind insbesondere zu prüfen:
 ```mermaid
 flowchart TD
     A[SDK verbindet sich] --> B{Superuser vorhanden?}
-    B -->|Nein| C[Superuser erzeugen]
+    B -->|Nein| C[Passwort und Kontakt-E-Mail setzen]
+    C --> H[Superuser erzeugen]
     B -->|Ja| D[Als Administrator anmelden]
-    C --> D
+    H --> D
     D --> E[Rollen und Gruppen definieren]
     E --> F[Benutzer anlegen oder Domänenlogin zulassen]
     F --> G[Berechtigungen testen]
 ```
 
+*Abbildung 7: Ersteinrichtung vom Superuser bis zum Berechtigungstest.*
+
 Der SDK-Ablauf besteht aus `SuperuserExists()`, bei Bedarf
-`CreateSuperuser()`, danach Login und Aufbau des Rollenmodells. Die
+`CreateSuperuser()`, danach Login und Aufbau des Rollenmodells. Bei der
+Initialisierung werden das Passwort des Superusers und seine Kontakt-E-Mail
+festgelegt. `CreateSuperuser()` übernimmt das Passwort; die Kontakt-E-Mail wird
+in der Client-Komposition als `SuperuserMail` des
+`RemoteSuperuserController` konfiguriert und beim Erzeugen übermittelt. Die
 Puma-Tests verwenden für das initiale Konto den Login `su`; produktive
-Zugangsdaten müssen davon abweichend sicher gewählt und verwahrt werden.
+Zugangsdaten und eine erreichbare Kontakt-E-Mail müssen sicher gewählt und
+verwahrt werden.
 
 ### 4.4 Transportverschlüsselung
 
@@ -188,6 +258,8 @@ flowchart LR
     P --> D[(Datenbank)]
     CERT[Zertifikat + privater Schlüssel] --> RP
 ```
+
+*Abbildung 8: TLS-geschützter Transport zwischen Client und Puma.*
 
 Produktionsregeln:
 
@@ -227,6 +299,9 @@ sequenceDiagram
     SDK->>P: Gruppenmitgliedschaft setzen
 ```
 
+*Abbildung 9: Anlage eines lokalen Benutzers mit Rollen- und
+Gruppenzuordnung.*
+
 **Ergebnis:** Der Benutzer erhält Berechtigungen aus direkten Rollen und
 Gruppenrollen. Ein bereits angemeldeter Benutzer muss sich gegebenenfalls neu
 anmelden, damit die Anwendung aktualisierte Sitzungsberechtigungen erhält.
@@ -250,6 +325,8 @@ flowchart LR
     R --> P1[Messung lesen]
     R --> P2[Prüfung freigeben]
 ```
+
+*Abbildung 10: Gemeinsame Berechtigungsvergabe über eine Gruppe.*
 
 **Nutzen:** Rollenänderungen wirken zentral auf alle Gruppenmitglieder.
 
@@ -282,6 +359,8 @@ sequenceDiagram
     A->>S: Logout()
     S->>P: Sitzung beenden
 ```
+
+*Abbildung 11: Anmeldung, Berechtigungsprüfung und Abmeldung einer Anwendung.*
 
 Fehler bei ungültigen Zugangsdaten, gesperrtem Konto, fehlender Verbindung
 oder fehlenden Serverkomponenten werden als fehlgeschlagener Login gemeldet.
@@ -318,6 +397,8 @@ flowchart TD
     Q --> F[Funktion ausführen]
     F --> O[Logout]
 ```
+
+*Abbildung 12: Minimaler Ablauf einer SDK-basierten Client-Anbindung.*
 
 Die minimale Reihenfolge im C++-Client lautet:
 
@@ -363,6 +444,8 @@ flowchart LR
     P -->|Token und Berechtigungen| ASDK
     ASDK -->|Zugriff erlaubt / verweigert| APP
 ```
+
+*Abbildung 13: Puma-Anbindung eines eigenen autorisierbaren Servers.*
 
 Der Anwendungsserver setzt:
 
@@ -436,6 +519,8 @@ sequenceDiagram
     P-->>A: Sitzung + Berechtigungen
 ```
 
+*Abbildung 14: Anmeldung eines Windows-Domänenbenutzers über Puma.*
+
 Bei erfolgreichem ersten Domänenlogin:
 
 - legt Puma einen internen Benutzerdatensatz an,
@@ -491,6 +576,8 @@ flowchart LR
     P -->|Benutzer + Scopes| API
 ```
 
+*Abbildung 15: Erstellung, Speicherung und Verwendung eines PAT.*
+
 ### 8.2 Lebenszyklus
 
 ```mermaid
@@ -502,6 +589,8 @@ stateDiagram-v2
     Widerrufen --> [*]
     Abgelaufen --> [*]
 ```
+
+*Abbildung 16: Zustände im Lebenszyklus eines PAT.*
 
 Ein Token ist gültig, wenn es existiert, aktiv, nicht widerrufen und nicht
 abgelaufen ist. Widerrufene Datensätze bleiben in der Liste sichtbar und
@@ -544,6 +633,8 @@ sequenceDiagram
     A-->>J: Ergebnis oder Zugriff verweigert
 ```
 
+*Abbildung 17: Validierung eines PAT für einen automatisierten Zugriff.*
+
 ### 8.5 PAT widerrufen
 
 1. Token anhand von Name, Produkt, Erstellungszeit und letzter Nutzung
@@ -574,6 +665,8 @@ flowchart TB
     DEV[Entwickler] --> PERM[Berechtigungsprüfungen]
     DEV --> SEC[Token sicher behandeln]
 ```
+
+*Abbildung 18: Aufteilung der betrieblichen Sicherheitsverantwortung.*
 
 ### 9.2 Regelmäßige Kontrollen
 
@@ -608,6 +701,8 @@ flowchart TD
     P -->|Nein| RBAC[Produkt-ID, Rolle, Gruppe, Scope]
     P -->|Ja| LOG[Server- und Anwendungsprotokoll prüfen]
 ```
+
+*Abbildung 19: Entscheidungsbaum zur Fehlerdiagnose.*
 
 | Problem | Wahrscheinliche Ursache | Maßnahme |
 |---|---|---|
