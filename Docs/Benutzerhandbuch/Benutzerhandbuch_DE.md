@@ -525,10 +525,11 @@ können PATs anderer Benutzer verwalten.
 
 ### 8.4 PAT verwenden
 
-Der Client-SDK erkennt nach erfolgreichem Tokenlogin den Typ
-`TokenType::PersonalAccessToken`; interaktive Sitzungen haben
-`TokenType::Session`. Anwendungen dürfen nur die im PAT enthaltenen Scopes
-freigeben und müssen zusätzlich den Produktkontext beachten.
+Das SDK-Datenmodell unterscheidet `TokenType::Session` und
+`TokenType::PersonalAccessToken`. Für einen nicht interaktiven Zugriff wird
+das PAT über `ValidatePersonalAccessToken()` geprüft; die Anwendung verwendet
+anschließend ausschließlich die zurückgegebenen Scopes und prüft zusätzlich
+den Produktkontext.
 
 ```mermaid
 sequenceDiagram
@@ -662,4 +663,3 @@ flowchart TD
 - [Abhängigkeiten](../Dependencies.md)
 - [Puma-Sicherheitsrichtlinie](../../SECURITY.md)
 - [Kompaktpräsentation](Puma_Kompakt_DE.pptx)
-
