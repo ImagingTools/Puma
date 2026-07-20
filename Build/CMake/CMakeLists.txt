@@ -49,6 +49,8 @@ imt_chain_windeploy_target(PumaServerSlTest)
 add_subdirectory("${IMPL_DIR}/PumaServerConfigurator/CMake" "${AUX_INCLUDE_DIR}/PumaServerConfigurator")
 imt_chain_windeploy_target(PumaServerConfigurator)
 
+option(BUILD_TESTING "Build test targets (pumatest)" ON)
+
 if(WIN32)
 	add_subdirectory("${IMPL_DIR}/PumaClient/CMake" "${AUX_INCLUDE_DIR}/PumaClient")
 	imt_chain_windeploy_target(PumaClient)
