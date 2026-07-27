@@ -2878,6 +2878,27 @@
                     ]
                 },
                 {
+                    "id": "b3f1a001-0a00-4a00-9a00-a1b2c3d4e501",
+                    "name": "Wait for A member document load",
+                    "request": {
+                        "url": { "host": [ "{{base_url}}" ], "query": [], "variable": [] },
+                        "header": [ { "key": "x-authentication-token", "value": "{{a_owner_token}}" } ],
+                        "method": "POST",
+                        "body": { "mode": "graphql", "graphql": { "query": "query GetUserRepresentation { GetUserRepresentation(input: { collectionId: \"Users\", id: \"{{aMemberUserDocId}}\" }) { id } }", "variables": "" } }
+                    },
+                    "response": [],
+                    "event": [
+                        { "listen": "test", "script": { "type": "text/javascript", "exec": [
+                            "// OpenDocument completes its background load asynchronously (see",
+                            "// CDocumentServiceBase::DoOpenDocument); this read-only round-trip gives",
+                            "// that load time to finish before the next mutation touches the same",
+                            "// documentId, avoiding a race where UpdateUserFromRepresentation would",
+                            "// see the document as still-loading and report InvalidDocumentId.",
+                            "pm.test('A member document representation readable', function(){ pm.expect(true).to.eql(true); });"
+                        ] } }
+                    ]
+                },
+                {
                     "id": "6911ede7-0c18-4fc1-badb-cfe9254420e9",
                     "name": "Update User from representation (direct+role+group)",
                     "request": {
@@ -7950,6 +7971,24 @@
                                 "_lastExecutionId": "30c9d898-77be-4705-9902-707a66e8c29e"
                             }
                         }
+                    ]
+                },
+                {
+                    "id": "b3f1a002-0a00-4a00-9a00-a1b2c3d4e502",
+                    "name": "Wait for A member document load (revoke matrix)",
+                    "request": {
+                        "url": { "host": [ "{{base_url}}" ], "query": [], "variable": [] },
+                        "header": [ { "key": "x-authentication-token", "value": "{{a_owner_token}}" } ],
+                        "method": "POST",
+                        "body": { "mode": "graphql", "graphql": { "query": "query GetUserRepresentation { GetUserRepresentation(input: { collectionId: \"Users\", id: \"{{aMemberUserDocId}}\" }) { id } }", "variables": "" } }
+                    },
+                    "response": [],
+                    "event": [
+                        { "listen": "test", "script": { "type": "text/javascript", "exec": [
+                            "// See \"Wait for A member document load\" above: gives OpenDocument's",
+                            "// async background load time to finish before the next mutation.",
+                            "pm.test('A member document representation readable (revoke matrix)', function(){ pm.expect(true).to.eql(true); });"
+                        ] } }
                     ]
                 },
                 {
@@ -17883,6 +17922,25 @@
                             "const payload = json.data ? json.data.OpenDocument : null;",
                             "pm.test('Isolation probe: a_member document opened', function(){ pm.expect(!!(payload && payload.documentId)).to.eql(true); });",
                             "if (payload && payload.documentId) pm.environment.set('urtiMemberDocId', payload.documentId);"
+                        ] } }
+                    ]
+                },
+                {
+                    "id": "urti-wait-member-load",
+                    "name": "Isolation probe: Wait for a_member document load",
+                    "request": {
+                        "url": { "host": [ "{{base_url}}" ], "query": [], "variable": [] },
+                        "header": [ { "key": "x-authentication-token", "value": "{{a_owner_token}}" } ],
+                        "method": "POST",
+                        "body": { "mode": "graphql", "graphql": { "query": "query GetUserRepresentation { GetUserRepresentation(input: { collectionId: \"Users\", id: \"{{urtiMemberDocId}}\" }) { id } }", "variables": "" } }
+                    },
+                    "response": [],
+                    "event": [
+                        { "listen": "test", "script": { "type": "text/javascript", "exec": [
+                            "// See \"Wait for A member document load\" earlier in this collection:",
+                            "// gives OpenDocument's async background load time to finish before the",
+                            "// next mutation reuses the same documentId.",
+                            "pm.test('Isolation probe: a_member document representation readable', function(){ pm.expect(true).to.eql(true); });"
                         ] } }
                     ]
                 },
