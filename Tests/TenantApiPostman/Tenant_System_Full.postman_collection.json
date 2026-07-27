@@ -17704,6 +17704,39 @@
             "name": "05B User representation tenant isolation (roles in GetUserRepresentation)",
             "item": [
                 {
+                    "id": "urti-refresh-auth-a",
+                    "name": "Refresh auth A owner (user repr isolation setup)",
+                    "request": {
+                        "url": { "host": [ "{{base_url}}" ], "query": [], "variable": [] },
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{a_owner_login}}\", password: \"{{a_owner_password}}\", productId: \"{{product_id}}\" }) { userId token permissions } }",
+                                "variables": ""
+                            }
+                        },
+                        "description": "This folder runs very late in the collection (a_owner_token was last refreshed thousands of requests earlier); re-authenticating here instead of reusing that stale token avoids a 401 (expired JWT) cascading through every request in this folder on slower CI runs, matching the 'Refresh auth A owner (No Organization)' pattern already used elsewhere in this collection."
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json && json.data ? json.data.Authorization : null;",
+                                    "pm.test('Authorization for user repr isolation setup succeeds', function () {",
+                                    "  pm.expect(!!payload && !!payload.token).to.eql(true);",
+                                    "});",
+                                    "if (payload && payload.token) pm.environment.set('a_owner_token', payload.token);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
                     "id": "urti-switch-a",
                     "name": "SelectTenant A owner (user repr isolation setup)",
                     "request": {
