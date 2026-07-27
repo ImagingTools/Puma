@@ -45,19 +45,13 @@ delegates user/role/group/PAT/login handling to that backend via
 `PumaClientEngine`. **CAuthServerLifecycleTest** does not need any backend:
 `Start()`/`Stop()` only bind local sockets.
 
-### Known integration gap surfaced by these tests
+### PAT permission integration
 
-`AuthClientSdk::GetTokenPermissions()` (the generic session-token
-`GetPermissions` GraphQL query) resolves its token via
-`imtauth::IJwtSessionController::GetUserFromJwt()`. On the real Puma server
-that interface is wired to the plain `JwtSessionController` - not the
-PAT-aware `AuthenticationManager` used for header-based request
-authentication - so a raw PAT is not a valid JWT for this query and
-`GetTokenPermissions()` currently returns an empty list for one.
-`CPersonalAccessTokenTest::GetPermissionsWithPatTest` asserts this *actual*
-behavior (with an explanatory comment) rather than the aspirational one; PAT
-permission checks must go through `ValidatePersonalAccessToken()`. Similarly,
-`ValidatePersonalAccessToken()`'s `productId` field is always empty because
+`AuthClientSdk::GetTokenPermissions()` supports both session tokens and
+personal access tokens. For a PAT, the server returns the intersection of the
+user's permissions and the token's scopes and enforces the token's product
+binding. `CPersonalAccessTokenTest::GetPermissionsWithPatTest` covers this
+behavior. `ValidatePersonalAccessToken()`'s `productId` field is always empty because
 the underlying `ValidateToken` GraphQL query does not return a token id to
 look the product scope up with - see `Docs/AuthClientSdk.md`.
 

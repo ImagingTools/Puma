@@ -401,34 +401,32 @@ void CPersonalAccessTokenTest::GetPermissionsWithPatTest()
 		"PatPermUser", "patpermuser", "1", "patperm@example.com");
 	QVERIFY(!userId.isEmpty());
 
+	QByteArray roleName = QByteArrayLiteral("PatPermissionRole_") + userId;
+	QByteArray roleId = m_authorizationController.CreateRole(
+		roleName, "", {"AdminAccess", "ReadOnly", "NotInTokenScope"});
+	QVERIFY(!roleId.isEmpty());
+	QVERIFY(m_authorizationController.AddRolesToUser(userId, {roleId}));
+
 	QByteArray token = m_authorizationController.CreatePersonalAccessToken(
 		userId, "Test", "Permission Test Token", {"AdminAccess", "ReadOnly"});
 	QVERIFY(!token.isEmpty());
 
-	// The PAT itself validates correctly and reports its own permissions
-	// through the dedicated PAT API...
+	// The PAT itself validates correctly and reports its configured scopes.
 	PersonalAccessTokenValidation validation = m_authorizationController.ValidatePersonalAccessToken(token);
 	QVERIFY(validation.isValid);
 	QCOMPARE(validation.permissions.size(), 2);
 
-	// ...but GetTokenPermissions() (the generic Authorization.sdl
-	// GetPermissions query, used for session/JWT tokens) resolves the
-	// token through imtauth::IJwtSessionController::GetUserFromJwt(), which
-	// on the real Puma server is wired to the plain JwtSessionController -
-	// not the PAT-aware AuthenticationManager used for header-based request
-	// authentication. A raw PAT is therefore not a valid JWT for this
-	// query and GetTokenPermissions() currently returns an empty list for
-	// it. This is a known integration gap on the ImtCore/Puma server side,
-	// not a client SDK bug - PAT-based permission checks must go through
-	// ValidatePersonalAccessToken() instead.
+	// GetPermissions returns the intersection of the user's permissions and
+	// the PAT scopes, excluding permissions granted only through the role.
 	QByteArrayList sessionPermissions = m_authorizationController.GetTokenPermissions(token);
-	QVERIFY2(sessionPermissions.isEmpty(),
-		"GetTokenPermissions() unexpectedly resolved a PAT - if the server-side "
-		"GetPermissions resolver started supporting PATs, update this assertion "
-		"to expect {\"AdminAccess\", \"ReadOnly\"} instead");
+	QCOMPARE(sessionPermissions.size(), 2);
+	QVERIFY(sessionPermissions.contains("AdminAccess"));
+	QVERIFY(sessionPermissions.contains("ReadOnly"));
+	QVERIFY(!sessionPermissions.contains("NotInTokenScope"));
 
 	// Cleanup
 	QVERIFY(m_authorizationController.RemoveUser(userId));
+	QVERIFY(m_authorizationController.RemoveRole(roleId));
 	QVERIFY(m_authorizationController.Logout());
 }
 
