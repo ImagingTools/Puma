@@ -21,6 +21,13 @@ if(NOT DEFINED PUMA_DIR)
 	set(PUMA_DIR "${PUMADIR}")
 endif()
 
+if(NOT DEFINED IMTCOREDIR_BUILD)
+	file(TO_CMAKE_PATH "$ENV{IMTCOREDIR_BUILD}" IMTCOREDIR_BUILD)
+	if(IMTCOREDIR_BUILD STREQUAL "")
+		set(IMTCOREDIR_BUILD ${IMTCOREDIR})
+	endif()
+endif()
+
 if(NOT DEFINED PUMA_BUILD_DIR)
 	file(TO_CMAKE_PATH "$ENV{PUMA_BUILD_DIR}" PUMA_BUILD_DIR)
 	if(DEFINED PUMA_DIR AND PUMA_BUILD_DIR STREQUAL "")
@@ -46,6 +53,7 @@ elseif(NOT TARGET ImtCore::imtbase)
 	# Acf, AcfSln, IAcf (optional) packages, so the Acf::/AcfSln::/IAcf::/ImtCore::
 	# imported targets referenced by the Puma dependency graph resolve.
 	set(ImtCore_DIR "${IMTCOREDIR_BUILD}/Lib/${CMAKE_BUILD_TYPE}_${TARGETNAME}/cmake" CACHE PATH "Path to the ImtCore build-tree CMake package")
+	message(STATUS "ImtCore_DIR: ${ImtCore_DIR}")
 	find_package(ImtCore REQUIRED GLOBAL)
 endif()
 
