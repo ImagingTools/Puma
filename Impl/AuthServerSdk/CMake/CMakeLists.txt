@@ -21,11 +21,11 @@ include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 target_sources(${PROJECT_NAME} PRIVATE ${SOURCES})
 
 target_link_libraries(${PROJECT_NAME} ${ACF_LIBRARY_LINK_SCOPE}
-	iauth iser imeas iqtmeas iqtinsp iproc iinsp iipr iprocgui isig iqtsig icalibgui icalib icam iqtcam AcfSlnLoc AcfLoc iedge iedgegui imtrepo iqtgui iview iqtprm iwidgets iloggui iqtdoc ifilegui icomm idoc
-	imtbase imtdesign imtdev imtgui imtdb imtdbgui imtlog imtloggui imtwidgets imtstyle imtguigql imtrest imt3d imtlic imtlicgui imt3dgui imt3dview ImtCoreLoc i2d iqt2d iedge
-	imtlicgui imtauthgui imtclientgql imtgql imtbase imtauth imtauthgui imtauthdb imtauthgql imtcrypt imtlicgui imtlicgql imtapp imtcolorsdl imtserverapp
-	imtqml imtdocguiqml imtauthguiqml imtlicguiqml imtcolguiqml imtguigqlqml imtguiqml imtcontrolsqml imtstylecontrolsqml imtcom imtauthsdl imtappsdl imtservergql imtbasesdl imtbase imtcol imtzip
-	imtchat imtchatdb imtdesk imtdeskdb imtdeskgql imtchatgql imtchatsdl imtdesksdl imtdoc
+	iauth iser imeas iqtmeas iqtinsp iproc iinsp iipr iprocgui isig iqtsig icalibgui icalib icam iqtcam AcfSln::AcfSlnLoc Acf::AcfLoc iedge iedgegui ImtCore::imtrepo iqtgui iview iqtprm iwidgets iloggui iqtdoc ifilegui icomm idoc
+	ImtCore::imtbase ImtCore::imtdesign ImtCore::imtdev ImtCore::imtgui ImtCore::imtdb ImtCore::imtdbgui ImtCore::imtlog ImtCore::imtloggui ImtCore::imtwidgets ImtCore::imtstyle ImtCore::imtguigql ImtCore::imtrest ImtCore::imt3d ImtCore::imtlic ImtCore::imtlicgui ImtCore::imt3dgui ImtCore::imt3dview ImtCore::ImtCoreLoc i2d iqt2d iedge
+	ImtCore::imtlicgui ImtCore::imtauthgui ImtCore::imtclientgql ImtCore::imtgql ImtCore::imtbase ImtCore::imtauth ImtCore::imtauthgui ImtCore::imtauthdb ImtCore::imtauthgql ImtCore::imtcrypt ImtCore::imtlicgui ImtCore::imtlicgql ImtCore::imtapp ImtCore::imtcolorsdl ImtCore::imtserverapp
+	ImtCore::imtqml ImtCore::imtdocguiqml ImtCore::imtauthguiqml ImtCore::imtlicguiqml ImtCore::imtcolguiqml ImtCore::imtguigqlqml ImtCore::imtguiqml ImtCore::imtcontrolsqml ImtCore::imtstylecontrolsqml ImtCore::imtcom ImtCore::imtauthsdl ImtCore::imtappsdl ImtCore::imtservergql ImtCore::imtbasesdl ImtCore::imtbase ImtCore::imtcol ImtCore::imtzip
+	ImtCore::imtchat ImtCore::imtchatdb ImtCore::imtdesk ImtCore::imtdeskdb ImtCore::imtdeskgql ImtCore::imtchatgql ImtCore::imtchatsdl ImtCore::imtdesksdl ImtCore::imtdoc
 	Qt${QT_VERSION_MAJOR}::Core
 	Qt${QT_VERSION_MAJOR}::Gui
 	Qt${QT_VERSION_MAJOR}::Sql

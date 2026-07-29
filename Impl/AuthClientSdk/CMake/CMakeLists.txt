@@ -29,11 +29,11 @@ endforeach()
 include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 
 target_link_libraries(${PROJECT_NAME} ${ACF_LIBRARY_LINK_SCOPE}
-	AcfSlnLoc AcfLoc ImtCoreLoc
+	AcfSln::AcfSlnLoc Acf::AcfLoc ImtCore::ImtCoreLoc
 	imeas iproc iqtgui iauth icomp idoc i2d icomm
-	imtbasesdl imtbase imtauthsdl imtgql imtcom imtservergql imtserverapp imtauthgql imtclientgql imtlic imtcol imtdb imtrest imtauth imtapp imtappsdl
-	imtstyle imtcontrolsqml imtguiqml imtauthguiqml imtguigqlqml imtstylecontrolsqml imtlicguiqml imtdocguiqml imtcolguiqml imtlicgui imtgui imtcolorsdl imt2dsdl
-	imtauthgui imtqml imtauthdb imtchatdb imtdeskdb
+	ImtCore::imtbasesdl ImtCore::imtbase ImtCore::imtauthsdl ImtCore::imtgql ImtCore::imtcom ImtCore::imtservergql ImtCore::imtserverapp ImtCore::imtauthgql ImtCore::imtclientgql ImtCore::imtlic ImtCore::imtcol ImtCore::imtdb ImtCore::imtrest ImtCore::imtauth ImtCore::imtapp ImtCore::imtappsdl
+	ImtCore::imtstyle ImtCore::imtcontrolsqml ImtCore::imtguiqml ImtCore::imtauthguiqml ImtCore::imtguigqlqml ImtCore::imtstylecontrolsqml ImtCore::imtlicguiqml ImtCore::imtdocguiqml ImtCore::imtcolguiqml ImtCore::imtlicgui ImtCore::imtgui ImtCore::imtcolorsdl ImtCore::imt2dsdl
+	ImtCore::imtauthgui ImtCore::imtqml ImtCore::imtauthdb ImtCore::imtchatdb ImtCore::imtdeskdb
 	Qt${QT_VERSION_MAJOR}::Core
 	Qt${QT_VERSION_MAJOR}::Gui
 	Qt${QT_VERSION_MAJOR}::Widgets

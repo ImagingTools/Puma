@@ -24,9 +24,9 @@ include(${IMTCOREDIR}/Config/CMake/Quazip.cmake)
 include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
 
 target_link_libraries(${PROJECT_NAME} ${ACF_APPLICATION_LINK_SCOPE}
-	imtauth imtmail imtlicdb imtlic imtzip imtcrypt imtrepo imtdb imtfile imtqml imtlog
-	imtlicgql imtgql imtauthgql imtauthdb imtcom imtguigql imtgui imtclientgql imtservice imtauthsdl imtservergql imtcol
-	imtserverapp imtbasesdl imtbase imtapp imtrest imtchat imtdoc
+	ImtCore::imtauth ImtCore::imtmail ImtCore::imtlicdb ImtCore::imtlic ImtCore::imtzip ImtCore::imtcrypt ImtCore::imtrepo ImtCore::imtdb ImtCore::imtfile ImtCore::imtqml ImtCore::imtlog
+	ImtCore::imtlicgql ImtCore::imtgql ImtCore::imtauthgql ImtCore::imtauthdb ImtCore::imtcom ImtCore::imtguigql ImtCore::imtgui ImtCore::imtclientgql ImtCore::imtservice ImtCore::imtauthsdl ImtCore::imtservergql ImtCore::imtcol
+	ImtCore::imtserverapp ImtCore::imtbasesdl ImtCore::imtbase ImtCore::imtapp ImtCore::imtrest ImtCore::imtchat ImtCore::imtdoc
 	iauth iservice
 	Qt${QT_VERSION_MAJOR}::WebSockets
 	Qt${QT_VERSION_MAJOR}::Sql
