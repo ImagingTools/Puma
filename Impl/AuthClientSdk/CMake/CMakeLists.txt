@@ -30,7 +30,7 @@ include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 
 target_link_libraries(${PROJECT_NAME} ${ACF_LIBRARY_LINK_SCOPE}
 	AcfSln::AcfSlnLoc Acf::AcfLoc ImtCore::ImtCoreLoc
-	imeas iproc iqtgui iauth icomp idoc i2d icomm
+	AcfSln::imeas AcfSln::iproc Acf::iqtgui AcfSln::iauth Acf::icomp Acf::idoc Acf::i2d AcfSln::icomm
 	ImtCore::imtbasesdl ImtCore::imtbase ImtCore::imtauthsdl ImtCore::imtgql ImtCore::imtcom ImtCore::imtservergql ImtCore::imtserverapp ImtCore::imtauthgql ImtCore::imtclientgql ImtCore::imtlic ImtCore::imtcol ImtCore::imtdb ImtCore::imtrest ImtCore::imtauth ImtCore::imtapp ImtCore::imtappsdl
 	ImtCore::imtstyle ImtCore::imtcontrolsqml ImtCore::imtguiqml ImtCore::imtauthguiqml ImtCore::imtguigqlqml ImtCore::imtstylecontrolsqml ImtCore::imtlicguiqml ImtCore::imtdocguiqml ImtCore::imtcolguiqml ImtCore::imtlicgui ImtCore::imtgui ImtCore::imtcolorsdl ImtCore::imt2dsdl
 	ImtCore::imtauthgui ImtCore::imtqml ImtCore::imtauthdb ImtCore::imtchatdb ImtCore::imtdeskdb

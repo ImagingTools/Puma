@@ -13,8 +13,8 @@ include(${ACFDIR}/Config/CMake/SharedLibraryConfig.cmake)
 include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 
 target_link_libraries(${PROJECT_NAME} ${ACF_PACKAGE_LINK_SCOPE}
-	i2d ImtCore::imtbasesdl ImtCore::imtbase ImtCore::imtapp ImtCore::imtdb ImtCore::imtfile ImtCore::imtservice ImtCore::imtauth ImtCore::imtrest ImtCore::imtcol ImtCore::imtcom ImtCore::imtgql ImtCore::imtserverapp
-	ifile istd idoc
+	Acf::i2d ImtCore::imtbasesdl ImtCore::imtbase ImtCore::imtapp ImtCore::imtdb ImtCore::imtfile ImtCore::imtservice ImtCore::imtauth ImtCore::imtrest ImtCore::imtcol ImtCore::imtcom ImtCore::imtgql ImtCore::imtserverapp
+	Acf::ifile Acf::istd Acf::idoc
 	Qt${QT_VERSION_MAJOR}::Core
 	Qt${QT_VERSION_MAJOR}::Sql
 	Qt${QT_VERSION_MAJOR}::Xml

@@ -11,7 +11,7 @@ target_link_libraries(${PROJECT_NAME} ${ACF_APPLICATION_LINK_SCOPE}
 	Qt${QT_VERSION_MAJOR}::Xml
 	Qt${QT_VERSION_MAJOR}::Core
 	Qt${QT_VERSION_MAJOR}::Widgets
-	itest ipackage ImtCore::imtbasesdl ImtCore::imtbase ImtCore::imtauth ImtCore::imtcrypt ImtCore::imtservergql ImtCore::imtdb ImtCore::imtgql ImtCore::imtgqltest ImtCore::imtauthgql ifile iser ImtCore::imtauthsdl ImtCore::imtcol
+	AcfSln::itest AcfSln::ipackage ImtCore::imtbasesdl ImtCore::imtbase ImtCore::imtauth ImtCore::imtcrypt ImtCore::imtservergql ImtCore::imtdb ImtCore::imtgql imtgqltest ImtCore::imtauthgql Acf::ifile Acf::iser ImtCore::imtauthsdl ImtCore::imtcol
 	ImtCore::imtserverapp
 	AuthClientSdk AuthServerSdk
 )

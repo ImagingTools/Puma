@@ -27,7 +27,7 @@ target_link_libraries(${PROJECT_NAME} ${ACF_APPLICATION_LINK_SCOPE}
 	ImtCore::imtauth ImtCore::imtmail ImtCore::imtlicdb ImtCore::imtlic ImtCore::imtzip ImtCore::imtcrypt ImtCore::imtrepo ImtCore::imtdb ImtCore::imtfile ImtCore::imtqml ImtCore::imtlog
 	ImtCore::imtlicgql ImtCore::imtgql ImtCore::imtauthgql ImtCore::imtauthdb ImtCore::imtcom ImtCore::imtguigql ImtCore::imtgui ImtCore::imtclientgql ImtCore::imtservice ImtCore::imtauthsdl ImtCore::imtservergql ImtCore::imtcol
 	ImtCore::imtserverapp ImtCore::imtbasesdl ImtCore::imtbase ImtCore::imtapp ImtCore::imtrest ImtCore::imtchat ImtCore::imtdoc
-	iauth iservice
+	AcfSln::iauth AcfSln::iservice
 	Qt${QT_VERSION_MAJOR}::WebSockets
 	Qt${QT_VERSION_MAJOR}::Sql
 	Qt${QT_VERSION_MAJOR}::Qml

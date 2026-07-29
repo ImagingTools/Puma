@@ -18,8 +18,8 @@ include(${ACFDIR}/Config/CMake/ApplicationConfig.cmake)
 include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
 
 target_link_libraries(${PROJECT_NAME} ${ACF_APPLICATION_LINK_SCOPE}
-	iauth imeas iqtmeas iqtinsp iproc iinsp iipr iprocgui isig iqtsig icalibgui icalib icam iqtcam AcfSln::AcfSlnLoc Acf::AcfLoc iedge iedgegui ImtCore::imtrepo iqtgui iview iqtprm iwidgets iloggui iqtdoc ifilegui istd icomp iprm imod iser iqt ilog ibase icomm
-	ImtCore::imtbase ImtCore::imtdesign ImtCore::imtdev ImtCore::imtgui ImtCore::imtlog ImtCore::imtloggui ImtCore::imtwidgets ImtCore::imtstyle ImtCore::imtguigql ImtCore::imtrest ImtCore::imt3d ImtCore::imtlic ImtCore::imtlicgui ImtCore::imt3dgui ImtCore::imt3dview ImtCore::ImtCoreLoc i2d iqt2d iedge
+	AcfSln::iauth AcfSln::imeas AcfSln::iqtmeas AcfSln::iqtinsp AcfSln::iproc AcfSln::iinsp AcfSln::iipr AcfSln::iprocgui AcfSln::isig AcfSln::iqtsig AcfSln::icalibgui AcfSln::icalib AcfSln::icam AcfSln::iqtcam AcfSln::AcfSlnLoc Acf::AcfLoc AcfSln::iedge AcfSln::iedgegui ImtCore::imtrepo Acf::iqtgui Acf::iview Acf::iqtprm Acf::iwidgets Acf::iloggui Acf::iqtdoc Acf::ifilegui Acf::istd Acf::icomp Acf::iprm Acf::imod Acf::iser Acf::iqt Acf::ilog Acf::ibase AcfSln::icomm
+	ImtCore::imtbase ImtCore::imtdesign ImtCore::imtdev ImtCore::imtgui ImtCore::imtlog ImtCore::imtloggui ImtCore::imtwidgets ImtCore::imtstyle ImtCore::imtguigql ImtCore::imtrest ImtCore::imt3d ImtCore::imtlic ImtCore::imtlicgui ImtCore::imt3dgui ImtCore::imt3dview ImtCore::ImtCoreLoc Acf::i2d Acf::iqt2d AcfSln::iedge
 	ImtCore::imtlicgui ImtCore::imtauthgui ImtCore::imtclientgql ImtCore::imtgql ImtCore::imtbase ImtCore::imtauth ImtCore::imtauthgui ImtCore::imtauthgql ImtCore::imtcrypt ImtCore::imtlicgui ImtCore::imtlicgql ImtCore::imtapp ImtCore::imtcolorsdl ImtCore::imtdb ImtCore::imtauthdb
 	ImtCore::imtqml ImtCore::imtdocguiqml ImtCore::imtauthguiqml ImtCore::imtlicguiqml ImtCore::imtcolguiqml ImtCore::imtguigqlqml ImtCore::imtguiqml ImtCore::imtcontrolsqml ImtCore::imtstylecontrolsqml ImtCore::imtcom ImtCore::imtauthsdl ImtCore::imtappsdl ImtCore::imtbasesdl ImtCore::imtcol ImtCore::imtzip
 	Qt${QT_VERSION_MAJOR}::QuickWidgets
