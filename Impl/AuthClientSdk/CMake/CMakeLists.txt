@@ -28,21 +28,14 @@ endforeach()
 
 include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 
-find_package(QT NAMES Qt6 Qt5 COMPONENTS Core)
-find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Widgets Core Gui Network WebSockets QuickWidgets Qml REQUIRED)
-
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(${PROJECT_NAME} ${ACF_LIBRARY_LINK_SCOPE}
 	AcfSlnLoc AcfLoc ImtCoreLoc
 	imeas iproc iqtgui iauth icomp idoc i2d icomm
 	imtbasesdl imtbase imtauthsdl imtgql imtcom imtservergql imtserverapp imtauthgql imtclientgql imtlic imtcol imtdb imtrest imtauth imtapp imtappsdl
 	imtstyle imtcontrolsqml imtguiqml imtauthguiqml imtguigqlqml imtstylecontrolsqml imtlicguiqml imtdocguiqml imtcolguiqml imtlicgui imtgui imtcolorsdl imt2dsdl
 	imtauthgui imtqml imtauthdb imtchatdb imtdeskdb
-)
-
-target_link_libraries(${PROJECT_NAME}
 	Qt${QT_VERSION_MAJOR}::Core
 	Qt${QT_VERSION_MAJOR}::Gui
-	Qt${QT_VERSION_MAJOR}::Core
 	Qt${QT_VERSION_MAJOR}::Widgets
 	Qt${QT_VERSION_MAJOR}::Network
 	Qt${QT_VERSION_MAJOR}::WebSockets
@@ -50,5 +43,5 @@ target_link_libraries(${PROJECT_NAME}
 	Qt${QT_VERSION_MAJOR}::QuickWidgets
 )
 
-add_definitions(-DUNICODE)
-add_definitions(-D_UNICODE)
+add_compile_definitions(UNICODE _UNICODE)
+

@@ -1,35 +1,42 @@
 cmake_minimum_required(VERSION 3.26)
 
-project(PumaAll)
+project(Puma)
+
+
+option(BUILD_TESTING "Build test targets (pumatest)" ON)
+option(WEB_COMPILE "Build with web compatibility" ON)
+
 
 if(NOT DEFINED QT_VERSION_MAJOR)
 	find_package(QT NAMES Qt6 Qt5 COMPONENTS Core)
-	find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Core Widgets QuickWidgets Core Gui Xml Network Svg Sql WebSockets Qml Concurrent REQUIRED)
+	find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Core Concurrent Gui Network Qml QuickWidgets Sql Svg WebSockets Widgets Xml REQUIRED)
 	if(QT_VERSION_MAJOR EQUAL 6)
 		find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Core5Compat REQUIRED)
 	endif()
 endif()
 
-if(NOT DEFINED IMTCOREDIR)
-	set(IMTCOREDIR "$ENV{IMTCOREDIR}")
-endif()
+get_filename_component(PUMA_DIR "../.." ABSOLUTE BASE_DIR ${CMAKE_CURRENT_LIST_DIR})
 
-if(NOT DEFINED BUILDDIR)
-	set(BUILDDIR "${CMAKE_CURRENT_LIST_DIR}/../../..")
-endif()
+# Enable modern target-based architecture:
+# find_package(ImtCore) provides ImtCore:: imported targets (and, transitively through it,
+# Acf::/AcfSln::/IAcf::) with transitive include dirs and link deps. Legacy global
+# include_directories()/link_directories() in the Env chain are skipped.
+set(ACF_MODERN_CMAKE ON)
 
-include(${IMTCOREDIR}/Config/CMake/ImtCoreEnv.cmake)
+# Collect Puma libraries in their own export set. Read by
+# StaticConfig.cmake / acf_register_library() (from Acf).
+set(ACF_PACKAGE_NAME "Puma")
 
-message("Puma IMTCOREDIR: ${IMTCOREDIR} IMTCOREDIR_BUILD ${IMTCOREDIR_BUILD}")
+include(${PUMA_DIR}/Config/CMake/PumaEnv.cmake)
 
-set(INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Include")
-set(IMPL_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Impl")
+acf_define_link_scope_var(ACF_QT_MODULE_LINK_SCOPE "PRIVATE" "Link scope used for Qt module dependencies")
+acf_define_link_scope_var(ACF_LIBRARY_LINK_SCOPE "PUBLIC" "Link scope used by Puma inter-library dependencies")
+acf_define_link_scope_var(ACF_PACKAGE_LINK_SCOPE "PRIVATE" "Link scope used by package (Pck) libraries linking their dependencies")
+acf_define_link_scope_var(ACF_APPLICATION_LINK_SCOPE "PRIVATE" "Link scope used by executables linking their dependencies")
 
-set(AUX_INCLUDE_DIR "${BUILDDIR}/Puma/AuxInclude/${TARGETNAME}/GeneratedFiles")
-
-include_directories("${AUX_INCLUDE_DIR}/../")
-include_directories("${AUX_INCLUDE_DIR}/")
-include_directories("${IMTCOREDIR}/Include")
+set(INCLUDE_DIR		"${PUMA_DIR}/Include")
+set(IMPL_DIR		"${PUMA_DIR}/Impl")
+set(AUX_INCLUDE_DIR "${PUMA_BUILD_DIR}/AuxInclude/${TARGETNAME}/GeneratedFiles")
 
 # Include
 add_subdirectory("${INCLUDE_DIR}/pumaqml/CMake" "${AUX_INCLUDE_DIR}/pumaqml")
@@ -61,4 +68,6 @@ if(WIN32)
 	endif()
 endif()
 
-
+# Declare target-based deps so include paths/link order propagate transitively across Puma
+# libraries and onto the underlying ImtCore::/Acf::/AcfSln::/IAcf:: libraries.
+include("${PUMA_DIR}/Config/CMake/PumaLibraryDependencies.cmake")

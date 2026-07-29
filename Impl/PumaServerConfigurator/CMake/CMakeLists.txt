@@ -18,8 +18,11 @@ endif()
 
 include(${ACFDIR}/Config/CMake/CustomBuild.cmake)
 include(${ACFDIR}/Config/CMake/ApplicationConfig.cmake)
+include(${IMTCOREDIR}/Config/CMake/OpenSSL.cmake)
+include(${IMTCOREDIR}/Config/CMake/Quazip.cmake)
+include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
 
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(${PROJECT_NAME} ${ACF_APPLICATION_LINK_SCOPE}
 	pumaqml
 	ImtCoreLoc
 	AcfLoc
@@ -60,12 +63,8 @@ target_link_libraries(${PROJECT_NAME}
 	Qt${QT_VERSION_MAJOR}::Sql
 )
 
-include(${ACFDIR}/Config/CMake/AcfQt.cmake)
-include(${ACFDIR}/Config/CMake/AcfStd.cmake)
-include(${ACFDIR}/Config/CMake/AcfStdGui.cmake)
-include(${IMTCOREDIR}/Config/CMake/OpenSSL.cmake)
-include(${IMTCOREDIR}/Config/CMake/Quazip.cmake)
-include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
+acf_use_qt_base_modules()
+acf_use_qt_graphics_modules()
 
 if(WIN32)
 	list(APPEND listOptions "--qmldir=${IMTCOREDIR}/Qml")

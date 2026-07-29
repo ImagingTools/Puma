@@ -15,18 +15,21 @@ endif()
 
 include(${ACFDIR}/Config/CMake/CustomBuild.cmake)
 include(${ACFDIR}/Config/CMake/ApplicationConfig.cmake)
-include(${ACFDIR}/Config/CMake/AcfQt.cmake)
-include(${ACFDIR}/Config/CMake/AcfStdGui.cmake)
 include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
 
-target_link_libraries(${PROJECT_NAME} iauth imeas iqtmeas iqtinsp iproc iinsp iipr iprocgui isig iqtsig icalibgui icalib icam iqtcam AcfSlnLoc AcfLoc iedge iedgegui imtrepo iqtgui iview iqtprm iwidgets iloggui iqtdoc ifilegui istd icomp iprm imod iser iqt ilog ibase icomm)
-target_link_libraries(${PROJECT_NAME} imtbase imtdesign imtdev imtgui imtlog imtloggui imtwidgets imtstyle imtguigql imtrest imt3d imtlic imtlicgui imt3dgui imt3dview ImtCoreLoc i2d iqt2d iedge)
-target_link_libraries(${PROJECT_NAME} imtlicgui imtauthgui imtclientgql imtgql imtbase imtauth imtauthgui imtauthgql imtcrypt imtlicgui imtlicgql imtapp imtcolorsdl imtdb imtauthdb)
-target_link_libraries(${PROJECT_NAME} imtqml imtdocguiqml imtauthguiqml imtlicguiqml imtcolguiqml imtguigqlqml imtguiqml imtcontrolsqml imtstylecontrolsqml imtcom imtauthsdl imtappsdl imtbasesdl imtcol imtzip)
-target_link_libraries(${PROJECT_NAME}  Qt${QT_VERSION_MAJOR}::QuickWidgets  Qt${QT_VERSION_MAJOR}::WebSockets)
+target_link_libraries(${PROJECT_NAME} ${ACF_APPLICATION_LINK_SCOPE}
+	iauth imeas iqtmeas iqtinsp iproc iinsp iipr iprocgui isig iqtsig icalibgui icalib icam iqtcam AcfSlnLoc AcfLoc iedge iedgegui imtrepo iqtgui iview iqtprm iwidgets iloggui iqtdoc ifilegui istd icomp iprm imod iser iqt ilog ibase icomm
+	imtbase imtdesign imtdev imtgui imtlog imtloggui imtwidgets imtstyle imtguigql imtrest imt3d imtlic imtlicgui imt3dgui imt3dview ImtCoreLoc i2d iqt2d iedge
+	imtlicgui imtauthgui imtclientgql imtgql imtbase imtauth imtauthgui imtauthgql imtcrypt imtlicgui imtlicgql imtapp imtcolorsdl imtdb imtauthdb
+	imtqml imtdocguiqml imtauthguiqml imtlicguiqml imtcolguiqml imtguigqlqml imtguiqml imtcontrolsqml imtstylecontrolsqml imtcom imtauthsdl imtappsdl imtbasesdl imtcol imtzip
+	Qt${QT_VERSION_MAJOR}::QuickWidgets
+	Qt${QT_VERSION_MAJOR}::WebSockets
+	Qt${QT_VERSION_MAJOR}::Sql
+	AuthClientSdk AuthServerSdk
+)
 
-target_link_libraries(${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::Sql)
-target_link_libraries(${PROJECT_NAME} AuthClientSdk AuthServerSdk)
+acf_use_qt_base_modules()
+acf_use_qt_graphics_modules()
 
 if(WIN32)
 	list(APPEND listOptions "--qmldir=${IMTCOREDIR}/Qml")
@@ -36,14 +39,14 @@ if(WIN32)
 	unset(listOptions)
 endif()
 
-ADD_DEFINITIONS(-DUNICODE)
-ADD_DEFINITIONS(-D_UNICODE)
+add_compile_definitions(UNICODE _UNICODE)
 
-if(DEFINED WEB_COMPILE AND  WEB_COMPILE)
+if(DEFINED WEB_COMPILE AND WEB_COMPILE)
 	add_compile_definitions(WEB_COMPILE)
 endif()
 
 include(${IACFDIR}/Config/CMake/zlib.cmake)
 if(UNIX)
-	target_link_libraries(${PROJECT_NAME} -lz)
+	target_link_libraries(${PROJECT_NAME} ${ACF_APPLICATION_LINK_SCOPE} -lz)
 endif()
+

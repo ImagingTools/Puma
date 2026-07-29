@@ -12,11 +12,11 @@ set(TARGET_EXT ".plugin")
 include(${ACFDIR}/Config/CMake/SharedLibraryConfig.cmake)
 include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 
-target_link_libraries(${PROJECT_NAME} i2d imtbasesdl imtbase imtapp imtdb imtfile imtservice imtauth imtrest imtcol imtcom imtgql imtserverapp)
-target_link_libraries(${PROJECT_NAME} ifile istd idoc)
-
-target_link_libraries(${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::Core)
-target_link_libraries(${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::Sql)
-target_link_libraries(${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::Xml)
-
+target_link_libraries(${PROJECT_NAME} ${ACF_PACKAGE_LINK_SCOPE}
+	i2d imtbasesdl imtbase imtapp imtdb imtfile imtservice imtauth imtrest imtcol imtcom imtgql imtserverapp
+	ifile istd idoc
+	Qt${QT_VERSION_MAJOR}::Core
+	Qt${QT_VERSION_MAJOR}::Sql
+	Qt${QT_VERSION_MAJOR}::Xml
+)
 
