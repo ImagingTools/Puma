@@ -2888,13 +2888,40 @@
                     },
                     "response": [],
                     "event": [
+                        { "listen": "prerequest", "script": { "type": "text/javascript", "exec": [
+                            "// Space out re-polls. The Postman sandbox has no sleep primitive and",
+                            "// newman's --delay-request would slow the whole 393-request suite, so a",
+                            "// short bounded busy-wait is used, and only on actual retries.",
+                            "if (parseInt(pm.environment.get('docWaitAttempt_aMember') || '0', 10) > 0) {",
+                            "    const until = Date.now() + 150;",
+                            "    while (Date.now() < until) { /* spin */ }",
+                            "}"
+                        ] } },
                         { "listen": "test", "script": { "type": "text/javascript", "exec": [
-                            "// OpenDocument completes its background load asynchronously (see",
-                            "// CDocumentServiceBase::DoOpenDocument); this read-only round-trip gives",
-                            "// that load time to finish before the next mutation touches the same",
-                            "// documentId, avoiding a race where UpdateUserFromRepresentation would",
-                            "// see the document as still-loading and report InvalidDocumentId.",
-                            "pm.test('A member document representation readable', function(){ pm.expect(true).to.eql(true); });"
+                            "// OpenDocument returns isLoading=true and finishes its load on a background",
+                            "// thread (CDocumentServiceBase::DoOpenDocument), so a mutation fired right",
+                            "// after it races that load and gets InvalidDocumentId. A single round-trip",
+                            "// is NOT enough to cover it: the load completes in ~10ms on SQLite but",
+                            "// ~400ms on Postgres (measured), which is exactly why this suite passed on",
+                            "// SQLite while failing on Postgres. Poll until the representation is really",
+                            "// readable instead of just burning one request and asserting true.",
+                            "const json = pm.response.json();",
+                            "const repr = json.data && json.data.GetUserRepresentation;",
+                            "const loaded = !!(repr && repr.id);",
+                            "const maxAttempts = 25;",
+                            "const attempt = parseInt(pm.environment.get('docWaitAttempt_aMember') || '0', 10);",
+                            "if (loaded) {",
+                            "    pm.environment.set('docWaitAttempt_aMember', '0');",
+                            "    pm.test('A member document loaded', function(){ pm.expect(loaded).to.eql(true); });",
+                            "} else if (attempt < maxAttempts) {",
+                            "    pm.environment.set('docWaitAttempt_aMember', String(attempt + 1));",
+                            "    postman.setNextRequest('Wait for A member document load');",
+                            "} else {",
+                            "    pm.environment.set('docWaitAttempt_aMember', '0');",
+                            "    pm.test('A member document loaded', function(){",
+                            "        pm.expect.fail('document still not readable after ' + maxAttempts + ' polls');",
+                            "    });",
+                            "}"
                         ] } }
                     ]
                 },
@@ -2969,7 +2996,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation SaveDocument { SaveDocument(input: { collectionId: \"Users\", documentId: \"{{aMemberUserDocId}}\", documentName: \"Member A\" }) { status message documentName } }",
+                                "query": "mutation SaveDocument { SaveDocument(input: { collectionId: \"Users\", documentId: \"{{aMemberUserDocId}}\", documentName: \"\" }) { status message documentName } }",
                                 "variables": ""
                             }
                         }
@@ -2983,12 +3010,14 @@
                                 "type": "text/javascript",
                                 "exec": [
                                     "const json = pm.response.json();",
-                                    "const warnings = (json.errors || []).filter(e => e && e.extensions && e.extensions.type === \"Warning\");",
-                                    "const hasAlreadyExists = warnings.some(e => /already exists/i.test(e.message || \"\"));",
                                     "const payload = json.data && json.data.SaveDocument ? json.data.SaveDocument : null;",
                                     "const status = payload && payload.status ? payload.status : '';",
+                                    "// Saving this user must always be a plain update. An 'already exists'",
+                                    "// warning here means SaveDocument took its save-as branch and inserted a",
+                                    "// duplicate user instead (see the empty documentName in the request), so",
+                                    "// it is a hard failure - the previous version of this test tolerated it,",
+                                    "// which is what let the duplicate-user bug go unnoticed.",
                                     "pm.test('Save user document strict success', function(){",
-                                    "  if (hasAlreadyExists) { pm.expect(status === \"Success\").to.eql(false); return; }",
                                     "  pm.expect(status === \"Success\").to.eql(true);",
                                     "});"
                                 ],
@@ -7984,10 +8013,32 @@
                     },
                     "response": [],
                     "event": [
+                        { "listen": "prerequest", "script": { "type": "text/javascript", "exec": [
+                            "if (parseInt(pm.environment.get('docWaitAttempt_revokeMatrix') || '0', 10) > 0) {",
+                            "    const until = Date.now() + 150;",
+                            "    while (Date.now() < until) { /* spin */ }",
+                            "}"
+                        ] } },
                         { "listen": "test", "script": { "type": "text/javascript", "exec": [
-                            "// See \"Wait for A member document load\" above: gives OpenDocument's",
-                            "// async background load time to finish before the next mutation.",
-                            "pm.test('A member document representation readable (revoke matrix)', function(){ pm.expect(true).to.eql(true); });"
+                            "// See \"Wait for A member document load\" above for why this polls instead",
+                            "// of doing a single round-trip.",
+                            "const json = pm.response.json();",
+                            "const repr = json.data && json.data.GetUserRepresentation;",
+                            "const loaded = !!(repr && repr.id);",
+                            "const maxAttempts = 25;",
+                            "const attempt = parseInt(pm.environment.get('docWaitAttempt_revokeMatrix') || '0', 10);",
+                            "if (loaded) {",
+                            "    pm.environment.set('docWaitAttempt_revokeMatrix', '0');",
+                            "    pm.test('A member document loaded (revoke matrix)', function(){ pm.expect(loaded).to.eql(true); });",
+                            "} else if (attempt < maxAttempts) {",
+                            "    pm.environment.set('docWaitAttempt_revokeMatrix', String(attempt + 1));",
+                            "    postman.setNextRequest('Wait for A member document load (revoke matrix)');",
+                            "} else {",
+                            "    pm.environment.set('docWaitAttempt_revokeMatrix', '0');",
+                            "    pm.test('A member document loaded (revoke matrix)', function(){",
+                            "        pm.expect.fail('document still not readable after ' + maxAttempts + ' polls');",
+                            "    });",
+                            "}"
                         ] } }
                     ]
                 },
@@ -8057,7 +8108,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation SaveDocument { SaveDocument(input: { collectionId: \"Users\", documentId: \"{{aMemberUserDocId}}\", documentName: \"Member A\" }) { status message documentName } }",
+                                "query": "mutation SaveDocument { SaveDocument(input: { collectionId: \"Users\", documentId: \"{{aMemberUserDocId}}\", documentName: \"\" }) { status message documentName } }",
                                 "variables": ""
                             }
                         }
@@ -8287,7 +8338,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation SaveDocument { SaveDocument(input: { collectionId: \"Users\", documentId: \"{{aMemberUserDocId}}\", documentName: \"Member A\" }) { status message documentName } }",
+                                "query": "mutation SaveDocument { SaveDocument(input: { collectionId: \"Users\", documentId: \"{{aMemberUserDocId}}\", documentName: \"\" }) { status message documentName } }",
                                 "variables": ""
                             }
                         }
@@ -17969,11 +18020,32 @@
                     },
                     "response": [],
                     "event": [
+                        { "listen": "prerequest", "script": { "type": "text/javascript", "exec": [
+                            "if (parseInt(pm.environment.get('docWaitAttempt_urtiMember') || '0', 10) > 0) {",
+                            "    const until = Date.now() + 150;",
+                            "    while (Date.now() < until) { /* spin */ }",
+                            "}"
+                        ] } },
                         { "listen": "test", "script": { "type": "text/javascript", "exec": [
-                            "// See \"Wait for A member document load\" earlier in this collection:",
-                            "// gives OpenDocument's async background load time to finish before the",
-                            "// next mutation reuses the same documentId.",
-                            "pm.test('Isolation probe: a_member document representation readable', function(){ pm.expect(true).to.eql(true); });"
+                            "// See \"Wait for A member document load\" earlier in this collection for why",
+                            "// this polls instead of doing a single round-trip.",
+                            "const json = pm.response.json();",
+                            "const repr = json.data && json.data.GetUserRepresentation;",
+                            "const loaded = !!(repr && repr.id);",
+                            "const maxAttempts = 25;",
+                            "const attempt = parseInt(pm.environment.get('docWaitAttempt_urtiMember') || '0', 10);",
+                            "if (loaded) {",
+                            "    pm.environment.set('docWaitAttempt_urtiMember', '0');",
+                            "    pm.test('Isolation probe: a_member document loaded', function(){ pm.expect(loaded).to.eql(true); });",
+                            "} else if (attempt < maxAttempts) {",
+                            "    pm.environment.set('docWaitAttempt_urtiMember', String(attempt + 1));",
+                            "    postman.setNextRequest('Isolation probe: Wait for a_member document load');",
+                            "} else {",
+                            "    pm.environment.set('docWaitAttempt_urtiMember', '0');",
+                            "    pm.test('Isolation probe: a_member document loaded', function(){",
+                            "        pm.expect.fail('document still not readable after ' + maxAttempts + ' polls');",
+                            "    });",
+                            "}"
                         ] } }
                     ]
                 },
@@ -18002,7 +18074,7 @@
                         "url": { "host": [ "{{base_url}}" ], "query": [], "variable": [] },
                         "header": [ { "key": "x-authentication-token", "value": "{{a_owner_token}}" } ],
                         "method": "POST",
-                        "body": { "mode": "graphql", "graphql": { "query": "mutation SaveDocument { SaveDocument(input: { collectionId: \"Users\", documentId: \"{{urtiMemberDocId}}\", documentName: \"Member A\" }) { status message } }", "variables": "" } }
+                        "body": { "mode": "graphql", "graphql": { "query": "mutation SaveDocument { SaveDocument(input: { collectionId: \"Users\", documentId: \"{{urtiMemberDocId}}\", documentName: \"\" }) { status message } }", "variables": "" } }
                     },
                     "response": [],
                     "event": [
