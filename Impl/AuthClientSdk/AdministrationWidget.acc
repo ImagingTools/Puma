@@ -56,7 +56,7 @@
                         <Data IsEnabled="true" Value="ApplicationInfoController"/>
                     </AttributeInfo>
                     <AttributeInfo Id="QmlFilePath" Type="String" ExportId="">
-                        <Data IsEnabled="true" Value="qrc:/qml/imtauthgui/AdministrationUi.qml"/>
+                        <Data IsEnabled="true" Value="qrc:/qml/imtauthgui/Views/AdministrationUi.qml"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ServerConnectionParam" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ServerConnectionInterfaceParam"/>
