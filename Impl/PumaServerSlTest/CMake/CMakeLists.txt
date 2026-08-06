@@ -24,15 +24,6 @@ include(${IMTCOREDIR}/Config/CMake/OpenSSL.cmake)
 include(${IMTCOREDIR}/Config/CMake/Quazip.cmake)
 include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
 
-target_link_libraries(${PROJECT_NAME} imtauth imtmail imtlicdb imtlic imtzip imtcrypt imtrepo imtdb imtfile imtqml imtlog)
-target_link_libraries(${PROJECT_NAME} imtlicgql imtgql imtauthgql imtauthdb imtcom imtguigql imtgui imtclientgql imtservice imtauthsdl imtservergql imtcol)
-target_link_libraries(${PROJECT_NAME} imtserverapp imtbasesdl imtbase imtapp imtrest imtchat imtdoc)
-target_link_libraries(${PROJECT_NAME} iauth iservice)
-target_link_libraries(${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::WebSockets)
-target_link_libraries(${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::Sql)
-target_link_libraries(${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::Qml)
-target_link_libraries(${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::Widgets)
-
 include(${ACFDIR}/Config/CMake/AcfStdGui.cmake)
 include(${ACFDIR}/Config/CMake/AcfStd.cmake)
 

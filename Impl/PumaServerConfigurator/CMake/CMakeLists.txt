@@ -19,47 +19,6 @@ endif()
 include(${ACFDIR}/Config/CMake/CustomBuild.cmake)
 include(${ACFDIR}/Config/CMake/ApplicationConfig.cmake)
 
-target_link_libraries(${PROJECT_NAME}
-	pumaqml
-	ImtCoreLoc
-	AcfLoc
-	AcfSlnLoc
-	imtrest
-	imtgui
-	imtqml
-	imtcom
-	imtdb
-	imtfile
-	imtguigql
-	imtservice
-	imtguiqml
-	imtauthsdl
-	imtappsdl
-	imtcolorsdl
-	imt2dsdl
-	imtstylecontrolsqml
-	imtcontrolsqml
-	imtguigqlqml
-	imtauthguiqml
-	imtcolguiqml
-	imtdocguiqml
-	imtchatdb
-	imtdeskdb
-	imtlicguiqml
-	imtauthgui
-	imtauthdb
-	imtstyle
-	imtlicgui
-	imtbasesdl
-	imtbase
-	imtserverapp
-	imtapp
-	imtgql
-	Qt${QT_VERSION_MAJOR}::QuickWidgets
-	Qt${QT_VERSION_MAJOR}::WebSockets
-	Qt${QT_VERSION_MAJOR}::Sql
-)
-
 include(${ACFDIR}/Config/CMake/AcfQt.cmake)
 include(${ACFDIR}/Config/CMake/AcfStd.cmake)
 include(${ACFDIR}/Config/CMake/AcfStdGui.cmake)
