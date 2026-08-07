@@ -37,7 +37,6 @@ endif()
 target_link_libraries(PumaClient ${ACF_APPLICATION_LINK_SCOPE}
 	AuthClientSdk 
 	AuthServerSdk
-	ImtCore::imt3dview 
 	ImtCore::imtrepo
 )
 
