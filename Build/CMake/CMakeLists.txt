@@ -84,6 +84,27 @@ if(_puma_force_plain_tll)
 	set(ACF_LIBRARY_LINK_SCOPE "" CACHE STRING "Link scope used by Puma inter-library dependencies" FORCE)
 	set(ACF_PACKAGE_LINK_SCOPE "" CACHE STRING "Link scope used by package (Pck) libraries linking their dependencies" FORCE)
 	set(ACF_APPLICATION_LINK_SCOPE "" CACHE STRING "Link scope used by executables linking their dependencies" FORCE)
+
+	# Legacy Acf*.cmake modules link against short names like "iqtdoc".
+	# In modern package mode, these libraries are exposed as namespaced imported
+	# targets (Acf::iqtdoc, ImtCore::imtbase, ...). Create short-name aliases so
+	# plain target_link_libraries() resolves to targets instead of *.lib filenames.
+	function(puma_create_legacy_short_target_aliases)
+		get_property(_all_targets GLOBAL PROPERTY TARGETS)
+		foreach(_t IN LISTS _all_targets)
+			if(_t MATCHES "^(Acf|AcfSln|IAcf|ImtCore)::(.+)$")
+				set(_alias "${CMAKE_MATCH_2}")
+				if(NOT TARGET ${_alias})
+					get_target_property(_type ${_t} TYPE)
+					if(_type STREQUAL "STATIC_LIBRARY" OR _type STREQUAL "SHARED_LIBRARY" OR _type STREQUAL "INTERFACE_LIBRARY")
+						add_library(${_alias} ALIAS ${_t})
+					endif()
+				endif()
+			endif()
+		endforeach()
+	endfunction()
+
+	puma_create_legacy_short_target_aliases()
 else()
 	# TeamCity can reuse an old CMakeCache.txt where these cache entries were left
 	# as empty strings (legacy plain target_link_libraries signature). Normalize
