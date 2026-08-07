@@ -149,3 +149,9 @@ puma_declare_library_dependencies(pumatest	LINK_SCOPE PUBLIC
 	ImtCore::imtserverapp ImtCore::imtgqltest ImtCore::imtauthgql
 	Acf::itest Acf::ipackage Acf::ifile Acf::iser
 	Qt${QT_VERSION_MAJOR}::Test Qt${QT_VERSION_MAJOR}::Sql Qt${QT_VERSION_MAJOR}::Xml Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Widgets)
+
+# PumaClient links the system zlib through the raw -lz flag (not a target) on Unix, so it must
+# bypass the target-only helper above.
+if(UNIX AND TARGET PumaClient)
+	target_link_libraries(PumaClient ${ACF_APPLICATION_LINK_SCOPE} -lz)
+endif()
