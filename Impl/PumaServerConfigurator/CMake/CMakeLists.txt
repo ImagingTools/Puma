@@ -26,7 +26,7 @@ include(${IMTCOREDIR}/Config/CMake/OpenSSL.cmake)
 include(${IMTCOREDIR}/Config/CMake/Quazip.cmake)
 include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
 
-target_link_libraries(PumaServerConfigurator PRIVATE
+target_link_libraries(PumaServerConfigurator
 	pumaqml
 	ImtCore::imtlicguiqml
 	ImtCore::imtauthguiqml

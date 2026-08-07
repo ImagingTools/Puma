@@ -15,7 +15,7 @@ endif()
 
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Test)
 
-target_link_libraries(pumatest PUBLIC
+target_link_libraries(pumatest
 	AuthClientSdk
 	AuthServerSdk
 	ImtCore::imtgqltest

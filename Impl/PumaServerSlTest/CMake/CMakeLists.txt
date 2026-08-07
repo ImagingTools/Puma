@@ -40,7 +40,7 @@ if(WIN32)
 	endif()
 endif()
 
-target_link_libraries(PumaServerSlTest PRIVATE
+target_link_libraries(PumaServerSlTest
 	ImtCore::imtserverapp
 	ImtCore::imtauthgql
 	ImtCore::imtauthdb
