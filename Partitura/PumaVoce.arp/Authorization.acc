@@ -30,6 +30,9 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
+                    <AttributeInfo Id="DelegatedAccess" Type="Reference" ExportId="DelegatedAccess">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="JwtSessionController" Type="Reference" ExportId="JwtSessionController">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
