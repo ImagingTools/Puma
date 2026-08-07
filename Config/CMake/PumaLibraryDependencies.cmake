@@ -65,68 +65,120 @@ if(QT_VERSION_MAJOR EQUAL 6)
 	puma_declare_library_dependencies(pumaqml	LINK_SCOPE PUBLIC	Qt${QT_VERSION_MAJOR}::Core5Compat)
 endif()
 
-# --- Arxc-generated SDK shared libraries (Windows-only) ---------------------
-# AuthClientSdk: client-side authentication/administration SDK. Linking
-# ImtCore::imtserverapp already provides the imtdb/imtqml/imtauth/imtrest/... core
-# transitively, so only the additional roots are listed.
-puma_declare_library_dependencies(AuthClientSdk	LINK_SCOPE PUBLIC
-	Acf::AcfLoc AcfSln::AcfSlnLoc ImtCore::ImtCoreLoc
-	ImtCore::imtserverapp ImtCore::imtauthgql ImtCore::imtauthdb ImtCore::imtchatdb ImtCore::imtdeskdb ImtCore::imt2dsdl
-	ImtCore::imtcontrolsqml ImtCore::imtguiqml ImtCore::imtauthguiqml ImtCore::imtguigqlqml ImtCore::imtstylecontrolsqml
-	ImtCore::imtlicguiqml ImtCore::imtdocguiqml ImtCore::imtcolguiqml)
+puma_declare_library_dependencies(AuthClientSdk LINK_SCOPE PUBLIC
+	ImtCore::imtauthguiqml
+	ImtCore::imtlicguiqml
+	ImtCore::imtdocguiqml
+	ImtCore::imtcolguiqml
+	ImtCore::imtguigqlqml
+	ImtCore::imtguiqml
+	ImtCore::imtcontrolsqml
+	ImtCore::imtstylecontrolsqml
+	ImtCore::imtauthgql
+	ImtCore::imtauthdb
+	ImtCore::imtchatdb
+	ImtCore::imtdeskdb
+	ImtCore::imt2dsdl
+	ImtCore::ImtCoreLoc
+	AcfSln::AcfSlnLoc
+	Acf::AcfLoc
 
-# AuthServerSdk: server-side authentication/administration SDK. This is a
-# server/console-oriented component and deliberately does NOT depend on the 3D
-# stack (imt3d/imt3dgui/imt3dview). Linking ImtCore::imtserverapp provides the
-# db/qml/auth/rest core transitively.
+)
+
 puma_declare_library_dependencies(AuthServerSdk	LINK_SCOPE PUBLIC
-	Acf::iqtprm Acf::iqtdoc Acf::iloggui Acf::AcfLoc
-	AcfSln::iqtmeas AcfSln::iqtsig AcfSln::icalibgui AcfSln::iqtcam AcfSln::iedgegui AcfSln::iprocgui AcfSln::AcfSlnLoc
-	ImtCore::imtserverapp ImtCore::imtdev ImtCore::imtdbgui ImtCore::imtloggui ImtCore::imtauthdb ImtCore::imtauthgql
-	ImtCore::imtlicgql ImtCore::imtzip ImtCore::imtchatdb ImtCore::imtdeskdb ImtCore::imtdeskgql ImtCore::imtchatgql
-	ImtCore::imtcontrolsqml ImtCore::imtstylecontrolsqml ImtCore::imtguiqml ImtCore::imtguigqlqml ImtCore::imtauthguiqml
-	ImtCore::imtlicguiqml ImtCore::imtcolguiqml ImtCore::imtdocguiqml ImtCore::ImtCoreLoc
-	Qt${QT_VERSION_MAJOR}::Xml)
+	ImtCore::imtdeskgql
+	ImtCore::imtauthgql
+	ImtCore::imtchatgql
+	ImtCore::imtauthdb
+	ImtCore::imtchatdb
+	ImtCore::imtdeskdb
+	Qt${QT_VERSION_MAJOR}::Widgets
+)
 
 
 # --- Plug-ins ---------------------------------------------------------------
-puma_declare_library_dependencies(PumaSettingsPlugin	LINK_SCOPE PRIVATE
-	ImtCore::imtserverapp Qt${QT_VERSION_MAJOR}::Xml)
-
+puma_declare_library_dependencies(PumaSettingsPlugin LINK_SCOPE PRIVATE
+	ImtCore::imtserverapp
+	Qt${QT_VERSION_MAJOR}::Xml
+)
 
 # --- Server applications ----------------------------------------------------
-# PumaServerPg / PumaServerSl and their *Test twins share the same closure.
-foreach(_puma_server PumaServerPg PumaServerSl PumaServerPgTest PumaServerSlTest)
-	puma_declare_library_dependencies(${_puma_server}	LINK_SCOPE PRIVATE
-		ImtCore::imtserverapp ImtCore::imtlicdb ImtCore::imtauthdb ImtCore::imtauthgql ImtCore::imtlicgql
-		ImtCore::imtgui ImtCore::imtchat ImtCore::imtzip ImtCore::imtrepo ImtCore::imtlog
-		AcfSln::iservice)
-endforeach()
+puma_declare_library_dependencies(PumaServerPg LINK_SCOPE PRIVATE
+	ImtCore::imtserverapp
+	ImtCore::imtauthgql
+	ImtCore::imtauthdb
+	ImtCore::imtlog
+	ImtCore::imtchat
+)
 
-puma_declare_library_dependencies(PumaServerConfigurator	LINK_SCOPE PRIVATE
-	pumaqml Acf::AcfLoc AcfSln::AcfSlnLoc ImtCore::ImtCoreLoc
-	ImtCore::imtserverapp ImtCore::imt2dsdl ImtCore::imtauthdb ImtCore::imtchatdb ImtCore::imtdeskdb
-	ImtCore::imtcontrolsqml ImtCore::imtstylecontrolsqml ImtCore::imtguiqml ImtCore::imtguigqlqml
-	ImtCore::imtauthguiqml ImtCore::imtcolguiqml ImtCore::imtdocguiqml ImtCore::imtlicguiqml)
+puma_declare_library_dependencies(PumaServerSl LINK_SCOPE PRIVATE
+	ImtCore::imtserverapp
+	ImtCore::imtauthgql
+	ImtCore::imtauthdb
+	ImtCore::imtlog
+	ImtCore::imtchat
+)
+
+puma_declare_library_dependencies(PumaServerPgTest LINK_SCOPE PRIVATE
+	ImtCore::imtserverapp
+	ImtCore::imtauthgql
+	ImtCore::imtauthdb
+	ImtCore::imtlog
+	ImtCore::imtchat
+)
+
+puma_declare_library_dependencies(PumaServerSlTest LINK_SCOPE PRIVATE
+	ImtCore::imtserverapp
+	ImtCore::imtauthgql
+	ImtCore::imtauthdb
+	ImtCore::imtlog
+	ImtCore::imtchat
+	Acf::AcfLoc
+)
 
 
-# --- Windows GUI client -----------------------------------------------------
-# Vision client: keeps the 3D and measurement/vision stack. AuthClientSdk and AuthServerSdk
-# transitively provide the whole Acf/AcfSln/ImtCore GUI and vision closure; only imt3dview (3D,
-# deliberately excluded from the server SDK) and imtrepo are additionally required.
-puma_declare_library_dependencies(PumaClient	LINK_SCOPE PRIVATE
-	AuthClientSdk AuthServerSdk
-	ImtCore::imt3dview ImtCore::imtrepo)
+puma_declare_library_dependencies(PumaServerConfigurator LINK_SCOPE PRIVATE
+	pumaqml
+	ImtCore::imtlicguiqml
+	ImtCore::imtauthguiqml
+	ImtCore::imtdocguiqml
+	ImtCore::imtcolguiqml
+	ImtCore::imtcontrolsqml
+	ImtCore::imtguigqlqml
+	ImtCore::imtstylecontrolsqml
+	ImtCore::imtguiqml
+	ImtCore::imtdeskdb
+	ImtCore::imtauthdb
+	ImtCore::imtchatdb
+	ImtCore::imtserverapp
+	ImtCore::imt2dsdl
+	ImtCore::ImtCoreLoc
+	AcfSln::AcfSlnLoc
+	Acf::AcfLoc
+)
+
+
+puma_declare_library_dependencies(PumaClient LINK_SCOPE PRIVATE
+	AuthClientSdk 
+	AuthServerSdk
+	ImtCore::imt3dview 
+	ImtCore::imtrepo
+)
 
 
 # --- Test harness -----------------------------------------------------------
-puma_declare_library_dependencies(pumatest	LINK_SCOPE PUBLIC
-	AuthClientSdk AuthServerSdk
-	ImtCore::imtgqltest Acf::itest
-	Qt${QT_VERSION_MAJOR}::Test)
+if(TARGET pumatest AND NOT TARGET Qt${QT_VERSION_MAJOR}::Test)
+	find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Test)
+endif()
 
-# PumaClient links the system zlib through the raw -lz flag (not a target) on Unix, so it must
-# bypass the target-only helper above.
+puma_declare_library_dependencies(pumatest LINK_SCOPE PUBLIC
+	AuthClientSdk
+	AuthServerSdk
+	ImtCore::imtgqltest
+	Acf::itest
+	Qt${QT_VERSION_MAJOR}::Test
+)
+
 if(UNIX AND TARGET PumaClient)
 	target_link_libraries(PumaClient ${ACF_APPLICATION_LINK_SCOPE} -lz)
 endif()
