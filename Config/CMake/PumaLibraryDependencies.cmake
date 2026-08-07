@@ -61,7 +61,7 @@ endfunction()
 
 
 if(QT_VERSION_MAJOR EQUAL 6)
-	puma_declare_library_dependencies(pumaqml LINK_SCOPE PUBLIC
+	puma_declare_library_dependencies(pumaqml LINK_SCOPE ${ACF_LIBRARY_LINK_SCOPE}
 		Qt${QT_VERSION_MAJOR}::Core5Compat
 	)
 endif()
