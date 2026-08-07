@@ -85,6 +85,22 @@ if(_puma_force_plain_tll)
 	set(ACF_PACKAGE_LINK_SCOPE "" CACHE STRING "Link scope used by package (Pck) libraries linking their dependencies" FORCE)
 	set(ACF_APPLICATION_LINK_SCOPE "" CACHE STRING "Link scope used by executables linking their dependencies" FORCE)
 
+	# In ACF_MODERN_CMAKE mode global link_directories() are disabled, but legacy
+	# Acf*.cmake modules still add plain names like "iqtdoc" that require these
+	# directories to resolve to concrete .lib files.
+	if(DEFINED ACFDIR_BUILD AND NOT ACFDIR_BUILD STREQUAL "")
+		link_directories("${ACFDIR_BUILD}/Lib/${CMAKE_BUILD_TYPE}_${TARGETNAME}")
+	endif()
+	if(DEFINED ACFSLNDIR_BUILD AND NOT ACFSLNDIR_BUILD STREQUAL "")
+		link_directories("${ACFSLNDIR_BUILD}/Lib/${CMAKE_BUILD_TYPE}_${TARGETNAME}")
+	endif()
+	if(DEFINED IACFDIR_BUILD AND NOT IACFDIR_BUILD STREQUAL "")
+		link_directories("${IACFDIR_BUILD}/Lib/${CMAKE_BUILD_TYPE}_${TARGETNAME}")
+	endif()
+	if(DEFINED IMTCOREDIR_BUILD AND NOT IMTCOREDIR_BUILD STREQUAL "")
+		link_directories("${IMTCOREDIR_BUILD}/Lib/${CMAKE_BUILD_TYPE}_${TARGETNAME}")
+	endif()
+
 	# Legacy Acf*.cmake modules link against short names like "iqtdoc".
 	# In modern package mode, these libraries are exposed as namespaced imported
 	# targets (Acf::iqtdoc, ImtCore::imtbase, ...). Create short-name aliases so
