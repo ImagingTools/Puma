@@ -34,4 +34,15 @@ if(DEFINED WEB_COMPILE AND  WEB_COMPILE)
 	add_compile_definitions(WEB_COMPILE)
 endif()
 
+target_link_libraries(PumaClient PRIVATE
+	AuthClientSdk 
+	AuthServerSdk
+	ImtCore::imt3dview 
+	ImtCore::imtrepo
+)
+
 include(${IACFDIR}/Config/CMake/zlib.cmake)
+
+if(UNIX AND TARGET PumaClient)
+	target_link_libraries(PumaClient ${ACF_APPLICATION_LINK_SCOPE} -lz)
+endif()

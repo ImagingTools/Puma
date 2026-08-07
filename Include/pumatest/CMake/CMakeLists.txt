@@ -12,3 +12,13 @@ if(WIN32)
 	set(listFiles \"${AUX_INCLUDE_DIR}/../../../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME}/${PROJECT_NAME}.exe\")
 	windeploy(${PROJECT_NAME} "" "${listFiles}")
 endif()
+
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Test)
+
+target_link_libraries(pumatest PUBLIC
+	AuthClientSdk
+	AuthServerSdk
+	ImtCore::imtgqltest
+	Acf::itest
+	Qt${QT_VERSION_MAJOR}::Test
+)

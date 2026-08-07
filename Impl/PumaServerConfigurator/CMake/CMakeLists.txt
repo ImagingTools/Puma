@@ -26,6 +26,26 @@ include(${IMTCOREDIR}/Config/CMake/OpenSSL.cmake)
 include(${IMTCOREDIR}/Config/CMake/Quazip.cmake)
 include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
 
+target_link_libraries(PumaServerConfigurator PRIVATE
+	pumaqml
+	ImtCore::imtlicguiqml
+	ImtCore::imtauthguiqml
+	ImtCore::imtdocguiqml
+	ImtCore::imtcolguiqml
+	ImtCore::imtcontrolsqml
+	ImtCore::imtguigqlqml
+	ImtCore::imtstylecontrolsqml
+	ImtCore::imtguiqml
+	ImtCore::imtdeskdb
+	ImtCore::imtauthdb
+	ImtCore::imtchatdb
+	ImtCore::imtserverapp
+	ImtCore::imt2dsdl
+	ImtCore::ImtCoreLoc
+	AcfSln::AcfSlnLoc
+	Acf::AcfLoc
+)
+
 if(WIN32)
 	list(APPEND listOptions "--qmldir=${IMTCOREDIR}/Qml")
 	set(files \"${AUX_INCLUDE_DIR}/../../../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME}/${PROJECT_NAME}.exe\")
