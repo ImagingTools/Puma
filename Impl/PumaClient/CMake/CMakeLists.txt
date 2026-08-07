@@ -34,7 +34,7 @@ if(DEFINED WEB_COMPILE AND  WEB_COMPILE)
 	add_compile_definitions(WEB_COMPILE)
 endif()
 
-target_link_libraries(PumaClient
+target_link_libraries(PumaClient ${ACF_APPLICATION_LINK_SCOPE}
 	AuthClientSdk 
 	AuthServerSdk
 	ImtCore::imt3dview 
