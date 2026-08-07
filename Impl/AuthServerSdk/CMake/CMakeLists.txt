@@ -20,7 +20,7 @@ include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 
 target_sources(${PROJECT_NAME} PRIVATE ${SOURCES})
 
-target_link_libraries(AuthServerSdk
+target_link_libraries(AuthServerSdk ${ACF_LIBRARY_LINK_SCOPE}
 	ImtCore::imtdeskgql
 	ImtCore::imtauthgql
 	ImtCore::imtchatgql

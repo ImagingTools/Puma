@@ -40,7 +40,7 @@ if(WIN32)
 	endif()
 endif()
 
-target_link_libraries(PumaServerPg
+target_link_libraries(PumaServerPg ${ACF_APPLICATION_LINK_SCOPE}
 	ImtCore::imtserverapp
 	ImtCore::imtauthgql
 	ImtCore::imtauthdb

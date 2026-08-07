@@ -28,7 +28,7 @@ endforeach()
 
 include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 
-target_link_libraries(AuthClientSdk
+target_link_libraries(AuthClientSdk ${ACF_LIBRARY_LINK_SCOPE}
 	ImtCore::imtauthguiqml
 	ImtCore::imtlicguiqml
 	ImtCore::imtdocguiqml
