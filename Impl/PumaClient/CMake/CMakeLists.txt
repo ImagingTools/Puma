@@ -35,6 +35,3 @@ if(DEFINED WEB_COMPILE AND  WEB_COMPILE)
 endif()
 
 include(${IACFDIR}/Config/CMake/zlib.cmake)
-if(UNIX)
-	target_link_libraries(${PROJECT_NAME} ${ACF_APPLICATION_LINK_SCOPE} -lz)
-endif()
