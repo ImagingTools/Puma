@@ -40,4 +40,12 @@ if(WIN32)
 	endif()
 endif()
 
+target_link_libraries(PumaServerSl PRIVATE
+	ImtCore::imtserverapp
+	ImtCore::imtauthgql
+	ImtCore::imtauthdb
+	ImtCore::imtlog
+	ImtCore::imtchat
+)
+
 include(${IACFDIR}/Config/CMake/zlib.cmake)

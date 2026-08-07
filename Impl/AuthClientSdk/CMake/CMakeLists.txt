@@ -28,8 +28,24 @@ endforeach()
 
 include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 
-find_package(QT NAMES Qt6 Qt5 COMPONENTS Core)
-find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Widgets Core Gui Network WebSockets QuickWidgets Qml REQUIRED)
+target_link_libraries(AuthClientSdk PUBLIC
+	ImtCore::imtauthguiqml
+	ImtCore::imtlicguiqml
+	ImtCore::imtdocguiqml
+	ImtCore::imtcolguiqml
+	ImtCore::imtguigqlqml
+	ImtCore::imtguiqml
+	ImtCore::imtcontrolsqml
+	ImtCore::imtstylecontrolsqml
+	ImtCore::imtauthgql
+	ImtCore::imtauthdb
+	ImtCore::imtchatdb
+	ImtCore::imtdeskdb
+	ImtCore::imt2dsdl
+	ImtCore::ImtCoreLoc
+	AcfSln::AcfSlnLoc
+	Acf::AcfLoc
+)
 
 add_definitions(-DUNICODE)
 add_definitions(-D_UNICODE)

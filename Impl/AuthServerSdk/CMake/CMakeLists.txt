@@ -20,7 +20,15 @@ include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 
 target_sources(${PROJECT_NAME} PRIVATE ${SOURCES})
 
-find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Widgets Sql Xml Core Gui Network WebSockets QuickWidgets Qml REQUIRED)
+target_link_libraries(AuthServerSdk PUBLIC
+	ImtCore::imtdeskgql
+	ImtCore::imtauthgql
+	ImtCore::imtchatgql
+	ImtCore::imtauthdb
+	ImtCore::imtchatdb
+	ImtCore::imtdeskdb
+	Qt${QT_VERSION_MAJOR}::Widgets
+)
 
 include(${IACFDIR}/Config/CMake/zlib.cmake)
 ADD_DEFINITIONS(-DUNICODE)
