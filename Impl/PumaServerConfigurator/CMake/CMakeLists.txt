@@ -19,53 +19,32 @@ endif()
 include(${ACFDIR}/Config/CMake/CustomBuild.cmake)
 include(${ACFDIR}/Config/CMake/ApplicationConfig.cmake)
 
-target_link_libraries(${PROJECT_NAME}
-	pumaqml
-	ImtCoreLoc
-	AcfLoc
-	AcfSlnLoc
-	imtrest
-	imtgui
-	imtqml
-	imtcom
-	imtdb
-	imtfile
-	imtguigql
-	imtservice
-	imtguiqml
-	imtauthsdl
-	imtappsdl
-	imtcolorsdl
-	imt2dsdl
-	imtstylecontrolsqml
-	imtcontrolsqml
-	imtguigqlqml
-	imtauthguiqml
-	imtcolguiqml
-	imtdocguiqml
-	imtchatdb
-	imtdeskdb
-	imtlicguiqml
-	imtauthgui
-	imtauthdb
-	imtstyle
-	imtlicgui
-	imtbasesdl
-	imtbase
-	imtserverapp
-	imtapp
-	imtgql
-	Qt${QT_VERSION_MAJOR}::QuickWidgets
-	Qt${QT_VERSION_MAJOR}::WebSockets
-	Qt${QT_VERSION_MAJOR}::Sql
-)
-
 include(${ACFDIR}/Config/CMake/AcfQt.cmake)
 include(${ACFDIR}/Config/CMake/AcfStd.cmake)
 include(${ACFDIR}/Config/CMake/AcfStdGui.cmake)
 include(${IMTCOREDIR}/Config/CMake/OpenSSL.cmake)
 include(${IMTCOREDIR}/Config/CMake/Quazip.cmake)
 include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
+
+target_link_libraries(PumaServerConfigurator ${ACF_APPLICATION_LINK_SCOPE}
+	pumaqml
+	ImtCore::imtlicguiqml
+	ImtCore::imtauthguiqml
+	ImtCore::imtdocguiqml
+	ImtCore::imtcolguiqml
+	ImtCore::imtcontrolsqml
+	ImtCore::imtguigqlqml
+	ImtCore::imtstylecontrolsqml
+	ImtCore::imtguiqml
+	ImtCore::imtdeskdb
+	ImtCore::imtauthdb
+	ImtCore::imtchatdb
+	ImtCore::imtserverapp
+	ImtCore::imt2dsdl
+	ImtCore::ImtCoreLoc
+	AcfSln::AcfSlnLoc
+	Acf::AcfLoc
+)
 
 if(WIN32)
 	list(APPEND listOptions "--qmldir=${IMTCOREDIR}/Qml")

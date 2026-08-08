@@ -28,26 +28,23 @@ endforeach()
 
 include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 
-find_package(QT NAMES Qt6 Qt5 COMPONENTS Core)
-find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Widgets Core Gui Network WebSockets QuickWidgets Qml REQUIRED)
-
-target_link_libraries(${PROJECT_NAME}
-	AcfSlnLoc AcfLoc ImtCoreLoc
-	imeas iproc iqtgui iauth icomp idoc i2d icomm
-	imtbasesdl imtbase imtauthsdl imtgql imtcom imtservergql imtserverapp imtauthgql imtclientgql imtlic imtcol imtdb imtrest imtauth imtapp imtappsdl
-	imtstyle imtcontrolsqml imtguiqml imtauthguiqml imtguigqlqml imtstylecontrolsqml imtlicguiqml imtdocguiqml imtcolguiqml imtlicgui imtgui imtcolorsdl imt2dsdl
-	imtauthgui imtqml imtauthdb imtchatdb imtdeskdb
-)
-
-target_link_libraries(${PROJECT_NAME}
-	Qt${QT_VERSION_MAJOR}::Core
-	Qt${QT_VERSION_MAJOR}::Gui
-	Qt${QT_VERSION_MAJOR}::Core
-	Qt${QT_VERSION_MAJOR}::Widgets
-	Qt${QT_VERSION_MAJOR}::Network
-	Qt${QT_VERSION_MAJOR}::WebSockets
-	Qt${QT_VERSION_MAJOR}::Qml
-	Qt${QT_VERSION_MAJOR}::QuickWidgets
+target_link_libraries(AuthClientSdk ${ACF_LIBRARY_LINK_SCOPE}
+	ImtCore::imtauthguiqml
+	ImtCore::imtlicguiqml
+	ImtCore::imtdocguiqml
+	ImtCore::imtcolguiqml
+	ImtCore::imtguigqlqml
+	ImtCore::imtguiqml
+	ImtCore::imtcontrolsqml
+	ImtCore::imtstylecontrolsqml
+	ImtCore::imtauthgql
+	ImtCore::imtauthdb
+	ImtCore::imtchatdb
+	ImtCore::imtdeskdb
+	ImtCore::imt2dsdl
+	ImtCore::ImtCoreLoc
+	AcfSln::AcfSlnLoc
+	Acf::AcfLoc
 )
 
 add_definitions(-DUNICODE)

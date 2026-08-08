@@ -18,9 +18,12 @@ if(NOT DEFINED BUILDDIR)
 	set(BUILDDIR "${CMAKE_CURRENT_LIST_DIR}/../../..")
 endif()
 
+set(ACF_MODERN_CMAKE ON)
+set(ACF_PACKAGE_NAME "Puma")
+
 include(${IMTCOREDIR}/Config/CMake/ImtCoreEnv.cmake)
 
-message("Puma IMTCOREDIR: ${IMTCOREDIR} IMTCOREDIR_BUILD ${IMTCOREDIR_BUILD}")
+message(VERBOSE "Puma IMTCOREDIR: ${IMTCOREDIR} IMTCOREDIR_BUILD ${IMTCOREDIR_BUILD}")
 
 set(INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Include")
 set(IMPL_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Impl")
@@ -30,14 +33,8 @@ set(AUX_INCLUDE_DIR "${BUILDDIR}/Puma/AuxInclude/${TARGETNAME}/GeneratedFiles")
 include_directories("${AUX_INCLUDE_DIR}/../")
 include_directories("${AUX_INCLUDE_DIR}/")
 include_directories("${IMTCOREDIR}/Include")
-
-# Keep ACF link scopes empty: this project still uses the plain
-# target_link_libraries() signature, which must not mix with the keyword
-# signature that unified builds (AcfImtDevAll) enable via the CMake cache.
-set(ACF_QT_MODULE_LINK_SCOPE "")
-set(ACF_LIBRARY_LINK_SCOPE "")
-set(ACF_PACKAGE_LINK_SCOPE "")
-set(ACF_APPLICATION_LINK_SCOPE "")
+include("${CMAKE_CURRENT_LIST_DIR}/../../Config/CMake/PumaLinkCompatibility.cmake")
+puma_apply_link_compatibility()
 
 # Include
 add_subdirectory("${INCLUDE_DIR}/pumaqml/CMake" "${AUX_INCLUDE_DIR}/pumaqml")
@@ -68,5 +65,9 @@ if(WIN32)
 		add_subdirectory("${INCLUDE_DIR}/pumatest/CMake" "${AUX_INCLUDE_DIR}/pumatest")
 	endif()
 endif()
+
+# Declare target-based deps so include paths/link order propagate transitively across Puma
+# libraries and onto the underlying ImtCore::/Acf::/AcfSln::/IAcf:: libraries.
+include("${CMAKE_CURRENT_LIST_DIR}/../../Config/CMake/PumaLibraryDependencies.cmake")
 
 
