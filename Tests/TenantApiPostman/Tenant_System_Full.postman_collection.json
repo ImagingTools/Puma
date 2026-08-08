@@ -1,4 +1,4 @@
-﻿{
+{
     "_": {
         "postman_id": "0cfa1ec3-9e86-4d1f-9b44-tenant-full-0001"
     },
@@ -2224,6 +2224,57 @@
                     ]
                 },
                 {
+                    "id": "rel-resolve-id",
+                    "name": "Resolve real relationship objectId after save",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetTenantRelationships { GetTenantRelationships(input: { tenantId: \"{{tenantAId}}\" }) { relationships { id sourceTenantId targetTenantId } errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_token}}"
+                            }
+                        ],
+                        "description": "Captures the relationship's real objectId once it exists; CreateNewDocument reports an empty objectId."
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "// CreateNewDocument returns objectId='' (the object only gets an id once it is",
+                                    "// saved), so capturing relationshipId there stored an empty string and the",
+                                    "// cleanup RemoveTenantRelationship could never work. Resolve it after the save.",
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.GetTenantRelationships : null;",
+                                    "const list = payload && Array.isArray(payload.relationships) ? payload.relationships : [];",
+                                    "pm.test('Saved relationship is retrievable and has a real id', function(){",
+                                    "  pm.expect(!!(json.errors && json.errors.length), 'GetTenantRelationships failed: ' + JSON.stringify(json.errors)).to.eql(false);",
+                                    "  pm.expect(list.length >= 1, 'no relationship found for tenant A after saving one').to.eql(true);",
+                                    "  pm.expect(!!list[0].id).to.eql(true);",
+                                    "});",
+                                    "if (list.length && list[0].id) pm.environment.set('relationshipId', list[0].id);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
                     "id": "939d7b3c-095c-4b32-8edf-6e78ad2f378f",
                     "name": "Create cross-org grant A -> B",
                     "request": {
@@ -2315,6 +2366,63 @@
             "id": "59081ed3-1de1-4667-93a3-348e97f5e4f0",
             "name": "04 RBAC (members, roles, groups, permissions)",
             "item": [
+                {
+                    "id": "rbac-resolve-tenant-perms",
+                    "name": "Resolve real tenant-A permissions for role fixtures",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetTenantPermissions { GetTenantPermissions(input: { tenantId: \"{{tenantAId}}\" }) { permissionIds errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_token}}"
+                            }
+                        ],
+                        "description": "Replaces the invented fixture.permission.* ids with permissions actually enabled for tenant A, so the VIEW/EDITOR role documents can be saved."
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "// The VIEW/EDITOR role fixtures used to be built from invented permission ids",
+                                    "// ('fixture.permission.read'/'.write'). CRoleDocumentValidatorComp rejects any",
+                                    "// permission that is not enabled for the tenant, so those SaveDocument calls",
+                                    "// always failed - the roles were never created, every downstream delegation /",
+                                    "// RoleItem check silently degraded, and rbac_*_expected stayed 'false' so the",
+                                    "// permission assertions skipped themselves. Resolve real ids instead.",
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.GetTenantPermissions : null;",
+                                    "const ids = payload && Array.isArray(payload.permissionIds) ? payload.permissionIds.filter(Boolean) : [];",
+                                    "pm.test('Tenant A exposes enough permissions to build role fixtures', function(){",
+                                    "  pm.expect(!!(json.errors && json.errors.length), 'GetTenantPermissions failed: ' + JSON.stringify(json.errors)).to.eql(false);",
+                                    "  pm.expect(!!payload && !payload.errorMessage).to.eql(true);",
+                                    "  pm.expect(ids.length >= 2, 'need >= 2 tenant permissions for VIEW/EDITOR fixtures, got ' + JSON.stringify(ids)).to.eql(true);",
+                                    "});",
+                                    "if (ids.length >= 2) {",
+                                    "  pm.environment.set('permReadX', ids[0]);",
+                                    "  pm.environment.set('permWriteX', ids[1]);",
+                                    "}"
+                                ]
+                            }
+                        }
+                    ]
+                },
                 {
                     "id": "a5c5fdf2-4c04-4564-9209-99b1e4a5b6b4",
                     "name": "Create Role VIEW document",
@@ -2881,48 +2989,77 @@
                     "id": "b3f1a001-0a00-4a00-9a00-a1b2c3d4e501",
                     "name": "Wait for A member document load",
                     "request": {
-                        "url": { "host": [ "{{base_url}}" ], "query": [], "variable": [] },
-                        "header": [ { "key": "x-authentication-token", "value": "{{a_owner_token}}" } ],
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_token}}"
+                            }
+                        ],
                         "method": "POST",
-                        "body": { "mode": "graphql", "graphql": { "query": "query GetUserRepresentation { GetUserRepresentation(input: { collectionId: \"Users\", id: \"{{aMemberUserDocId}}\" }) { id } }", "variables": "" } }
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetUserRepresentation { GetUserRepresentation(input: { collectionId: \"Users\", id: \"{{aMemberUserDocId}}\" }) { id } }",
+                                "variables": ""
+                            }
+                        }
                     },
                     "response": [],
                     "event": [
-                        { "listen": "prerequest", "script": { "type": "text/javascript", "exec": [
-                            "// Space out re-polls. The Postman sandbox has no sleep primitive and",
-                            "// newman's --delay-request would slow the whole 393-request suite, so a",
-                            "// short bounded busy-wait is used, and only on actual retries.",
-                            "if (parseInt(pm.environment.get('docWaitAttempt_aMember') || '0', 10) > 0) {",
-                            "    const until = Date.now() + 150;",
-                            "    while (Date.now() < until) { /* spin */ }",
-                            "}"
-                        ] } },
-                        { "listen": "test", "script": { "type": "text/javascript", "exec": [
-                            "// OpenDocument returns isLoading=true and finishes its load on a background",
-                            "// thread (CDocumentServiceBase::DoOpenDocument), so a mutation fired right",
-                            "// after it races that load and gets InvalidDocumentId. A single round-trip",
-                            "// is NOT enough to cover it: the load completes in ~10ms on SQLite but",
-                            "// ~400ms on Postgres (measured), which is exactly why this suite passed on",
-                            "// SQLite while failing on Postgres. Poll until the representation is really",
-                            "// readable instead of just burning one request and asserting true.",
-                            "const json = pm.response.json();",
-                            "const repr = json.data && json.data.GetUserRepresentation;",
-                            "const loaded = !!(repr && repr.id);",
-                            "const maxAttempts = 25;",
-                            "const attempt = parseInt(pm.environment.get('docWaitAttempt_aMember') || '0', 10);",
-                            "if (loaded) {",
-                            "    pm.environment.set('docWaitAttempt_aMember', '0');",
-                            "    pm.test('A member document loaded', function(){ pm.expect(loaded).to.eql(true); });",
-                            "} else if (attempt < maxAttempts) {",
-                            "    pm.environment.set('docWaitAttempt_aMember', String(attempt + 1));",
-                            "    postman.setNextRequest('Wait for A member document load');",
-                            "} else {",
-                            "    pm.environment.set('docWaitAttempt_aMember', '0');",
-                            "    pm.test('A member document loaded', function(){",
-                            "        pm.expect.fail('document still not readable after ' + maxAttempts + ' polls');",
-                            "    });",
-                            "}"
-                        ] } }
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "// Space out re-polls. The Postman sandbox has no sleep primitive and",
+                                    "// newman's --delay-request would slow the whole 393-request suite, so a",
+                                    "// short bounded busy-wait is used, and only on actual retries.",
+                                    "if (parseInt(pm.environment.get('docWaitAttempt_aMember') || '0', 10) > 0) {",
+                                    "    const until = Date.now() + 150;",
+                                    "    while (Date.now() < until) { /* spin */ }",
+                                    "}"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "// OpenDocument returns isLoading=true and finishes its load on a background",
+                                    "// thread (CDocumentServiceBase::DoOpenDocument), so a mutation fired right",
+                                    "// after it races that load and gets InvalidDocumentId. A single round-trip",
+                                    "// is NOT enough to cover it: the load completes in ~10ms on SQLite but",
+                                    "// ~400ms on Postgres (measured), which is exactly why this suite passed on",
+                                    "// SQLite while failing on Postgres. Poll until the representation is really",
+                                    "// readable instead of just burning one request and asserting true.",
+                                    "const json = pm.response.json();",
+                                    "const repr = json.data && json.data.GetUserRepresentation;",
+                                    "const loaded = !!(repr && repr.id);",
+                                    "const maxAttempts = 25;",
+                                    "const attempt = parseInt(pm.environment.get('docWaitAttempt_aMember') || '0', 10);",
+                                    "if (loaded) {",
+                                    "    pm.environment.set('docWaitAttempt_aMember', '0');",
+                                    "    pm.test('A member document loaded', function(){ pm.expect(loaded).to.eql(true); });",
+                                    "} else if (attempt < maxAttempts) {",
+                                    "    pm.environment.set('docWaitAttempt_aMember', String(attempt + 1));",
+                                    "    postman.setNextRequest('Wait for A member document load');",
+                                    "} else {",
+                                    "    pm.environment.set('docWaitAttempt_aMember', '0');",
+                                    "    pm.test('A member document loaded', function(){",
+                                    "        pm.expect.fail('document still not readable after ' + maxAttempts + ' polls');",
+                                    "    });",
+                                    "}"
+                                ]
+                            }
+                        }
                     ]
                 },
                 {
@@ -5264,7 +5401,15 @@
                                 "type": "text/javascript",
                                 "exec": [
                                     "const json = pm.response.json();",
-                                    "pm.test(\"HasMinimumRole returns boolean\", function () { pm.expect(typeof json.data.HasMinimumRole.hasRole).to.eql(\"boolean\"); });"
+                                    "const payload = json.data ? json.data.HasMinimumRole : null;",
+                                    "// The probed user is an accepted member of this tenant, so the \"Member\"",
+                                    "// minimum-role check must actually come back true - asserting only that the",
+                                    "// field is a boolean passed even when the role logic was wrong.",
+                                    "pm.test(\"HasMinimumRole reports the member as having the Member role\", function () {",
+                                    "  pm.expect(!!(json.errors && json.errors.length)).to.eql(false);",
+                                    "  pm.expect(!!payload).to.eql(true);",
+                                    "  pm.expect(payload.hasRole).to.eql(true);",
+                                    "});"
                                 ],
                                 "_lastExecutionId": "665d3a6a-3715-4fb5-9e6b-cf83679df11e"
                             }
@@ -6763,8 +6908,8 @@
                                     "const roleViewId = pm.environment.get(\"roleViewId\");",
                                     "const delegatedGrantId = pm.environment.get(\"delegatedGrantId\") || \"\";",
                                     "pm.test(\"GetProfile succeeds in delegated tenant A context\", function(){ pm.expect(hasErr).to.eql(false); pm.expect(!!payload).to.eql(true); });",
-                                    "pm.test(\"currentTenantId reflects delegated tenant A\", function(){ if (!payload) { pm.expect(true).to.eql(true); return; } pm.expect(payload.currentTenantId).to.eql(tenantAId); });",
-                                    "pm.test(\"GetProfile.roles is an array in delegated tenant A context\", function(){ if (!payload || !Array.isArray(payload.roles)) { pm.expect(true).to.eql(true); return; } pm.expect(Array.isArray(payload.roles)).to.eql(true); });"
+                                    "pm.test(\"currentTenantId reflects delegated tenant A\", function(){ pm.expect(payload.currentTenantId).to.eql(tenantAId); });",
+                                    "pm.test(\"GetProfile.roles is an array in delegated tenant A context\", function(){ pm.expect(Array.isArray(payload.roles), 'payload.roles must be an array').to.eql(true); });"
                                 ]
                             }
                         }
@@ -6908,7 +7053,7 @@
                                     "const hasErr = !!(json.errors && json.errors.length);",
                                     "const tenantBId = pm.environment.get(\"tenantBId\");",
                                     "pm.test(\"GetProfile succeeds after switch back to B\", function(){ pm.expect(hasErr).to.eql(false); pm.expect(!!payload).to.eql(true); });",
-                                    "pm.test(\"currentTenantId is back to own tenant B\", function(){ if (!payload) { pm.expect(true).to.eql(true); return; } pm.expect(payload.currentTenantId).to.eql(tenantBId); });"
+                                    "pm.test(\"currentTenantId is back to own tenant B\", function(){ pm.expect(payload.currentTenantId).to.eql(tenantBId); });"
                                 ]
                             }
                         }
@@ -8006,40 +8151,69 @@
                     "id": "b3f1a002-0a00-4a00-9a00-a1b2c3d4e502",
                     "name": "Wait for A member document load (revoke matrix)",
                     "request": {
-                        "url": { "host": [ "{{base_url}}" ], "query": [], "variable": [] },
-                        "header": [ { "key": "x-authentication-token", "value": "{{a_owner_token}}" } ],
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_token}}"
+                            }
+                        ],
                         "method": "POST",
-                        "body": { "mode": "graphql", "graphql": { "query": "query GetUserRepresentation { GetUserRepresentation(input: { collectionId: \"Users\", id: \"{{aMemberUserDocId}}\" }) { id } }", "variables": "" } }
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetUserRepresentation { GetUserRepresentation(input: { collectionId: \"Users\", id: \"{{aMemberUserDocId}}\" }) { id } }",
+                                "variables": ""
+                            }
+                        }
                     },
                     "response": [],
                     "event": [
-                        { "listen": "prerequest", "script": { "type": "text/javascript", "exec": [
-                            "if (parseInt(pm.environment.get('docWaitAttempt_revokeMatrix') || '0', 10) > 0) {",
-                            "    const until = Date.now() + 150;",
-                            "    while (Date.now() < until) { /* spin */ }",
-                            "}"
-                        ] } },
-                        { "listen": "test", "script": { "type": "text/javascript", "exec": [
-                            "// See \"Wait for A member document load\" above for why this polls instead",
-                            "// of doing a single round-trip.",
-                            "const json = pm.response.json();",
-                            "const repr = json.data && json.data.GetUserRepresentation;",
-                            "const loaded = !!(repr && repr.id);",
-                            "const maxAttempts = 25;",
-                            "const attempt = parseInt(pm.environment.get('docWaitAttempt_revokeMatrix') || '0', 10);",
-                            "if (loaded) {",
-                            "    pm.environment.set('docWaitAttempt_revokeMatrix', '0');",
-                            "    pm.test('A member document loaded (revoke matrix)', function(){ pm.expect(loaded).to.eql(true); });",
-                            "} else if (attempt < maxAttempts) {",
-                            "    pm.environment.set('docWaitAttempt_revokeMatrix', String(attempt + 1));",
-                            "    postman.setNextRequest('Wait for A member document load (revoke matrix)');",
-                            "} else {",
-                            "    pm.environment.set('docWaitAttempt_revokeMatrix', '0');",
-                            "    pm.test('A member document loaded (revoke matrix)', function(){",
-                            "        pm.expect.fail('document still not readable after ' + maxAttempts + ' polls');",
-                            "    });",
-                            "}"
-                        ] } }
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "if (parseInt(pm.environment.get('docWaitAttempt_revokeMatrix') || '0', 10) > 0) {",
+                                    "    const until = Date.now() + 150;",
+                                    "    while (Date.now() < until) { /* spin */ }",
+                                    "}"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "// See \"Wait for A member document load\" above for why this polls instead",
+                                    "// of doing a single round-trip.",
+                                    "const json = pm.response.json();",
+                                    "const repr = json.data && json.data.GetUserRepresentation;",
+                                    "const loaded = !!(repr && repr.id);",
+                                    "const maxAttempts = 25;",
+                                    "const attempt = parseInt(pm.environment.get('docWaitAttempt_revokeMatrix') || '0', 10);",
+                                    "if (loaded) {",
+                                    "    pm.environment.set('docWaitAttempt_revokeMatrix', '0');",
+                                    "    pm.test('A member document loaded (revoke matrix)', function(){ pm.expect(loaded).to.eql(true); });",
+                                    "} else if (attempt < maxAttempts) {",
+                                    "    pm.environment.set('docWaitAttempt_revokeMatrix', String(attempt + 1));",
+                                    "    postman.setNextRequest('Wait for A member document load (revoke matrix)');",
+                                    "} else {",
+                                    "    pm.environment.set('docWaitAttempt_revokeMatrix', '0');",
+                                    "    pm.test('A member document loaded (revoke matrix)', function(){",
+                                    "        pm.expect.fail('document still not readable after ' + maxAttempts + ' polls');",
+                                    "    });",
+                                    "}"
+                                ]
+                            }
+                        }
                     ]
                 },
                 {
@@ -8667,7 +8841,7 @@
                                     "const allowed = !!(json.data && json.data.RolesList && Array.isArray(json.data.RolesList.items));",
                                     "const denied = !!(json.errors && json.errors.length);",
                                     "const expected = pm.iterationData.get(\"expectRolesListAllowed\");",
-                                    "if (expected === undefined || expected === null || String(expected) === \"\") { pm.test(\"RolesList matrix probe skipped (run with -d iteration data) :: \" + scenario, function(){ pm.expect(true).to.eql(true); }); return; }",
+                                    "if (expected === undefined || expected === null || String(expected) === \"\") { pm.test.skip(\"RolesList matrix probe :: \" + scenario + \" (no iteration data: run with -d)\", function(){}); return; }",
                                     "const expectedBool = (expected !== undefined && expected !== null && String(expected) !== \"\") ? (String(expected).toLowerCase() === \"true\") : false;",
                                     "pm.test(\"RolesList response shape is strict :: \" + scenario, function(){",
                                     "  pm.expect(allowed).to.eql(expectedBool);",
@@ -8889,7 +9063,7 @@
                                     "const allowed = !!tenant && tenant.id === pm.environment.get(\"matrix_target_tenant_id\") && !payload.errorMessage;",
                                     "const denied = !!(json.errors && json.errors.length) || !!(payload && payload.errorMessage) || !tenant;",
                                     "const expected = pm.iterationData.get(\"expectGetTenantAllowed\");",
-                                    "if (expected === undefined || expected === null || String(expected) === \"\") { pm.test(\"GetTenant matrix probe skipped (run with -d iteration data) :: \" + scenario, function(){ pm.expect(true).to.eql(true); }); return; }",
+                                    "if (expected === undefined || expected === null || String(expected) === \"\") { pm.test.skip(\"GetTenant matrix probe :: \" + scenario + \" (no iteration data: run with -d)\", function(){}); return; }",
                                     "const expectedBool = (expected !== undefined && expected !== null && String(expected) !== \"\") ? (String(expected).toLowerCase() === \"true\") : false;",
                                     "pm.test(\"GetTenant deterministic result :: \" + scenario, function(){",
                                     "  pm.expect(allowed).to.eql(expectedBool);",
@@ -9694,10 +9868,11 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const payload = json.data ? json.data.EnsureSystemTenant : null;",
-                                    "pm.test('EnsureSystemTenant returns deterministic payload', function(){",
+                                    "pm.test('EnsureSystemTenant succeeds and returns the system tenant id', function(){",
                                     "  pm.expect(!!(json.errors && json.errors.length)).to.eql(false);",
                                     "  pm.expect(payload !== null).to.eql(true);",
-                                    "  pm.expect(typeof payload.success).to.eql('boolean');",
+                                    "  pm.expect(payload.success, 'EnsureSystemTenant reported failure: ' + (payload.errorMessage || '')).to.eql(true);",
+                                    "  pm.expect(!!payload.systemTenantId).to.eql(true);",
                                     "});"
                                 ],
                                 "_lastExecutionId": "651ad1fa-4269-4d25-addc-beb032bb135f"
@@ -10317,7 +10492,10 @@
                                     "const json = pm.response.json();",
                                     "const payload = json.data ? json.data.GetRelationshipRepresentation : null;",
                                     "const hasErr = !!(json.errors && json.errors.length);",
-                                    "pm.test('GetRelationshipRepresentation returns requested relationship', function(){ pm.expect(hasErr).to.eql(false); pm.expect(payload.id).to.eql(pm.environment.get('relationshipId')); });"
+                                    "// The request addresses the relationship by its document id, so that is the id the",
+                                    "// answer has to carry - relationshipId is the same object seen through the",
+                                    "// GetTenantRelationships list, which hands out the stored relationship id.",
+                                    "pm.test('GetRelationshipRepresentation returns requested relationship', function(){ pm.expect(hasErr).to.eql(false); pm.expect(payload.id).to.eql(pm.environment.get('relationshipDocId')); });"
                                 ],
                                 "_lastExecutionId": "22d060a9-91dc-44bf-a090-32e4809de671"
                             }
@@ -10361,7 +10539,7 @@
                                     "const json = pm.response.json();",
                                     "const payload = json.data ? json.data.GetUserRepresentation : null;",
                                     "const hasErr = !!(json.errors && json.errors.length);",
-                                    "pm.test('GetUserRepresentation returns requested user or warning', function(){ if (hasErr) { pm.expect(true).to.eql(true); return; } pm.expect(payload.id).to.eql(pm.environment.get('a_member_user_id')); });"
+                                    "pm.test('GetUserRepresentation returns the requested user', function(){ pm.expect(hasErr, 'unexpected GraphQL error: ' + JSON.stringify(json.errors)).to.eql(false); pm.expect(payload.id).to.eql(pm.environment.get('a_member_user_id')); });"
                                 ],
                                 "_lastExecutionId": "939b622d-2075-461b-8dad-61a9343e596f"
                             }
@@ -10405,7 +10583,7 @@
                                     "const json = pm.response.json();",
                                     "const payload = json.data ? json.data.GetGroupRepresentation : null;",
                                     "const hasErr = !!(json.errors && json.errors.length);",
-                                    "pm.test('GetGroupRepresentation returns requested group or warning', function(){ if (hasErr) { pm.expect(true).to.eql(true); return; } pm.expect(payload.id).to.eql(pm.environment.get('groupSupportId')); });"
+                                    "pm.test('GetGroupRepresentation returns the requested group', function(){ pm.expect(hasErr, 'unexpected GraphQL error: ' + JSON.stringify(json.errors)).to.eql(false); pm.expect(payload.id).to.eql(pm.environment.get('groupSupportId')); });"
                                 ],
                                 "_lastExecutionId": "9d9f7e2c-2ed2-424a-936e-dd81e93d3661"
                             }
@@ -10454,7 +10632,7 @@
                                     "const roleEditorId = pm.environment.get(\"roleEditorId\");",
                                     "pm.test(\"RoleItem returns requested role or acceptable state\", function(){",
                                     "  if (!roleEditorId) { pm.expect(false, \"Skipped: roleEditorId not set\").to.eql(true); return; }",
-                                    "  if (hasWarning) { pm.expect(true).to.eql(true); return; }",
+                                    "  pm.expect(hasWarning, 'unexpected warning: ' + JSON.stringify(warnings)).to.eql(false);",
                                     "  if (docNotExist) { pm.expect(false, \"Document removed or stale\").to.eql(true); return; }",
                                     "  pm.expect(payload ? payload.id : null).to.eql(roleEditorId);",
                                     "});"
@@ -10506,7 +10684,7 @@
                                     "const groupSupportId = pm.environment.get(\"groupSupportId\");",
                                     "pm.test(\"GroupItem returns requested group or acceptable state\", function(){",
                                     "  if (!groupSupportId) { pm.expect(false, \"Skipped: groupSupportId not set\").to.eql(true); return; }",
-                                    "  if (hasWarning && docNotExist) { pm.expect(true).to.eql(true); return; }",
+                                    "  pm.expect(hasWarning && docNotExist, 'group document unexpectedly missing').to.eql(false);",
                                     "  if (hasWarning) { pm.expect(false, \"Permission warning state is not allowed\").to.eql(true); return; }",
                                     "  pm.expect(payload ? payload.id : null).to.eql(groupSupportId);",
                                     "});"
@@ -10760,8 +10938,16 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const payload = json.data ? json.data.Logout : null;",
-                                    "const hasErr = !!(json.errors && json.errors.length);",
-                                    "pm.test('Logout returns boolean status', function(){ pm.expect(hasErr).to.eql(false); pm.expect(typeof payload.ok).to.eql('boolean'); });"
+                                    "// NOTE: this request deliberately carries no x-authentication-token header.",
+                                    "// CAuthorizationControllerComp::OnLogout ignores the accessToken INPUT argument",
+                                    "// and resolves the session from the request context (header) instead, so with no",
+                                    "// header there is no session to remove and ok must be false. Asserting only",
+                                    "// typeof ok === 'boolean' passed regardless of the value and hid that fact.",
+                                    "pm.test('Logout without an auth header cannot end a session (input accessToken is ignored by the server)', function(){",
+                                    "  pm.expect(!!(json.errors && json.errors.length)).to.eql(false);",
+                                    "  pm.expect(!!payload).to.eql(true);",
+                                    "  pm.expect(payload.ok).to.eql(false);",
+                                    "});"
                                 ],
                                 "_lastExecutionId": "69f1a777-2626-48e6-af2a-6e37eb777663"
                             }
@@ -11622,9 +11808,9 @@
                                     "const tenantARoleId = pm.environment.get(\"roleViewId\");",
                                     "const noOrgGroupId = pm.environment.get(\"noOrgGroupId\");",
                                     "pm.test(\"GetProfile succeeds in NoOrg context\", function(){ pm.expect(hasErr).to.eql(false); pm.expect(!!payload).to.eql(true); });",
-                                    "pm.test(\"NoOrg GetProfile has empty currentTenantId\", function(){ if (!payload) { pm.expect(true).to.eql(true); return; } const ct = payload.currentTenantId; pm.expect(!ct || ct === \"\" || ct === null).to.eql(true); });",
-                                    "pm.test(\"NoOrg GetProfile.roles is an array (direct assignments only)\", function(){ if (!payload || !Array.isArray(payload.roles)) { pm.expect(true).to.eql(true); return; } pm.expect(Array.isArray(payload.roles)).to.eql(true); });",
-                                    "pm.test(\"Tenant-A role hidden in NoOrg GetProfile\", function(){ if (!payload || !Array.isArray(payload.roles)) { pm.expect(true).to.eql(true); return; } if (!tenantARoleId) { pm.expect(false, \"Skipped: tenantARoleId not set\").to.eql(true); return; } pm.expect(payload.roles.some(r => r && r.id === tenantARoleId)).to.eql(false); });"
+                                    "pm.test(\"NoOrg GetProfile has empty currentTenantId\", function(){ const ct = payload.currentTenantId; pm.expect(!ct || ct === \"\" || ct === null).to.eql(true); });",
+                                    "pm.test(\"NoOrg GetProfile.roles is an array (direct assignments only)\", function(){ pm.expect(Array.isArray(payload.roles), 'payload.roles must be an array').to.eql(true); });",
+                                    "pm.test(\"Tenant-A role hidden in NoOrg GetProfile\", function(){ pm.expect(Array.isArray(payload.roles)).to.eql(true); pm.expect(!!tenantARoleId, \"fixture roleViewId is missing - isolation check cannot run\").to.eql(true); pm.expect(payload.roles.some(r => r && r.id === tenantARoleId), \"tenant-A role leaked into NoOrg profile: \" + JSON.stringify(payload.roles)).to.eql(false); });"
                                 ]
                             }
                         }
@@ -11935,9 +12121,9 @@
                                     "const tenantARoleId = pm.environment.get(\"roleViewId\");",
                                     "const noOrgRoleId = pm.environment.get(\"noOrgRoleId\");",
                                     "pm.test(\"GetProfile succeeds in Tenant A context\", function(){ pm.expect(hasErr).to.eql(false); pm.expect(!!payload).to.eql(true); });",
-                                    "pm.test(\"Tenant A GetProfile has correct currentTenantId\", function(){ if (!payload) { pm.expect(true).to.eql(true); return; } pm.expect(payload.currentTenantId).to.eql(tenantAId); });",
-                                    "pm.test(\"Tenant A GetProfile.roles is an array (direct assignments only)\", function(){ if (!payload || !Array.isArray(payload.roles)) { pm.expect(true).to.eql(true); return; } pm.expect(Array.isArray(payload.roles)).to.eql(true); });",
-                                    "pm.test(\"NoOrg role hidden in Tenant A GetProfile\", function(){ if (!payload || !Array.isArray(payload.roles) || !noOrgRoleId) { pm.expect(true).to.eql(true); return; } pm.expect(payload.roles.some(r => r && r.id === noOrgRoleId)).to.eql(false); });"
+                                    "pm.test(\"Tenant A GetProfile has correct currentTenantId\", function(){ pm.expect(payload.currentTenantId).to.eql(tenantAId); });",
+                                    "pm.test(\"Tenant A GetProfile.roles is an array (direct assignments only)\", function(){ pm.expect(Array.isArray(payload.roles), 'payload.roles must be an array').to.eql(true); });",
+                                    "pm.test(\"NoOrg role hidden in Tenant A GetProfile\", function(){ pm.expect(Array.isArray(payload.roles)).to.eql(true); pm.expect(!!noOrgRoleId, \"fixture noOrgRoleId is missing - isolation check cannot run\").to.eql(true); pm.expect(payload.roles.some(r => r && r.id === noOrgRoleId), \"NoOrg role leaked into tenant-A profile: \" + JSON.stringify(payload.roles)).to.eql(false); });"
                                 ]
                             }
                         }
@@ -13935,7 +14121,7 @@
                                     "const oldCode = pm.environment.get(\"advConnCodeOld\") || \"\";",
                                     "const denied = !!(json.errors && json.errors.length) || !!(payload && payload.errorMessage);",
                                     "pm.test(\"Regenerated connection code has strict success-or-deny outcome\", function(){",
-                                    "  if (denied) { pm.expect(true).to.eql(true); return; }",
+                                    "  pm.expect(denied, 'RegenerateConnectionCode was denied in a positive scenario').to.eql(false);",
                                     "  pm.expect(newCode !== \"\").to.eql(true);",
                                     "  pm.expect(newCode).to.not.eql(oldCode);",
                                     "});",
@@ -15141,8 +15327,8 @@
                                     "const roleViewId = pm.environment.get(\"roleViewId\");",
                                     "const roleEditorId = pm.environment.get(\"roleEditorId\");",
                                     "pm.test(\"GetProfile succeeds with dual grants in A\", function(){ pm.expect(hasErr).to.eql(false); pm.expect(!!payload).to.eql(true); });",
-                                    "pm.test(\"currentTenantId is delegated A\", function(){ if (!payload) { pm.expect(true).to.eql(true); return; } pm.expect(payload.currentTenantId).to.eql(tenantAId); });",
-                                    "pm.test(\"GetProfile.roles is an array under dual grants (delegation surfaced via GetPermissions)\", function(){ if (!payload || !Array.isArray(payload.roles)) { pm.expect(true).to.eql(true); return; } pm.expect(Array.isArray(payload.roles)).to.eql(true); });"
+                                    "pm.test(\"currentTenantId is delegated A\", function(){ pm.expect(payload.currentTenantId).to.eql(tenantAId); });",
+                                    "pm.test(\"GetProfile.roles is an array under dual grants (delegation surfaced via GetPermissions)\", function(){ pm.expect(Array.isArray(payload.roles), 'payload.roles must be an array').to.eql(true); });"
                                 ]
                             }
                         }
@@ -15189,17 +15375,17 @@
                                     "const permWrite = pm.environment.get(\"permWriteX\") || \"\";",
                                     "const readExpected = (pm.environment.get(\"rbac_read_expected\") || \"false\") === \"true\";",
                                     "const editorExpected = (pm.environment.get(\"rbac_editor_write_expected\") || \"false\") === \"true\";",
-                                    "pm.test(\"B owner permissions response shape is valid\", function(){",
-                                    "  pm.expect(Array.isArray(raw)).to.eql(true);",
-                                    "});",
-                                    "pm.test(\"B owner read permission follows grant visibility model\", function(){",
-                                    "  if (!readExpected || !permRead) { pm.expect(true).to.eql(true); return; }",
-                                    "  pm.expect(perms.includes(permRead)).to.eql(true);",
-                                    "});",
-                                    "pm.test(\"B owner write permission follows editor grant availability\", function(){",
-                                    "  if (!editorExpected || !permWrite) { pm.expect(true).to.eql(true); return; }",
-                                    "  pm.expect(perms.includes(permWrite)).to.eql(true);",
-                                    "});"
+                                    "pm.test(\"B owner permissions response shape is valid\", function(){ pm.expect(Array.isArray(raw)).to.eql(true); });",
+                                    "if (!readExpected || !permRead) {",
+                                    "  pm.test.skip(\"B owner read permission follows grant visibility model (not applicable in this state)\", function(){});",
+                                    "} else {",
+                                    "  pm.test(\"B owner read permission follows grant visibility model\", function(){ pm.expect(perms.includes(permRead), 'view-grant read permission missing: ' + JSON.stringify(perms)).to.eql(true); });",
+                                    "}",
+                                    "if (!editorExpected || !permWrite) {",
+                                    "  pm.test.skip(\"B owner write permission follows editor grant availability (not applicable in this state)\", function(){});",
+                                    "} else {",
+                                    "  pm.test(\"B owner write permission follows editor grant availability\", function(){ pm.expect(perms.includes(permWrite), 'editor-grant write permission missing: ' + JSON.stringify(perms)).to.eql(true); });",
+                                    "}"
                                 ],
                                 "_lastExecutionId": "d9e8ae2b-b8d8-4f1b-bf2e-ebc715e9908b"
                             }
@@ -15427,15 +15613,14 @@
                                     "const perms = raw.map(p => (typeof p === \"string\" ? p : (p && p.id ? p.id : \"\"))).filter(Boolean);",
                                     "const permRead = pm.environment.get(\"permReadX\") || \"\";",
                                     "const permWrite = pm.environment.get(\"permWriteX\") || \"\";",
-                                    "const readExpected = (pm.environment.get(\"rbac_read_expected\") || \"false\") === \"true\";",
-                                    "const editorExpected = (pm.environment.get(\"rbac_editor_write_expected\") || \"false\") === \"true\";",
-                                    "pm.test(\"A member has read permission from view grant\", function(){",
-                                    "  if (!readExpected || !permRead) { pm.expect(true).to.eql(true); return; }",
-                                    "  pm.expect(perms.includes(permRead)).to.eql(true);",
-                                    "});",
-                                    "pm.test(\"A member write permission follows editor grant availability\", function(){",
-                                    "  if (!editorExpected || !permWrite) { pm.expect(true).to.eql(true); return; }",
-                                    "  pm.expect(typeof perms.includes(permWrite)).to.eql(\"boolean\");",
+                                    "// A member belongs to tenant A - the tenant that ISSUED the grant. imtauthgql::",
+                                    "// AdaptUserForTenant enriches with delegated roles only for users WITHOUT a direct",
+                                    "// membership in the current tenant (that is the B owner case, asserted above), so",
+                                    "// inside A the grant adds nothing: A member keeps exactly their own A permissions.",
+                                    "pm.test(\"A member permissions response shape is valid\", function(){ pm.expect(Array.isArray(raw)).to.eql(true); });",
+                                    "pm.test(\"A member gains no delegated permissions inside the granting tenant\", function(){",
+                                    "  if (permRead) { pm.expect(perms.includes(permRead), 'unexpected delegated read permission: ' + JSON.stringify(perms)).to.eql(false); }",
+                                    "  if (permWrite) { pm.expect(perms.includes(permWrite), 'unexpected delegated write permission: ' + JSON.stringify(perms)).to.eql(false); }",
                                     "});"
                                 ],
                                 "_lastExecutionId": "8e338b07-8ad7-49f9-857d-21af90888b95"
@@ -15665,14 +15850,16 @@
                                     "const permWrite = pm.environment.get(\"permWriteX\") || \"\";",
                                     "const readExpected = (pm.environment.get(\"rbac_read_expected\") || \"false\") === \"true\";",
                                     "const editorExpected = (pm.environment.get(\"rbac_editor_write_expected\") || \"false\") === \"true\";",
-                                    "pm.test(\"Read permission persists after editor revoke\", function(){",
-                                    "  if (!readExpected || !permRead) { pm.expect(true).to.eql(true); return; }",
-                                    "  pm.expect(perms.includes(permRead)).to.eql(true);",
-                                    "});",
-                                    "pm.test(\"Write permission removed after editor revoke\", function(){",
-                                    "  if (!editorExpected || !permWrite) { pm.expect(true).to.eql(true); return; }",
-                                    "  pm.expect(perms.includes(permWrite)).to.eql(false);",
-                                    "});"
+                                    "if (!readExpected || !permRead) {",
+                                    "  pm.test.skip(\"Read permission persists after editor revoke (not applicable in this state)\", function(){});",
+                                    "} else {",
+                                    "  pm.test(\"Read permission persists after editor revoke\", function(){ pm.expect(perms.includes(permRead)).to.eql(true); });",
+                                    "}",
+                                    "if (!editorExpected || !permWrite) {",
+                                    "  pm.test.skip(\"Write permission removed after editor revoke (not applicable in this state)\", function(){});",
+                                    "} else {",
+                                    "  pm.test(\"Write permission removed after editor revoke\", function(){ pm.expect(perms.includes(permWrite)).to.eql(false); });",
+                                    "}"
                                 ],
                                 "_lastExecutionId": "d4e066c4-835a-4fdb-af8e-a3ea27de0da3"
                             }
@@ -15720,8 +15907,8 @@
                                     "const roleViewId = pm.environment.get(\"roleViewId\");",
                                     "const roleEditorId = pm.environment.get(\"roleEditorId\");",
                                     "pm.test(\"GetProfile succeeds after partial revoke\", function(){ pm.expect(hasErr).to.eql(false); pm.expect(!!payload).to.eql(true); });",
-                                    "pm.test(\"still in A context\", function(){ if (!payload) { pm.expect(true).to.eql(true); return; } pm.expect(payload.currentTenantId).to.eql(tenantAId); });",
-                                    "pm.test(\"GetProfile.roles is an array after editor revoke (delegation surfaced via GetPermissions)\", function(){ if (!payload || !Array.isArray(payload.roles)) { pm.expect(true).to.eql(true); return; } pm.expect(Array.isArray(payload.roles)).to.eql(true); });"
+                                    "pm.test(\"still in A context\", function(){ pm.expect(payload.currentTenantId).to.eql(tenantAId); });",
+                                    "pm.test(\"GetProfile.roles is an array after editor revoke (delegation surfaced via GetPermissions)\", function(){ pm.expect(Array.isArray(payload.roles), 'payload.roles must be an array').to.eql(true); });"
                                 ]
                             }
                         }
@@ -15902,15 +16089,14 @@
                                     "const perms = raw.map(p => (typeof p === \"string\" ? p : (p && p.id ? p.id : \"\"))).filter(Boolean);",
                                     "const permRead = pm.environment.get(\"permReadX\") || \"\";",
                                     "const permWrite = pm.environment.get(\"permWriteX\") || \"\";",
-                                    "const readExpected = (pm.environment.get(\"rbac_read_expected\") || \"false\") === \"true\";",
-                                    "const editorExpected = (pm.environment.get(\"rbac_editor_write_expected\") || \"false\") === \"true\";",
-                                    "pm.test(\"A member read permission persists after editor revoke\", function(){",
-                                    "  if (!readExpected || !permRead) { pm.expect(true).to.eql(true); return; }",
-                                    "  pm.expect(perms.includes(permRead)).to.eql(true);",
-                                    "});",
-                                    "pm.test(\"A member write permission removed after editor revoke\", function(){",
-                                    "  if (!editorExpected) { pm.expect(true).to.eql(true); return; }",
-                                    "  pm.expect(perms.includes(permWrite)).to.eql(false);",
+                                    "// A member belongs to tenant A - the tenant that ISSUED the grant. imtauthgql::",
+                                    "// AdaptUserForTenant enriches with delegated roles only for users WITHOUT a direct",
+                                    "// membership in the current tenant (that is the B owner case, asserted above), so",
+                                    "// inside A the grant adds nothing: A member keeps exactly their own A permissions.",
+                                    "pm.test(\"A member permissions response shape is valid\", function(){ pm.expect(Array.isArray(raw)).to.eql(true); });",
+                                    "pm.test(\"A member permissions are unaffected by the editor revoke\", function(){",
+                                    "  if (permRead) { pm.expect(perms.includes(permRead), 'unexpected delegated read permission: ' + JSON.stringify(perms)).to.eql(false); }",
+                                    "  if (permWrite) { pm.expect(perms.includes(permWrite), 'unexpected delegated write permission: ' + JSON.stringify(perms)).to.eql(false); }",
                                     "});"
                                 ],
                                 "_lastExecutionId": "e1c5534d-12d5-44a7-8806-a5296957ae98"
@@ -16043,7 +16229,7 @@
                                     "const session = payload ? payload.userSession : null;",
                                     "const denied = !!(json.errors && json.errors.length) || !!(payload && payload.errorMessage) || !!(payload && payload.ok === false);",
                                     "pm.test(\"B owner SelectTenant(B) after all revokes has strict allow-or-deny shape\", function(){",
-                                    "  if (denied) { pm.expect(true).to.eql(true); return; }",
+                                    "  pm.expect(denied, 'B owner must still be able to select its OWN tenant B after revokes').to.eql(false);",
                                     "  pm.expect(!!payload && payload.ok === true).to.eql(true);",
                                     "  pm.expect(!!session && !!session.accessToken).to.eql(true);",
                                     "});",
@@ -16227,7 +16413,7 @@
                                     "const session = payload ? payload.userSession : null;",
                                     "const denied = !!(json.errors && json.errors.length) || !!(payload && payload.errorMessage) || !!(payload && payload.ok === false);",
                                     "pm.test(\"A member SelectTenant(B) after all revokes has strict allow-or-deny shape\", function(){",
-                                    "  if (denied) { pm.expect(true).to.eql(true); return; }",
+                                    "  pm.expect(denied, 'A member must still be able to select tenant B (own membership) after revokes').to.eql(false);",
                                     "  pm.expect(!!payload && payload.ok === true).to.eql(true);",
                                     "  pm.expect(!!session && !!session.accessToken).to.eql(true);",
                                     "});",
@@ -16615,7 +16801,7 @@
                                     "    pm.expect(!payload || payload.status !== 'Success').to.eql(true);",
                                     "  });",
                                     "} else {",
-                                    "  pm.test('RolePerm: forbidden check skipped (no forbidden permission)', function(){ pm.expect(true).to.eql(true); });",
+                                    "  pm.test.skip('RolePerm: forbidden permission save is rejected (not applicable: tenant exposes no forbidden permission)', function(){});",
                                     "}"
                                 ]
                             }
@@ -16749,7 +16935,7 @@
                                     "    pm.expect(!!payload && payload.status === 'Success').to.eql(true);",
                                     "  });",
                                     "} else {",
-                                    "  pm.test('RolePerm: allowed check skipped (tenant has no selectable permissions)', function(){ pm.expect(true).to.eql(true); });",
+                                    "  pm.test.skip('RolePerm: allowed permission path succeeds (not applicable: tenant has no selectable permission)', function(){});",
                                     "}"
                                 ]
                             }
@@ -17758,7 +17944,13 @@
                     "id": "urti-refresh-auth-a",
                     "name": "Refresh auth A owner (user repr isolation setup)",
                     "request": {
-                        "url": { "host": [ "{{base_url}}" ], "query": [], "variable": [] },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
                         "method": "POST",
                         "body": {
                             "mode": "graphql",
@@ -17834,255 +18026,543 @@
                     "id": "urti-create-role",
                     "name": "Isolation probe: Create role bound to tenant A",
                     "request": {
-                        "url": { "host": [ "{{base_url}}" ], "query": [], "variable": [] },
-                        "header": [ { "key": "x-authentication-token", "value": "{{a_owner_token}}" } ],
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_token}}"
+                            }
+                        ],
                         "method": "POST",
-                        "body": { "mode": "graphql", "graphql": { "query": "mutation CreateNewDocument { CreateNewDocument(input: { collectionId: \"Roles\", typeId: \"Role\", proposedSourceDocumentId: \"{{urtiRoleId}}\" }) { documentId objectId } }", "variables": "" } }
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateNewDocument { CreateNewDocument(input: { collectionId: \"Roles\", typeId: \"Role\", proposedSourceDocumentId: \"{{urtiRoleId}}\" }) { documentId objectId } }",
+                                "variables": ""
+                            }
+                        }
                     },
                     "response": [],
                     "event": [
-                        { "listen": "prerequest", "script": { "type": "text/javascript", "exec": [
-                            "pm.environment.set('urtiRoleId', pm.variables.replaceIn('{{$guid}}'));",
-                            "pm.environment.set('urtiRoleCode', 'R_URTI_' + pm.variables.replaceIn('{{$timestamp}}'));",
-                            "pm.environment.set('urtiGroupId', pm.variables.replaceIn('{{$guid}}'));",
-                            "pm.environment.set('urtiGroupName', 'G_URTI_' + pm.variables.replaceIn('{{$timestamp}}'));"
-                        ] } },
-                        { "listen": "test", "script": { "type": "text/javascript", "exec": [
-                            "const json = pm.response.json();",
-                            "const payload = json.data ? json.data.CreateNewDocument : null;",
-                            "pm.test('Isolation probe role document created', function(){ pm.expect(!!(payload && payload.documentId)).to.eql(true); });",
-                            "if (payload && payload.documentId) pm.environment.set('urtiRoleDocId', payload.documentId);",
-                            "if (payload && payload.objectId) pm.environment.set('urtiRoleId', payload.objectId);"
-                        ] } }
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.environment.set('urtiRoleId', pm.variables.replaceIn('{{$guid}}'));",
+                                    "pm.environment.set('urtiRoleCode', 'R_URTI_' + pm.variables.replaceIn('{{$timestamp}}'));",
+                                    "pm.environment.set('urtiGroupId', pm.variables.replaceIn('{{$guid}}'));",
+                                    "pm.environment.set('urtiGroupName', 'G_URTI_' + pm.variables.replaceIn('{{$timestamp}}'));"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.CreateNewDocument : null;",
+                                    "pm.test('Isolation probe role document created', function(){ pm.expect(!!(payload && payload.documentId)).to.eql(true); });",
+                                    "if (payload && payload.documentId) pm.environment.set('urtiRoleDocId', payload.documentId);",
+                                    "if (payload && payload.objectId) pm.environment.set('urtiRoleId', payload.objectId);"
+                                ]
+                            }
+                        }
                     ]
                 },
                 {
                     "id": "urti-update-role",
                     "name": "Isolation probe: Update role permissions",
                     "request": {
-                        "url": { "host": [ "{{base_url}}" ], "query": [], "variable": [] },
-                        "header": [ { "key": "x-authentication-token", "value": "{{a_owner_token}}" } ],
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_token}}"
+                            }
+                        ],
                         "method": "POST",
-                        "body": { "mode": "graphql", "graphql": { "query": "mutation UpdateRoleFromRepresentation { UpdateRoleFromRepresentation(input: { documentId: \"{{urtiRoleDocId}}\", role: { id: \"{{urtiRoleId}}\", name: \"{{urtiRoleCode}}\", description: \"Tenant A isolation probe role\", roleId: \"{{urtiRoleCode}}\", productId: \"{{product_id}}\", parentRoles: [], permissions: \"ViewUsers\", isDefault: false, isGuest: false } }) { status message } }", "variables": "" } }
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UpdateRoleFromRepresentation { UpdateRoleFromRepresentation(input: { documentId: \"{{urtiRoleDocId}}\", role: { id: \"{{urtiRoleId}}\", name: \"{{urtiRoleCode}}\", description: \"Tenant A isolation probe role\", roleId: \"{{urtiRoleCode}}\", productId: \"{{product_id}}\", parentRoles: [], permissions: \"ViewUsers\", isDefault: false, isGuest: false } }) { status message } }",
+                                "variables": ""
+                            }
+                        }
                     },
                     "response": [],
                     "event": [
-                        { "listen": "test", "script": { "type": "text/javascript", "exec": [
-                            "const json = pm.response.json();",
-                            "const payload = json.data ? json.data.UpdateRoleFromRepresentation : null;",
-                            "pm.test('Isolation probe role representation updated', function(){ pm.expect(payload && payload.status === 'Success').to.eql(true); });"
-                        ] } }
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.UpdateRoleFromRepresentation : null;",
+                                    "pm.test('Isolation probe role representation updated', function(){ pm.expect(payload && payload.status === 'Success').to.eql(true); });"
+                                ]
+                            }
+                        }
                     ]
                 },
                 {
                     "id": "urti-save-role",
                     "name": "Isolation probe: Save role document",
                     "request": {
-                        "url": { "host": [ "{{base_url}}" ], "query": [], "variable": [] },
-                        "header": [ { "key": "x-authentication-token", "value": "{{a_owner_token}}" } ],
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_token}}"
+                            }
+                        ],
                         "method": "POST",
-                        "body": { "mode": "graphql", "graphql": { "query": "mutation SaveDocument { SaveDocument(input: { collectionId: \"Roles\", documentId: \"{{urtiRoleDocId}}\", documentName: \"{{urtiRoleCode}}\" }) { status message } }", "variables": "" } }
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SaveDocument { SaveDocument(input: { collectionId: \"Roles\", documentId: \"{{urtiRoleDocId}}\", documentName: \"{{urtiRoleCode}}\" }) { status message } }",
+                                "variables": ""
+                            }
+                        }
                     },
                     "response": [],
                     "event": [
-                        { "listen": "test", "script": { "type": "text/javascript", "exec": [
-                            "const json = pm.response.json();",
-                            "const payload = json.data ? json.data.SaveDocument : null;",
-                            "pm.test('Isolation probe role document saved', function(){ pm.expect(payload && payload.status === 'Success').to.eql(true); });"
-                        ] } }
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.SaveDocument : null;",
+                                    "pm.test('Isolation probe role document saved', function(){ pm.expect(payload && payload.status === 'Success').to.eql(true); });"
+                                ]
+                            }
+                        }
                     ]
                 },
                 {
                     "id": "urti-get-role-id",
                     "name": "Isolation probe: Resolve real role objectId",
                     "request": {
-                        "url": { "host": [ "{{base_url}}" ], "query": [], "variable": [] },
-                        "header": [ { "key": "x-authentication-token", "value": "{{a_owner_token}}" } ],
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_token}}"
+                            }
+                        ],
                         "method": "POST",
-                        "body": { "mode": "graphql", "graphql": { "query": "query RolesList { RolesList(input: { productId: \"{{product_id}}\", viewParams: { offset: 0, count: 500 } }) { items { id roleId roleName } } }", "variables": "" } }
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query RolesList { RolesList(input: { productId: \"{{product_id}}\", viewParams: { offset: 0, count: 500 } }) { items { id roleId roleName } } }",
+                                "variables": ""
+                            }
+                        }
                     },
                     "response": [],
                     "event": [
-                        { "listen": "test", "script": { "type": "text/javascript", "exec": [
-                            "const json = pm.response.json();",
-                            "const items = (json.data && json.data.RolesList && json.data.RolesList.items) || [];",
-                            "const urtiRoleCode = pm.environment.get('urtiRoleCode');",
-                            "const found = items.find(function(it){ return it.roleId === urtiRoleCode; });",
-                            "pm.test('Isolation probe role real ID resolved', function(){ pm.expect(!!(found && found.id)).to.eql(true); });",
-                            "if (found && found.id) pm.environment.set('urtiRoleId', found.id);"
-                        ] } }
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const items = (json.data && json.data.RolesList && json.data.RolesList.items) || [];",
+                                    "const urtiRoleCode = pm.environment.get('urtiRoleCode');",
+                                    "const found = items.find(function(it){ return it.roleId === urtiRoleCode; });",
+                                    "pm.test('Isolation probe role real ID resolved', function(){ pm.expect(!!(found && found.id)).to.eql(true); });",
+                                    "if (found && found.id) pm.environment.set('urtiRoleId', found.id);"
+                                ]
+                            }
+                        }
                     ]
                 },
                 {
                     "id": "urti-create-group",
                     "name": "Isolation probe: Create group bound to tenant A",
                     "request": {
-                        "url": { "host": [ "{{base_url}}" ], "query": [], "variable": [] },
-                        "header": [ { "key": "x-authentication-token", "value": "{{a_owner_token}}" } ],
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_token}}"
+                            }
+                        ],
                         "method": "POST",
-                        "body": { "mode": "graphql", "graphql": { "query": "mutation CreateNewDocument { CreateNewDocument(input: { collectionId: \"Groups\", typeId: \"Group\", proposedSourceDocumentId: \"{{urtiGroupId}}\" }) { documentId objectId } }", "variables": "" } }
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateNewDocument { CreateNewDocument(input: { collectionId: \"Groups\", typeId: \"Group\", proposedSourceDocumentId: \"{{urtiGroupId}}\" }) { documentId objectId } }",
+                                "variables": ""
+                            }
+                        }
                     },
                     "response": [],
                     "event": [
-                        { "listen": "test", "script": { "type": "text/javascript", "exec": [
-                            "const json = pm.response.json();",
-                            "const payload = json.data ? json.data.CreateNewDocument : null;",
-                            "pm.test('Isolation probe group document created', function(){ pm.expect(!!(payload && payload.documentId)).to.eql(true); });",
-                            "if (payload && payload.documentId) pm.environment.set('urtiGroupDocId', payload.documentId);",
-                            "if (payload && payload.objectId) pm.environment.set('urtiGroupId', payload.objectId);"
-                        ] } }
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.CreateNewDocument : null;",
+                                    "pm.test('Isolation probe group document created', function(){ pm.expect(!!(payload && payload.documentId)).to.eql(true); });",
+                                    "if (payload && payload.documentId) pm.environment.set('urtiGroupDocId', payload.documentId);",
+                                    "if (payload && payload.objectId) pm.environment.set('urtiGroupId', payload.objectId);"
+                                ]
+                            }
+                        }
                     ]
                 },
                 {
                     "id": "urti-update-group",
                     "name": "Isolation probe: Update group",
                     "request": {
-                        "url": { "host": [ "{{base_url}}" ], "query": [], "variable": [] },
-                        "header": [ { "key": "x-authentication-token", "value": "{{a_owner_token}}" } ],
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_token}}"
+                            }
+                        ],
                         "method": "POST",
-                        "body": { "mode": "graphql", "graphql": { "query": "mutation UpdateGroupFromRepresentation { UpdateGroupFromRepresentation(input: { documentId: \"{{urtiGroupDocId}}\", group: { id: \"{{urtiGroupId}}\", productId: \"{{product_id}}\", name: \"{{urtiGroupName}}\", description: \"Tenant A isolation probe group\", roles: [], users: [], parentGroups: [] } }) { status message } }", "variables": "" } }
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UpdateGroupFromRepresentation { UpdateGroupFromRepresentation(input: { documentId: \"{{urtiGroupDocId}}\", group: { id: \"{{urtiGroupId}}\", productId: \"{{product_id}}\", name: \"{{urtiGroupName}}\", description: \"Tenant A isolation probe group\", roles: [], users: [], parentGroups: [] } }) { status message } }",
+                                "variables": ""
+                            }
+                        }
                     },
                     "response": [],
                     "event": [
-                        { "listen": "test", "script": { "type": "text/javascript", "exec": [
-                            "const json = pm.response.json();",
-                            "const payload = json.data ? json.data.UpdateGroupFromRepresentation : null;",
-                            "pm.test('Isolation probe group representation updated', function(){ pm.expect(payload && payload.status === 'Success').to.eql(true); });"
-                        ] } }
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.UpdateGroupFromRepresentation : null;",
+                                    "pm.test('Isolation probe group representation updated', function(){ pm.expect(payload && payload.status === 'Success').to.eql(true); });"
+                                ]
+                            }
+                        }
                     ]
                 },
                 {
                     "id": "urti-save-group",
                     "name": "Isolation probe: Save group document",
                     "request": {
-                        "url": { "host": [ "{{base_url}}" ], "query": [], "variable": [] },
-                        "header": [ { "key": "x-authentication-token", "value": "{{a_owner_token}}" } ],
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_token}}"
+                            }
+                        ],
                         "method": "POST",
-                        "body": { "mode": "graphql", "graphql": { "query": "mutation SaveDocument { SaveDocument(input: { collectionId: \"Groups\", documentId: \"{{urtiGroupDocId}}\", documentName: \"{{urtiGroupName}}\" }) { status message } }", "variables": "" } }
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SaveDocument { SaveDocument(input: { collectionId: \"Groups\", documentId: \"{{urtiGroupDocId}}\", documentName: \"{{urtiGroupName}}\" }) { status message } }",
+                                "variables": ""
+                            }
+                        }
                     },
                     "response": [],
                     "event": [
-                        { "listen": "test", "script": { "type": "text/javascript", "exec": [
-                            "const json = pm.response.json();",
-                            "const payload = json.data ? json.data.SaveDocument : null;",
-                            "pm.test('Isolation probe group document saved', function(){ pm.expect(payload && payload.status === 'Success').to.eql(true); });"
-                        ] } }
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.SaveDocument : null;",
+                                    "pm.test('Isolation probe group document saved', function(){ pm.expect(payload && payload.status === 'Success').to.eql(true); });"
+                                ]
+                            }
+                        }
                     ]
                 },
                 {
                     "id": "urti-get-group-id",
                     "name": "Isolation probe: Resolve real group objectId",
                     "request": {
-                        "url": { "host": [ "{{base_url}}" ], "query": [], "variable": [] },
-                        "header": [ { "key": "x-authentication-token", "value": "{{a_owner_token}}" } ],
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_token}}"
+                            }
+                        ],
                         "method": "POST",
-                        "body": { "mode": "graphql", "graphql": { "query": "query GroupsList { GroupsList(input: { productId: \"{{product_id}}\", viewParams: { offset: 0, count: 500 } }) { items { id name description } } }", "variables": "" } }
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GroupsList { GroupsList(input: { productId: \"{{product_id}}\", viewParams: { offset: 0, count: 500 } }) { items { id name description } } }",
+                                "variables": ""
+                            }
+                        }
                     },
                     "response": [],
                     "event": [
-                        { "listen": "test", "script": { "type": "text/javascript", "exec": [
-                            "const json = pm.response.json();",
-                            "const items = (json.data && json.data.GroupsList && json.data.GroupsList.items) || [];",
-                            "const urtiGroupName = pm.environment.get('urtiGroupName');",
-                            "const found = items.find(function(it){ return it.name === urtiGroupName; });",
-                            "pm.test('Isolation probe group real ID resolved', function(){ pm.expect(!!(found && found.id)).to.eql(true); });",
-                            "if (found && found.id) pm.environment.set('urtiGroupId', found.id);"
-                        ] } }
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const items = (json.data && json.data.GroupsList && json.data.GroupsList.items) || [];",
+                                    "const urtiGroupName = pm.environment.get('urtiGroupName');",
+                                    "const found = items.find(function(it){ return it.name === urtiGroupName; });",
+                                    "pm.test('Isolation probe group real ID resolved', function(){ pm.expect(!!(found && found.id)).to.eql(true); });",
+                                    "if (found && found.id) pm.environment.set('urtiGroupId', found.id);"
+                                ]
+                            }
+                        }
                     ]
                 },
                 {
                     "id": "urti-open-member",
                     "name": "Isolation probe: Open a_member user document",
                     "request": {
-                        "url": { "host": [ "{{base_url}}" ], "query": [], "variable": [] },
-                        "header": [ { "key": "x-authentication-token", "value": "{{a_owner_token}}" } ],
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_token}}"
+                            }
+                        ],
                         "method": "POST",
-                        "body": { "mode": "graphql", "graphql": { "query": "mutation OpenDocument { OpenDocument(input: { collectionId: \"Users\", id: \"{{a_member_user_id}}\" }) { documentId } }", "variables": "" } }
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation OpenDocument { OpenDocument(input: { collectionId: \"Users\", id: \"{{a_member_user_id}}\" }) { documentId } }",
+                                "variables": ""
+                            }
+                        }
                     },
                     "response": [],
                     "event": [
-                        { "listen": "test", "script": { "type": "text/javascript", "exec": [
-                            "const json = pm.response.json();",
-                            "const payload = json.data ? json.data.OpenDocument : null;",
-                            "pm.test('Isolation probe: a_member document opened', function(){ pm.expect(!!(payload && payload.documentId)).to.eql(true); });",
-                            "if (payload && payload.documentId) pm.environment.set('urtiMemberDocId', payload.documentId);"
-                        ] } }
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.OpenDocument : null;",
+                                    "pm.test('Isolation probe: a_member document opened', function(){ pm.expect(!!(payload && payload.documentId)).to.eql(true); });",
+                                    "if (payload && payload.documentId) pm.environment.set('urtiMemberDocId', payload.documentId);"
+                                ]
+                            }
+                        }
                     ]
                 },
                 {
                     "id": "urti-wait-member-load",
                     "name": "Isolation probe: Wait for a_member document load",
                     "request": {
-                        "url": { "host": [ "{{base_url}}" ], "query": [], "variable": [] },
-                        "header": [ { "key": "x-authentication-token", "value": "{{a_owner_token}}" } ],
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_token}}"
+                            }
+                        ],
                         "method": "POST",
-                        "body": { "mode": "graphql", "graphql": { "query": "query GetUserRepresentation { GetUserRepresentation(input: { collectionId: \"Users\", id: \"{{urtiMemberDocId}}\" }) { id } }", "variables": "" } }
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetUserRepresentation { GetUserRepresentation(input: { collectionId: \"Users\", id: \"{{urtiMemberDocId}}\" }) { id } }",
+                                "variables": ""
+                            }
+                        }
                     },
                     "response": [],
                     "event": [
-                        { "listen": "prerequest", "script": { "type": "text/javascript", "exec": [
-                            "if (parseInt(pm.environment.get('docWaitAttempt_urtiMember') || '0', 10) > 0) {",
-                            "    const until = Date.now() + 150;",
-                            "    while (Date.now() < until) { /* spin */ }",
-                            "}"
-                        ] } },
-                        { "listen": "test", "script": { "type": "text/javascript", "exec": [
-                            "// See \"Wait for A member document load\" earlier in this collection for why",
-                            "// this polls instead of doing a single round-trip.",
-                            "const json = pm.response.json();",
-                            "const repr = json.data && json.data.GetUserRepresentation;",
-                            "const loaded = !!(repr && repr.id);",
-                            "const maxAttempts = 25;",
-                            "const attempt = parseInt(pm.environment.get('docWaitAttempt_urtiMember') || '0', 10);",
-                            "if (loaded) {",
-                            "    pm.environment.set('docWaitAttempt_urtiMember', '0');",
-                            "    pm.test('Isolation probe: a_member document loaded', function(){ pm.expect(loaded).to.eql(true); });",
-                            "} else if (attempt < maxAttempts) {",
-                            "    pm.environment.set('docWaitAttempt_urtiMember', String(attempt + 1));",
-                            "    postman.setNextRequest('Isolation probe: Wait for a_member document load');",
-                            "} else {",
-                            "    pm.environment.set('docWaitAttempt_urtiMember', '0');",
-                            "    pm.test('Isolation probe: a_member document loaded', function(){",
-                            "        pm.expect.fail('document still not readable after ' + maxAttempts + ' polls');",
-                            "    });",
-                            "}"
-                        ] } }
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "if (parseInt(pm.environment.get('docWaitAttempt_urtiMember') || '0', 10) > 0) {",
+                                    "    const until = Date.now() + 150;",
+                                    "    while (Date.now() < until) { /* spin */ }",
+                                    "}"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "// See \"Wait for A member document load\" earlier in this collection for why",
+                                    "// this polls instead of doing a single round-trip.",
+                                    "const json = pm.response.json();",
+                                    "const repr = json.data && json.data.GetUserRepresentation;",
+                                    "const loaded = !!(repr && repr.id);",
+                                    "const maxAttempts = 25;",
+                                    "const attempt = parseInt(pm.environment.get('docWaitAttempt_urtiMember') || '0', 10);",
+                                    "if (loaded) {",
+                                    "    pm.environment.set('docWaitAttempt_urtiMember', '0');",
+                                    "    pm.test('Isolation probe: a_member document loaded', function(){ pm.expect(loaded).to.eql(true); });",
+                                    "} else if (attempt < maxAttempts) {",
+                                    "    pm.environment.set('docWaitAttempt_urtiMember', String(attempt + 1));",
+                                    "    postman.setNextRequest('Isolation probe: Wait for a_member document load');",
+                                    "} else {",
+                                    "    pm.environment.set('docWaitAttempt_urtiMember', '0');",
+                                    "    pm.test('Isolation probe: a_member document loaded', function(){",
+                                    "        pm.expect.fail('document still not readable after ' + maxAttempts + ' polls');",
+                                    "    });",
+                                    "}"
+                                ]
+                            }
+                        }
                     ]
                 },
                 {
                     "id": "urti-assign-member",
                     "name": "Isolation probe: Assign role+group to a_member (tenant A binding)",
                     "request": {
-                        "url": { "host": [ "{{base_url}}" ], "query": [], "variable": [] },
-                        "header": [ { "key": "x-authentication-token", "value": "{{a_owner_token}}" } ],
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_token}}"
+                            }
+                        ],
                         "method": "POST",
-                        "body": { "mode": "graphql", "graphql": { "query": "mutation UpdateUserFromRepresentation { UpdateUserFromRepresentation(input: { documentId: \"{{urtiMemberDocId}}\", tenantId: \"{{tenantAId}}\", user: { id: \"{{a_member_user_id}}\", productId: \"{{product_id}}\", name: \"A Member\", username: \"{{a_member_login}}\", password: \"\", email: \"\", groups: [\"{{urtiGroupId}}\"], roles: [\"{{urtiRoleId}}\"], permissions: [], systemInfos: [] } }) { status message } }", "variables": "" } }
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UpdateUserFromRepresentation { UpdateUserFromRepresentation(input: { documentId: \"{{urtiMemberDocId}}\", tenantId: \"{{tenantAId}}\", user: { id: \"{{a_member_user_id}}\", productId: \"{{product_id}}\", name: \"A Member\", username: \"{{a_member_login}}\", password: \"\", email: \"\", groups: [\"{{urtiGroupId}}\"], roles: [\"{{urtiRoleId}}\"], permissions: [], systemInfos: [] } }) { status message } }",
+                                "variables": ""
+                            }
+                        }
                     },
                     "response": [],
                     "event": [
-                        { "listen": "test", "script": { "type": "text/javascript", "exec": [
-                            "const json = pm.response.json();",
-                            "const payload = json.data ? json.data.UpdateUserFromRepresentation : null;",
-                            "pm.test('Isolation probe role+group assigned to a_member', function(){ pm.expect(payload && payload.status === 'Success').to.eql(true); });"
-                        ] } }
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.UpdateUserFromRepresentation : null;",
+                                    "pm.test('Isolation probe role+group assigned to a_member', function(){ pm.expect(payload && payload.status === 'Success').to.eql(true); });"
+                                ]
+                            }
+                        }
                     ]
                 },
                 {
                     "id": "urti-save-member",
                     "name": "Isolation probe: Save a_member document",
                     "request": {
-                        "url": { "host": [ "{{base_url}}" ], "query": [], "variable": [] },
-                        "header": [ { "key": "x-authentication-token", "value": "{{a_owner_token}}" } ],
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_token}}"
+                            }
+                        ],
                         "method": "POST",
-                        "body": { "mode": "graphql", "graphql": { "query": "mutation SaveDocument { SaveDocument(input: { collectionId: \"Users\", documentId: \"{{urtiMemberDocId}}\", documentName: \"\" }) { status message } }", "variables": "" } }
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SaveDocument { SaveDocument(input: { collectionId: \"Users\", documentId: \"{{urtiMemberDocId}}\", documentName: \"\" }) { status message } }",
+                                "variables": ""
+                            }
+                        }
                     },
                     "response": [],
                     "event": [
-                        { "listen": "test", "script": { "type": "text/javascript", "exec": [
-                            "const json = pm.response.json();",
-                            "const payload = json.data ? json.data.SaveDocument : null;",
-                            "pm.test('Isolation probe: a_member document saved', function(){ pm.expect(payload && payload.status === 'Success').to.eql(true); });"
-                        ] } }
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.SaveDocument : null;",
+                                    "pm.test('Isolation probe: a_member document saved', function(){ pm.expect(payload && payload.status === 'Success').to.eql(true); });"
+                                ]
+                            }
+                        }
                     ]
                 },
                 {
@@ -18121,7 +18601,7 @@
                                     "const json = pm.response.json();",
                                     "const payload = json.data ? json.data.GetUserRepresentation : null;",
                                     "const hasErr = !!(json.errors && json.errors.length);",
-                                    "pm.test('GetUserRepresentation under tenant returns data', function(){ if (hasErr) { pm.expect(true).to.eql(true); return; } pm.expect(!!payload && !!payload.id).to.eql(true); });",
+                                    "pm.test('GetUserRepresentation under tenant returns data', function(){ pm.expect(hasErr, 'unexpected GraphQL error: ' + JSON.stringify(json.errors)).to.eql(false); pm.expect(!!payload && !!payload.id).to.eql(true); });",
                                     "pm.test('Roles array includes tenant-A-bound isolation probe role (tenant filtered by CUserCollectionDocumentServiceComp)', function(){",
                                     "  if (hasErr || !payload) return;",
                                     "  pm.expect(Array.isArray(payload.roles)).to.eql(true);",
@@ -18183,6 +18663,130 @@
                     ]
                 },
                 {
+                    "id": "urti-open-b",
+                    "name": "Isolation probe: Open a_member user document as B owner",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{b_owner_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation OpenDocument { OpenDocument(input: { collectionId: \"Users\", id: \"{{a_member_user_id}}\" }) { documentId } }",
+                                "variables": ""
+                            }
+                        },
+                        "description": "Opens the shared user in B owner's own document workspace so the cross-tenant leak assertion can actually run."
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "// The leak check below used to reuse urtiMemberDocId - a document opened in",
+                                    "// A OWNER's workspace. Document workspaces are keyed per user server-side, so",
+                                    "// B owner always got 'Document not found' and the assertion, which treated any",
+                                    "// error as a pass, never actually verified anything. B owner must open the user",
+                                    "// in its own workspace for the cross-tenant check to mean something.",
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.OpenDocument : null;",
+                                    "const docId = payload && payload.documentId ? payload.documentId : '';",
+                                    "pm.environment.set('urtiMemberDocIdB', docId);",
+                                    "pm.environment.set('urtiOpenedUnderB', docId ? 'true' : 'false');",
+                                    "pm.test('B owner OpenDocument on a shared user is either granted or cleanly denied', function(){",
+                                    "  const denied = !!(json.errors && json.errors.length);",
+                                    "  pm.expect(denied || !!docId, 'neither a document nor a clean denial was returned').to.eql(true);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "urti-wait-b",
+                    "name": "Isolation probe: Wait for a_member document load (B owner)",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{b_owner_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetUserRepresentation { GetUserRepresentation(input: { collectionId: \"Users\", id: \"{{urtiMemberDocIdB}}\" }) { id } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "if (parseInt(pm.environment.get('docWaitAttempt_urtiB') || '0', 10) > 0) {",
+                                    "    const until = Date.now() + 150;",
+                                    "    while (Date.now() < until) { /* spin */ }",
+                                    "}"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const openedUnderB = pm.environment.get('urtiOpenedUnderB') === 'true';",
+                                    "if (!openedUnderB) {",
+                                    "  pm.environment.set('docWaitAttempt_urtiB', '0');",
+                                    "  pm.test.skip('a_member document loaded in B owner workspace (not applicable: open was denied)', function(){});",
+                                    "} else {",
+                                    "  const json = pm.response.json();",
+                                    "  const repr = json.data && json.data.GetUserRepresentation;",
+                                    "  const loaded = !!(repr && repr.id);",
+                                    "  const maxAttempts = 25;",
+                                    "  const attempt = parseInt(pm.environment.get('docWaitAttempt_urtiB') || '0', 10);",
+                                    "  if (loaded) {",
+                                    "    pm.environment.set('docWaitAttempt_urtiB', '0');",
+                                    "    pm.test('a_member document loaded in B owner workspace', function(){ pm.expect(loaded).to.eql(true); });",
+                                    "  } else if (attempt < maxAttempts) {",
+                                    "    pm.environment.set('docWaitAttempt_urtiB', String(attempt + 1));",
+                                    "    postman.setNextRequest('Isolation probe: Wait for a_member document load (B owner)');",
+                                    "  } else {",
+                                    "    pm.environment.set('docWaitAttempt_urtiB', '0');",
+                                    "    pm.test('a_member document loaded in B owner workspace', function(){ pm.expect.fail('document still not readable after ' + maxAttempts + ' polls'); });",
+                                    "  }",
+                                    "}"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
                     "id": "urti-get-repr-b",
                     "name": "GetUserRepresentation under B (must not return A-tenant role IDs for shared users)",
                     "request": {
@@ -18203,7 +18807,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "query GetUserReprIsoB { GetUserRepresentation(input: { collectionId: \"Users\", id: \"{{urtiMemberDocId}}\" }) { id username roles groups } }",
+                                "query": "query GetUserReprIsoB { GetUserRepresentation(input: { collectionId: \"Users\", id: \"{{urtiMemberDocIdB}}\" }) { id username roles groups } }",
                                 "variables": ""
                             }
                         }
@@ -18215,22 +18819,33 @@
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "const json = pm.response.json();",
-                                    "const payload = json.data ? json.data.GetUserRepresentation : null;",
-                                    "const hasErr = !!(json.errors && json.errors.length);",
-                                    "pm.test('GetUserRepresentation under other tenant succeeds (or access handled)', function(){ pm.expect(hasErr || !!payload).to.eql(true); });",
-                                    "pm.test('User repr roles under foreign tenant context must not leak non-bound role IDs (core fix verification)', function(){",
-                                    "  if (hasErr || !payload || !payload.roles) { pm.expect(true).to.eql(true); return; }",
-                                    "  pm.expect(Array.isArray(payload.roles)).to.eql(true);",
-                                    "  const urtiRoleId = pm.environment.get('urtiRoleId');",
-                                    "  if (urtiRoleId) pm.expect(payload.roles.includes(urtiRoleId), 'tenant-A-bound role leaked into tenant B view: ' + JSON.stringify(payload.roles)).to.eql(false);",
-                                    "});",
-                                    "pm.test('User repr groups under foreign tenant context must not leak non-bound group IDs', function(){",
-                                    "  if (hasErr || !payload || !payload.groups) { pm.expect(true).to.eql(true); return; }",
-                                    "  pm.expect(Array.isArray(payload.groups)).to.eql(true);",
-                                    "  const urtiGroupId = pm.environment.get('urtiGroupId');",
-                                    "  if (urtiGroupId) pm.expect(payload.groups.includes(urtiGroupId), 'tenant-A-bound group leaked into tenant B view: ' + JSON.stringify(payload.groups)).to.eql(false);",
-                                    "});"
+                                    "const openedUnderB = pm.environment.get('urtiOpenedUnderB') === 'true';",
+                                    "const urtiRoleId = pm.environment.get('urtiRoleId');",
+                                    "const urtiGroupId = pm.environment.get('urtiGroupId');",
+                                    "if (!openedUnderB) {",
+                                    "  // B owner could not open the shared user at all - that is itself a valid",
+                                    "  // isolation outcome, but it does NOT verify role/group filtering, so report",
+                                    "  // it as skipped rather than as a pass.",
+                                    "  pm.test.skip('User repr roles under foreign tenant context must not leak non-bound role IDs (not applicable: B owner cannot open the document)', function(){});",
+                                    "  pm.test.skip('User repr groups under foreign tenant context must not leak non-bound group IDs (not applicable: B owner cannot open the document)', function(){});",
+                                    "} else {",
+                                    "  const json = pm.response.json();",
+                                    "  const payload = json.data ? json.data.GetUserRepresentation : null;",
+                                    "  pm.test('GetUserRepresentation under foreign tenant returns the shared user', function(){",
+                                    "    pm.expect(!!(json.errors && json.errors.length), 'unexpected GraphQL error: ' + JSON.stringify(json.errors)).to.eql(false);",
+                                    "    pm.expect(!!payload && !!payload.id).to.eql(true);",
+                                    "  });",
+                                    "  pm.test('User repr roles under foreign tenant context must not leak non-bound role IDs (core fix verification)', function(){",
+                                    "    pm.expect(Array.isArray(payload.roles), 'no roles array returned - leak check cannot run').to.eql(true);",
+                                    "    pm.expect(!!urtiRoleId, 'fixture urtiRoleId missing - leak check cannot run').to.eql(true);",
+                                    "    pm.expect(payload.roles.includes(urtiRoleId), 'tenant-A-bound role leaked into tenant B view: ' + JSON.stringify(payload.roles)).to.eql(false);",
+                                    "  });",
+                                    "  pm.test('User repr groups under foreign tenant context must not leak non-bound group IDs', function(){",
+                                    "    pm.expect(Array.isArray(payload.groups), 'no groups array returned - leak check cannot run').to.eql(true);",
+                                    "    pm.expect(!!urtiGroupId, 'fixture urtiGroupId missing - leak check cannot run').to.eql(true);",
+                                    "    pm.expect(payload.groups.includes(urtiGroupId), 'tenant-A-bound group leaked into tenant B view: ' + JSON.stringify(payload.groups)).to.eql(false);",
+                                    "  });",
+                                    "}"
                                 ]
                             }
                         }
@@ -18280,7 +18895,7 @@
                                     "const json = pm.response.json();",
                                     "const relId = pm.environment.get(\"relationshipId\");",
                                     "pm.test(\"Relationship removed\", function(){",
-                                    "  if (!relId) { pm.expect(true).to.eql(true); return; }",
+                                    "  pm.expect(!!relId, 'relationshipId fixture missing - cleanup assertion cannot run').to.eql(true);",
                                     "  pm.expect(!!(json.data && json.data.RemoveTenantRelationship && json.data.RemoveTenantRelationship.success === true)).to.eql(true);",
                                     "});"
                                 ],
@@ -18483,7 +19098,19 @@
                 "id": "8da314f7-4f77-4472-98b8-2c389f51b385",
                 "type": "text/javascript",
                 "exec": [
-                    "if (!pm.environment.get('base_url')) { pm.environment.set('base_url', 'http://localhost:7788/Puma/graphql'); }"
+                    "if (!pm.environment.get('base_url')) { pm.environment.set('base_url', 'http://localhost:7788/Puma/graphql'); }",
+                    "",
+                    "// The real GUI client sends the active product as a 'productid' header on every",
+                    "// request (see the same upsert in ProLife's collection). It matters for more than",
+                    "// cosmetics: imtauthgql::AdaptUserForTenant only filters ROLES and PERMISSIONS by",
+                    "// tenant when productId is non-empty (groups are filtered unconditionally), and the",
+                    "// delegated-role enrichment is gated on it too. Without this header the suite ran",
+                    "// every request with an empty product context, so tenant role filtering silently",
+                    "// did nothing and cross-tenant role isolation was never actually exercised.",
+                    "const __productId = pm.environment.get('product_id');",
+                    "if (__productId) {",
+                    "    pm.request.headers.upsert({ key: 'productid', value: __productId });",
+                    "}"
                 ],
                 "_lastExecutionId": "f355b023-fa30-4d6c-b4ad-413874237ed6"
             }
