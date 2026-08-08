@@ -226,6 +226,17 @@ Write-Host "ServerExePath: $ServerExePath"
 Write-Host "TestExePath:   $TestExePath"
 Write-Host "HttpPort/WsPort: $HttpPort / $WsPort"
 
+# Validate prerequisites upfront before starting the server
+if (-not (Test-Path -LiteralPath $TestExePath -PathType Leaf)) {
+    throw "Test executable not found: $TestExePath (build it with -DBUILD_TESTING=ON, or pass -TestExePath / -BuildConfig)"
+}
+if (-not (Test-Path -LiteralPath $ServerExePath -PathType Leaf)) {
+    # Only required when no server is already running
+    if (-not (Test-PortOpen $HttpPort)) {
+        throw "Server executable not found: $ServerExePath (build it, or pass -ServerExePath / -BuildConfig)"
+    }
+}
+
 try {
     if (Test-PortOpen $HttpPort) {
         Write-Step "Port $HttpPort is already accepting connections - reusing the running server (not starting, resetting, or stopping one)"
