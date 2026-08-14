@@ -46,6 +46,9 @@ target_link_libraries(PumaServerPgTest ${ACF_APPLICATION_LINK_SCOPE}
 	ImtCore::imtauthdb
 	ImtCore::imtlog
 	ImtCore::imtchat
+	ImtCore::ImtCoreLoc
+	AcfSln::AcfSlnLoc
+	Acf::AcfLoc
 )
 
 include(${IACFDIR}/Config/CMake/zlib.cmake)

@@ -28,19 +28,11 @@ include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
 
 target_link_libraries(PumaServerConfigurator ${ACF_APPLICATION_LINK_SCOPE}
 	pumaqml
-	ImtCore::imtlicguiqml
-	ImtCore::imtauthguiqml
-	ImtCore::imtdocguiqml
-	ImtCore::imtcolguiqml
 	ImtCore::imtcontrolsqml
 	ImtCore::imtguigqlqml
 	ImtCore::imtstylecontrolsqml
 	ImtCore::imtguiqml
-	ImtCore::imtdeskdb
-	ImtCore::imtauthdb
-	ImtCore::imtchatdb
 	ImtCore::imtserverapp
-	ImtCore::imt2dsdl
 	ImtCore::ImtCoreLoc
 	AcfSln::AcfSlnLoc
 	Acf::AcfLoc

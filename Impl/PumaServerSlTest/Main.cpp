@@ -2,31 +2,19 @@
 
 
 // Qt includes
-#include <QtCore/QCoreApplication>
-#include <cstdio>
+#include <imtcore/CApplicationRunner.h>
+#include <imtcore/CImtCoreAuthorizableServerInitializer.h>
 
-// ACF includes
-#include <ibase/IApplication.h>
-
-// ImtCore includes
+// Puma includes
 #include <GeneratedFiles/PumaServerSlTest/CPumaServerSlTest.h>
 
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
+	InitializeImtCoreAuthorizableServer();
 	Q_INIT_RESOURCE(imtresthtml);
-	Q_INIT_RESOURCE(imtdb);
-	Q_INIT_RESOURCE(imtauthdb);
-	Q_INIT_RESOURCE(imtbase);
-
 	Q_INIT_RESOURCE(PumaServerSlTest);
 
 	CPumaServerSlTest instance;
-
-	ibase::IApplication* applicationPtr = instance.GetInterface<ibase::IApplication>();
-	if (applicationPtr != nullptr){
-		return applicationPtr->Execute(argc, argv);
-	}
-
-	return -1;
+	return imtcore::CApplicationRunner::Run(argc, argv, instance);
 }
