@@ -46,6 +46,8 @@ target_link_libraries(PumaServerSlTest ${ACF_APPLICATION_LINK_SCOPE}
 	ImtCore::imtauthdb
 	ImtCore::imtlog
 	ImtCore::imtchat
+	ImtCore::ImtCoreLoc
+	AcfSln::AcfSlnLoc
 	Acf::AcfLoc
 )
 

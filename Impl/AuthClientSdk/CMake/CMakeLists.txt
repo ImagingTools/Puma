@@ -30,18 +30,11 @@ include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 
 target_link_libraries(AuthClientSdk ${ACF_LIBRARY_LINK_SCOPE}
 	ImtCore::imtauthguiqml
-	ImtCore::imtlicguiqml
-	ImtCore::imtdocguiqml
-	ImtCore::imtcolguiqml
 	ImtCore::imtguigqlqml
 	ImtCore::imtguiqml
 	ImtCore::imtcontrolsqml
 	ImtCore::imtstylecontrolsqml
 	ImtCore::imtauthgql
-	ImtCore::imtauthdb
-	ImtCore::imtchatdb
-	ImtCore::imtdeskdb
-	ImtCore::imt2dsdl
 	ImtCore::ImtCoreLoc
 	AcfSln::AcfSlnLoc
 	Acf::AcfLoc
