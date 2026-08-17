@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: LicenseRef-Puma-Commercial
 
 
-// Qt includes
+// ImtCore includes
 #include <imtcore/CApplicationRunner.h>
 #include <imtcore/CImtCoreAuthorizableServerInitializer.h>
 

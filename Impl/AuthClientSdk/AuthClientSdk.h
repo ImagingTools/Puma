@@ -41,13 +41,13 @@
 
 	// Authenticate user
 	Login loginData;
-	if (controller.Login("username", "password", loginData)) {
+	if (controller.Login("username", "password", loginData)){
 	    qDebug() << "Logged in as:" << loginData.userName;
 	    qDebug() << "Access token:" << loginData.accessToken;
 	    qDebug() << "Permissions:" << loginData.permissions;
 
 	    // Check specific permission
-	    if (controller.HasPermission("admin.users.create")) {
+	    if (controller.HasPermission("admin.users.create")){
 	        // User has permission to create other users
 	    }
 	}
@@ -783,7 +783,7 @@ public:
 		controller.SetConnectionParam(serverConfig);
 	
 		Login sessionData;
-		if (controller.Login("alice", "secret123", sessionData)) {
+		if (controller.Login("alice", "secret123", sessionData)){
 		    qDebug() << "Welcome, " << sessionData.userName;
 		    qDebug() << "Your permissions:" << sessionData.permissions;
 		} else {
