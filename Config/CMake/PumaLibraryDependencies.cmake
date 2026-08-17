@@ -65,3 +65,7 @@ if(QT_VERSION_MAJOR EQUAL 6)
 		Qt${QT_VERSION_MAJOR}::Core5Compat
 	)
 endif()
+
+puma_declare_library_dependencies(pumatest LINK_SCOPE ${ACF_APPLICATION_LINK_SCOPE}
+	AuthClientSdk
+)

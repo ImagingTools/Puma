@@ -54,7 +54,7 @@ imt_chain_windeploy_target(PumaServerSlTest)
 add_subdirectory("${IMPL_DIR}/PumaServerConfigurator/CMake" "${AUX_INCLUDE_DIR}/PumaServerConfigurator")
 imt_chain_windeploy_target(PumaServerConfigurator)
 
-if(WIN32)
+# if(WIN32)
 	add_subdirectory("${IMPL_DIR}/PumaClient/CMake" "${AUX_INCLUDE_DIR}/PumaClient")
 	imt_chain_windeploy_target(PumaClient)
 	add_subdirectory("${IMPL_DIR}/AuthClientSdk/CMake" "${AUX_INCLUDE_DIR}/AuthClientSdk")
@@ -64,7 +64,7 @@ if(WIN32)
 	if (BUILD_TESTING)
 		add_subdirectory("${INCLUDE_DIR}/pumatest/CMake" "${AUX_INCLUDE_DIR}/pumatest")
 	endif()
-endif()
+# endif()
 
 # Declare target-based deps so include paths/link order propagate transitively across Puma
 # libraries and onto the underlying ImtCore::/Acf::/AcfSln::/IAcf:: libraries.

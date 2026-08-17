@@ -89,7 +89,7 @@ public:
 		out.Clear();
 
 		iauth::ILogin* loginPtr = m_sdk.GetInterface<iauth::ILogin>();
-		if (loginPtr == nullptr) {
+		if (loginPtr == nullptr){
 			qWarning() << "[Login] Failed: iauth::ILogin interface not found";
 			return false;
 		}
@@ -100,7 +100,7 @@ public:
 		loginPtr->Logout();
 
 		bool ok = loginPtr->Login(login, password);
-		if (!ok) {
+		if (!ok){
 			qWarning() << "[Login] Failed: iauth::ILogin::Login() returned false";
 			return false;
 		}
@@ -114,10 +114,10 @@ public:
 		// removed automatically so that the authoritative LDAP identity takes
 		// precedence.
 		imtauth::IUserManager* userManagerPtr = m_sdk.GetInterface<imtauth::IUserManager>();
-		if (userManagerPtr != nullptr) {
+		if (userManagerPtr != nullptr){
 			imtauth::IUserInfo::SystemInfo systemInfo;
-			if (userManagerPtr->GetUserAuthSystem(login.toUtf8(), systemInfo)) {
-				if (!systemInfo.systemId.isEmpty()) {
+			if (userManagerPtr->GetUserAuthSystem(login.toUtf8(), systemInfo)){
+				if (!systemInfo.systemId.isEmpty()){
 					// The authenticated user is an LDAP user.
 					// Obtain the authoritative objectId for this login after the
 					// successful LDAP authentication.  Any other user record that
@@ -127,16 +127,16 @@ public:
 
 					QByteArrayList allUserIds = userManagerPtr->GetUserIds();
 					for (const QByteArray& uid : allUserIds) {
-						if (uid == ldapObjectId) {
+						if (uid == ldapObjectId){
 							continue; // This is the LDAP user record – keep it.
 						}
 
 						imtauth::IUserInfoUniquePtr infoPtr = userManagerPtr->GetUser(uid);
-						if (!infoPtr.IsValid()) {
+						if (!infoPtr.IsValid()){
 							continue;
 						}
 
-						if (infoPtr->GetId() != login.toUtf8()) {
+						if (infoPtr->GetId() != login.toUtf8()){
 							continue; // Different login name – not related.
 						}
 
@@ -144,7 +144,7 @@ public:
 						// This is a stale local (non-LDAP) user record – remove it.
 						qWarning() << "[Login] Removing conflicting local user with login" << login
 								   << "to allow LDAP identity to take precedence.";
-						if (!userManagerPtr->RemoveUser(uid)) {
+						if (!userManagerPtr->RemoveUser(uid)){
 							qWarning() << "[Login] Failed to remove conflicting local user with id" << uid
 									   << "for login" << login << "- conflict may remain.";
 						}
@@ -154,25 +154,25 @@ public:
 		}
 
 		iauth::CUser* userPtr = loginPtr->GetLoggedUser();
-		if (userPtr == nullptr) {
+		if (userPtr == nullptr){
 			qWarning() << "[Login] Failed: GetLoggedUser() returned nullptr";
 			return false;
 		}
 
 		imtauth::IAccessTokenProvider* tokenProviderPtr = m_sdk.GetInterface<imtauth::IAccessTokenProvider>();
-		if (tokenProviderPtr == nullptr) {
+		if (tokenProviderPtr == nullptr){
 			qWarning() << "[Login] Failed: imtauth::IAccessTokenProvider interface not found";
 			return false;
 		}
 
 		ibase::IApplicationInfo* applicationInfoPtr = m_sdk.GetInterface<ibase::IApplicationInfo>();
-		if (applicationInfoPtr == nullptr) {
+		if (applicationInfoPtr == nullptr){
 			qWarning() << "[Login] Failed: ibase::IApplicationInfo interface not found";
 			return false;
 		}
 
 		imtauth::IUserPermissionsController* userPermissionsControllerPtr = m_sdk.GetInterface<imtauth::IUserPermissionsController>();
-		if (userPermissionsControllerPtr == nullptr) {
+		if (userPermissionsControllerPtr == nullptr){
 			qWarning() << "[Login] Failed: imtauth::IUserPermissionsController interface not found";
 			return false;
 		}
@@ -188,7 +188,7 @@ public:
 	bool Logout()
 	{
 		iauth::ILogin* loginPtr = m_sdk.GetInterface<iauth::ILogin>();
-		if (loginPtr == nullptr) {
+		if (loginPtr == nullptr){
 			qWarning() << "[Logout] Failed: iauth::ILogin interface not found";
 			return false;
 		}
@@ -214,7 +214,7 @@ public:
 	bool SetConnectionParam(const ServerConfig& config)
 	{
 		imtcom::IServerConnectionInterface* connectionInterfacePtr = m_sdk.GetInterface<imtcom::IServerConnectionInterface>();
-		if (connectionInterfacePtr == nullptr) {
+		if (connectionInterfacePtr == nullptr){
 			qWarning() << "[SetConnectionParam] Failed: imtcom::IServerConnectionInterface interface not found";
 			return false;
 		}
@@ -234,7 +234,7 @@ public:
 	bool HasPermission(const QByteArray& permissionId)
 	{
 		iauth::IRightsProvider* rightsProviderPtr = m_sdk.GetInterface<iauth::IRightsProvider>();
-		if (rightsProviderPtr == nullptr) {
+		if (rightsProviderPtr == nullptr){
 			qWarning() << "[HasPermission] Failed: iauth::IRightsProvider interface not found";
 			return false;
 		}
@@ -245,7 +245,7 @@ public:
 	QByteArrayList GetTokenPermissions(const QByteArray& accessToken) const
 	{
 		imtauth::IUserPermissionsController* userPermissionsControllerPtr = m_sdk.GetInterface<imtauth::IUserPermissionsController>();
-		if (userPermissionsControllerPtr != nullptr) {
+		if (userPermissionsControllerPtr != nullptr){
 			return userPermissionsControllerPtr->GetPermissions(accessToken);
 		}
 
@@ -257,7 +257,7 @@ public:
 	QByteArray GetToken() const
 	{
 		imtauth::IAccessTokenProvider* accessTokenProviderPtr = m_sdk.GetInterface<imtauth::IAccessTokenProvider>();
-		if (accessTokenProviderPtr != nullptr) {
+		if (accessTokenProviderPtr != nullptr){
 			return accessTokenProviderPtr->GetToken("");
 		}
 
@@ -269,7 +269,7 @@ public:
 	void SetProductId(const QByteArray& productId)
 	{
 		imtbase::IApplicationInfoController* applicationInfoControllerPtr = m_sdk.GetInterface<imtbase::IApplicationInfoController>();
-		if (applicationInfoControllerPtr != nullptr) {
+		if (applicationInfoControllerPtr != nullptr){
 			applicationInfoControllerPtr->SetApplicationAttribute(
 						imtbase::IApplicationInfoController::ApplicationAttribute::AA_APPLICATION_ID,
 						productId);
@@ -282,7 +282,7 @@ public:
 	SuperuserStatus SuperuserExists(QString& errorMessage)
 	{
 		imtauth::ISuperuserProvider* superuserProviderPtr = m_sdk.GetInterface<imtauth::ISuperuserProvider>();
-		if (superuserProviderPtr != nullptr) {
+		if (superuserProviderPtr != nullptr){
 			imtauth::ISuperuserProvider::ExistsStatus status = superuserProviderPtr->SuperuserExists(errorMessage);
 			switch (status){
 			case imtauth::ISuperuserProvider::ES_EXISTS:
@@ -347,7 +347,7 @@ public:
 			internUser.roleIds = externUser.roleIds;
 			internUser.groupIds = externUser.groupIds;
 			imtauth::IUserInfo::SystemInfo systemInfo;
-			if (userManagerPtr->GetUserAuthSystem(externUser.login, systemInfo)) {
+			if (userManagerPtr->GetUserAuthSystem(externUser.login, systemInfo)){
 				internUser.systemType = systemInfo.systemId.isEmpty() ? SystemType::Local : SystemType::Ldap;
 			}
 
@@ -376,7 +376,7 @@ public:
 			userData.groupIds = userInfoPtr->GetGroups();
 
 			imtauth::IUserInfo::SystemInfo systemInfo;
-			if (userManagerPtr->GetUserAuthSystem(userData.login, systemInfo)) {
+			if (userManagerPtr->GetUserAuthSystem(userData.login, systemInfo)){
 				userData.systemType = systemInfo.systemId.isEmpty() ? SystemType::Local : SystemType::Ldap;
 			}
 	
@@ -408,7 +408,7 @@ public:
 			userData.groupIds = userInfoPtr->GetGroups();
 
 			imtauth::IUserInfo::SystemInfo systemInfo;
-			if (userManagerPtr->GetUserAuthSystem(login, systemInfo)) {
+			if (userManagerPtr->GetUserAuthSystem(login, systemInfo)){
 				userData.systemType = systemInfo.systemId.isEmpty() ? SystemType::Local : SystemType::Ldap;
 			}
 	
@@ -849,7 +849,7 @@ private:
 	QByteArray GetProductId() const
 	{
 		ibase::IApplicationInfo* applicationInfoPtr = m_sdk.GetInterface<ibase::IApplicationInfo>();
-		if (applicationInfoPtr == nullptr) {
+		if (applicationInfoPtr == nullptr){
 			return QByteArray();
 		}
 

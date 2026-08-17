@@ -10,13 +10,43 @@
 #include <istd/CChangeGroup.h>
 
 // ImtCore includes
-#include <imtbase/Init.h>
+#include <imtcore/CImtCoreAuthInitializer.h>
+#include <imtcore/CImtCoreBaseInitializer.h>
+#include <imtcore/CImtCoreLocalizationInitializer.h>
+#include <imtcore/CImtCoreStyleInitializer.h>
 #include <imtbase/IApplicationInfoController.h>
 #include <imtcom/IServerConnectionInterface.h>
 #include <imtqml/IQuickObject.h>
 
 // Local includes
 #include <GeneratedFiles/AuthClientSdk/CAdministrationWidget.h>
+
+
+static void InitializeAdministrationWidgetResources()
+{
+	ImtCoreInitLocalizationResources();
+	ImtCoreInitBaseResources();
+
+	ImtCoreInitStyleResources();
+	ImtCoreInitAuthStyleResources();
+
+	ImtCoreInitQmlApplicationCoreResources();
+	ImtCoreInitQmlDocumentManagementResources();
+
+	Q_INIT_RESOURCE(imtauthguiqml);
+	Q_INIT_RESOURCE(imtauthGroupsSdl);
+	Q_INIT_RESOURCE(imtauthRolesSdl);
+	Q_INIT_RESOURCE(imtauthUsersSdl);
+	Q_INIT_RESOURCE(imtauthAuthorizationSdl);
+	Q_INIT_RESOURCE(imtauthPermissionsSdl);
+	Q_INIT_RESOURCE(imtauthSessionsSdl);
+	Q_INIT_RESOURCE(imtauthTenantMembershipsSdl);
+	Q_INIT_RESOURCE(imtauthRoleCollectionDocumentServiceSdl);
+	Q_INIT_RESOURCE(imtauthGroupCollectionDocumentServiceSdl);
+	Q_INIT_RESOURCE(imtauthUserCollectionDocumentServiceSdl);
+
+	InitializeImtCoreStyle();
+}
 
 
 namespace AuthClientSdk
@@ -34,7 +64,7 @@ public:
 
 	QWidget* GetWidget(QWidget* parentPtr)
 	{
-		iqtgui::IGuiObject* guiObjectPtr = m_sdk.GetInterface<iqtgui::IGuiObject>();
+		auto* guiObjectPtr = m_sdk.GetInterface<iqtgui::IGuiObject>();
 		if (guiObjectPtr != nullptr){
 			if (!guiObjectPtr->IsGuiCreated()){
 				guiObjectPtr->CreateGui(parentPtr);
@@ -49,7 +79,7 @@ public:
 
 	bool SetConnectionParam(const ServerConfig& config)
 	{
-		imtcom::IServerConnectionInterface* serverConnectionParamPtr = m_sdk.GetInterface<imtcom::IServerConnectionInterface>();
+		auto* serverConnectionParamPtr = m_sdk.GetInterface<imtcom::IServerConnectionInterface>();
 		if (serverConnectionParamPtr != nullptr){
 			istd::CChangeGroup changeGroup(serverConnectionParamPtr);
 
@@ -70,14 +100,14 @@ public:
 
 	bool SetLoginParam(Login param)
 	{
-		imtbase::IApplicationInfoController* applicationInfoControllerPtr = m_sdk.GetInterface<imtbase::IApplicationInfoController>();
+		auto* applicationInfoControllerPtr = m_sdk.GetInterface<imtbase::IApplicationInfoController>();
 		if (applicationInfoControllerPtr == nullptr){
 			return false;
 		}
 
 		applicationInfoControllerPtr->SetApplicationAttribute(imtbase::IApplicationInfoController::ApplicationAttribute::AA_APPLICATION_ID, param.productId);
 
-		imtqml::IQuickObject* quickObjectPtr = m_sdk.GetInterface<imtqml::IQuickObject>();
+		auto* quickObjectPtr = m_sdk.GetInterface<imtqml::IQuickObject>();
 		if (quickObjectPtr == nullptr){
 			return false;
 		}
@@ -106,15 +136,14 @@ private:
 // public methods
 
 CAdministrationViewWidget::CAdministrationViewWidget()
-	:m_implPtr(nullptr)
+	: m_implPtr(nullptr)
 {
-	DefaultImtCoreQmlInitializer initializer;
-	initializer.Init();
+	InitializeAdministrationWidgetResources();
 
 	m_implPtr = new CAdministrationViewWidgetImpl;
 	QWidget* widgetPtr = m_implPtr->GetWidget(this);
 	if (widgetPtr != nullptr){
-		QVBoxLayout* layout = new QVBoxLayout(this);
+		auto* layout = new QVBoxLayout(this);
 		layout->setContentsMargins(0, 0, 0, 0);
 		layout->addWidget(widgetPtr);
 		setLayout(layout);
@@ -124,9 +153,7 @@ CAdministrationViewWidget::CAdministrationViewWidget()
 
 CAdministrationViewWidget::~CAdministrationViewWidget()
 {
-	if (m_implPtr != nullptr){
-		delete m_implPtr;
-	}
+	delete m_implPtr;
 }
 
 
@@ -151,5 +178,3 @@ bool CAdministrationViewWidget::SetLoginParam(Login param) const
 
 
 } // namespace AuthClientSdk
-
-

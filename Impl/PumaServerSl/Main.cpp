@@ -37,7 +37,7 @@ static QString MaskSensitiveMessage(const QString& message)
 static void MaskingMessageHandler(QtMsgType type, const QMessageLogContext& context, const QString& message)
 {
 	const QString masked = MaskSensitiveMessage(message);
-	if (s_previousMessageHandler != nullptr) {
+	if (s_previousMessageHandler != nullptr){
 		s_previousMessageHandler(type, context, masked);
 		return;
 	}

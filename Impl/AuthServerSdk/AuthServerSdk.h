@@ -45,7 +45,7 @@
 * server.SetFeaturesFilePath("/path/to/features.xml");
 *
 * // Start the server
-* if (server.Start(config)) {
+* if (server.Start(config)){
 *     qDebug() << "Server started successfully";
 *     // Server is now running and accepting connections
 * } else {
@@ -419,7 +419,7 @@ struct ServerConfig
 * config.sslConfig = ssl;
 * 
 * // Start server
-* if (server.Start(config)) {
+* if (server.Start(config)){
 *     // Server is running
 *     QCoreApplication::exec();  // Keep running
 *     server.Stop();
@@ -506,7 +506,7 @@ public:
 	* config.httpPort = 8080;
 	* config.wsPort = 8081;
 	*
-	* if (!server.Start(config)) {
+	* if (!server.Start(config)){
 	*     qCritical() << "Failed to start server";
 	*     return -1;
 	* }
@@ -730,7 +730,7 @@ private:
 *
 * @subsection step4 Step 4: Start Server
 * @code
-* if (server.Start(config)) {
+* if (server.Start(config)){
 *     qDebug() << "Server running on port" << config.httpPort;
 * } else {
 *     qCritical() << "Failed to start server";

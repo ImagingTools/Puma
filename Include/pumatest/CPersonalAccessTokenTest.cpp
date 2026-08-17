@@ -43,7 +43,7 @@ void CPersonalAccessTokenTest::initTestCase()
 	// own, without depending on CAuthClientSdkTest having run first in the
 	// same process and already created "su"/"1" in the shared backend.
 	Login loginData;
-	if (m_authorizationController.Login("su", "1", loginData)) {
+	if (m_authorizationController.Login("su", "1", loginData)){
 		QVERIFY(m_authorizationController.Logout());
 	}
 	else {
@@ -443,8 +443,8 @@ void CPersonalAccessTokenTest::cleanupTestCase()
 	QByteArrayList userIds = m_authorizationController.GetUserIds();
 	for (const QByteArray& userId : userIds) {
 		User userData;
-		if (m_authorizationController.GetUser(userId, userData)) {
-			if (s_testLogins.contains(userData.login)) {
+		if (m_authorizationController.GetUser(userId, userData)){
+			if (s_testLogins.contains(userData.login)){
 				QVERIFY(m_authorizationController.RemoveUser(userId));
 			}
 		}

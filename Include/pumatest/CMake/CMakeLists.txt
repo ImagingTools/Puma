@@ -14,11 +14,3 @@ if(WIN32)
 endif()
 
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Test)
-
-target_link_libraries(pumatest ${ACF_APPLICATION_LINK_SCOPE}
-	AuthClientSdk
-	AuthServerSdk
-	ImtCore::imtgqltest
-	Acf::itest
-	Qt${QT_VERSION_MAJOR}::Test
-)
