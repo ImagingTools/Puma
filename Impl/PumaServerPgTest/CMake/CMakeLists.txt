@@ -19,13 +19,9 @@ endif()
 include(${ACFDIR}/Config/CMake/CustomBuild.cmake)
 
 include(${ACFDIR}/Config/CMake/ApplicationConfig.cmake)
-include(${ACFDIR}/Config/CMake/AcfQt.cmake)
 include(${IMTCOREDIR}/Config/CMake/OpenSSL.cmake)
 include(${IMTCOREDIR}/Config/CMake/Quazip.cmake)
 include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
-
-include(${ACFDIR}/Config/CMake/AcfStdGui.cmake)
-include(${ACFDIR}/Config/CMake/AcfStd.cmake)
 
 if(WIN32)
 	list(APPEND listOptions "--qmldir=${IMTCOREDIR}/Qml")
@@ -47,6 +43,7 @@ target_link_libraries(PumaServerPgTest ${ACF_APPLICATION_LINK_SCOPE}
 	ImtCore::imtlog
 	ImtCore::imtchat
 	ImtCore::ImtCoreLoc
+	Acf::iqtdoc
 	AcfSln::AcfSlnLoc
 	Acf::AcfLoc
 )
