@@ -20,10 +20,8 @@
 # so those are not repeated). Do not add a dependency that is already reachable
 # through another listed target.
 #
-# The target_link_libraries() signature is controlled by ACF_LIBRARY_LINK_SCOPE:
-#  * when empty, the plain signature is used (matching the legacy Puma CMake),
-#  * when set to PUBLIC/PRIVATE/INTERFACE, the keyword signature is used.
-# CMake forbids mixing the plain and keyword signatures on the same target.
+# Puma uses keyword target_link_libraries() signatures (PUBLIC/PRIVATE/
+# INTERFACE) consistently via ACF_LIBRARY_LINK_SCOPE.
 #
 # Included once, centrally, from Build/CMake/CMakeLists.txt after all library
 # targets have been created.
@@ -31,8 +29,7 @@
 
 # Declare the dependencies of a Puma library, ignoring any entry whose target
 # does not exist in the current configuration (for example Windows-only SDK
-# libraries, or ImtCore::/Acf::/AcfSln::/IAcf:: targets that are not available
-# because the legacy shim is used instead of find_package).
+# libraries, or ImtCore::/Acf::/AcfSln::/IAcf:: targets that are not available).
 function(puma_declare_library_dependencies target)
 	cmake_parse_arguments(ARG "" "LINK_SCOPE" "" ${ARGN})
 
