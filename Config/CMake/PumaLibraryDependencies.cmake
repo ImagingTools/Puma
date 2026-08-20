@@ -27,42 +27,12 @@
 # targets have been created.
 # ---------------------------------------------------------------------------
 
-# Declare the dependencies of a Puma library, ignoring any entry whose target
-# does not exist in the current configuration (for example Windows-only SDK
-# libraries, or ImtCore::/Acf::/AcfSln::/IAcf:: targets that are not available).
-function(puma_declare_library_dependencies target)
-	cmake_parse_arguments(ARG "" "LINK_SCOPE" "" ${ARGN})
-
-	if(NOT ARG_LINK_SCOPE)
-		set(ARG_LINK_SCOPE ${ACF_LIBRARY_LINK_SCOPE})
-	endif()
-
-	if(NOT TARGET ${target})
-		return()
-	endif()
-
-	# target_link_libraries() is illegal on an ALIAS target (e.g. in-tree ImtCore::
-	# aliases in unified builds), and augmenting the real target can inject dependency
-	# cycles through the Qt autogen targets. Never target an alias.
-	get_target_property(_puma_aliased ${target} ALIASED_TARGET)
-	if(_puma_aliased)
-		return()
-	endif()
-
-	foreach(dependency IN LISTS ARG_UNPARSED_ARGUMENTS)
-		if(TARGET ${dependency})
-			target_link_libraries(${target} ${ARG_LINK_SCOPE} ${dependency})
-		endif()
-	endforeach()
-endfunction()
-
-
 if(QT_VERSION_MAJOR EQUAL 6)
-	puma_declare_library_dependencies(pumaqml LINK_SCOPE ${ACF_LIBRARY_LINK_SCOPE}
+	acf_declare_target_dependencies(pumaqml LINK_SCOPE ${ACF_LIBRARY_LINK_SCOPE}
 		Qt${QT_VERSION_MAJOR}::Core5Compat
 	)
 endif()
 
-puma_declare_library_dependencies(pumatest LINK_SCOPE ${ACF_APPLICATION_LINK_SCOPE}
+acf_declare_target_dependencies(pumatest LINK_SCOPE ${ACF_APPLICATION_LINK_SCOPE}
 	AuthClientSdk
 )
