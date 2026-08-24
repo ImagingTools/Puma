@@ -27,11 +27,11 @@
 # ---------------------------------------------------------------------------
 
 if(QT_VERSION_MAJOR EQUAL 6)
-	acf_declare_target_dependencies(pumaqml LINK_SCOPE PUBLIC
+	declare_target_dependencies(pumaqml LINK_SCOPE PUBLIC
 		Qt${QT_VERSION_MAJOR}::Core5Compat
 	)
 endif()
 
-acf_declare_target_dependencies(pumatest LINK_SCOPE PRIVATE
+declare_target_dependencies(pumatest LINK_SCOPE PRIVATE
 	AuthClientSdk
 )
