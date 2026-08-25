@@ -1,5 +1,6 @@
 project(PumaClient LANGUAGES CXX)
 
+
 set(ARXC_CONFIG "${PROJECT_SOURCE_DIR}/../../../Config/PumaServer.awc")
 set(ARXC_FILES "${PROJECT_SOURCE_DIR}/../PumaClient.acc")
 set(ARXC_OUTDIR "${AUX_INCLUDE_DIR}")
@@ -20,7 +21,7 @@ include(${ACFDIR}/Config/CMake/DeployQt.cmake)
 ADD_DEFINITIONS(-DUNICODE)
 ADD_DEFINITIONS(-D_UNICODE)
 
-if(DEFINED WEB_COMPILE AND  WEB_COMPILE)
+if(WEB_COMPILE)
 	add_compile_definitions(WEB_COMPILE)
 endif()
 

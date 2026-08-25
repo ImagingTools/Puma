@@ -1,5 +1,6 @@
 project(PumaServerConfigurator LANGUAGES CXX)
 
+
 set(ARXC_CONFIG "${PROJECT_SOURCE_DIR}/../../../Config/PumaServer.awc")
 set(ARXC_FILES "${PROJECT_SOURCE_DIR}/../${PROJECT_NAME}.acc")
 set(ARXC_OUTDIR "${AUX_INCLUDE_DIR}")
@@ -10,10 +11,6 @@ if(WIN32)
 	set(ACF_CONVERT_REGISTRY "${PROJECT_SOURCE_DIR}/../VC/FileSubstitCopyApp.acc")
 	set(ACF_CONVERT_CONFIG "${PROJECT_SOURCE_DIR}/../../../Config/BaseOnly.awc")
 	set(RC_FILE "${AUX_INCLUDE_DIR}/${PROJECT_NAME}/PumaServerConfigurator.rc")
-endif()
-
-if(APPLE)
-	set(CMAKE_MACOSX_BUNDLE "on")
 endif()
 
 include(${ACFDIR}/Config/CMake/CustomBuild.cmake)

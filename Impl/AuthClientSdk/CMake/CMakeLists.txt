@@ -1,5 +1,6 @@
 project(AuthClientSdk LANGUAGES CXX)
 
+
 set(ARXC_CONFIG "${PROJECT_SOURCE_DIR}/../../../Config/PumaServer.awc")
 set(ARXC_OUTDIR "${AUX_INCLUDE_DIR}")
 set(ARX_ENABLE_GENERATE_DEPENDENCIES_LIST OFF)
@@ -38,9 +39,8 @@ target_link_libraries(AuthClientSdk PUBLIC
 	ImtCore::imtstylecontrolsqml
 	ImtCore::imtauthgql
 	ImtCore::ImtCoreLoc
-	AcfSln::AcfSlnLoc
-	Acf::AcfLoc
 )
 
 add_definitions(-DUNICODE)
 add_definitions(-D_UNICODE)
+
