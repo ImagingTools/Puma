@@ -15,15 +15,7 @@ endif()
 
 include(${ACFDIR}/Config/CMake/CustomBuild.cmake)
 include(${ACFDIR}/Config/CMake/ApplicationConfig.cmake)
-include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
-
-if(WIN32)
-	list(APPEND listOptions "--qmldir=${IMTCOREDIR}/Qml")
-	set(listFiles \"${AUX_INCLUDE_DIR}/../../../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME}/${PROJECT_NAME}.exe\")
-
-	windeploy(${PROJECT_NAME} "${listOptions}" "${listFiles}")
-	unset(listOptions)
-endif()
+include(${ACFDIR}/Config/CMake/DeployQt.cmake)
 
 ADD_DEFINITIONS(-DUNICODE)
 ADD_DEFINITIONS(-D_UNICODE)
@@ -43,3 +35,7 @@ include(${IACFDIR}/Config/CMake/zlib.cmake)
 if(UNIX)
 	target_link_libraries(PumaClient PRIVATE -lz)
 endif()
+
+set(DEPLOY_QT_QML_DIRS "${IMTCOREDIR}/Qml")
+deploy_qt(TARGET ${PROJECT_NAME})
+
