@@ -32,6 +32,4 @@ if(QT_VERSION_MAJOR EQUAL 6)
 	)
 endif()
 
-declare_target_dependencies(pumatest LINK_SCOPE PRIVATE
-	AuthClientSdk
-)
+declare_target_dependencies(pumatest LINK_SCOPE PRIVATE AuthClientSdk)
