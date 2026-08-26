@@ -1,5 +1,6 @@
 project(PumaServerConfigurator LANGUAGES CXX)
 
+
 set(ARXC_CONFIG "${PROJECT_SOURCE_DIR}/../../../Config/PumaServer.awc")
 set(ARXC_FILES "${PROJECT_SOURCE_DIR}/../${PROJECT_NAME}.acc")
 set(ARXC_OUTDIR "${AUX_INCLUDE_DIR}")
@@ -12,16 +13,12 @@ if(WIN32)
 	set(RC_FILE "${AUX_INCLUDE_DIR}/${PROJECT_NAME}/PumaServerConfigurator.rc")
 endif()
 
-if(APPLE)
-	set(CMAKE_MACOSX_BUNDLE "on")
-endif()
-
 include(${ACFDIR}/Config/CMake/CustomBuild.cmake)
 include(${ACFDIR}/Config/CMake/ApplicationConfig.cmake)
 
 include(${IMTCOREDIR}/Config/CMake/OpenSSL.cmake)
 include(${IMTCOREDIR}/Config/CMake/Quazip.cmake)
-include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
+include(${ACFDIR}/Config/CMake/DeployQt.cmake)
 
 target_link_libraries(PumaServerConfigurator PRIVATE
 	pumaqml
@@ -35,11 +32,5 @@ target_link_libraries(PumaServerConfigurator PRIVATE
 	Acf::AcfLoc
 )
 
-if(WIN32)
-	list(APPEND listOptions "--qmldir=${IMTCOREDIR}/Qml")
-	set(files \"${AUX_INCLUDE_DIR}/../../../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME}/${PROJECT_NAME}.exe\")
-
-	windeploy(${PROJECT_NAME} "${listOptions}" "${files}")
-	unset(listOptions)
-endif()
+deploy_qt(TARGET ${PROJECT_NAME})
 

@@ -1,5 +1,6 @@
 project(PumaSettingsPlugin LANGUAGES CXX)
 
+
 set(ARXC_CONFIG "${PROJECT_SOURCE_DIR}/../../../../Config/PumaServer.awc")
 set(ARXC_FILES "${PROJECT_SOURCE_DIR}/../${PROJECT_NAME}.acc")
 set(ARXC_OUTDIR "${AUX_INCLUDE_DIR}")
@@ -16,5 +17,4 @@ target_link_libraries(PumaSettingsPlugin PUBLIC
 	ImtCore::imtserverapp
 	Qt${QT_VERSION_MAJOR}::Xml
 )
-
 

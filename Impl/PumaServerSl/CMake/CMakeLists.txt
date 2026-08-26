@@ -1,5 +1,6 @@
 project(PumaServerSl LANGUAGES CXX)
 
+
 set(ARXC_CONFIG "${PROJECT_SOURCE_DIR}/../../../Config/PumaServer.awc")
 set(ARXC_FILES "${PROJECT_SOURCE_DIR}/../${PROJECT_NAME}.acc")
 set(ARXC_OUTDIR "${AUX_INCLUDE_DIR}")
@@ -12,28 +13,15 @@ if(WIN32)
 	set(RC_FILE "${AUX_INCLUDE_DIR}/${PROJECT_NAME}/PumaServerSl.rc")
 endif()
 
-if(APPLE)
-	set(CMAKE_MACOSX_BUNDLE ON)
-endif()
-
 include(${ACFDIR}/Config/CMake/CustomBuild.cmake)
-
 include(${ACFDIR}/Config/CMake/ApplicationConfig.cmake)
 include(${IMTCOREDIR}/Config/CMake/OpenSSL.cmake)
 include(${IMTCOREDIR}/Config/CMake/Quazip.cmake)
-include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
+include(${ACFDIR}/Config/CMake/DeployQt.cmake)
 
-if(WIN32)
-	list(APPEND listOptions "--qmldir=${IMTCOREDIR}/Qml")
-	set(files \"${AUX_INCLUDE_DIR}/../../../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME}/${PROJECT_NAME}.exe\")
-
-	windeploy(${PROJECT_NAME} "${listOptions}" "${files}")
-	unset(listOptions)
-
-	if(NOT USE_FIND_PACKAGE)
-		file(COPY ${OPENSSLDIR}/lib/x64/libcrypto-1_1-x64.dll DESTINATION ${PROJECT_SOURCE_DIR}/../../../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME})
-		file(COPY ${OPENSSLDIR}/lib/x64/libssl-1_1-x64.dll DESTINATION ${PROJECT_SOURCE_DIR}/../../../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME})
-	endif()
+if(WIN32 AND NOT USE_FIND_PACKAGE)
+	file(COPY ${OPENSSLDIR}/lib/x64/libcrypto-1_1-x64.dll DESTINATION ${PROJECT_SOURCE_DIR}/../../../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME})
+	file(COPY ${OPENSSLDIR}/lib/x64/libssl-1_1-x64.dll DESTINATION ${PROJECT_SOURCE_DIR}/../../../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME})
 endif()
 
 target_link_libraries(PumaServerSl PRIVATE
@@ -44,8 +32,9 @@ target_link_libraries(PumaServerSl PRIVATE
 	ImtCore::imtchat
 	ImtCore::ImtCoreLoc
 	Acf::iqtdoc
-	AcfSln::AcfSlnLoc
-	Acf::AcfLoc
 )
 
 include(${IACFDIR}/Config/CMake/zlib.cmake)
+
+deploy_qt(TARGET ${PROJECT_NAME})
+

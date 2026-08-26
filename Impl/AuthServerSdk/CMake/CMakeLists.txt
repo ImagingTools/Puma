@@ -1,5 +1,6 @@
 project(AuthServerSdk LANGUAGES CXX)
 
+
 set(ARXC_CONFIG "${PROJECT_SOURCE_DIR}/../../../Config/PumaServer.awc")
 set(ARXC_FILES "${PROJECT_SOURCE_DIR}/../${PROJECT_NAME}.acc")
 set(ARXC_OUTDIR "${AUX_INCLUDE_DIR}")
@@ -7,7 +8,6 @@ set(ARX_ENABLE_GENERATE_DEPENDENCIES_LIST ON)
 
 set(TARGET_EXT ".dll")
 include(${ACFDIR}/Config/CMake/SharedLibraryConfig.cmake)
-
 include(${ACFDIR}/Config/CMake/CustomBuild.cmake)
 
 target_sources(${PROJECT_NAME}
@@ -33,3 +33,4 @@ target_link_libraries(AuthServerSdk PUBLIC
 include(${IACFDIR}/Config/CMake/zlib.cmake)
 ADD_DEFINITIONS(-DUNICODE)
 ADD_DEFINITIONS(-D_UNICODE)
+

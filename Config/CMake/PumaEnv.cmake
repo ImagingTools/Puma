@@ -1,17 +1,39 @@
 cmake_minimum_required(VERSION 3.26)
 
 if(NOT DEFINED PUMADIR)
-	set(PUMADIR "$ENV{PUMADIR}")
+	file(TO_CMAKE_PATH "$ENV{PUMADIR}" PUMADIR)
+	if(PUMADIR STREQUAL "")
+		get_filename_component(PUMADIR "${CMAKE_CURRENT_LIST_DIR}/../.." ABSOLUTE)
+	endif()
 endif()
 
-if(PUMADIR STREQUAL "")
-	set(PUMADIR ${IMTCOREDIR}/../Puma)
+if(NOT DEFINED IMTCOREDIR)
+	file(TO_CMAKE_PATH "$ENV{IMTCOREDIR}" IMTCOREDIR)
+	if(IMTCOREDIR STREQUAL "")
+		set(IMTCOREDIR "${PUMADIR}/../ImtCore")
+	endif()
 endif()
 
-message("PUMADIR ${PUMADIR}")
+include("${IMTCOREDIR}/Config/CMake/ImtCoreEnv.cmake")
 
-include_directories("${PUMADIR}/AuxInclude/${TARGETNAME}")
-include_directories("${PUMADIR}/Include")
-include_directories("${PUMADIR}/Impl")
+if(NOT DEFINED PUMADIR_BUILD)
+	file(TO_CMAKE_PATH "$ENV{PUMADIR_BUILD}" PUMADIR_BUILD)
+	if(PUMADIR_BUILD STREQUAL "")
+		set(PUMADIR_BUILD "${PUMADIR}")
+	endif()
+endif()
 
-link_directories("${PUMADIR}/Lib/${CMAKE_BUILD_TYPE}_${TARGETNAME}")
+include_directories("${PUMADIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles")
+include_directories("${PUMADIR_BUILD}/AuxInclude/${TARGETNAME}")
+
+if(NOT ACF_MODERN_CMAKE)
+	include_directories("${PUMADIR}/Include")
+	include_directories("${PUMADIR}/Impl")
+
+	link_directories("${PUMADIR_BUILD}/Lib/${CMAKE_BUILD_TYPE}_${TARGETNAME}")
+elseif(NOT TARGET ImtCore::imtbase)
+	set(ImtCore_DIR "${IMTCOREDIR_BUILD}/Lib/${CMAKE_BUILD_TYPE}_${TARGETNAME}/cmake")
+	message(STATUS "ImtCore_DIR (find_package): ${ImtCore_DIR}")
+
+	find_package(ImtCore REQUIRED GLOBAL)
+endif()
