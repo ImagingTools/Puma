@@ -36,5 +36,7 @@ target_link_libraries(PumaServerSl PRIVATE
 
 include(${IACFDIR}/Config/CMake/zlib.cmake)
 
+set(DEPLOY_QT_QML_DIRS "${IMTCOREDIR}/Qml")
 deploy_qt(TARGET ${PROJECT_NAME})
+unset(DEPLOY_QT_QML_DIRS)
 
