@@ -13,6 +13,10 @@ if(WIN32)
 	set(RC_FILE "${AUX_INCLUDE_DIR}/${PROJECT_NAME}/PumaServerConfigurator.rc")
 endif()
 
+if(APPLE)
+	set(CMAKE_MACOSX_BUNDLE ON)
+endif()
+
 include(${ACFDIR}/Config/CMake/CustomBuild.cmake)
 include(${ACFDIR}/Config/CMake/ApplicationConfig.cmake)
 
@@ -32,5 +36,7 @@ target_link_libraries(PumaServerConfigurator PRIVATE
 	Acf::AcfLoc
 )
 
+set(DEPLOY_QT_QML_DIRS "${IMTCOREDIR}/Qml")
 deploy_qt(TARGET ${PROJECT_NAME})
+unset(DEPLOY_QT_QML_DIRS)
 

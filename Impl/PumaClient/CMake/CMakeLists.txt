@@ -1,6 +1,5 @@
 project(PumaClient LANGUAGES CXX)
 
-
 set(ARXC_CONFIG "${PROJECT_SOURCE_DIR}/../../../Config/PumaServer.awc")
 set(ARXC_FILES "${PROJECT_SOURCE_DIR}/../PumaClient.acc")
 set(ARXC_OUTDIR "${AUX_INCLUDE_DIR}")
@@ -39,4 +38,5 @@ endif()
 
 set(DEPLOY_QT_QML_DIRS "${IMTCOREDIR}/Qml")
 deploy_qt(TARGET ${PROJECT_NAME})
+unset(DEPLOY_QT_QML_DIRS)
 
