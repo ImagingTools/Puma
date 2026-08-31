@@ -26,6 +26,15 @@
 # targets have been created.
 # ---------------------------------------------------------------------------
 
+# The SDL code generated into ImtCore::imtbasesdl serializes through
+# imtgql::CGqlParamObject, but ImtCore does not declare that edge, so GNU ld places
+# libimtgql.a before libimtbasesdl.a and leaves those symbols undefined. Augmenting the
+# imported target here is safe: Puma sees ImtCore as plain imported static libraries,
+# without the Qt autogen targets that make the same edge a hard cycle inside ImtCore.
+declare_target_dependencies(ImtCore::imtbasesdl LINK_SCOPE INTERFACE
+	ImtCore::imtgql
+)
+
 if(QT_VERSION_MAJOR EQUAL 6)
 	declare_target_dependencies(pumaqml LINK_SCOPE PUBLIC
 		Qt${QT_VERSION_MAJOR}::Core5Compat
