@@ -4705,6 +4705,46 @@
                     ]
                 },
                 {
+                    "id": "6f1a2c53-0b7e-4a19-9c1c-5f2d0a41b7e1",
+                    "name": "Auth A owner for active toggle probe",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "method": "POST",
+                        "description": "SelectTenant deletes the session of the token it is called with (CGqlJwtSessionControllerComp::OnSelectTenant removes oldSessionId), so the probe below must consume a throwaway session instead of the shared a_owner_token.",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{a_owner_login}}\", password: \"{{a_owner_password}}\", productId: \"{{product_id}}\" }) { userId token permissions } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "4a3f9d21-6c88-4a02-9d10-2f6b1f0c93aa",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json && json.data ? json.data.Authorization : null;",
+                                    "pm.test(\"Authorization for active toggle probe succeeds\", function () {",
+                                    "  pm.expect(!!payload && !!payload.token).to.eql(true);",
+                                    "});",
+                                    "if (payload && payload.token) pm.environment.set('a_owner_probe_auth_token', payload.token);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
                     "id": "008bb086-bb8a-4f5a-82ad-174ffa581cda",
                     "name": "SelectTenant active toggle probe context",
                     "request": {
@@ -4718,7 +4758,7 @@
                         "header": [
                             {
                                 "key": "x-authentication-token",
-                                "value": "{{a_owner_token}}"
+                                "value": "{{a_owner_probe_auth_token}}"
                             }
                         ],
                         "method": "POST",
@@ -7680,6 +7720,46 @@
                     ]
                 },
                 {
+                    "id": "1d7c4b90-3a26-4f55-8b0e-6d9c7a2e4f31",
+                    "name": "Delegation post-revoke: Auth B owner for denied select probe",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "method": "POST",
+                        "description": "SelectTenant deletes the session of the token it is called with, so this negative probe must consume a throwaway session instead of the shared b_owner_token.",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{b_owner_login}}\", password: \"{{b_owner_password}}\", productId: \"{{product_id}}\" }) { userId token permissions } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "8b2e6c14-77a9-41d3-bb52-0c8a5e3d9107",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json && json.data ? json.data.Authorization : null;",
+                                    "pm.test(\"Authorization for B owner denied select probe succeeds\", function () {",
+                                    "  pm.expect(!!payload && !!payload.token).to.eql(true);",
+                                    "});",
+                                    "if (payload && payload.token) pm.environment.set('b_owner_probe_auth_token', payload.token);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
                     "id": "3c960c78-db5c-434b-b3b2-f1b20dc9fa1a",
                     "name": "Delegation post-revoke: B owner cannot select tenant A",
                     "request": {
@@ -7693,7 +7773,7 @@
                         "header": [
                             {
                                 "key": "x-authentication-token",
-                                "value": "{{b_owner_token}}"
+                                "value": "{{b_owner_probe_auth_token}}"
                             }
                         ],
                         "method": "POST",
@@ -7864,6 +7944,46 @@
                     ]
                 },
                 {
+                    "id": "9c05a7e2-4d18-4b6f-a3d9-71e2c0b84a56",
+                    "name": "Delegation post-revoke: Auth outsider for denied select probe",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "method": "POST",
+                        "description": "SelectTenant deletes the session of the token it is called with, so this negative probe must consume a throwaway session instead of the shared outsider_token.",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{outsider_login}}\", password: \"{{outsider_password}}\", productId: \"{{product_id}}\" }) { userId token permissions } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "2e91b40d-5f63-4c8a-9de1-3a70c6f2b8d4",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json && json.data ? json.data.Authorization : null;",
+                                    "pm.test(\"Authorization for outsider denied select probe succeeds\", function () {",
+                                    "  pm.expect(!!payload && !!payload.token).to.eql(true);",
+                                    "});",
+                                    "if (payload && payload.token) pm.environment.set('outsider_probe_auth_token', payload.token);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
                     "id": "f38da95e-6d97-42e5-a857-31f73f0bae05",
                     "name": "Delegation post-revoke: Outsider cannot select tenant A",
                     "request": {
@@ -7877,7 +7997,7 @@
                         "header": [
                             {
                                 "key": "x-authentication-token",
-                                "value": "{{outsider_token}}"
+                                "value": "{{outsider_probe_auth_token}}"
                             }
                         ],
                         "method": "POST",
@@ -11935,6 +12055,46 @@
                     ]
                 },
                 {
+                    "id": "b48e1f07-2c95-4d3a-8e61-9f0d5b7c2a13",
+                    "name": "Auth A owner for tenant A context switch",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "method": "POST",
+                        "description": "SelectTenant deletes the session of the token it is called with, so the switch below must consume a throwaway session - a_owner_no_org_token has to stay alive for the remaining No Organization isolation checks.",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{a_owner_login}}\", password: \"{{a_owner_password}}\", productId: \"{{product_id}}\" }) { userId token permissions } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "7d6c3a58-1b04-4e97-a2f5-8c41e0d95b62",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json && json.data ? json.data.Authorization : null;",
+                                    "pm.test(\"Authorization for tenant A context switch succeeds\", function () {",
+                                    "  pm.expect(!!payload && !!payload.token).to.eql(true);",
+                                    "});",
+                                    "if (payload && payload.token) pm.environment.set('a_owner_switch_auth_token', payload.token);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
                     "id": "851cf1be-2034-4c67-a008-b44389e42c86",
                     "name": "SelectTenant A owner context for isolation checks",
                     "request": {
@@ -11948,7 +12108,7 @@
                         "header": [
                             {
                                 "key": "x-authentication-token",
-                                "value": "{{a_owner_no_org_token}}"
+                                "value": "{{a_owner_switch_auth_token}}"
                             }
                         ],
                         "method": "POST",
@@ -16287,6 +16447,46 @@
                     ]
                 },
                 {
+                    "id": "c3a70e46-8d21-4b59-97ec-5a1f2d84b0c7",
+                    "name": "Advanced grant depth: Auth B owner for denied select probe",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "method": "POST",
+                        "description": "SelectTenant deletes the session of the token it is called with, so this negative probe must consume a throwaway session instead of the shared b_owner_token.",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{b_owner_login}}\", password: \"{{b_owner_password}}\", productId: \"{{product_id}}\" }) { userId token permissions } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "f0b95d38-6e27-4c81-a4d6-19c73e5a8b20",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json && json.data ? json.data.Authorization : null;",
+                                    "pm.test(\"Authorization for grant depth denied select probe succeeds\", function () {",
+                                    "  pm.expect(!!payload && !!payload.token).to.eql(true);",
+                                    "});",
+                                    "if (payload && payload.token) pm.environment.set('b_owner_probe_auth_token', payload.token);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
                     "id": "35966257-191a-4776-bb66-cf8bfaa749ca",
                     "name": "Advanced grant depth: B owner cannot select tenant A after all revokes",
                     "request": {
@@ -16300,7 +16500,7 @@
                         "header": [
                             {
                                 "key": "x-authentication-token",
-                                "value": "{{b_owner_token}}"
+                                "value": "{{b_owner_probe_auth_token}}"
                             }
                         ],
                         "method": "POST",
