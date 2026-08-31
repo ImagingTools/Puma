@@ -48,3 +48,13 @@ declare_target_dependencies(pumatest LINK_SCOPE PRIVATE
 	Acf::itest
 	Qt${QT_VERSION_MAJOR}::Test
 )
+
+# declare_target_dependencies() skips missing targets silently, and ImtCore builds and
+# exports imtgqltest only when it is itself configured with BUILD_TESTING=ON - without
+# this check the omission surfaces much later as unresolved CGqlSdlRequestTest symbols.
+if(TARGET pumatest AND NOT TARGET ImtCore::imtgqltest)
+	message(FATAL_ERROR
+		"pumatest requires ImtCore::imtgqltest, which is missing from the ImtCore package at "
+		"'${ImtCore_DIR}'. Reconfigure ImtCore with -DBUILD_TESTING=ON, or configure Puma with "
+		"-DBUILD_TESTING=OFF to skip the tests.")
+endif()
