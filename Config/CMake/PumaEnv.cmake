@@ -1,10 +1,7 @@
 cmake_minimum_required(VERSION 3.26)
 
 if(NOT DEFINED PUMADIR)
-	file(TO_CMAKE_PATH "$ENV{PUMADIR}" PUMADIR)
-	if(PUMADIR STREQUAL "")
-		get_filename_component(PUMADIR "${CMAKE_CURRENT_LIST_DIR}/../.." ABSOLUTE)
-	endif()
+	get_filename_component(PUMADIR "${CMAKE_CURRENT_LIST_DIR}/../.." ABSOLUTE)
 endif()
 
 if(NOT DEFINED IMTCOREDIR)
