@@ -30,6 +30,9 @@ target_link_libraries(PumaServerConfigurator PRIVATE
 	ImtCore::imtguigqlqml
 	ImtCore::imtstylecontrolsqml
 	ImtCore::imtguiqml
+	ImtCore::imtauthguiqml
+	ImtCore::imtcolguiqml
+	ImtCore::imtdocguiqml
 	ImtCore::imtserverapp
 	ImtCore::ImtCoreLoc
 	AcfSln::AcfSlnLoc

@@ -3,6 +3,7 @@
 
 // ImtCore includes
 #include <imtcore/CApplicationRunner.h>
+#include <imtcore/CImtCoreAuthInitializer.h>
 #include <imtcore/CImtCoreBaseInitializer.h>
 #include <imtcore/CImtCoreLocalizationInitializer.h>
 #include <imtcore/CImtCoreStyleInitializer.h>
@@ -15,8 +16,14 @@ static void InitializePumaServerConfiguratorResources()
 {
 	ImtCoreInitLocalizationResources();
 	ImtCoreInitBaseResources();
+
 	ImtCoreInitStyleResources();
+	ImtCoreInitAuthStyleResources();
+
 	ImtCoreInitQmlApplicationCoreResources();
+	ImtCoreInitQmlDocumentManagementResources();
+	ImtCoreInitAuthQmlResources();
+
 	InitializeImtCoreStyle();
 }
 

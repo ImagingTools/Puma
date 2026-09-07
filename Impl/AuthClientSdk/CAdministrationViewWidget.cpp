@@ -33,17 +33,7 @@ static void InitializeAdministrationWidgetResources()
 	ImtCoreInitQmlApplicationCoreResources();
 	ImtCoreInitQmlDocumentManagementResources();
 
-	Q_INIT_RESOURCE(imtauthguiqml);
-	Q_INIT_RESOURCE(imtauthGroupsSdl);
-	Q_INIT_RESOURCE(imtauthRolesSdl);
-	Q_INIT_RESOURCE(imtauthUsersSdl);
-	Q_INIT_RESOURCE(imtauthAuthorizationSdl);
-	Q_INIT_RESOURCE(imtauthPermissionsSdl);
-	Q_INIT_RESOURCE(imtauthSessionsSdl);
-	Q_INIT_RESOURCE(imtauthTenantMembershipsSdl);
-	Q_INIT_RESOURCE(imtauthRoleCollectionDocumentServiceSdl);
-	Q_INIT_RESOURCE(imtauthGroupCollectionDocumentServiceSdl);
-	Q_INIT_RESOURCE(imtauthUserCollectionDocumentServiceSdl);
+	ImtCoreInitAuthQmlResources();
 
 	InitializeImtCoreStyle();
 }
