@@ -95,6 +95,10 @@ param(
     [string]$EnvironmentPath = (Join-Path $ScriptDir "Tenant_System_Full.postman_environment.json"),
     [string]$JUnitReportPath = (Join-Path $ScriptDir "junit-report.xml"),
     [string]$JsonReportPath = (Join-Path $ScriptDir "run-report.json"),
+    [string]$WsJUnitReportPath = (Join-Path $ScriptDir "junit-report-ws.xml"),
+    [string]$ServerStdOutPath = (Join-Path $ScriptDir "server-stdout.log"),
+    [string]$ServerStdErrPath = (Join-Path $ScriptDir "server-stderr.log"),
+    [int]$WebSocketPort = 18788,
     [int]$StartupTimeoutSeconds = 60
 )
 
@@ -170,8 +174,19 @@ function Start-TestServer {
         throw "Server executable not found: $ServerExePath"
     }
     $workDir = Split-Path -Parent $ServerExePath
-    $script:serverProcess = Start-Process -FilePath $ServerExePath -WorkingDirectory $workDir -PassThru -WindowStyle Hidden
+
+    # Redirected to files rather than left on a hidden console: the Debug CRT
+    # writes console output one character at a time, so under this suite's load
+    # the main thread ends up permanently inside NtWriteFile, log messages queue
+    # up in memory (observed: 8.8 GB) and the server stops answering - which
+    # looks exactly like a hang. The files are also the only server-side log we
+    # get when a request fails.
+    $script:serverProcess = Start-Process -FilePath $ServerExePath -WorkingDirectory $workDir -PassThru `
+        -WindowStyle Hidden `
+        -RedirectStandardOutput $ServerStdOutPath `
+        -RedirectStandardError $ServerStdErrPath
     Write-Host "Started PID $($script:serverProcess.Id)"
+    Write-Host "Server stdout: $ServerStdOutPath"
 
     $deadline = (Get-Date).AddSeconds($StartupTimeoutSeconds)
     $ready = $false
@@ -231,6 +246,25 @@ function Invoke-NewmanSuite {
     return $LASTEXITCODE
 }
 
+function Invoke-WsSuite {
+    # Newman does not execute Postman WebSocket requests, so subscription
+    # coverage lives in a node runner speaking the same protocol, writing its
+    # own JUnit report (see ws\ws-subscriptions.js).
+    $wsScript = Join-Path $ScriptDir "ws\ws-subscriptions.js"
+    if (-not (Test-Path $wsScript)) {
+        Write-Host "WebSocket suite not found at $wsScript - skipping." -ForegroundColor Yellow
+        return 0
+    }
+
+    Write-Step "Running WebSocket subscription suite"
+
+    $httpUrl = "http://localhost:$HttpPort/Puma/graphql"
+    $wsUrl = "ws://localhost:$WebSocketPort"
+
+    & node $wsScript --http $httpUrl --ws $wsUrl --env $EnvironmentPath --junit $WsJUnitReportPath | Out-Host
+    return $LASTEXITCODE
+}
+
 $repoRootSource = if ($PSBoundParameters.ContainsKey('RepoRoot')) { 'explicit -RepoRoot' }
     elseif ($env:PUMADIR -eq $RepoRoot) { 'PUMADIR env var' }
     elseif ((Get-Location).Path -eq $RepoRoot) { 'working directory' }
@@ -248,6 +282,10 @@ try {
     Reset-TestDatabase
     Start-TestServer
     $exitCode = Invoke-NewmanSuite
+
+    # Runs against the same live server, after newman has seeded users/tenants.
+    $wsExitCode = Invoke-WsSuite
+    if ($exitCode -eq 0) { $exitCode = $wsExitCode }
 }
 finally {
     if ($serverProcess -and -not $serverProcess.HasExited) {

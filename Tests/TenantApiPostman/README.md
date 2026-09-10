@@ -467,3 +467,105 @@ Total request-level scenarios: 323
 3. Remove tenant A
 4. Remove tenant B
 5. Remove tenant created via document service
+
+## WebSocket subscriptions (`ws/ws-subscriptions.js`)
+
+Newman does not execute Postman WebSocket requests — it runs HTTP requests only —
+so the subscription side of the tenant API cannot live in the Postman collection.
+It is covered by a small Node runner that speaks the same protocol as the client
+(`ImtCore/Qml/imtguigql/SubscriptionManager.qml` and `CWebSocketServletComp`):
+
+```
+-> {"type":"connection_init"}                                    <- {"type":"connection_ack"}
+-> {"id":..,"type":"start","headers":{..},"payload":{"data":Q}}  <- (silence on success)
+                                                                 <- {"type":"data","id":..,"payload":{..}}
+-> {"id":..,"type":"stop"}                                       <- {"type":"complete","id":..}
+                                              refusals arrive as <- {"type":"error","id":..,"payload":[..]}
+                                    plus unsolicited keep-alives <- {"type":"ka"}
+```
+
+It reuses this folder's environment file for `base_url` / `su_login` / `su_password`,
+and writes `junit-report-ws.xml` in the same format TeamCity already consumes.
+
+`Run-CiTests.ps1` runs it right after newman against the same live server, so no
+extra build step is needed. Standalone:
+
+```
+npm install
+node ws/ws-subscriptions.js --http http://localhost:17788/Puma/graphql --ws ws://localhost:18788
+```
+
+Options: `--http`, `--ws`, `--env`, `--junit`, `--timeout`, `--grace`, `--su-login`,
+`--su-password`, `--product-id`. `--grace` is how long a `start` has to stay unanswered
+before it counts as accepted (default 2500 ms) - a successful registration is answered
+with silence, so the absence of a refusal is the only acceptance signal on the wire.
+
+The WS port defaults to the HTTP port + 1000 (17788 → 18788, matching
+`PumaServerPgTest.acc`); override with `--ws` where that convention does not hold.
+
+### Covered subscriptions
+
+| Subscription | SDL |
+|---|---|
+| `OnDocumentManagerChanged` | `imtbase/CollectionDocumentService.sdl` |
+| `OnDocumentChanged` | `imtbase/CollectionDocumentService.sdl` |
+| `OnUndoRedoChanged` | `imtbase/CollectionDocumentService.sdl` |
+| `OnMembershipNotification` | `imtauth/TenantMemberships.sdl` |
+| `OnConnectionCodesNotification` | `imtauth/Tenants.sdl` |
+| `OnCrossTenantMessageNotification` | `imtauth/Tenants.sdl` |
+
+Beyond "does it deliver", the suite pins down the protocol behaviour that has
+actually broken in the field: an error frame must carry the id of the subscription
+it refers to (the client attributes failures by id), `stop` on a live subscription
+must answer `complete` rather than an error *and* end delivery to it, a repeated
+`stop` must not desynchronise the session, and a subscription presenting an invalid
+token must be refused as an authentication failure.
+
+Every case asserts on the specific outcome, not on the presence of a frame. A refusal
+is matched against the reason the server gives, so a case that stops reaching the check
+it was written for - a malformed payload, a broken token - fails instead of passing on
+whatever error came back. Notifications are matched on `documentId` and
+`documentOperation` rather than counted. On top of that, every inbound frame is audited
+against a running ledger of what the suite asked for: an unknown frame type, an error
+nobody expected, a notification delivered to an id holding no subscription, or a payload
+carrying another command's data fails the final case even though no individual case
+looks for it. Cases whose preconditions an earlier failure destroyed report
+"precondition not met" rather than asserting against undefined state.
+
+The eight tenant notification subscriptions assert registration only - nothing in the
+suite triggers the events that would make them deliver - and they share one grace window
+instead of waiting per subscription.
+
+The `SaveDocument` case is a regression probe for the tenant editor: after saving,
+the last `OnUndoRedoChanged` frame has to report `isDirty=false`. When it does not,
+the Save button stays enabled in the GUI.
+
+### Why the routing cases are here
+
+A ProLife client reaches Puma through the ProLife server, which forwards what it
+does not serve itself. The document-service subscriptions are a single command per
+operation naming their collection in `input`, where they used to be one command per
+collection (`OnUsersDocumentChanged` and friends). Two things went wrong with that
+migration, and neither is visible from a single server:
+
+- a forwarder that passed the command on **without** the arguments — the upstream
+  publisher selects on them, so nothing bound and the client waited forever;
+- a forwarder that decided on the **command alone** — it could no longer tell a
+  remotely served collection from a locally served one.
+
+These cases keep the server strict enough that neither mistake can look healthy:
+a document-service subscription with no `input`, one naming a collection this server
+does not serve, and `OnDocumentChanged` without a document id all have to be refused.
+The empty-id case is the same idea for the subscription id itself, which both sides
+key everything on.
+
+**This case currently fails, and the failure is real.** `CWebSocketServletComp::RegisterSubscription`
+checks for an empty *command* id but never for an empty *subscription* id, and
+`CWebSocketRequest` assigns `m_requestId` from the frame's `"id"` unconditionally - so a
+`start` carrying `"id": ""` is accepted and bound. Every subscription sent with an empty
+id then collides on that one key and receives the others' notifications. The case used to
+pass because it sent raw GraphQL as `payload.data` instead of the `{"query": ...}` string
+the client sends: `CGqlRequest::ParseQuery` rejected the payload before the id was ever
+looked at, so the error frame it asserted on came from the malformed payload rather than
+from the id. It now sends the well-formed payload and fails until the server rejects an
+empty subscription id.

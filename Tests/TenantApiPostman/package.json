@@ -3,6 +3,10 @@
     "private": true,
     "description": "Newman dependency pin for the Tenant API Postman CI suite (see Run-CiTests.ps1)",
     "devDependencies": {
-        "newman": "6.2.2"
+        "newman": "6.2.2",
+        "ws": "8.18.0"
+    },
+    "scripts": {
+        "test:ws": "node ws/ws-subscriptions.js"
     }
 }
