@@ -10576,6 +10576,53 @@
                     ]
                 },
                 {
+                    "name": "Reopen relationship document (coverage)",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation OpenDocument { OpenDocument(input: { collectionId: \"TenantRelationships\", id: \"{{relationshipId}}\" }) { documentId } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "// The server closes any document left without an active OnDocumentChanged",
+                                    "// subscriber for CloseDocumentTimeout (30000ms by default) - see",
+                                    "// CCollectionDocumentServicePublisherComp::CloseIdleDocuments. This suite is",
+                                    "// pure HTTP and never subscribes, so the handle captured back in folder 03 is",
+                                    "// already closed by the time this folder runs on anything but a very fast",
+                                    "// machine. Reopen right before reading, the way a real client does.",
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.OpenDocument : null;",
+                                    "pm.test('Relationship document reopened for coverage', function(){ pm.expect(!!(payload && payload.documentId), 'OpenDocument failed: ' + JSON.stringify(json.errors || [])).to.eql(true); });",
+                                    "if (payload && payload.documentId) pm.environment.set('relationshipCoverageDocId', payload.documentId);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
                     "id": "e8dd83d0-b35a-49e9-80b0-292eb01ad34f",
                     "name": "GetRelationshipRepresentation coverage",
                     "request": {
@@ -10596,7 +10643,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "query GetRelationshipRepresentation { GetRelationshipRepresentation(input: { collectionId: \"TenantRelationships\", id: \"{{relationshipDocId}}\" }) { id sourceTenantId targetTenantId status } }",
+                                "query": "query GetRelationshipRepresentation { GetRelationshipRepresentation(input: { collectionId: \"TenantRelationships\", id: \"{{relationshipCoverageDocId}}\" }) { id sourceTenantId targetTenantId status } }",
                                 "variables": ""
                             }
                         }
@@ -10623,17 +10670,17 @@
                                 "id": "3f6d8d05-6975-45ba-9272-da86ae7842f3",
                                 "type": "text/javascript",
                                 "exec": [
-                                    "// The request addresses the relationship by its document id, so that is the id the",
-                                    "// answer has to carry - relationshipId is the same object seen through the",
-                                    "// GetTenantRelationships list, which hands out the stored relationship id.",
-                                    "// This document was created ~30 folders earlier via CreateNewDocument/SaveDocument;",
-                                    "// under CI-agent load, CDocumentServiceBase's unbounded per-document worker thread",
-                                    "// can still be finishing that write when this read lands, yielding a transient",
-                                    "// \"Document not found\" warning here. Poll instead of asserting on one round-trip.",
+                                    "// The request addresses the relationship by the document id just handed out by",
+                                    "// \"Reopen relationship document (coverage)\", so that is the id the answer has to",
+                                    "// carry - relationshipId is the same object seen through the GetTenantRelationships",
+                                    "// list, which hands out the stored relationship id.",
+                                    "// OpenDocument finishes its load on a background thread, so poll rather than",
+                                    "// asserting on a single round-trip (same reason as \"Wait for A member document load\").",
                                     "const json = pm.response.json();",
                                     "const payload = json.data ? json.data.GetRelationshipRepresentation : null;",
                                     "const hasErr = !!(json.errors && json.errors.length);",
-                                    "const ready = !hasErr && !!payload && payload.id === pm.environment.get('relationshipDocId');",
+                                    "const expectedId = pm.environment.get('relationshipCoverageDocId');",
+                                    "const ready = !hasErr && !!payload && payload.id === expectedId;",
                                     "const maxAttempts = 25;",
                                     "const attempt = parseInt(pm.environment.get('docWaitAttempt_relRepr') || '0', 10);",
                                     "if (ready) {",
@@ -10644,10 +10691,93 @@
                                     "    postman.setNextRequest('GetRelationshipRepresentation coverage');",
                                     "} else {",
                                     "    pm.environment.set('docWaitAttempt_relRepr', '0');",
-                                    "    pm.test('GetRelationshipRepresentation returns requested relationship', function(){ pm.expect(hasErr).to.eql(false); pm.expect(payload.id).to.eql(pm.environment.get('relationshipDocId')); });",
+                                    "    pm.test('GetRelationshipRepresentation returns requested relationship', function(){ pm.expect(hasErr, 'unexpected GraphQL error: ' + JSON.stringify(json.errors)).to.eql(false); pm.expect(payload.id).to.eql(expectedId); });",
                                     "}"
                                 ],
                                 "_lastExecutionId": "22d060a9-91dc-44bf-a090-32e4809de671"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Close relationship document (coverage)",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CloseDocument { CloseDocument(input: { collectionId: \"TenantRelationships\", id: \"{{relationshipCoverageDocId}}\" }) { status message } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "// Release the handle explicitly instead of leaving it for the 30s idle sweep.",
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.CloseDocument : null;",
+                                    "pm.test('Relationship coverage document closed', function(){ pm.expect(payload ? payload.status : '', 'CloseDocument failed: ' + JSON.stringify(json.errors || [])).to.eql('Success'); });"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Reopen user document (coverage)",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation OpenDocument { OpenDocument(input: { collectionId: \"Users\", id: \"{{a_member_user_id}}\" }) { documentId } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "// Open right before the read - see \"Reopen relationship document (coverage)\".",
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.OpenDocument : null;",
+                                    "pm.test('User document reopened for coverage', function(){ pm.expect(!!(payload && payload.documentId), 'OpenDocument failed: ' + JSON.stringify(json.errors || [])).to.eql(true); });",
+                                    "if (payload && payload.documentId) pm.environment.set('userCoverageDocId', payload.documentId);"
+                                ]
                             }
                         }
                     ]
@@ -10673,7 +10803,79 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "query GetUserRepresentation { GetUserRepresentation(input: { collectionId: \"Users\", id: \"{{aMemberUserDocId}}\" }) { id username name roles groups } }",
+                                "query": "query GetUserRepresentation { GetUserRepresentation(input: { collectionId: \"Users\", id: \"{{userCoverageDocId}}\" }) { id username name roles groups } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "// See \"Wait for A member document load\" for why this busy-waits instead",
+                                    "// of a real sleep, and only on actual retries.",
+                                    "if (parseInt(pm.environment.get('docWaitAttempt_userRepr') || '0', 10) > 0) {",
+                                    "    const until = Date.now() + 150;",
+                                    "    while (Date.now() < until) { /* spin */ }",
+                                    "}"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "f46b3775-0a13-4070-98a1-397bdf3f10aa",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "// OpenDocument finishes its load on a background thread, so poll rather than",
+                                    "// asserting on a single round-trip (same reason as \"Wait for A member document load\").",
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.GetUserRepresentation : null;",
+                                    "const hasErr = !!(json.errors && json.errors.length);",
+                                    "const expectedId = pm.environment.get('a_member_user_id');",
+                                    "const ready = !hasErr && !!payload && payload.id === expectedId;",
+                                    "const maxAttempts = 25;",
+                                    "const attempt = parseInt(pm.environment.get('docWaitAttempt_userRepr') || '0', 10);",
+                                    "if (ready) {",
+                                    "    pm.environment.set('docWaitAttempt_userRepr', '0');",
+                                    "    pm.test('GetUserRepresentation returns the requested user', function(){ pm.expect(ready).to.eql(true); });",
+                                    "} else if (attempt < maxAttempts) {",
+                                    "    pm.environment.set('docWaitAttempt_userRepr', String(attempt + 1));",
+                                    "    postman.setNextRequest('GetUserRepresentation coverage');",
+                                    "} else {",
+                                    "    pm.environment.set('docWaitAttempt_userRepr', '0');",
+                                    "    pm.test('GetUserRepresentation returns the requested user', function(){ pm.expect(hasErr, 'unexpected GraphQL error: ' + JSON.stringify(json.errors)).to.eql(false); pm.expect(payload.id).to.eql(expectedId); });",
+                                    "}"
+                                ],
+                                "_lastExecutionId": "939b622d-2075-461b-8dad-61a9343e596f"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Close user document (coverage)",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CloseDocument { CloseDocument(input: { collectionId: \"Users\", id: \"{{userCoverageDocId}}\" }) { status message } }",
                                 "variables": ""
                             }
                         }
@@ -10683,15 +10885,55 @@
                         {
                             "listen": "test",
                             "script": {
-                                "id": "f46b3775-0a13-4070-98a1-397bdf3f10aa",
                                 "type": "text/javascript",
                                 "exec": [
+                                    "// Release the handle explicitly instead of leaving it for the 30s idle sweep.",
                                     "const json = pm.response.json();",
-                                    "const payload = json.data ? json.data.GetUserRepresentation : null;",
-                                    "const hasErr = !!(json.errors && json.errors.length);",
-                                    "pm.test('GetUserRepresentation returns the requested user', function(){ pm.expect(hasErr, 'unexpected GraphQL error: ' + JSON.stringify(json.errors)).to.eql(false); pm.expect(payload.id).to.eql(pm.environment.get('a_member_user_id')); });"
-                                ],
-                                "_lastExecutionId": "939b622d-2075-461b-8dad-61a9343e596f"
+                                    "const payload = json.data ? json.data.CloseDocument : null;",
+                                    "pm.test('User coverage document closed', function(){ pm.expect(payload ? payload.status : '', 'CloseDocument failed: ' + JSON.stringify(json.errors || [])).to.eql('Success'); });"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Reopen group document (coverage)",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation OpenDocument { OpenDocument(input: { collectionId: \"Groups\", id: \"{{groupSupportId}}\" }) { documentId } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "// Open right before the read - see \"Reopen relationship document (coverage)\".",
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.OpenDocument : null;",
+                                    "pm.test('Group document reopened for coverage', function(){ pm.expect(!!(payload && payload.documentId), 'OpenDocument failed: ' + JSON.stringify(json.errors || [])).to.eql(true); });",
+                                    "if (payload && payload.documentId) pm.environment.set('groupCoverageDocId', payload.documentId);"
+                                ]
                             }
                         }
                     ]
@@ -10717,7 +10959,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "query GetGroupRepresentation { GetGroupRepresentation(input: { collectionId: \"Groups\", id: \"{{groupSupportDocId}}\" }) { id name description roles users } }",
+                                "query": "query GetGroupRepresentation { GetGroupRepresentation(input: { collectionId: \"Groups\", id: \"{{groupCoverageDocId}}\" }) { id name description roles users } }",
                                 "variables": ""
                             }
                         }
@@ -10744,10 +10986,8 @@
                                 "id": "f1f53eb4-3275-490a-9d77-e741922923fb",
                                 "type": "text/javascript",
                                 "exec": [
-                                    "// This document was created ~30 folders earlier via CreateNewDocument/SaveDocument;",
-                                    "// under CI-agent load, CDocumentServiceBase's unbounded per-document worker thread",
-                                    "// can still be finishing that write when this read lands, yielding a transient",
-                                    "// \"Document not found\" warning here. Poll instead of asserting on one round-trip.",
+                                    "// OpenDocument finishes its load on a background thread, so poll rather than",
+                                    "// asserting on a single round-trip (same reason as \"Wait for A member document load\").",
                                     "const json = pm.response.json();",
                                     "const payload = json.data ? json.data.GetGroupRepresentation : null;",
                                     "const hasErr = !!(json.errors && json.errors.length);",
@@ -10766,6 +11006,47 @@
                                     "}"
                                 ],
                                 "_lastExecutionId": "9d9f7e2c-2ed2-424a-936e-dd81e93d3661"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Close group document (coverage)",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CloseDocument { CloseDocument(input: { collectionId: \"Groups\", id: \"{{groupCoverageDocId}}\" }) { status message } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "// Release the handle explicitly instead of leaving it for the 30s idle sweep.",
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.CloseDocument : null;",
+                                    "pm.test('Group coverage document closed', function(){ pm.expect(payload ? payload.status : '', 'CloseDocument failed: ' + JSON.stringify(json.errors || [])).to.eql('Success'); });"
+                                ]
                             }
                         }
                     ]
