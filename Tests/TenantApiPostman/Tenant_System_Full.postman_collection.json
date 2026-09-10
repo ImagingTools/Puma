@@ -49,12 +49,9 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const payload = json.data && json.data.CreateSuperuser ? json.data.CreateSuperuser : null;",
-                                    "const graphQLErrText = JSON.stringify(json.errors || []);",
-                                    "const msg = (payload && payload.message ? payload.message : '') + ' ' + graphQLErrText;",
-                                    "const created = !!(payload && payload.success === true);",
-                                    "const alreadyExists = /exist|already|уже/i.test(msg);",
-                                    "pm.test('Superuser is ensured for empty system', function(){",
-                                    "  pm.expect(created || alreadyExists).to.eql(true);",
+                                    "pm.test('Superuser is created on the empty system', function(){",
+                                    "  pm.expect(!!(json.errors && json.errors.length), 'unexpected GraphQL error: ' + JSON.stringify(json.errors)).to.eql(false);",
+                                    "  pm.expect(payload && payload.success, 'CreateSuperuser payload: ' + JSON.stringify(payload)).to.eql(true);",
                                     "});",
                                     "pm.environment.set('su_login', 'su');"
                                 ],
@@ -168,11 +165,9 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const payload = (json.data && json.data.RegisterUser) || null;",
-                                    "const errText = JSON.stringify(json.errors || []);",
-                                    "const alreadyExists = /exist|already|duplicate/i.test(errText);",
-                                    "pm.test('RegisterUser a_owner succeeds or already exists', function () {",
-                                    "  pm.response.to.be.ok;",
-                                    "  pm.expect(alreadyExists || !!(payload && payload.id)).to.eql(true);",
+                                    "pm.test('RegisterUser a_owner succeeds', function(){",
+                                    "  pm.expect(!!(json.errors && json.errors.length), 'unexpected GraphQL error: ' + JSON.stringify(json.errors)).to.eql(false);",
+                                    "  pm.expect(!!(payload && payload.id), 'RegisterUser payload: ' + JSON.stringify(payload)).to.eql(true);",
                                     "});",
                                     "if (payload && payload.id) pm.environment.set('a_owner_user_id', payload.id);"
                                 ],
@@ -229,11 +224,9 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const payload = (json.data && json.data.RegisterUser) || null;",
-                                    "const errText = JSON.stringify(json.errors || []);",
-                                    "const alreadyExists = /exist|already|duplicate/i.test(errText);",
-                                    "pm.test('RegisterUser b_owner succeeds or already exists', function () {",
-                                    "  pm.response.to.be.ok;",
-                                    "  pm.expect(alreadyExists || !!(payload && payload.id)).to.eql(true);",
+                                    "pm.test('RegisterUser b_owner succeeds', function(){",
+                                    "  pm.expect(!!(json.errors && json.errors.length), 'unexpected GraphQL error: ' + JSON.stringify(json.errors)).to.eql(false);",
+                                    "  pm.expect(!!(payload && payload.id), 'RegisterUser payload: ' + JSON.stringify(payload)).to.eql(true);",
                                     "});",
                                     "if (payload && payload.id) pm.environment.set('b_owner_user_id', payload.id);"
                                 ],
@@ -290,11 +283,9 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const payload = (json.data && json.data.RegisterUser) || null;",
-                                    "const errText = JSON.stringify(json.errors || []);",
-                                    "const alreadyExists = /exist|already|duplicate/i.test(errText);",
-                                    "pm.test('RegisterUser a_member succeeds or already exists', function () {",
-                                    "  pm.response.to.be.ok;",
-                                    "  pm.expect(alreadyExists || !!(payload && payload.id)).to.eql(true);",
+                                    "pm.test('RegisterUser a_member succeeds', function(){",
+                                    "  pm.expect(!!(json.errors && json.errors.length), 'unexpected GraphQL error: ' + JSON.stringify(json.errors)).to.eql(false);",
+                                    "  pm.expect(!!(payload && payload.id), 'RegisterUser payload: ' + JSON.stringify(payload)).to.eql(true);",
                                     "});",
                                     "if (payload && payload.id) pm.environment.set('a_member_user_id', payload.id);"
                                 ],
@@ -351,11 +342,9 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const payload = (json.data && json.data.RegisterUser) || null;",
-                                    "const errText = JSON.stringify(json.errors || []);",
-                                    "const alreadyExists = /exist|already|duplicate/i.test(errText);",
-                                    "pm.test('RegisterUser outsider succeeds or already exists', function () {",
-                                    "  pm.response.to.be.ok;",
-                                    "  pm.expect(alreadyExists || !!(payload && payload.id)).to.eql(true);",
+                                    "pm.test('RegisterUser outsider succeeds', function(){",
+                                    "  pm.expect(!!(json.errors && json.errors.length), 'unexpected GraphQL error: ' + JSON.stringify(json.errors)).to.eql(false);",
+                                    "  pm.expect(!!(payload && payload.id), 'RegisterUser payload: ' + JSON.stringify(payload)).to.eql(true);",
                                     "});",
                                     "if (payload && payload.id) pm.environment.set('outsider_user_id', payload.id);"
                                 ],
@@ -907,12 +896,10 @@
                                 "type": "text/javascript",
                                 "exec": [
                                     "const json = pm.response.json();",
-                                    "pm.test('UpdateTenant success', function () {",
-                                    "  pm.response.to.be.ok;",
-                                    "  const payload = json.data ? json.data.UpdateTenant : null;",
-                                    "  const msg = (payload && payload.errorMessage) || \"\";",
-                                    "  const alreadyExists = /already exists/i.test(msg);",
-                                    "  pm.expect((payload && payload.success === true) || alreadyExists).to.eql(true);",
+                                    "const payload = json.data ? json.data.UpdateTenant : null;",
+                                    "pm.test('UpdateTenant success', function(){",
+                                    "  pm.expect(!!(json.errors && json.errors.length), 'unexpected GraphQL error: ' + JSON.stringify(json.errors)).to.eql(false);",
+                                    "  pm.expect(payload && payload.success, 'UpdateTenant payload: ' + JSON.stringify(payload)).to.eql(true);",
                                     "});"
                                 ],
                                 "_lastExecutionId": "3234721a-09c0-4a1d-9ce4-26ab7db14918"
@@ -2460,9 +2447,7 @@
                                     "if (!pm.environment.get(\"roleViewId\")) pm.environment.set(\"roleViewId\", pm.variables.replaceIn(\"{{$guid}}\"));",
                                     "if (!pm.environment.get(\"permReadX\")) pm.environment.set(\"permReadX\", \"fixture.permission.read\");",
                                     "if (!pm.environment.get(\"permWriteX\")) pm.environment.set(\"permWriteX\", \"fixture.permission.write\");",
-                                    "if (!pm.environment.get(\"permAdminX\")) pm.environment.set(\"permAdminX\", \"fixture.permission.admin\");",
-                                    "pm.environment.set(\"rbac_read_expected\", \"false\");",
-                                    "pm.environment.set(\"rbac_editor_write_expected\", \"false\");"
+                                    "if (!pm.environment.get(\"permAdminX\")) pm.environment.set(\"permAdminX\", \"fixture.permission.admin\");"
                                 ],
                                 "_lastExecutionId": "479eb96d-ca9a-452a-b2a9-d48baa859d17"
                             }
@@ -2571,9 +2556,7 @@
                                     "const status = payload && payload.status ? payload.status : \"\";",
                                     "pm.test(\"Update role VIEW strict success\", function(){",
                                     "  pm.expect(hasInvalidPermWarning).to.eql(false); pm.expect(status === \"Success\").to.eql(true);",
-                                    "});",
-                                    "if (hasInvalidPermWarning) pm.environment.set(\"rbac_read_expected\", \"false\");",
-                                    "if (!hasInvalidPermWarning && status === \"Success\") pm.environment.set(\"rbac_read_expected\", \"true\");"
+                                    "});"
                                 ],
                                 "_lastExecutionId": "9e875099-d048-46e9-8cf4-bac8ad721fbc"
                             }
@@ -2614,18 +2597,16 @@
                                 "id": "d32c00ef-0a1a-487d-abe2-8a37f802e625",
                                 "type": "text/javascript",
                                 "exec": [
+                                    "// A tenant owner saving a role in its own tenant must simply succeed. The old",
+                                    "// version accepted an 'Invalid permissions' warning as a valid outcome and then",
+                                    "// disabled the downstream delegation assertions through rbac_*_expected.",
                                     "const json = pm.response.json();",
-                                    "const warnings = (json.errors || []).filter(e => e && e.extensions && e.extensions.type === \"Warning\");",
-                                    "const hasAlreadyExists = warnings.some(e => /already exists/i.test(e.message || \"\"));",
-                                    "const hasInvalidPermWarning = warnings.some(e => /Invalid permissions|is not allowed for tenant/i.test(e.message || \"\"));",
+                                    "const warnings = (json.errors || []).filter(e => e && e.extensions && e.extensions.type === 'Warning');",
                                     "const payload = json.data && json.data.SaveDocument ? json.data.SaveDocument : null;",
-                                    "const status = payload && payload.status ? payload.status : '';",
-                                    "pm.test('Save strict success', function(){",
-                                    "  if (hasInvalidPermWarning) { pm.expect(status === \"Success\").to.eql(false); return; }",
-                                    "  pm.expect(hasAlreadyExists).to.eql(false); pm.expect(status === \"Success\").to.eql(true);",
-                                    "});",
-                                    "if (hasAlreadyExists || hasInvalidPermWarning) { pm.environment.set(\"rbac_read_expected\", \"false\"); }",
-                                    "else if (status === \"Success\") { pm.environment.set(\"rbac_read_expected\", \"true\"); }"
+                                    "pm.test('Save role VIEW strict success', function(){",
+                                    "  pm.expect(warnings.length, 'unexpected warnings: ' + JSON.stringify(warnings)).to.eql(0);",
+                                    "  pm.expect(payload ? payload.status : '', 'SaveDocument payload: ' + JSON.stringify(payload)).to.eql('Success');",
+                                    "});"
                                 ],
                                 "_lastExecutionId": "98d08829-72c8-4166-85e3-99631ab277c2"
                             }
@@ -2726,8 +2707,6 @@
                                     "const hasInvalidPermWarning = warnings.some(e => /Invalid permissions for the user|is not allowed for tenant/i.test(e.message || \"\"));",
                                     "const payload = json.data && json.data.UpdateRoleFromRepresentation ? json.data.UpdateRoleFromRepresentation : null;",
                                     "const status = payload && payload.status ? payload.status : \"\";",
-                                    "if (hasInvalidPermWarning) pm.environment.set(\"rbac_editor_write_expected\", \"false\");",
-                                    "if (!hasInvalidPermWarning && status === \"Success\") pm.environment.set(\"rbac_editor_write_expected\", \"true\");",
                                     "pm.test(\"Update role EDITOR strict success\", function(){",
                                     "  pm.expect(hasInvalidPermWarning).to.eql(false); pm.expect(status === \"Success\").to.eql(true);",
                                     "});"
@@ -2771,18 +2750,16 @@
                                 "id": "38f9ba70-b9b3-4eb9-a28f-7c5976281c8b",
                                 "type": "text/javascript",
                                 "exec": [
+                                    "// A tenant owner saving a role in its own tenant must simply succeed. The old",
+                                    "// version accepted an 'Invalid permissions' warning as a valid outcome and then",
+                                    "// disabled the downstream delegation assertions through rbac_*_expected.",
                                     "const json = pm.response.json();",
-                                    "const warnings = (json.errors || []).filter(e => e && e.extensions && e.extensions.type === \"Warning\");",
-                                    "const hasAlreadyExists = warnings.some(e => /already exists/i.test(e.message || \"\"));",
-                                    "const hasInvalidPermWarning = warnings.some(e => /Invalid permissions|is not allowed for tenant/i.test(e.message || \"\"));",
+                                    "const warnings = (json.errors || []).filter(e => e && e.extensions && e.extensions.type === 'Warning');",
                                     "const payload = json.data && json.data.SaveDocument ? json.data.SaveDocument : null;",
-                                    "const status = payload && payload.status ? payload.status : '';",
-                                    "pm.test('Save strict success', function(){",
-                                    "  if (hasInvalidPermWarning) { pm.expect(status === \"Success\").to.eql(false); return; }",
-                                    "  pm.expect(hasAlreadyExists).to.eql(false); pm.expect(status === \"Success\").to.eql(true);",
-                                    "});",
-                                    "if (hasAlreadyExists || hasInvalidPermWarning) { pm.environment.set(\"rbac_editor_write_expected\", \"false\"); }",
-                                    "else if (status === \"Success\") { pm.environment.set(\"rbac_editor_write_expected\", \"true\"); }"
+                                    "pm.test('Save role EDITOR strict success', function(){",
+                                    "  pm.expect(warnings.length, 'unexpected warnings: ' + JSON.stringify(warnings)).to.eql(0);",
+                                    "  pm.expect(payload ? payload.status : '', 'SaveDocument payload: ' + JSON.stringify(payload)).to.eql('Success');",
+                                    "});"
                                 ],
                                 "_lastExecutionId": "8b36b4ce-f385-4ad6-826b-90c7e01a5e2d"
                             }
@@ -3098,14 +3075,12 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const payload = json && json.data ? json.data.UpdateUserFromRepresentation : null;",
-                                    "const warnings = (json.errors || []).filter(e => e && e.extensions && e.extensions.type === \"Warning\");",
-                                    "const hasPermWarning = warnings.some(e => /Invalid permissions|is not allowed for tenant/i.test(e.message || \"\"));",
-                                    "const status = payload && payload.status ? payload.status : \"\";",
-                                    "pm.test(\"Update user representation strict success\", function(){ pm.expect(hasPermWarning).to.eql(false); pm.expect(status === \"Success\").to.eql(true); });",
-                                    "const readPerm = pm.environment.get(\"permReadX\");",
-                                    "const readExpected = (pm.environment.get(\"rbac_read_expected\") || \"false\") === \"true\";",
-                                    "const assigned = (readExpected && !hasPermWarning) ? [readPerm].filter(Boolean) : [];",
-                                    "pm.environment.set(\"assignedUserPermissionsCsv\", assigned.join(\";\"));"
+                                    "const warnings = (json.errors || []).filter(e => e && e.extensions && e.extensions.type === 'Warning');",
+                                    "const hasPermWarning = warnings.some(e => /Invalid permissions|is not allowed for tenant/i.test(e.message || ''));",
+                                    "const status = payload && payload.status ? payload.status : '';",
+                                    "pm.test('Update user representation strict success', function(){ pm.expect(hasPermWarning).to.eql(false); pm.expect(status).to.eql('Success'); });",
+                                    "const readPerm = pm.environment.get('permReadX');",
+                                    "pm.environment.set('assignedUserPermissionsCsv', readPerm || '');"
                                 ],
                                 "_lastExecutionId": "401de4b5-38a5-4d9c-b68b-73c84837959d"
                             }
@@ -3387,13 +3362,14 @@
                                 "id": "a7a12cd6-ff5b-4442-a375-13dbd1161547",
                                 "type": "text/javascript",
                                 "exec": [
+                                    "// Pin the actual refusal, not just 'something went wrong' - otherwise an",
+                                    "// unrelated failure (bad request, server error) would satisfy this test too.",
                                     "const json = pm.response.json();",
-                                    "pm.test(\"Member grant creation is forbidden\", function () {",
-                                    "  const hasGraphqlErr = !!(json.errors && json.errors.length);",
-                                    "  const hasPayloadErr = !!(json.data && json.data.CreateCrossOrgGrant && json.data.CreateCrossOrgGrant.errorMessage);",
-                                    "  const noGrant = !(json.data && json.data.CreateCrossOrgGrant && json.data.CreateCrossOrgGrant.grantId);",
-                                    "  pm.expect(hasGraphqlErr || hasPayloadErr).to.eql(true);",
-                                    "  pm.expect(noGrant).to.eql(true);",
+                                    "const payload = json.data ? json.data.CreateCrossOrgGrant : null;",
+                                    "pm.test('Member grant creation is refused with an access-denied reason', function(){",
+                                    "  pm.expect(!!(json.errors && json.errors.length), 'expected a payload-level refusal, got GraphQL errors: ' + JSON.stringify(json.errors)).to.eql(false);",
+                                    "  pm.expect(payload && payload.errorMessage ? payload.errorMessage : '', 'CreateCrossOrgGrant payload: ' + JSON.stringify(payload)).to.match(/Access denied/i);",
+                                    "  pm.expect(!!(payload && payload.grantId), 'a grant was created despite the refusal').to.eql(false);",
                                     "});"
                                 ],
                                 "_lastExecutionId": "c3ca004b-d5b4-49fc-8409-34aec43b4cdb"
@@ -5915,8 +5891,10 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const payload = json.data && json.data.RemoveElements ? json.data.RemoveElements : null;",
-                                    "const success = payload && payload.success;",
-                                    "pm.test('User remove succeeded or skipped (if not supported in this context)', function(){ pm.expect(success === true || success === false || (json.errors && json.errors.length)).to.eql(true); });"
+                                    "pm.test('Phantom user removal succeeds', function(){",
+                                    "  pm.expect(!!(json.errors && json.errors.length), 'unexpected GraphQL error: ' + JSON.stringify(json.errors)).to.eql(false);",
+                                    "  pm.expect(payload ? payload.success : null, 'RemoveElements payload: ' + JSON.stringify(payload)).to.eql(true);",
+                                    "});"
                                 ]
                             }
                         }
@@ -6238,10 +6216,11 @@
                                 "type": "text/javascript",
                                 "exec": [
                                     "const json = pm.response.json();",
-                                    "pm.test(\"Outsider cannot remove connection\", function () {",
-                                    "  const hasErr = !!(json.errors && json.errors.length);",
-                                    "  const denied = !!(json.data && json.data.RemoveConnection && (json.data.RemoveConnection.success === false || json.data.RemoveConnection.errorMessage));",
-                                    "  pm.expect(hasErr || denied).to.eql(true);",
+                                    "const payload = json.data ? json.data.RemoveConnection : null;",
+                                    "pm.test('Outsider cannot remove connection', function(){",
+                                    "  pm.expect(!!(json.errors && json.errors.length), 'expected a payload-level refusal, got GraphQL errors: ' + JSON.stringify(json.errors)).to.eql(false);",
+                                    "  pm.expect(payload ? payload.success : null, 'RemoveConnection payload: ' + JSON.stringify(payload)).to.eql(false);",
+                                    "  pm.expect(payload && payload.errorMessage ? payload.errorMessage : '', 'RemoveConnection payload: ' + JSON.stringify(payload)).to.match(/Access denied/i);",
                                     "});"
                                 ],
                                 "_lastExecutionId": "5b9145c4-7b67-4baf-b4fd-9ed145984c20"
@@ -6991,13 +6970,12 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const permsRaw = json.data && json.data.GetPermissions ? (json.data.GetPermissions.permissions || []) : [];",
-                                    "const perms = permsRaw.map(p => (typeof p === \"string\" ? p : (p && p.id ? p.id : \"\"))).filter(Boolean);",
-                                    "const permR = pm.environment.get(\"permReadX\");",
-                                    "const delegatedGrantId = pm.environment.get(\"delegatedGrantId\") || \"\";",
-                                    "const readExpected = (pm.environment.get(\"rbac_read_expected\") || \"false\") === \"true\";",
-                                    "pm.test(\"B owner delegated permissions check is strict and conditional\", function(){",
-                                    "  if (!delegatedGrantId || delegatedGrantId === \"00000000-0000-0000-0000-000000000000\" || !permR || !readExpected) { pm.expect(Array.isArray(perms)).to.eql(true); return; }",
-                                    "  pm.expect(perms.includes(permR)).to.eql(true);",
+                                    "const perms = permsRaw.map(p => (typeof p === 'string' ? p : (p && p.id ? p.id : ''))).filter(Boolean);",
+                                    "const permR = pm.environment.get('permReadX');",
+                                    "const delegatedGrantId = pm.environment.get('delegatedGrantId') || '';",
+                                    "pm.test('B owner receives the delegated role permissions', function(){",
+                                    "  pm.expect(!!delegatedGrantId && delegatedGrantId !== '00000000-0000-0000-0000-000000000000', 'no delegated grant was created upstream').to.eql(true);",
+                                    "  pm.expect(perms.includes(permR), 'delegated permission missing: ' + JSON.stringify(perms)).to.eql(true);",
                                     "});"
                                 ],
                                 "_lastExecutionId": "6bb6e517-bb33-451d-a8bd-524ff202a29e"
@@ -7473,13 +7451,12 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const permsRaw = json.data && json.data.GetPermissions ? (json.data.GetPermissions.permissions || []) : [];",
-                                    "const perms = permsRaw.map(p => (typeof p === \"string\" ? p : (p && p.id ? p.id : \"\"))).filter(Boolean);",
-                                    "const permR = pm.environment.get(\"permReadX\");",
-                                    "const delegatedGrantId = pm.environment.get(\"delegatedGrantId\") || \"\";",
-                                    "const readExpected = (pm.environment.get(\"rbac_read_expected\") || \"false\") === \"true\";",
-                                    "pm.test(\"Outsider delegated permissions check is strict and conditional\", function(){",
-                                    "  if (!delegatedGrantId || delegatedGrantId === \"00000000-0000-0000-0000-000000000000\" || !permR || !readExpected) { pm.expect(Array.isArray(perms)).to.eql(true); return; }",
-                                    "  pm.expect(perms.includes(permR)).to.eql(true);",
+                                    "const perms = permsRaw.map(p => (typeof p === 'string' ? p : (p && p.id ? p.id : ''))).filter(Boolean);",
+                                    "const permR = pm.environment.get('permReadX');",
+                                    "const delegatedGrantId = pm.environment.get('delegatedGrantId') || '';",
+                                    "pm.test('Outsider receives the delegated role permissions', function(){",
+                                    "  pm.expect(!!delegatedGrantId && delegatedGrantId !== '00000000-0000-0000-0000-000000000000', 'no delegated grant was created upstream').to.eql(true);",
+                                    "  pm.expect(perms.includes(permR), 'delegated permission missing: ' + JSON.stringify(perms)).to.eql(true);",
                                     "});"
                                 ],
                                 "_lastExecutionId": "ad06b1c9-785f-489a-8527-d7d026a08c6f"
@@ -8903,11 +8880,10 @@
         },
         {
             "id": "8e694eb2-d6f5-438a-a457-8689e2532969",
-            "name": "12 Data-driven permission visibility matrix",
+            "name": "12 Permission visibility matrix (per actor)",
             "item": [
                 {
-                    "id": "8ad4ab2a-1e75-4707-bda8-9d2f55f74468",
-                    "name": "Matrix RolesList visibility probe",
+                    "name": "Matrix RolesList :: a_owner (allowed)",
                     "request": {
                         "url": {
                             "host": [
@@ -8919,7 +8895,7 @@
                         "header": [
                             {
                                 "key": "x-authentication-token",
-                                "value": "{{matrix_actor_token}}"
+                                "value": "{{a_owner_token}}"
                             }
                         ],
                         "method": "POST",
@@ -8934,52 +8910,23 @@
                     "response": [],
                     "event": [
                         {
-                            "listen": "prerequest",
-                            "script": {
-                                "id": "198738a8-c1b8-4d95-a034-84a9ca6701dc",
-                                "type": "text/javascript",
-                                "exec": [
-                                    "const scenario = pm.iterationData.get(\"scenario\") || pm.environment.get(\"matrix_scenario\") || \"default\";",
-                                    "const actorTokenVar = pm.iterationData.get(\"actorTokenVar\") || pm.iterationData.get(\"actor_token_var\") || pm.environment.get(\"matrix_actor_token_var\") || \"a_owner_token\";",
-                                    "pm.environment.set(\"matrix_actor_token_var\", actorTokenVar);",
-                                    "const actorToken = pm.environment.get(actorTokenVar);",
-                                    "if (!actorToken) { throw new Error(\"Environment token variable is missing: \" + actorTokenVar); }",
-                                    "pm.environment.set(\"matrix_actor_token\", actorToken);",
-                                    "pm.environment.set(\"matrix_scenario\", scenario);"
-                                ],
-                                "_lastExecutionId": "9b99720f-324f-47eb-8af7-7b0cc71c5551"
-                            }
-                        },
-                        {
                             "listen": "test",
                             "script": {
-                                "id": "40830a8d-3160-40ff-bae5-86a515f6b32d",
                                 "type": "text/javascript",
                                 "exec": [
-                                    "const scenario = pm.environment.get(\"matrix_scenario\");",
                                     "const json = pm.response.json();",
-                                    "const allowed = !!(json.data && json.data.RolesList && Array.isArray(json.data.RolesList.items));",
-                                    "const denied = !!(json.errors && json.errors.length);",
-                                    "const expected = pm.iterationData.get(\"expectRolesListAllowed\");",
-                                    "if (expected === undefined || expected === null || String(expected) === \"\") { pm.test.skip(\"RolesList matrix probe :: \" + scenario + \" (no iteration data: run with -d)\", function(){}); return; }",
-                                    "const expectedBool = (expected !== undefined && expected !== null && String(expected) !== \"\") ? (String(expected).toLowerCase() === \"true\") : false;",
-                                    "pm.test(\"RolesList response shape is strict :: \" + scenario, function(){",
-                                    "  pm.expect(allowed).to.eql(expectedBool);",
-                                    "  pm.expect(denied).to.eql(!expectedBool);",
-                                    "  pm.expect(!(allowed && denied)).to.eql(true);",
-                                    "});",
-                                    "pm.test(\"RolesList expected allow/deny :: \" + scenario, function(){",
-                                    "  pm.expect(allowed).to.eql(expectedBool);",
+                                    "const payload = json.data ? json.data.RolesList : null;",
+                                    "pm.test('RolesList is allowed for a_owner', function(){",
+                                    "  pm.expect(!!(json.errors && json.errors.length), 'unexpected GraphQL error: ' + JSON.stringify(json.errors)).to.eql(false);",
+                                    "  pm.expect(Array.isArray(payload && payload.items), 'RolesList payload: ' + JSON.stringify(payload)).to.eql(true);",
                                     "});"
-                                ],
-                                "_lastExecutionId": "ba9dbb26-9955-400b-b8db-3387154b517e"
+                                ]
                             }
                         }
                     ]
                 },
                 {
-                    "id": "a4cb9088-9b4f-49af-bb0d-37df63be6ff2",
-                    "name": "Matrix GroupsList visibility probe",
+                    "name": "Matrix RolesList :: b_owner (allowed)",
                     "request": {
                         "url": {
                             "host": [
@@ -8991,7 +8938,142 @@
                         "header": [
                             {
                                 "key": "x-authentication-token",
-                                "value": "{{matrix_actor_token}}"
+                                "value": "{{b_owner_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query RolesList { RolesList(input: { productId: \"{{product_id}}\", viewParams: { offset: 0, count: 20 } }) { items { id roleId roleName } } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.RolesList : null;",
+                                    "pm.test('RolesList is allowed for b_owner', function(){",
+                                    "  pm.expect(!!(json.errors && json.errors.length), 'unexpected GraphQL error: ' + JSON.stringify(json.errors)).to.eql(false);",
+                                    "  pm.expect(Array.isArray(payload && payload.items), 'RolesList payload: ' + JSON.stringify(payload)).to.eql(true);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Matrix RolesList :: a_member (refused)",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_member_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query RolesList { RolesList(input: { productId: \"{{product_id}}\", viewParams: { offset: 0, count: 20 } }) { items { id roleId roleName } } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "// Denial must come back as an 'Invalid permissions' warning - not as an empty",
+                                    "// list, and not as an unrelated error, either of which would mask a real defect.",
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.RolesList : null;",
+                                    "const messages = (json.errors || []).map(e => e.message || '');",
+                                    "pm.test('RolesList is refused for a_member with an invalid-permissions reason', function(){",
+                                    "  pm.expect(messages.join(' | '), 'expected an Invalid permissions refusal, got: ' + JSON.stringify(json)).to.match(/Invalid permissions/i);",
+                                    "  pm.expect(Array.isArray(payload && payload.items), 'a list was returned despite the refusal: ' + JSON.stringify(payload)).to.eql(false);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Matrix RolesList :: outsider (refused)",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{outsider_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query RolesList { RolesList(input: { productId: \"{{product_id}}\", viewParams: { offset: 0, count: 20 } }) { items { id roleId roleName } } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "// Denial must come back as an 'Invalid permissions' warning - not as an empty",
+                                    "// list, and not as an unrelated error, either of which would mask a real defect.",
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.RolesList : null;",
+                                    "const messages = (json.errors || []).map(e => e.message || '');",
+                                    "pm.test('RolesList is refused for outsider with an invalid-permissions reason', function(){",
+                                    "  pm.expect(messages.join(' | '), 'expected an Invalid permissions refusal, got: ' + JSON.stringify(json)).to.match(/Invalid permissions/i);",
+                                    "  pm.expect(Array.isArray(payload && payload.items), 'a list was returned despite the refusal: ' + JSON.stringify(payload)).to.eql(false);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Matrix GroupsList :: a_owner (allowed)",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_token}}"
                             }
                         ],
                         "method": "POST",
@@ -9006,50 +9088,23 @@
                     "response": [],
                     "event": [
                         {
-                            "listen": "prerequest",
-                            "script": {
-                                "id": "d9f71963-aef6-4a68-bf2c-6fb99defcb87",
-                                "type": "text/javascript",
-                                "exec": [
-                                    "const scenario = pm.iterationData.get(\"scenario\") || pm.environment.get(\"matrix_scenario\") || \"default\";",
-                                    "const actorTokenVar = pm.iterationData.get(\"actorTokenVar\") || pm.iterationData.get(\"actor_token_var\") || pm.environment.get(\"matrix_actor_token_var\") || \"a_owner_token\";",
-                                    "pm.environment.set(\"matrix_actor_token_var\", actorTokenVar);",
-                                    "const actorToken = pm.environment.get(actorTokenVar);",
-                                    "if (!actorToken) { throw new Error(\"Environment token variable is missing: \" + actorTokenVar); }",
-                                    "pm.environment.set(\"matrix_actor_token\", actorToken);",
-                                    "pm.environment.set(\"matrix_scenario\", scenario);"
-                                ],
-                                "_lastExecutionId": "0554c2ae-af92-4dae-b410-2375336d3684"
-                            }
-                        },
-                        {
                             "listen": "test",
                             "script": {
-                                "id": "c1ea38af-afb5-410d-abf6-42a5941c2e41",
                                 "type": "text/javascript",
                                 "exec": [
-                                    "const scenario = pm.environment.get(\"matrix_scenario\");",
                                     "const json = pm.response.json();",
-                                    "const allowed = !!(json.data && json.data.GroupsList && Array.isArray(json.data.GroupsList.items));",
-                                    "const denied = !!(json.errors && json.errors.length);",
-                                    "pm.test(\"GroupsList response shape is strict :: \" + scenario, function(){",
-                                    "  pm.expect(denied).to.eql(false); pm.expect(allowed).to.eql(true);",
-                                    "  pm.expect(!(allowed && denied)).to.eql(true);",
-                                    "});",
-                                    "const expected = pm.iterationData.get(\"expectGroupsListAllowed\");",
-                                    "if (expected !== undefined && expected !== null && String(expected) !== \"\") {",
-                                    "  const expectedBool = String(expected).toLowerCase() === \"true\";",
-                                    "  pm.test(\"GroupsList expected allow/deny :: \" + scenario, function(){ pm.expect(allowed).to.eql(expectedBool); });",
-                                    "}"
-                                ],
-                                "_lastExecutionId": "62c3fe5a-3f48-4a21-a81a-723f6f79ecf0"
+                                    "const payload = json.data ? json.data.GroupsList : null;",
+                                    "pm.test('GroupsList is allowed for a_owner', function(){",
+                                    "  pm.expect(!!(json.errors && json.errors.length), 'unexpected GraphQL error: ' + JSON.stringify(json.errors)).to.eql(false);",
+                                    "  pm.expect(Array.isArray(payload && payload.items), 'GroupsList payload: ' + JSON.stringify(payload)).to.eql(true);",
+                                    "});"
+                                ]
                             }
                         }
                     ]
                 },
                 {
-                    "id": "c382825a-4f21-4080-b145-b9c736169f9f",
-                    "name": "Matrix GetPermissions probe",
+                    "name": "Matrix GroupsList :: b_owner (allowed)",
                     "request": {
                         "url": {
                             "host": [
@@ -9061,14 +9116,14 @@
                         "header": [
                             {
                                 "key": "x-authentication-token",
-                                "value": "{{matrix_actor_token}}"
+                                "value": "{{b_owner_token}}"
                             }
                         ],
                         "method": "POST",
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "query GetPermissions { GetPermissions(input: { accessToken: \"{{matrix_actor_token}}\" }) { permissions } }",
+                                "query": "query GroupsList { GroupsList(input: { productId: \"{{product_id}}\", viewParams: { offset: 0, count: 20 } }) { items { id name description } } }",
                                 "variables": ""
                             }
                         }
@@ -9076,53 +9131,23 @@
                     "response": [],
                     "event": [
                         {
-                            "listen": "prerequest",
-                            "script": {
-                                "id": "abdb963b-02d4-4404-8d2a-fba741f863dd",
-                                "type": "text/javascript",
-                                "exec": [
-                                    "const scenario = pm.iterationData.get(\"scenario\") || pm.environment.get(\"matrix_scenario\") || \"default\";",
-                                    "const actorTokenVar = pm.iterationData.get(\"actorTokenVar\") || pm.iterationData.get(\"actor_token_var\") || pm.environment.get(\"matrix_actor_token_var\") || \"a_owner_token\";",
-                                    "pm.environment.set(\"matrix_actor_token_var\", actorTokenVar);",
-                                    "const actorToken = pm.environment.get(actorTokenVar);",
-                                    "if (!actorToken) { throw new Error(\"Environment token variable is missing: \" + actorTokenVar); }",
-                                    "pm.environment.set(\"matrix_actor_token\", actorToken);",
-                                    "pm.environment.set(\"matrix_scenario\", scenario);"
-                                ],
-                                "_lastExecutionId": "015b23e5-8eb1-42b0-9bdf-af7960d174d1"
-                            }
-                        },
-                        {
                             "listen": "test",
                             "script": {
-                                "id": "bd1251bb-aaf8-4199-beaa-78b221895691",
                                 "type": "text/javascript",
                                 "exec": [
-                                    "const scenario = pm.environment.get(\"matrix_scenario\");",
                                     "const json = pm.response.json();",
-                                    "const allowed = !!(json.data && json.data.GetPermissions && Array.isArray(json.data.GetPermissions.permissions));",
-                                    "const denied = !!(json.errors && json.errors.length);",
-                                    "pm.test(\"GetPermissions response shape is strict :: \" + scenario, function(){",
-                                    "  pm.expect(denied).to.eql(false); pm.expect(allowed).to.eql(true);",
-                                    "  pm.expect(!(allowed && denied)).to.eql(true);",
-                                    "});",
-                                    "if (!allowed) { return; }",
-                                    "const perms = json.data.GetPermissions.permissions || [];",
-                                    "const rawExpected = pm.iterationData.get(\"expectedPermissionsCsv\") || \"\";",
-                                    "const expectedParts = rawExpected.split(\",\").map(s => s.trim()).filter(s => s.length > 0);",
-                                    "const expanded = expectedParts.map(x => pm.variables.replaceIn(x));",
-                                    "expanded.forEach(p => {",
-                                    "  pm.test(\"Expected permission present: \" + p + \" :: \" + scenario, function(){ pm.expect(perms.includes(p)).to.eql(true); });",
+                                    "const payload = json.data ? json.data.GroupsList : null;",
+                                    "pm.test('GroupsList is allowed for b_owner', function(){",
+                                    "  pm.expect(!!(json.errors && json.errors.length), 'unexpected GraphQL error: ' + JSON.stringify(json.errors)).to.eql(false);",
+                                    "  pm.expect(Array.isArray(payload && payload.items), 'GroupsList payload: ' + JSON.stringify(payload)).to.eql(true);",
                                     "});"
-                                ],
-                                "_lastExecutionId": "58613933-fdde-4ec9-9d08-8c9ad31ab974"
+                                ]
                             }
                         }
                     ]
                 },
                 {
-                    "id": "e2fa8c7c-c5ab-4dd5-ac1b-65ebdfe883da",
-                    "name": "Matrix GetTenant isolation probe",
+                    "name": "Matrix GroupsList :: a_member (refused)",
                     "request": {
                         "url": {
                             "host": [
@@ -9134,14 +9159,14 @@
                         "header": [
                             {
                                 "key": "x-authentication-token",
-                                "value": "{{matrix_actor_token}}"
+                                "value": "{{a_member_token}}"
                             }
                         ],
                         "method": "POST",
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "query GetTenant { GetTenant(input: { tenantId: \"{{matrix_target_tenant_id}}\" }) { tenant { id name ownerId } errorMessage } }",
+                                "query": "query GroupsList { GroupsList(input: { productId: \"{{product_id}}\", viewParams: { offset: 0, count: 20 } }) { items { id name description } } }",
                                 "variables": ""
                             }
                         }
@@ -9149,52 +9174,250 @@
                     "response": [],
                     "event": [
                         {
-                            "listen": "prerequest",
+                            "listen": "test",
                             "script": {
-                                "id": "d4884554-0c4a-44fa-a7c7-9e7c219fb374",
                                 "type": "text/javascript",
                                 "exec": [
-                                    "const scenario = pm.iterationData.get(\"scenario\") || pm.environment.get(\"matrix_scenario\") || \"default\";",
-                                    "const actorTokenVar = pm.iterationData.get(\"actorTokenVar\") || pm.iterationData.get(\"actor_token_var\") || pm.environment.get(\"matrix_actor_token_var\") || \"a_owner_token\";",
-                                    "pm.environment.set(\"matrix_actor_token_var\", actorTokenVar);",
-                                    "const actorToken = pm.environment.get(actorTokenVar);",
-                                    "if (!actorToken) { throw new Error(\"Environment token variable is missing: \" + actorTokenVar); }",
-                                    "const targetTenantVar = pm.iterationData.get(\"targetTenantVar\") || pm.iterationData.get(\"target_tenant_var\") || pm.environment.get(\"matrix_target_tenant_var\") || \"tenantAId\";",
-                                    "pm.environment.set(\"matrix_target_tenant_var\", targetTenantVar);",
-                                    "const targetTenantId = pm.environment.get(targetTenantVar);",
-                                    "if (!targetTenantId) { throw new Error(\"Environment tenant variable is missing: \" + targetTenantVar); }",
-                                    "pm.environment.set(\"matrix_actor_token\", actorToken);",
-                                    "pm.environment.set(\"matrix_scenario\", scenario);",
-                                    "pm.environment.set(\"matrix_target_tenant_id\", targetTenantId);"
-                                ],
-                                "_lastExecutionId": "af4f25f6-5a06-4039-be42-b9cce6da954b"
+                                    "// Denial must come back as an 'Invalid permissions' warning - not as an empty",
+                                    "// list, and not as an unrelated error, either of which would mask a real defect.",
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.GroupsList : null;",
+                                    "const messages = (json.errors || []).map(e => e.message || '');",
+                                    "pm.test('GroupsList is refused for a_member with an invalid-permissions reason', function(){",
+                                    "  pm.expect(messages.join(' | '), 'expected an Invalid permissions refusal, got: ' + JSON.stringify(json)).to.match(/Invalid permissions/i);",
+                                    "  pm.expect(Array.isArray(payload && payload.items), 'a list was returned despite the refusal: ' + JSON.stringify(payload)).to.eql(false);",
+                                    "});"
+                                ]
                             }
+                        }
+                    ]
+                },
+                {
+                    "name": "Matrix GroupsList :: outsider (refused)",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
                         },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{outsider_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GroupsList { GroupsList(input: { productId: \"{{product_id}}\", viewParams: { offset: 0, count: 20 } }) { items { id name description } } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
                         {
                             "listen": "test",
                             "script": {
-                                "id": "7b5c89da-bf21-433b-879e-e697f8917557",
                                 "type": "text/javascript",
                                 "exec": [
-                                    "const scenario = pm.environment.get(\"matrix_scenario\");",
+                                    "// Denial must come back as an 'Invalid permissions' warning - not as an empty",
+                                    "// list, and not as an unrelated error, either of which would mask a real defect.",
                                     "const json = pm.response.json();",
-                                    "const payload = json.data ? json.data.GetTenant : null;",
-                                    "const tenant = payload ? payload.tenant : null;",
-                                    "const allowed = !!tenant && tenant.id === pm.environment.get(\"matrix_target_tenant_id\") && !payload.errorMessage;",
-                                    "const denied = !!(json.errors && json.errors.length) || !!(payload && payload.errorMessage) || !tenant;",
-                                    "const expected = pm.iterationData.get(\"expectGetTenantAllowed\");",
-                                    "if (expected === undefined || expected === null || String(expected) === \"\") { pm.test.skip(\"GetTenant matrix probe :: \" + scenario + \" (no iteration data: run with -d)\", function(){}); return; }",
-                                    "const expectedBool = (expected !== undefined && expected !== null && String(expected) !== \"\") ? (String(expected).toLowerCase() === \"true\") : false;",
-                                    "pm.test(\"GetTenant deterministic result :: \" + scenario, function(){",
-                                    "  pm.expect(allowed).to.eql(expectedBool);",
-                                    "  pm.expect(denied).to.eql(!expectedBool);",
-                                    "  pm.expect(!(allowed && denied)).to.eql(true);",
-                                    "});",
-                                    "pm.test(\"GetTenant expected allow/deny :: \" + scenario, function(){",
-                                    "  pm.expect(allowed).to.eql(expectedBool);",
+                                    "const payload = json.data ? json.data.GroupsList : null;",
+                                    "const messages = (json.errors || []).map(e => e.message || '');",
+                                    "pm.test('GroupsList is refused for outsider with an invalid-permissions reason', function(){",
+                                    "  pm.expect(messages.join(' | '), 'expected an Invalid permissions refusal, got: ' + JSON.stringify(json)).to.match(/Invalid permissions/i);",
+                                    "  pm.expect(Array.isArray(payload && payload.items), 'a list was returned despite the refusal: ' + JSON.stringify(payload)).to.eql(false);",
                                     "});"
-                                ],
-                                "_lastExecutionId": "d8e9afd2-15a7-4b17-a789-9c79890ace20"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Matrix GetPermissions :: a_owner",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetPermissions { GetPermissions(input: { accessToken: \"{{a_owner_token}}\" }) { permissions } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "// Any authenticated actor must be able to read its own permission set. The",
+                                    "// contents are asserted by the delegation tests in folders 09 and 14, which",
+                                    "// check for specific permission ids rather than just the response shape.",
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.GetPermissions : null;",
+                                    "pm.test('GetPermissions answers a_owner with a permission array', function(){",
+                                    "  pm.expect(!!(json.errors && json.errors.length), 'unexpected GraphQL error: ' + JSON.stringify(json.errors)).to.eql(false);",
+                                    "  pm.expect(Array.isArray(payload && payload.permissions), 'GetPermissions payload: ' + JSON.stringify(payload)).to.eql(true);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Matrix GetPermissions :: b_owner",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{b_owner_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetPermissions { GetPermissions(input: { accessToken: \"{{b_owner_token}}\" }) { permissions } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "// Any authenticated actor must be able to read its own permission set. The",
+                                    "// contents are asserted by the delegation tests in folders 09 and 14, which",
+                                    "// check for specific permission ids rather than just the response shape.",
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.GetPermissions : null;",
+                                    "pm.test('GetPermissions answers b_owner with a permission array', function(){",
+                                    "  pm.expect(!!(json.errors && json.errors.length), 'unexpected GraphQL error: ' + JSON.stringify(json.errors)).to.eql(false);",
+                                    "  pm.expect(Array.isArray(payload && payload.permissions), 'GetPermissions payload: ' + JSON.stringify(payload)).to.eql(true);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Matrix GetPermissions :: a_member",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_member_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetPermissions { GetPermissions(input: { accessToken: \"{{a_member_token}}\" }) { permissions } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "// Any authenticated actor must be able to read its own permission set. The",
+                                    "// contents are asserted by the delegation tests in folders 09 and 14, which",
+                                    "// check for specific permission ids rather than just the response shape.",
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.GetPermissions : null;",
+                                    "pm.test('GetPermissions answers a_member with a permission array', function(){",
+                                    "  pm.expect(!!(json.errors && json.errors.length), 'unexpected GraphQL error: ' + JSON.stringify(json.errors)).to.eql(false);",
+                                    "  pm.expect(Array.isArray(payload && payload.permissions), 'GetPermissions payload: ' + JSON.stringify(payload)).to.eql(true);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Matrix GetPermissions :: outsider",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{outsider_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetPermissions { GetPermissions(input: { accessToken: \"{{outsider_token}}\" }) { permissions } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "// Any authenticated actor must be able to read its own permission set. The",
+                                    "// contents are asserted by the delegation tests in folders 09 and 14, which",
+                                    "// check for specific permission ids rather than just the response shape.",
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.GetPermissions : null;",
+                                    "pm.test('GetPermissions answers outsider with a permission array', function(){",
+                                    "  pm.expect(!!(json.errors && json.errors.length), 'unexpected GraphQL error: ' + JSON.stringify(json.errors)).to.eql(false);",
+                                    "  pm.expect(Array.isArray(payload && payload.permissions), 'GetPermissions payload: ' + JSON.stringify(payload)).to.eql(true);",
+                                    "});"
+                                ]
                             }
                         }
                     ]
@@ -9287,10 +9510,12 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const payload = json.data ? json.data.GetMembershipsByUser : null;",
-                                    "const denied = !!(json.errors && json.errors.length) || !!(payload && payload.errorMessage);",
-                                    "const hasList = Array.isArray(payload && payload.membershipIds);",
-                                    "pm.test('GetMembershipsByUser has strict success-or-deny outcome', function(){",
-                                    "  pm.expect(denied || hasList).to.eql(true);",
+                                    "const ids = payload && Array.isArray(payload.membershipIds) ? payload.membershipIds : null;",
+                                    "pm.test('GetMembershipsByUser returns the members own membership', function(){",
+                                    "  pm.expect(!!(json.errors && json.errors.length), 'unexpected GraphQL error: ' + JSON.stringify(json.errors)).to.eql(false);",
+                                    "  pm.expect(payload && payload.errorMessage ? payload.errorMessage : '', 'unexpected errorMessage').to.eql('');",
+                                    "  pm.expect(Array.isArray(ids), 'membershipIds is not an array: ' + JSON.stringify(payload)).to.eql(true);",
+                                    "  pm.expect(ids.includes(pm.environment.get('memberAMembershipId')), 'expected membership missing: ' + JSON.stringify(ids)).to.eql(true);",
                                     "});"
                                 ],
                                 "_lastExecutionId": "924335d6-6399-43e4-8ea7-da006c7d056b"
@@ -9717,10 +9942,10 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const payload = json.data ? json.data.UpdateMembershipPermissions : null;",
-                                    "const denied = !!(json.errors && json.errors.length) || !!(payload && payload.errorMessage);",
-                                    "const success = !!payload && payload.success === true;",
-                                    "pm.test('UpdateMembershipPermissions has strict success-or-deny outcome', function(){",
-                                    "  pm.expect(denied || success).to.eql(true);",
+                                    "pm.test('UpdateMembershipPermissions succeeds for the tenant owner', function(){",
+                                    "  pm.expect(!!(json.errors && json.errors.length), 'unexpected GraphQL error: ' + JSON.stringify(json.errors)).to.eql(false);",
+                                    "  pm.expect(payload && payload.errorMessage ? payload.errorMessage : '', 'unexpected errorMessage').to.eql('');",
+                                    "  pm.expect(payload ? payload.success : null, 'payload: ' + JSON.stringify(payload)).to.eql(true);",
                                     "});"
                                 ],
                                 "_lastExecutionId": "3d6105e6-1e46-4ecd-a8ed-9e1922899b99"
@@ -9808,10 +10033,14 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const payload = json.data ? json.data.GetConnectionRequests : null;",
-                                    "const denied = !!(json.errors && json.errors.length) || !!(payload && payload.errorMessage);",
-                                    "const hasList = Array.isArray(payload && payload.requests);",
-                                    "pm.test('GetConnectionRequests has strict success-or-deny outcome', function(){",
-                                    "  pm.expect(denied || hasList).to.eql(true);",
+                                    "const requests = payload && Array.isArray(payload.requests) ? payload.requests : null;",
+                                    "pm.test('GetConnectionRequests returns the tenants own approved request', function(){",
+                                    "  pm.expect(!!(json.errors && json.errors.length), 'unexpected GraphQL error: ' + JSON.stringify(json.errors)).to.eql(false);",
+                                    "  pm.expect(payload && payload.errorMessage ? payload.errorMessage : '', 'unexpected errorMessage').to.eql('');",
+                                    "  pm.expect(Array.isArray(requests), 'requests is not an array: ' + JSON.stringify(payload)).to.eql(true);",
+                                    "  const own = requests.filter(r => r.sourceTenantId === pm.environment.get('tenantAId') || r.targetTenantId === pm.environment.get('tenantAId'));",
+                                    "  pm.expect(own.length > 0, 'no connection request for tenant A: ' + JSON.stringify(requests)).to.eql(true);",
+                                    "  pm.expect(own.every(r => !!r.id && !!r.status), 'malformed request entry: ' + JSON.stringify(own)).to.eql(true);",
                                     "});"
                                 ],
                                 "_lastExecutionId": "c1602507-c791-437e-940f-78cd44be7ace"
@@ -9996,581 +10225,6 @@
                                     "});"
                                 ],
                                 "_lastExecutionId": "651ad1fa-4269-4d25-addc-beb032bb135f"
-                            }
-                        }
-                    ]
-                },
-                {
-                    "id": "44ef1be5-d448-4c35-a14c-2042e105900d",
-                    "name": "CreateContract coverage",
-                    "request": {
-                        "url": {
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "query": [],
-                            "variable": []
-                        },
-                        "header": [
-                            {
-                                "key": "x-authentication-token",
-                                "value": "{{a_owner_token}}"
-                            }
-                        ],
-                        "method": "POST",
-                        "body": {
-                            "mode": "graphql",
-                            "graphql": {
-                                "query": "mutation CreateContract { CreateContract(input: { relationshipId: \"00000000-0000-0000-0000-000000000000\", sourceTenantId: \"{{tenantAId}}\", targetTenantId: \"{{tenantBId}}\", scope: \"coverage\", description: \"coverage\", terms: \"n/a\" }) { contractId errorMessage } }",
-                                "variables": ""
-                            }
-                        }
-                    },
-                    "response": [],
-                    "event": [
-                        {
-                            "listen": "test",
-                            "script": {
-                                "id": "d2e3dd05-26c8-415b-812c-8c71775cd485",
-                                "type": "text/javascript",
-                                "exec": [
-                                    "const json = pm.response.json();",
-                                    "const payload = json.data ? json.data.CreateContract : null;",
-                                    "const hasErr = !!(json.errors && json.errors.length);",
-                                    "pm.test('CreateContract returns business outcome', function(){ const decided = hasErr || !!(payload && payload.errorMessage) || !!payload.contractId; pm.expect(decided).to.eql(true); });"
-                                ],
-                                "_lastExecutionId": "9eef0b8f-f10c-43ff-b31a-d6b4ede794ea"
-                            }
-                        }
-                    ]
-                },
-                {
-                    "id": "d8148d34-161a-462c-9a77-b8db9e0cec26",
-                    "name": "GetContracts coverage",
-                    "request": {
-                        "url": {
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "query": [],
-                            "variable": []
-                        },
-                        "header": [
-                            {
-                                "key": "x-authentication-token",
-                                "value": "{{a_owner_token}}"
-                            }
-                        ],
-                        "method": "POST",
-                        "body": {
-                            "mode": "graphql",
-                            "graphql": {
-                                "query": "query GetContracts { GetContracts(input: { tenantId: \"{{tenantAId}}\" }) { contracts { id relationshipId status } errorMessage } }",
-                                "variables": ""
-                            }
-                        }
-                    },
-                    "response": [],
-                    "event": [
-                        {
-                            "listen": "test",
-                            "script": {
-                                "id": "41f47608-ecda-4d79-9af4-751538eb959c",
-                                "type": "text/javascript",
-                                "exec": [
-                                    "const json = pm.response.json();",
-                                    "const payload = json.data ? json.data.GetContracts : null;",
-                                    "const hasErr = !!(json.errors && json.errors.length);",
-                                    "pm.test('GetContracts returns contracts array', function(){ pm.expect(hasErr).to.eql(false); pm.expect(Array.isArray(payload.contracts)).to.eql(true); });"
-                                ],
-                                "_lastExecutionId": "8c9e3178-5d8a-41d7-9f18-2241a89a73ea"
-                            }
-                        }
-                    ]
-                },
-                {
-                    "id": "05816b6b-313a-4dc1-9a97-6101972e32e0",
-                    "name": "UpdateContractStatus coverage",
-                    "request": {
-                        "url": {
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "query": [],
-                            "variable": []
-                        },
-                        "header": [
-                            {
-                                "key": "x-authentication-token",
-                                "value": "{{a_owner_token}}"
-                            }
-                        ],
-                        "method": "POST",
-                        "body": {
-                            "mode": "graphql",
-                            "graphql": {
-                                "query": "mutation UpdateContractStatus { UpdateContractStatus(input: { contractId: \"00000000-0000-0000-0000-000000000000\", status: Active }) { success errorMessage } }",
-                                "variables": ""
-                            }
-                        }
-                    },
-                    "response": [],
-                    "event": [
-                        {
-                            "listen": "test",
-                            "script": {
-                                "id": "6885df54-b15a-45bc-b6ea-8ea8ed5ef216",
-                                "type": "text/javascript",
-                                "exec": [
-                                    "const json = pm.response.json();",
-                                    "const payload = json.data ? json.data.UpdateContractStatus : null;",
-                                    "const hasErr = !!(json.errors && json.errors.length);",
-                                    "pm.test('UpdateContractStatus returns business outcome', function(){ const decided = hasErr || !!(payload && payload.errorMessage) || payload.success === true || payload.success === false; pm.expect(decided).to.eql(true); });"
-                                ],
-                                "_lastExecutionId": "888f4b08-7f03-48bf-9076-f754312186e8"
-                            }
-                        }
-                    ]
-                },
-                {
-                    "id": "1aa46a0b-2e71-42cb-abb5-6be5f6cb0f38",
-                    "name": "TerminateContract coverage",
-                    "request": {
-                        "url": {
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "query": [],
-                            "variable": []
-                        },
-                        "header": [
-                            {
-                                "key": "x-authentication-token",
-                                "value": "{{a_owner_token}}"
-                            }
-                        ],
-                        "method": "POST",
-                        "body": {
-                            "mode": "graphql",
-                            "graphql": {
-                                "query": "mutation TerminateContract { TerminateContract(input: { contractId: \"00000000-0000-0000-0000-000000000000\" }) { success errorMessage } }",
-                                "variables": ""
-                            }
-                        }
-                    },
-                    "response": [],
-                    "event": [
-                        {
-                            "listen": "test",
-                            "script": {
-                                "id": "1642abff-6e60-4ac8-a57f-1d47832a2233",
-                                "type": "text/javascript",
-                                "exec": [
-                                    "const json = pm.response.json();",
-                                    "const payload = json.data ? json.data.TerminateContract : null;",
-                                    "const hasErr = !!(json.errors && json.errors.length);",
-                                    "pm.test('TerminateContract returns business outcome', function(){ const decided = hasErr || !!(payload && payload.errorMessage) || payload.success === true || payload.success === false; pm.expect(decided).to.eql(true); });"
-                                ],
-                                "_lastExecutionId": "3f88a2a6-e281-4efa-9fba-3ab796556f26"
-                            }
-                        }
-                    ]
-                },
-                {
-                    "id": "2f97fb10-0b52-47f7-9f2a-2d1bc1da721d",
-                    "name": "SendCrossTenantMessage coverage",
-                    "request": {
-                        "url": {
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "query": [],
-                            "variable": []
-                        },
-                        "header": [
-                            {
-                                "key": "x-authentication-token",
-                                "value": "{{a_owner_token}}"
-                            }
-                        ],
-                        "method": "POST",
-                        "body": {
-                            "mode": "graphql",
-                            "graphql": {
-                                "query": "mutation SendCrossTenantMessage { SendCrossTenantMessage(input: { sourceTenantId: \"{{tenantAId}}\", targetTenantId: \"{{tenantBId}}\", relationshipId: \"00000000-0000-0000-0000-000000000000\", messageType: Custom, payload: \"{\\\"ping\\\":true}\" }) { messageId errorMessage } }",
-                                "variables": ""
-                            }
-                        }
-                    },
-                    "response": [],
-                    "event": [
-                        {
-                            "listen": "test",
-                            "script": {
-                                "id": "8621290a-9179-46ab-a617-b8daf5992d9b",
-                                "type": "text/javascript",
-                                "exec": [
-                                    "const json = pm.response.json();",
-                                    "const payload = json.data ? json.data.SendCrossTenantMessage : null;",
-                                    "const hasErr = !!(json.errors && json.errors.length);",
-                                    "pm.test('SendCrossTenantMessage returns business outcome', function(){ const decided = hasErr || !!(payload && payload.errorMessage) || !!payload.messageId; pm.expect(decided).to.eql(true); });"
-                                ],
-                                "_lastExecutionId": "1c3ba682-5d7d-405d-9a58-7236ead1ea5a"
-                            }
-                        }
-                    ]
-                },
-                {
-                    "id": "0c00717a-687b-43a0-897b-9e9e0e8084bb",
-                    "name": "GetCrossTenantMessages coverage",
-                    "request": {
-                        "url": {
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "query": [],
-                            "variable": []
-                        },
-                        "header": [
-                            {
-                                "key": "x-authentication-token",
-                                "value": "{{a_owner_token}}"
-                            }
-                        ],
-                        "method": "POST",
-                        "body": {
-                            "mode": "graphql",
-                            "graphql": {
-                                "query": "query GetCrossTenantMessages { GetCrossTenantMessages(input: { tenantId: \"{{tenantAId}}\", direction: Outgoing }) { messages { id status messageType } errorMessage } }",
-                                "variables": ""
-                            }
-                        }
-                    },
-                    "response": [],
-                    "event": [
-                        {
-                            "listen": "test",
-                            "script": {
-                                "id": "2c47aaad-4655-496b-a1c5-05c3393c6e30",
-                                "type": "text/javascript",
-                                "exec": [
-                                    "const json = pm.response.json();",
-                                    "const payload = json.data ? json.data.GetCrossTenantMessages : null;",
-                                    "const hasErr = !!(json.errors && json.errors.length);",
-                                    "pm.test('GetCrossTenantMessages returns messages array', function(){ pm.expect(hasErr).to.eql(false); pm.expect(Array.isArray(payload.messages)).to.eql(true); });"
-                                ],
-                                "_lastExecutionId": "c4dcdb4d-8000-471d-90c4-ccf60f006ba1"
-                            }
-                        }
-                    ]
-                },
-                {
-                    "id": "1476094e-32b0-4648-9ef4-c60ab03c0777",
-                    "name": "GetCrossTenantMessage coverage",
-                    "request": {
-                        "url": {
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "query": [],
-                            "variable": []
-                        },
-                        "header": [
-                            {
-                                "key": "x-authentication-token",
-                                "value": "{{a_owner_token}}"
-                            }
-                        ],
-                        "method": "POST",
-                        "body": {
-                            "mode": "graphql",
-                            "graphql": {
-                                "query": "query GetCrossTenantMessage { GetCrossTenantMessage(input: { messageId: \"00000000-0000-0000-0000-000000000000\" }) { message { id status } errorMessage } }",
-                                "variables": ""
-                            }
-                        }
-                    },
-                    "response": [],
-                    "event": [
-                        {
-                            "listen": "test",
-                            "script": {
-                                "id": "33db86c3-e8aa-4c4c-957d-9dfc74f81e74",
-                                "type": "text/javascript",
-                                "exec": [
-                                    "const json = pm.response.json();",
-                                    "const payload = json.data ? json.data.GetCrossTenantMessage : null;",
-                                    "const hasErr = !!(json.errors && json.errors.length);",
-                                    "pm.test('GetCrossTenantMessage returns business outcome', function(){ const decided = hasErr || !!(payload && payload.errorMessage) || !!(payload && payload.message && payload.message.id); pm.expect(decided).to.eql(true); });"
-                                ],
-                                "_lastExecutionId": "e5c90e1f-1a83-4cd0-ab5f-1c1ad9eb20ef"
-                            }
-                        }
-                    ]
-                },
-                {
-                    "id": "8f7da54a-ba66-46f5-874b-f799509b20eb",
-                    "name": "UpdateCrossTenantMessageStatus coverage",
-                    "request": {
-                        "url": {
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "query": [],
-                            "variable": []
-                        },
-                        "header": [
-                            {
-                                "key": "x-authentication-token",
-                                "value": "{{a_owner_token}}"
-                            }
-                        ],
-                        "method": "POST",
-                        "body": {
-                            "mode": "graphql",
-                            "graphql": {
-                                "query": "mutation UpdateCrossTenantMessageStatus { UpdateCrossTenantMessageStatus(input: { messageId: \"00000000-0000-0000-0000-000000000000\", status: Processed, errorMessage: \"coverage\" }) { success errorMessage } }",
-                                "variables": ""
-                            }
-                        }
-                    },
-                    "response": [],
-                    "event": [
-                        {
-                            "listen": "test",
-                            "script": {
-                                "id": "f63c1fc9-b3fa-4480-a655-ff015c8e1483",
-                                "type": "text/javascript",
-                                "exec": [
-                                    "const json = pm.response.json();",
-                                    "const payload = json.data ? json.data.UpdateCrossTenantMessageStatus : null;",
-                                    "const hasErr = !!(json.errors && json.errors.length);",
-                                    "pm.test('UpdateCrossTenantMessageStatus returns business outcome', function(){ const decided = hasErr || !!(payload && payload.errorMessage) || payload.success === true || payload.success === false; pm.expect(decided).to.eql(true); });"
-                                ],
-                                "_lastExecutionId": "392a4048-fc15-4765-80b1-3bb2d1cea0c1"
-                            }
-                        }
-                    ]
-                },
-                {
-                    "id": "ce8bb3be-7e13-454e-ae02-60a104e631e2",
-                    "name": "GetOrderRequests coverage",
-                    "request": {
-                        "url": {
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "query": [],
-                            "variable": []
-                        },
-                        "header": [
-                            {
-                                "key": "x-authentication-token",
-                                "value": "{{a_owner_tenantA_token}}"
-                            }
-                        ],
-                        "method": "POST",
-                        "body": {
-                            "mode": "graphql",
-                            "graphql": {
-                                "query": "query GetOrderRequests { GetOrderRequests(input: { tenantId: \"{{tenantAId}}\" }) { orderRequests { id status } errorMessage } }",
-                                "variables": ""
-                            }
-                        }
-                    },
-                    "response": [],
-                    "event": [
-                        {
-                            "listen": "test",
-                            "script": {
-                                "id": "9317a336-844d-41a5-b9a7-2bfd0060247b",
-                                "type": "text/javascript",
-                                "exec": [
-                                    "const json = pm.response.json();",
-                                    "pm.test(\"GetOrderRequests returns orderRequests array or not-configured\", function () {",
-                                    "  const payload = json.data ? json.data.GetOrderRequests : null;",
-                                    "  const notConfigured = !!(payload && payload.errorMessage && payload.errorMessage.indexOf(\"not configured\") >= 0);",
-                                    "  const hasArray = !!(payload && Array.isArray(payload.orderRequests));",
-                                    "  pm.expect(notConfigured || hasArray).to.eql(true);",
-                                    "});"
-                                ],
-                                "_lastExecutionId": "a4925504-5609-45b2-8200-e841d1630954"
-                            }
-                        }
-                    ]
-                },
-                {
-                    "id": "a9dd12c2-e2b5-4d57-8a8c-7cf7dc6fcbaa",
-                    "name": "GetOrderRequest coverage",
-                    "request": {
-                        "url": {
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "query": [],
-                            "variable": []
-                        },
-                        "header": [
-                            {
-                                "key": "x-authentication-token",
-                                "value": "{{a_owner_token}}"
-                            }
-                        ],
-                        "method": "POST",
-                        "body": {
-                            "mode": "graphql",
-                            "graphql": {
-                                "query": "query GetOrderRequest { GetOrderRequest(input: { orderRequestId: \"00000000-0000-0000-0000-000000000000\" }) { orderRequest { id status } errorMessage } }",
-                                "variables": ""
-                            }
-                        }
-                    },
-                    "response": [],
-                    "event": [
-                        {
-                            "listen": "test",
-                            "script": {
-                                "id": "356bceba-f1d9-4c2f-be63-5bb4b9a8759c",
-                                "type": "text/javascript",
-                                "exec": [
-                                    "const json = pm.response.json();",
-                                    "const payload = json.data ? json.data.GetOrderRequest : null;",
-                                    "const hasErr = !!(json.errors && json.errors.length);",
-                                    "pm.test('GetOrderRequest returns business outcome', function(){ const decided = hasErr || !!(payload && payload.errorMessage) || !!(payload && payload.orderRequest && payload.orderRequest.id); pm.expect(decided).to.eql(true); });"
-                                ],
-                                "_lastExecutionId": "9364a737-3c06-4ff4-a619-579a8b5690bc"
-                            }
-                        }
-                    ]
-                },
-                {
-                    "id": "ce0bd7ae-81bd-400a-9584-8d14cbd53e3b",
-                    "name": "ConfirmOrderRequest coverage",
-                    "request": {
-                        "url": {
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "query": [],
-                            "variable": []
-                        },
-                        "header": [
-                            {
-                                "key": "x-authentication-token",
-                                "value": "{{a_owner_token}}"
-                            }
-                        ],
-                        "method": "POST",
-                        "body": {
-                            "mode": "graphql",
-                            "graphql": {
-                                "query": "mutation ConfirmOrderRequest { ConfirmOrderRequest(input: { orderRequestId: \"00000000-0000-0000-0000-000000000000\", note: \"coverage\" }) { success errorMessage } }",
-                                "variables": ""
-                            }
-                        }
-                    },
-                    "response": [],
-                    "event": [
-                        {
-                            "listen": "test",
-                            "script": {
-                                "id": "b3383fa1-35dd-460d-a8e6-63d0ecdb91fa",
-                                "type": "text/javascript",
-                                "exec": [
-                                    "const json = pm.response.json();",
-                                    "const payload = json.data ? json.data.ConfirmOrderRequest : null;",
-                                    "const hasErr = !!(json.errors && json.errors.length);",
-                                    "pm.test('ConfirmOrderRequest returns business outcome', function(){ const decided = hasErr || !!(payload && payload.errorMessage) || payload.success === true || payload.success === false; pm.expect(decided).to.eql(true); });"
-                                ],
-                                "_lastExecutionId": "dad0087a-afc4-4274-bf3c-c65cdfc26190"
-                            }
-                        }
-                    ]
-                },
-                {
-                    "id": "06738034-4073-41ea-91c2-2dd957801fd9",
-                    "name": "RejectOrderRequest coverage",
-                    "request": {
-                        "url": {
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "query": [],
-                            "variable": []
-                        },
-                        "header": [
-                            {
-                                "key": "x-authentication-token",
-                                "value": "{{a_owner_token}}"
-                            }
-                        ],
-                        "method": "POST",
-                        "body": {
-                            "mode": "graphql",
-                            "graphql": {
-                                "query": "mutation RejectOrderRequest { RejectOrderRequest(input: { orderRequestId: \"00000000-0000-0000-0000-000000000000\", reason: \"coverage\" }) { success errorMessage } }",
-                                "variables": ""
-                            }
-                        }
-                    },
-                    "response": [],
-                    "event": [
-                        {
-                            "listen": "test",
-                            "script": {
-                                "id": "b34590fb-2da3-49bd-b437-40f08ac091b5",
-                                "type": "text/javascript",
-                                "exec": [
-                                    "const json = pm.response.json();",
-                                    "const payload = json.data ? json.data.RejectOrderRequest : null;",
-                                    "const hasErr = !!(json.errors && json.errors.length);",
-                                    "pm.test('RejectOrderRequest returns business outcome', function(){ const decided = hasErr || !!(payload && payload.errorMessage) || payload.success === true || payload.success === false; pm.expect(decided).to.eql(true); });"
-                                ],
-                                "_lastExecutionId": "bd07b1d7-788d-4064-8ce9-b2e1fd0facba"
-                            }
-                        }
-                    ]
-                },
-                {
-                    "id": "1f31a92d-bb36-4403-932f-5fa929582fae",
-                    "name": "UpdateOrderRequestStatus coverage",
-                    "request": {
-                        "url": {
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "query": [],
-                            "variable": []
-                        },
-                        "header": [
-                            {
-                                "key": "x-authentication-token",
-                                "value": "{{a_owner_token}}"
-                            }
-                        ],
-                        "method": "POST",
-                        "body": {
-                            "mode": "graphql",
-                            "graphql": {
-                                "query": "mutation UpdateOrderRequestStatus { UpdateOrderRequestStatus(input: { orderRequestId: \"00000000-0000-0000-0000-000000000000\", status: Completed, note: \"coverage\" }) { success errorMessage } }",
-                                "variables": ""
-                            }
-                        }
-                    },
-                    "response": [],
-                    "event": [
-                        {
-                            "listen": "test",
-                            "script": {
-                                "id": "ee72929d-851b-4fa6-a1e6-2ae1fac1a837",
-                                "type": "text/javascript",
-                                "exec": [
-                                    "const json = pm.response.json();",
-                                    "const payload = json.data ? json.data.UpdateOrderRequestStatus : null;",
-                                    "const hasErr = !!(json.errors && json.errors.length);",
-                                    "pm.test('UpdateOrderRequestStatus returns business outcome', function(){ const decided = hasErr || !!(payload && payload.errorMessage) || payload.success === true || payload.success === false; pm.expect(decided).to.eql(true); });"
-                                ],
-                                "_lastExecutionId": "fab12328-5b59-4103-a69a-85a9ffbc346b"
                             }
                         }
                     ]
@@ -11191,8 +10845,10 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const payload = json.data ? json.data.RoleAdd : null;",
-                                    "const hasErr = !!(json.errors && json.errors.length);",
-                                    "pm.test('RoleAdd returns business outcome', function(){ const decided = hasErr || !!(payload && payload.id); pm.expect(decided).to.eql(true); });"
+                                    "pm.test('RoleAdd registers the role and echoes its id', function(){",
+                                    "  pm.expect(!!(json.errors && json.errors.length), 'unexpected GraphQL error: ' + JSON.stringify(json.errors)).to.eql(false);",
+                                    "  pm.expect(payload ? payload.id : '', 'RoleAdd payload: ' + JSON.stringify(payload)).to.eql('11111111-1111-1111-1111-111111111111');",
+                                    "});"
                                 ],
                                 "_lastExecutionId": "a6529bea-55e5-4faa-b449-9520b2bd90a8"
                             }
@@ -11220,7 +10876,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation RoleUpdate { RoleUpdate(input: { id: \"00000000-0000-0000-0000-000000000000\", typeId: \"Role\", productId: \"{{product_id}}\", item: { id: \"00000000-0000-0000-0000-000000000000\", name: \"COVERAGE_ROLE_UPD\", roleId: \"COVERAGE_ROLE_UPD\", productId: \"{{product_id}}\", parentRoles: [], permissions: \"\" } }) { id } }",
+                                "query": "mutation RoleUpdate { RoleUpdate(input: { id: \"11111111-1111-1111-1111-111111111111\", typeId: \"Role\", productId: \"{{product_id}}\", item: { id: \"11111111-1111-1111-1111-111111111111\", name: \"COVERAGE_ROLE_UPD\", roleId: \"COVERAGE_ROLE_UPD\", productId: \"{{product_id}}\", parentRoles: [], permissions: \"\" } }) { id } }",
                                 "variables": ""
                             }
                         }
@@ -11235,10 +10891,57 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const payload = json.data ? json.data.RoleUpdate : null;",
-                                    "const hasErr = !!(json.errors && json.errors.length);",
-                                    "pm.test('RoleUpdate returns business outcome', function(){ const decided = hasErr || !!(payload && payload.id); pm.expect(decided).to.eql(true); });"
+                                    "pm.test('RoleUpdate updates the role created by RoleAdd', function(){",
+                                    "  pm.expect(!!(json.errors && json.errors.length), 'unexpected GraphQL error: ' + JSON.stringify(json.errors)).to.eql(false);",
+                                    "  pm.expect(payload ? payload.id : '', 'RoleUpdate payload: ' + JSON.stringify(payload)).to.eql('11111111-1111-1111-1111-111111111111');",
+                                    "});"
                                 ],
                                 "_lastExecutionId": "3c313daf-dd8c-497f-8516-e9efcb7d85ae"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "RoleUpdate coverage: verify the update landed",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query RoleItem { RoleItem(input: { id: \"11111111-1111-1111-1111-111111111111\", productId: \"{{product_id}}\" }) { id name roleId } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "// Without this read-back RoleUpdate could return its own input id and change nothing.",
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.RoleItem : null;",
+                                    "pm.test('Updated role reads back with the new name', function(){",
+                                    "  pm.expect(!!(json.errors && json.errors.length), 'unexpected GraphQL error: ' + JSON.stringify(json.errors)).to.eql(false);",
+                                    "  pm.expect(payload ? payload.name : '', 'RoleItem payload: ' + JSON.stringify(payload)).to.eql('COVERAGE_ROLE_UPD');",
+                                    "  pm.expect(payload ? payload.roleId : '', 'RoleItem payload: ' + JSON.stringify(payload)).to.eql('COVERAGE_ROLE_UPD');",
+                                    "});"
+                                ]
                             }
                         }
                     ]
@@ -11279,8 +10982,10 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const payload = json.data ? json.data.GroupAdd : null;",
-                                    "const hasErr = !!(json.errors && json.errors.length);",
-                                    "pm.test('GroupAdd returns business outcome', function(){ const decided = hasErr || !!(payload && payload.id); pm.expect(decided).to.eql(true); });"
+                                    "pm.test('GroupAdd registers the group and echoes its id', function(){",
+                                    "  pm.expect(!!(json.errors && json.errors.length), 'unexpected GraphQL error: ' + JSON.stringify(json.errors)).to.eql(false);",
+                                    "  pm.expect(payload ? payload.id : '', 'GroupAdd payload: ' + JSON.stringify(payload)).to.eql('22222222-2222-2222-2222-222222222222');",
+                                    "});"
                                 ],
                                 "_lastExecutionId": "864638c0-a7f9-4427-8a39-6edd3edc1622"
                             }
@@ -11308,7 +11013,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation GroupUpdate { GroupUpdate(input: { id: \"00000000-0000-0000-0000-000000000000\", typeId: \"Group\", productId: \"{{product_id}}\", item: { id: \"00000000-0000-0000-0000-000000000000\", productId: \"{{product_id}}\", name: \"COVERAGE_GROUP_UPD\", description: \"coverage\", roles: [], users: [], parentGroups: [] } }) { id } }",
+                                "query": "mutation GroupUpdate { GroupUpdate(input: { id: \"22222222-2222-2222-2222-222222222222\", typeId: \"Group\", productId: \"{{product_id}}\", item: { id: \"22222222-2222-2222-2222-222222222222\", productId: \"{{product_id}}\", name: \"COVERAGE_GROUP_UPD\", description: \"coverage upd\", roles: [], users: [], parentGroups: [] } }) { id } }",
                                 "variables": ""
                             }
                         }
@@ -11323,10 +11028,57 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const payload = json.data ? json.data.GroupUpdate : null;",
-                                    "const hasErr = !!(json.errors && json.errors.length);",
-                                    "pm.test('GroupUpdate returns business outcome', function(){ const decided = hasErr || !!(payload && payload.id); pm.expect(decided).to.eql(true); });"
+                                    "pm.test('GroupUpdate updates the group created by GroupAdd', function(){",
+                                    "  pm.expect(!!(json.errors && json.errors.length), 'unexpected GraphQL error: ' + JSON.stringify(json.errors)).to.eql(false);",
+                                    "  pm.expect(payload ? payload.id : '', 'GroupUpdate payload: ' + JSON.stringify(payload)).to.eql('22222222-2222-2222-2222-222222222222');",
+                                    "});"
                                 ],
                                 "_lastExecutionId": "3d72c83a-7776-48ed-aa73-966ee3b41055"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "GroupUpdate coverage: verify the update landed",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GroupItem { GroupItem(input: { id: \"22222222-2222-2222-2222-222222222222\", productId: \"{{product_id}}\" }) { id name description } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "// Without this read-back GroupUpdate could return its own input id and change nothing.",
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.GroupItem : null;",
+                                    "pm.test('Updated group reads back with the new name', function(){",
+                                    "  pm.expect(!!(json.errors && json.errors.length), 'unexpected GraphQL error: ' + JSON.stringify(json.errors)).to.eql(false);",
+                                    "  pm.expect(payload ? payload.name : '', 'GroupItem payload: ' + JSON.stringify(payload)).to.eql('COVERAGE_GROUP_UPD');",
+                                    "  pm.expect(payload ? payload.description : '', 'GroupItem payload: ' + JSON.stringify(payload)).to.eql('coverage upd');",
+                                    "});"
+                                ]
                             }
                         }
                     ]
@@ -11469,9 +11221,10 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const payload = json.data ? json.data.RegisterUser : null;",
-                                    "const errText = JSON.stringify(json.errors || []);",
-                                    "const alreadyExists = /exist|already|duplicate/i.test(errText);",
-                                    "pm.test('NoOrg viewer user registered or already exists', function(){ pm.expect(alreadyExists || !!(payload && payload.id)).to.eql(true); });",
+                                    "pm.test('NoOrg viewer user registered', function(){",
+                                    "  pm.expect(!!(json.errors && json.errors.length), 'unexpected GraphQL error: ' + JSON.stringify(json.errors)).to.eql(false);",
+                                    "  pm.expect(!!(payload && payload.id), 'RegisterUser payload: ' + JSON.stringify(payload)).to.eql(true);",
+                                    "});",
                                     "if (payload && payload.id) pm.environment.set('noOrgViewerUserId', payload.id);"
                                 ]
                             }
@@ -11640,10 +11393,11 @@
                                 "type": "text/javascript",
                                 "exec": [
                                     "const json = pm.response.json();",
-                                    "const warnings = (json.errors || []).filter(e => e && e.extensions && e.extensions.type === 'Warning');",
-                                    "const hasAlreadyExists = warnings.some(e => /already exists/i.test(e.message || ''));",
                                     "const payload = json.data ? json.data.SaveDocument : null;",
-                                    "pm.test('NoOrg global viewer role document saved', function(){ pm.expect(hasAlreadyExists || (payload && payload.status === 'Success')).to.eql(true); });"
+                                    "pm.test('NoOrg global viewer role document saved', function(){",
+                                    "  pm.expect(!!(json.errors && json.errors.length), 'unexpected GraphQL error: ' + JSON.stringify(json.errors)).to.eql(false);",
+                                    "  pm.expect(payload ? payload.status : '', 'SaveDocument payload: ' + JSON.stringify(payload)).to.eql('Success');",
+                                    "});"
                                 ]
                             }
                         }
@@ -15871,22 +15625,12 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const raw = json.data && json.data.GetPermissions ? (json.data.GetPermissions.permissions || []) : [];",
-                                    "const perms = raw.map(p => (typeof p === \"string\" ? p : (p && p.id ? p.id : \"\"))).filter(Boolean);",
-                                    "const permRead = pm.environment.get(\"permReadX\") || \"\";",
-                                    "const permWrite = pm.environment.get(\"permWriteX\") || \"\";",
-                                    "const readExpected = (pm.environment.get(\"rbac_read_expected\") || \"false\") === \"true\";",
-                                    "const editorExpected = (pm.environment.get(\"rbac_editor_write_expected\") || \"false\") === \"true\";",
-                                    "pm.test(\"B owner permissions response shape is valid\", function(){ pm.expect(Array.isArray(raw)).to.eql(true); });",
-                                    "if (!readExpected || !permRead) {",
-                                    "  pm.test.skip(\"B owner read permission follows grant visibility model (not applicable in this state)\", function(){});",
-                                    "} else {",
-                                    "  pm.test(\"B owner read permission follows grant visibility model\", function(){ pm.expect(perms.includes(permRead), 'view-grant read permission missing: ' + JSON.stringify(perms)).to.eql(true); });",
-                                    "}",
-                                    "if (!editorExpected || !permWrite) {",
-                                    "  pm.test.skip(\"B owner write permission follows editor grant availability (not applicable in this state)\", function(){});",
-                                    "} else {",
-                                    "  pm.test(\"B owner write permission follows editor grant availability\", function(){ pm.expect(perms.includes(permWrite), 'editor-grant write permission missing: ' + JSON.stringify(perms)).to.eql(true); });",
-                                    "}"
+                                    "const perms = raw.map(p => (typeof p === 'string' ? p : (p && p.id ? p.id : ''))).filter(Boolean);",
+                                    "const permRead = pm.environment.get('permReadX') || '';",
+                                    "const permWrite = pm.environment.get('permWriteX') || '';",
+                                    "pm.test('B owner permissions response shape is valid', function(){ pm.expect(Array.isArray(raw)).to.eql(true); });",
+                                    "pm.test('B owner read permission follows grant visibility model', function(){ pm.expect(perms.includes(permRead), 'view-grant read permission missing: ' + JSON.stringify(perms)).to.eql(true); });",
+                                    "pm.test('B owner write permission follows editor grant availability', function(){ pm.expect(perms.includes(permWrite), 'editor-grant write permission missing: ' + JSON.stringify(perms)).to.eql(true); });"
                                 ],
                                 "_lastExecutionId": "d9e8ae2b-b8d8-4f1b-bf2e-ebc715e9908b"
                             }
@@ -16346,21 +16090,11 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const raw = json.data && json.data.GetPermissions ? (json.data.GetPermissions.permissions || []) : [];",
-                                    "const perms = raw.map(p => (typeof p === \"string\" ? p : (p && p.id ? p.id : \"\"))).filter(Boolean);",
-                                    "const permRead = pm.environment.get(\"permReadX\") || \"\";",
-                                    "const permWrite = pm.environment.get(\"permWriteX\") || \"\";",
-                                    "const readExpected = (pm.environment.get(\"rbac_read_expected\") || \"false\") === \"true\";",
-                                    "const editorExpected = (pm.environment.get(\"rbac_editor_write_expected\") || \"false\") === \"true\";",
-                                    "if (!readExpected || !permRead) {",
-                                    "  pm.test.skip(\"Read permission persists after editor revoke (not applicable in this state)\", function(){});",
-                                    "} else {",
-                                    "  pm.test(\"Read permission persists after editor revoke\", function(){ pm.expect(perms.includes(permRead)).to.eql(true); });",
-                                    "}",
-                                    "if (!editorExpected || !permWrite) {",
-                                    "  pm.test.skip(\"Write permission removed after editor revoke (not applicable in this state)\", function(){});",
-                                    "} else {",
-                                    "  pm.test(\"Write permission removed after editor revoke\", function(){ pm.expect(perms.includes(permWrite)).to.eql(false); });",
-                                    "}"
+                                    "const perms = raw.map(p => (typeof p === 'string' ? p : (p && p.id ? p.id : ''))).filter(Boolean);",
+                                    "const permRead = pm.environment.get('permReadX') || '';",
+                                    "const permWrite = pm.environment.get('permWriteX') || '';",
+                                    "pm.test('Read permission persists after editor revoke', function(){ pm.expect(perms.includes(permRead), 'read permission lost: ' + JSON.stringify(perms)).to.eql(true); });",
+                                    "pm.test('Write permission removed after editor revoke', function(){ pm.expect(perms.includes(permWrite), 'write permission still present: ' + JSON.stringify(perms)).to.eql(false); });"
                                 ],
                                 "_lastExecutionId": "d4e066c4-835a-4fdb-af8e-a3ea27de0da3"
                             }
@@ -19139,21 +18873,25 @@
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
+                                    "// The role/group checks used to bail out with a bare `return` when the query",
+                                    "// errored, which turned a failed request into a passing test.",
                                     "const json = pm.response.json();",
                                     "const payload = json.data ? json.data.GetUserRepresentation : null;",
-                                    "const hasErr = !!(json.errors && json.errors.length);",
-                                    "pm.test('GetUserRepresentation under tenant returns data', function(){ pm.expect(hasErr, 'unexpected GraphQL error: ' + JSON.stringify(json.errors)).to.eql(false); pm.expect(!!payload && !!payload.id).to.eql(true); });",
+                                    "const urtiRoleId = pm.environment.get('urtiRoleId');",
+                                    "const urtiGroupId = pm.environment.get('urtiGroupId');",
+                                    "pm.test('GetUserRepresentation under tenant returns data', function(){",
+                                    "  pm.expect(!!(json.errors && json.errors.length), 'unexpected GraphQL error: ' + JSON.stringify(json.errors)).to.eql(false);",
+                                    "  pm.expect(!!(payload && payload.id), 'payload: ' + JSON.stringify(payload)).to.eql(true);",
+                                    "});",
                                     "pm.test('Roles array includes tenant-A-bound isolation probe role (tenant filtered by CUserCollectionDocumentServiceComp)', function(){",
-                                    "  if (hasErr || !payload) return;",
-                                    "  pm.expect(Array.isArray(payload.roles)).to.eql(true);",
-                                    "  const urtiRoleId = pm.environment.get('urtiRoleId');",
-                                    "  if (urtiRoleId) pm.expect(payload.roles.includes(urtiRoleId), 'expected roles to include ' + urtiRoleId + ' but got ' + JSON.stringify(payload.roles)).to.eql(true);",
+                                    "  pm.expect(!!urtiRoleId, 'fixture urtiRoleId missing - the check cannot run').to.eql(true);",
+                                    "  pm.expect(Array.isArray(payload && payload.roles), 'no roles array: ' + JSON.stringify(payload)).to.eql(true);",
+                                    "  pm.expect(payload.roles.includes(urtiRoleId), 'expected roles to include ' + urtiRoleId + ' but got ' + JSON.stringify(payload.roles)).to.eql(true);",
                                     "});",
                                     "pm.test('Groups array includes tenant-A-bound isolation probe group (tenant filtered)', function(){",
-                                    "  if (hasErr || !payload) return;",
-                                    "  pm.expect(Array.isArray(payload.groups)).to.eql(true);",
-                                    "  const urtiGroupId = pm.environment.get('urtiGroupId');",
-                                    "  if (urtiGroupId) pm.expect(payload.groups.includes(urtiGroupId), 'expected groups to include ' + urtiGroupId + ' but got ' + JSON.stringify(payload.groups)).to.eql(true);",
+                                    "  pm.expect(!!urtiGroupId, 'fixture urtiGroupId missing - the check cannot run').to.eql(true);",
+                                    "  pm.expect(Array.isArray(payload && payload.groups), 'no groups array: ' + JSON.stringify(payload)).to.eql(true);",
+                                    "  pm.expect(payload.groups.includes(urtiGroupId), 'expected groups to include ' + urtiGroupId + ' but got ' + JSON.stringify(payload.groups)).to.eql(true);",
                                     "});"
                                 ]
                             }
@@ -19237,19 +18975,18 @@
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "// The leak check below used to reuse urtiMemberDocId - a document opened in",
-                                    "// A OWNER's workspace. Document workspaces are keyed per user server-side, so",
-                                    "// B owner always got 'Document not found' and the assertion, which treated any",
-                                    "// error as a pass, never actually verified anything. B owner must open the user",
-                                    "// in its own workspace for the cross-tenant check to mean something.",
+                                    "// Document workspaces are keyed per user server-side, so B owner must open the",
+                                    "// shared user in its own workspace for the leak check below to mean anything.",
+                                    "// The verified policy is that the open is GRANTED and the tenant filtering then",
+                                    "// happens in the representation - the previous 'granted or cleanly denied'",
+                                    "// assertion accepted both and so could not detect either behaviour changing.",
                                     "const json = pm.response.json();",
                                     "const payload = json.data ? json.data.OpenDocument : null;",
                                     "const docId = payload && payload.documentId ? payload.documentId : '';",
                                     "pm.environment.set('urtiMemberDocIdB', docId);",
-                                    "pm.environment.set('urtiOpenedUnderB', docId ? 'true' : 'false');",
-                                    "pm.test('B owner OpenDocument on a shared user is either granted or cleanly denied', function(){",
-                                    "  const denied = !!(json.errors && json.errors.length);",
-                                    "  pm.expect(denied || !!docId, 'neither a document nor a clean denial was returned').to.eql(true);",
+                                    "pm.test('B owner can open a user shared across tenants', function(){",
+                                    "  pm.expect(!!(json.errors && json.errors.length), 'unexpected GraphQL error: ' + JSON.stringify(json.errors)).to.eql(false);",
+                                    "  pm.expect(!!docId, 'OpenDocument payload: ' + JSON.stringify(payload)).to.eql(true);",
                                     "});"
                                 ]
                             }
@@ -19301,26 +19038,21 @@
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "const openedUnderB = pm.environment.get('urtiOpenedUnderB') === 'true';",
-                                    "if (!openedUnderB) {",
+                                    "// OpenDocument finishes its load on a background thread - poll until readable.",
+                                    "const json = pm.response.json();",
+                                    "const repr = json.data && json.data.GetUserRepresentation;",
+                                    "const loaded = !!(repr && repr.id);",
+                                    "const maxAttempts = 25;",
+                                    "const attempt = parseInt(pm.environment.get('docWaitAttempt_urtiB') || '0', 10);",
+                                    "if (loaded) {",
                                     "  pm.environment.set('docWaitAttempt_urtiB', '0');",
-                                    "  pm.test.skip('a_member document loaded in B owner workspace (not applicable: open was denied)', function(){});",
+                                    "  pm.test('a_member document loaded in B owner workspace', function(){ pm.expect(loaded).to.eql(true); });",
+                                    "} else if (attempt < maxAttempts) {",
+                                    "  pm.environment.set('docWaitAttempt_urtiB', String(attempt + 1));",
+                                    "  postman.setNextRequest('Isolation probe: Wait for a_member document load (B owner)');",
                                     "} else {",
-                                    "  const json = pm.response.json();",
-                                    "  const repr = json.data && json.data.GetUserRepresentation;",
-                                    "  const loaded = !!(repr && repr.id);",
-                                    "  const maxAttempts = 25;",
-                                    "  const attempt = parseInt(pm.environment.get('docWaitAttempt_urtiB') || '0', 10);",
-                                    "  if (loaded) {",
-                                    "    pm.environment.set('docWaitAttempt_urtiB', '0');",
-                                    "    pm.test('a_member document loaded in B owner workspace', function(){ pm.expect(loaded).to.eql(true); });",
-                                    "  } else if (attempt < maxAttempts) {",
-                                    "    pm.environment.set('docWaitAttempt_urtiB', String(attempt + 1));",
-                                    "    postman.setNextRequest('Isolation probe: Wait for a_member document load (B owner)');",
-                                    "  } else {",
-                                    "    pm.environment.set('docWaitAttempt_urtiB', '0');",
-                                    "    pm.test('a_member document loaded in B owner workspace', function(){ pm.expect.fail('document still not readable after ' + maxAttempts + ' polls'); });",
-                                    "  }",
+                                    "  pm.environment.set('docWaitAttempt_urtiB', '0');",
+                                    "  pm.test('a_member document loaded in B owner workspace', function(){ pm.expect.fail('document still not readable after ' + maxAttempts + ' polls'); });",
                                     "}"
                                 ]
                             }
@@ -19360,33 +19092,24 @@
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "const openedUnderB = pm.environment.get('urtiOpenedUnderB') === 'true';",
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.GetUserRepresentation : null;",
                                     "const urtiRoleId = pm.environment.get('urtiRoleId');",
                                     "const urtiGroupId = pm.environment.get('urtiGroupId');",
-                                    "if (!openedUnderB) {",
-                                    "  // B owner could not open the shared user at all - that is itself a valid",
-                                    "  // isolation outcome, but it does NOT verify role/group filtering, so report",
-                                    "  // it as skipped rather than as a pass.",
-                                    "  pm.test.skip('User repr roles under foreign tenant context must not leak non-bound role IDs (not applicable: B owner cannot open the document)', function(){});",
-                                    "  pm.test.skip('User repr groups under foreign tenant context must not leak non-bound group IDs (not applicable: B owner cannot open the document)', function(){});",
-                                    "} else {",
-                                    "  const json = pm.response.json();",
-                                    "  const payload = json.data ? json.data.GetUserRepresentation : null;",
-                                    "  pm.test('GetUserRepresentation under foreign tenant returns the shared user', function(){",
-                                    "    pm.expect(!!(json.errors && json.errors.length), 'unexpected GraphQL error: ' + JSON.stringify(json.errors)).to.eql(false);",
-                                    "    pm.expect(!!payload && !!payload.id).to.eql(true);",
-                                    "  });",
-                                    "  pm.test('User repr roles under foreign tenant context must not leak non-bound role IDs (core fix verification)', function(){",
-                                    "    pm.expect(Array.isArray(payload.roles), 'no roles array returned - leak check cannot run').to.eql(true);",
-                                    "    pm.expect(!!urtiRoleId, 'fixture urtiRoleId missing - leak check cannot run').to.eql(true);",
-                                    "    pm.expect(payload.roles.includes(urtiRoleId), 'tenant-A-bound role leaked into tenant B view: ' + JSON.stringify(payload.roles)).to.eql(false);",
-                                    "  });",
-                                    "  pm.test('User repr groups under foreign tenant context must not leak non-bound group IDs', function(){",
-                                    "    pm.expect(Array.isArray(payload.groups), 'no groups array returned - leak check cannot run').to.eql(true);",
-                                    "    pm.expect(!!urtiGroupId, 'fixture urtiGroupId missing - leak check cannot run').to.eql(true);",
-                                    "    pm.expect(payload.groups.includes(urtiGroupId), 'tenant-A-bound group leaked into tenant B view: ' + JSON.stringify(payload.groups)).to.eql(false);",
-                                    "  });",
-                                    "}"
+                                    "pm.test('GetUserRepresentation under foreign tenant returns the shared user', function(){",
+                                    "  pm.expect(!!(json.errors && json.errors.length), 'unexpected GraphQL error: ' + JSON.stringify(json.errors)).to.eql(false);",
+                                    "  pm.expect(!!(payload && payload.id), 'payload: ' + JSON.stringify(payload)).to.eql(true);",
+                                    "});",
+                                    "pm.test('User repr roles under foreign tenant context must not leak non-bound role IDs (core fix verification)', function(){",
+                                    "  pm.expect(!!urtiRoleId, 'fixture urtiRoleId missing - leak check cannot run').to.eql(true);",
+                                    "  pm.expect(Array.isArray(payload && payload.roles), 'no roles array returned - leak check cannot run').to.eql(true);",
+                                    "  pm.expect(payload.roles.includes(urtiRoleId), 'tenant-A-bound role leaked into tenant B view: ' + JSON.stringify(payload.roles)).to.eql(false);",
+                                    "});",
+                                    "pm.test('User repr groups under foreign tenant context must not leak non-bound group IDs', function(){",
+                                    "  pm.expect(!!urtiGroupId, 'fixture urtiGroupId missing - leak check cannot run').to.eql(true);",
+                                    "  pm.expect(Array.isArray(payload && payload.groups), 'no groups array returned - leak check cannot run').to.eql(true);",
+                                    "  pm.expect(payload.groups.includes(urtiGroupId), 'tenant-A-bound group leaked into tenant B view: ' + JSON.stringify(payload.groups)).to.eql(false);",
+                                    "});"
                                 ]
                             }
                         }

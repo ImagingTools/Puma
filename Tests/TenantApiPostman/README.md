@@ -4,7 +4,6 @@
 
 - Tenant_System_Full.postman_collection.json: main end-to-end Postman collection.
 - Tenant_System_Full.postman_environment.json: environment values used by Newman/Postman.
-- permission_visibility_matrix.iteration.json: matrix artifact used by data-driven visibility checks.
 
 Temporary debug reports (_tmp_*) are not required for normal test execution and can be removed.
 
@@ -41,33 +40,47 @@ newman run Tenant_System_Full.postman_collection.json -e Tenant_System_Full.post
 
 ## Scenario Coverage Summary
 
-Total request-level scenarios: 323
+Total request-level scenarios: 405
 
 - 00 System bootstrap: 1 requests
 - 00A Auth SU: 1 requests
 - 00B Register users: 4 requests
 - 00C Auth all users: 4 requests
-- 01 Tenant bootstrap: 6 requests
+- 01 Tenant bootstrap: 8 requests
 - 01A Tenant document-service create/update: 8 requests
 - 02 Memberships and invitations: 11 requests
-- 03 Connections, relationships, grants: 9 requests
-- 04 RBAC (members, roles, groups, permissions): 16 requests
+- 03 Connections, relationships, grants: 10 requests
+- 04 RBAC (members, roles, groups, permissions): 18 requests
 - 05 Isolation and negative checks: 4 requests
 - 05A Isolation matrix - cross-tenant boundaries: 15 requests
-- 05B User representation tenant isolation (roles/groups in repr): 4 requests
-- 05B User representation tenant isolation (roles in GetUserRepresentation): 4 requests
-- 06 Edge - Tenant lifecycle: 17 requests
-- 07 Edge - Memberships and invitations: 16 requests
+- 05B User representation tenant isolation (roles in GetUserRepresentation): 19 requests
+- 06 Edge - Tenant lifecycle: 18 requests
+- 07 Edge - Memberships and invitations: 20 requests
 - 08 Edge - Connections and relationships: 6 requests
-- 09 Edge - Grants and delegation: 40 requests  [detailed GetProfile for cross-tenant delegation visibility]
-- 10 Edge - RBAC source/revoke matrix: 11 requests
+- 09 Edge - Grants and delegation: 42 requests  [detailed GetProfile for cross-tenant delegation visibility]
+- 10 Edge - RBAC source/revoke matrix: 12 requests
 - 11 Edge - Token and visibility probes: 2 requests
-- 12 Data-driven permission visibility matrix: 4 requests
-- 13 Coverage sweep - remaining tenant APIs: 38 requests
-- 13 Edge - No Organization isolation: 19 requests
-- 14 Advanced Edge - Lifecycle and delegation depth: 82 requests  [GetProfile for dual grants and revoke]
-- 14A Role permissions validation in-tenant: 5 requests
+- 12 Permission visibility matrix (per actor): 12 requests
+- 13 Coverage sweep - remaining tenant APIs: 36 requests
+- 13 Edge - No Organization isolation: 31 requests
+- 14 Advanced Edge - Lifecycle and delegation depth: 88 requests  [GetProfile for dual grants and revoke]
+- 14A Role permissions validation in-tenant: 12 requests
+- 14B Scope isolation - Roles/Users/Groups: 18 requests
 - 99 Cleanup: 5 requests
+
+### Assertion policy
+
+Every test asserts the specific outcome the API is contracted to produce. A test
+must not accept "success or a denial", "success or already exists", or "any
+decided outcome" - an assertion that cannot fail cannot detect a regression, and
+the endpoints that had such assertions were exactly the ones whose backing tables
+were silently missing. Negative tests pin the refusal *reason* (for example
+`/Access denied/`), so an unrelated failure cannot satisfy them.
+
+Documents are opened immediately before they are read and closed afterwards: the
+server closes any document left without an active `OnDocumentChanged` subscriber
+after `CloseDocumentTimeout` (30s by default), and this suite is pure HTTP, so a
+document handle carried across folders expires on any run slower than ~30s.
 
 ## Full Scenario Catalog (All Request-Level Scenarios)
 
@@ -297,56 +310,74 @@ Total request-level scenarios: 323
 1. GetPermissions by stale token probe
 2. Functional visibility probe: RolesList with low-privilege user
 
-### 12 Data-driven permission visibility matrix (4)
+### 12 Permission visibility matrix (per actor) (12)
 
-1. Matrix RolesList visibility probe
-2. Matrix GroupsList visibility probe
-3. Matrix GetPermissions probe
-4. Matrix GetTenant isolation probe
+Was a data-driven folder that newman was never given a `-d` file for, so its
+expectations never ran. The scenarios are now explicit requests, one per actor,
+with the allow/deny outcome asserted directly.
 
-### 13 Coverage sweep - remaining tenant APIs (40+)
+1. Matrix RolesList :: a_owner (allowed)
+2. Matrix RolesList :: b_owner (allowed)
+3. Matrix RolesList :: a_member (refused)
+4. Matrix RolesList :: outsider (refused)
+5. Matrix GroupsList :: a_owner (allowed)
+6. Matrix GroupsList :: b_owner (allowed)
+7. Matrix GroupsList :: a_member (refused)
+8. Matrix GroupsList :: outsider (refused)
+9. Matrix GetPermissions :: a_owner
+10. Matrix GetPermissions :: b_owner
+11. Matrix GetPermissions :: a_member
+12. Matrix GetPermissions :: outsider
+
+The former `Matrix GetTenant isolation probe` is gone: the iteration file never
+carried an `expectGetTenantAllowed` value, so it could only ever skip, and folder
+05A already covers GetTenant isolation from every actor.
+
+### 13 Coverage sweep - remaining tenant APIs (36)
 
 1. GetMembershipsByTenant coverage
 2. GetMembershipsByUser coverage
 3. GetMembership coverage
-4. IsMember coverage
-5. GetTenantInvitations coverage
-6. AddMembership coverage
-7. ResendTenantInvitation coverage
-8. UpdateMembershipRole coverage
-9. GetOrganizationPermissions coverage — verifies 6-group org permission tree (EditOrganization, MemberManagement, RoleManagement, GroupManagement, PermissionManagement, ConnectionManagement); asserts stale groups absent (OrganizationManagement, ContractManagement, MessageManagement); verifies EditOrganizationMemberPermissions in PermissionManagement
-10. UpdateMembershipPermissions coverage — assigns ViewOrganizationMembers, EditOrganizationMember, EditOrganizationMemberPermissions; verifies success
-11. Verify organizationPermissions in GetMembership — confirms all 3 permissions from step 10 are returned by GetMembership
+4. GetOrganizationPermissions (new org perms tree) — verifies 6-group org permission tree (EditOrganization, MemberManagement, RoleManagement, GroupManagement, PermissionManagement, ConnectionManagement); asserts stale groups absent (OrganizationManagement, ContractManagement, MessageManagement)
+5. UpdateMembershipPermissions + verify (new org perms)
+6. Verify organizationPermissions in GetMembership (new)
+7. IsMember coverage
+8. GetTenantInvitations coverage
+9. AddMembership coverage
+10. ResendTenantInvitation coverage
+11. UpdateMembershipPermissions coverage
 12. TransferTenantOwnership coverage
 13. GetConnectionRequests coverage
 14. RegenerateConnectionCode coverage
 15. RejectConnectionRequest coverage
 16. CancelConnectionRequest coverage
 17. EnsureSystemTenant coverage
-18. CreateContract coverage
-19. GetContracts coverage
-20. UpdateContractStatus coverage
-21. TerminateContract coverage
-22. SendCrossTenantMessage coverage
-23. GetCrossTenantMessages coverage
-24. GetCrossTenantMessage coverage
-25. UpdateCrossTenantMessageStatus coverage
-26. GetOrderRequests coverage
-27. GetOrderRequest coverage
-28. ConfirmOrderRequest coverage
-29. RejectOrderRequest coverage
-30. UpdateOrderRequestStatus coverage
-31. GetRelationshipRepresentation coverage
-32. GetUserRepresentation coverage
-33. GetGroupRepresentation coverage
-34. RoleItem coverage
-35. GroupItem coverage
-36. RoleAdd coverage
-37. RoleUpdate coverage
-38. GroupAdd coverage
-39. GroupUpdate coverage
-40. UserToken coverage
-41. Logout coverage
+18. Reopen relationship document (coverage)
+19. GetRelationshipRepresentation coverage
+20. Close relationship document (coverage)
+21. Reopen user document (coverage)
+22. GetUserRepresentation coverage
+23. Close user document (coverage)
+24. Reopen group document (coverage)
+25. GetGroupRepresentation coverage
+26. Close group document (coverage)
+27. RoleItem coverage
+28. GroupItem coverage
+29. RoleAdd coverage
+30. RoleUpdate coverage
+31. RoleUpdate coverage: verify the update landed
+32. GroupAdd coverage
+33. GroupUpdate coverage
+34. GroupUpdate coverage: verify the update landed
+35. UserToken coverage
+36. Logout coverage
+
+The Contract, CrossTenantMessage and OrderRequest sweeps were removed: those
+features are not used in the system, their SQLite repositories never create their
+tables (`no such table: Contracts` / `CrossTenantMessages` in the server log), and
+every one of their assertions was written to accept any response, so they reported
+green over a non-functional feature. Re-add them with real assertions when the
+feature is actually wired up.
 
 ### 13 Edge - No Organization isolation (17)
 
