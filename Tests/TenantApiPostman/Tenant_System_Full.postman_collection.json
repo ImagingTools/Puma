@@ -10604,18 +10604,48 @@
                     "response": [],
                     "event": [
                         {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "// See \"Wait for A member document load\" for why this busy-waits instead",
+                                    "// of a real sleep, and only on actual retries.",
+                                    "if (parseInt(pm.environment.get('docWaitAttempt_relRepr') || '0', 10) > 0) {",
+                                    "    const until = Date.now() + 150;",
+                                    "    while (Date.now() < until) { /* spin */ }",
+                                    "}"
+                                ]
+                            }
+                        },
+                        {
                             "listen": "test",
                             "script": {
                                 "id": "3f6d8d05-6975-45ba-9272-da86ae7842f3",
                                 "type": "text/javascript",
                                 "exec": [
-                                    "const json = pm.response.json();",
-                                    "const payload = json.data ? json.data.GetRelationshipRepresentation : null;",
-                                    "const hasErr = !!(json.errors && json.errors.length);",
                                     "// The request addresses the relationship by its document id, so that is the id the",
                                     "// answer has to carry - relationshipId is the same object seen through the",
                                     "// GetTenantRelationships list, which hands out the stored relationship id.",
-                                    "pm.test('GetRelationshipRepresentation returns requested relationship', function(){ pm.expect(hasErr).to.eql(false); pm.expect(payload.id).to.eql(pm.environment.get('relationshipDocId')); });"
+                                    "// This document was created ~30 folders earlier via CreateNewDocument/SaveDocument;",
+                                    "// under CI-agent load, CDocumentServiceBase's unbounded per-document worker thread",
+                                    "// can still be finishing that write when this read lands, yielding a transient",
+                                    "// \"Document not found\" warning here. Poll instead of asserting on one round-trip.",
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.GetRelationshipRepresentation : null;",
+                                    "const hasErr = !!(json.errors && json.errors.length);",
+                                    "const ready = !hasErr && !!payload && payload.id === pm.environment.get('relationshipDocId');",
+                                    "const maxAttempts = 25;",
+                                    "const attempt = parseInt(pm.environment.get('docWaitAttempt_relRepr') || '0', 10);",
+                                    "if (ready) {",
+                                    "    pm.environment.set('docWaitAttempt_relRepr', '0');",
+                                    "    pm.test('GetRelationshipRepresentation returns requested relationship', function(){ pm.expect(ready).to.eql(true); });",
+                                    "} else if (attempt < maxAttempts) {",
+                                    "    pm.environment.set('docWaitAttempt_relRepr', String(attempt + 1));",
+                                    "    postman.setNextRequest('GetRelationshipRepresentation coverage');",
+                                    "} else {",
+                                    "    pm.environment.set('docWaitAttempt_relRepr', '0');",
+                                    "    pm.test('GetRelationshipRepresentation returns requested relationship', function(){ pm.expect(hasErr).to.eql(false); pm.expect(payload.id).to.eql(pm.environment.get('relationshipDocId')); });",
+                                    "}"
                                 ],
                                 "_lastExecutionId": "22d060a9-91dc-44bf-a090-32e4809de671"
                             }
@@ -10695,15 +10725,45 @@
                     "response": [],
                     "event": [
                         {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "// See \"Wait for A member document load\" for why this busy-waits instead",
+                                    "// of a real sleep, and only on actual retries.",
+                                    "if (parseInt(pm.environment.get('docWaitAttempt_groupRepr') || '0', 10) > 0) {",
+                                    "    const until = Date.now() + 150;",
+                                    "    while (Date.now() < until) { /* spin */ }",
+                                    "}"
+                                ]
+                            }
+                        },
+                        {
                             "listen": "test",
                             "script": {
                                 "id": "f1f53eb4-3275-490a-9d77-e741922923fb",
                                 "type": "text/javascript",
                                 "exec": [
+                                    "// This document was created ~30 folders earlier via CreateNewDocument/SaveDocument;",
+                                    "// under CI-agent load, CDocumentServiceBase's unbounded per-document worker thread",
+                                    "// can still be finishing that write when this read lands, yielding a transient",
+                                    "// \"Document not found\" warning here. Poll instead of asserting on one round-trip.",
                                     "const json = pm.response.json();",
                                     "const payload = json.data ? json.data.GetGroupRepresentation : null;",
                                     "const hasErr = !!(json.errors && json.errors.length);",
-                                    "pm.test('GetGroupRepresentation returns the requested group', function(){ pm.expect(hasErr, 'unexpected GraphQL error: ' + JSON.stringify(json.errors)).to.eql(false); pm.expect(payload.id).to.eql(pm.environment.get('groupSupportId')); });"
+                                    "const ready = !hasErr && !!payload && payload.id === pm.environment.get('groupSupportId');",
+                                    "const maxAttempts = 25;",
+                                    "const attempt = parseInt(pm.environment.get('docWaitAttempt_groupRepr') || '0', 10);",
+                                    "if (ready) {",
+                                    "    pm.environment.set('docWaitAttempt_groupRepr', '0');",
+                                    "    pm.test('GetGroupRepresentation returns the requested group', function(){ pm.expect(ready).to.eql(true); });",
+                                    "} else if (attempt < maxAttempts) {",
+                                    "    pm.environment.set('docWaitAttempt_groupRepr', String(attempt + 1));",
+                                    "    postman.setNextRequest('GetGroupRepresentation coverage');",
+                                    "} else {",
+                                    "    pm.environment.set('docWaitAttempt_groupRepr', '0');",
+                                    "    pm.test('GetGroupRepresentation returns the requested group', function(){ pm.expect(hasErr, 'unexpected GraphQL error: ' + JSON.stringify(json.errors)).to.eql(false); pm.expect(payload.id).to.eql(pm.environment.get('groupSupportId')); });",
+                                    "}"
                                 ],
                                 "_lastExecutionId": "9d9f7e2c-2ed2-424a-936e-dd81e93d3661"
                             }
