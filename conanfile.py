@@ -142,7 +142,7 @@ class PumaConan(ConanFile):
         self.run(f'"{script_path}" "{backup_dir}"', cwd=self.source_folder)
 
     def _copy_dlls(self):
-        binDir = Path(self.build_folder) / 'Puma' / 'Bin' / self._build_folder_suffix()
+        binDir = Path(self.build_folder) / 'Bin' / self._build_folder_suffix()
         self.output.info(f"Copying shared libraries to {binDir}")
         files = []
 
@@ -172,6 +172,7 @@ class PumaConan(ConanFile):
         tc.variables["USE_FIND_PACKAGE"] = True
         tc.variables["CMAKE_CXX_STANDARD"] = 17
         tc.variables['BUILDDIR'] = self.build_path.as_posix()
+        tc.variables['PUMADIR_BUILD'] = self.build_path.as_posix()
         tc.variables['PYTHONEXE'] = Path(sys.executable).as_posix()
         # fvisibility hidden
         tc.variables['CMAKE_POLICY_DEFAULT_CMP0063'] = 'NEW'
