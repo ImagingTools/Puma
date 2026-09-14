@@ -2,17 +2,41 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6435" Description="ACF"/>
-            <Version Id="1" Number="2410" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6560" Description="ACF"/>
+            <Version Id="1" Number="2449" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
+        <Element Id="AccountLockoutController" PackageId="ImtAuthPck" ComponentId="AccountLockoutController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="FailedAttemptsPeriod" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="300"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="LockoutDuration" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="900"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MaxFailedAttempts" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="5"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="AuthorizationController" PackageId="ImtAuthGqlPck" ComponentId="LdapAuthorizationController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="AccountLockoutController" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="AccountLockoutController"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
