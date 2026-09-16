@@ -25,9 +25,6 @@
                     <AttributeInfo Id="MaxFailedAttempts" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="5"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
