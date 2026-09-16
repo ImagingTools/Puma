@@ -19,6 +19,7 @@ Dieses Handbuch beschreibt:
 - die Einbindung eigener Server über `AuthServerSdk`,
 - Windows-Domänenanmeldung über die in ImtCore implementierte LDAP-Schicht,
 - Personal Access Tokens (PATs) für nicht interaktive Zugriffe,
+- Passwortrichtlinie, Kontostatus und Sperre nach Fehlversuchen,
 - typische Betriebs-, Sicherheits- und Fehlerfälle.
 
 Die Beschreibung basiert auf Puma und der zugrunde liegenden
@@ -145,6 +146,11 @@ anderen Zuordnung ab.
 > **Wichtig:** Verwaltungsoperationen verwenden die interne Benutzer-ID, nicht
 > den Login-Namen. Eine Anwendung setzt ihre Produkt-ID vor der Anmeldung.
 
+Die Administrationsseite liest und schreibt Rollen und Berechtigungen
+ausschließlich im Kontext der aktuellen Produkt-ID. Ist ein Benutzer in
+mehreren Produkten berechtigt, bleiben die Zuordnungen der übrigen Produkte
+beim Speichern unverändert.
+
 ### 3.1 Verbindliche und optionale Elemente
 
 | Element | Verbindlich oder optional? |
@@ -243,7 +249,8 @@ in der Client-Komposition als `SuperuserMail` des
 `RemoteSuperuserController` konfiguriert und beim Erzeugen übermittelt. Die
 Puma-Tests verwenden für das initiale Konto den Login `su`; produktive
 Zugangsdaten und eine erreichbare Kontakt-E-Mail müssen sicher gewählt und
-verwahrt werden.
+verwahrt werden. Das Superuser-Passwort unterliegt bereits der
+Passwortrichtlinie aus [Abschnitt 9.4](#94-passwortrichtlinie).
 
 ### 4.4 Transportverschlüsselung
 
@@ -362,8 +369,11 @@ sequenceDiagram
 
 *Abbildung 11: Anmeldung, Berechtigungsprüfung und Abmeldung einer Anwendung.*
 
-Fehler bei ungültigen Zugangsdaten, gesperrtem Konto, fehlender Verbindung
-oder fehlenden Serverkomponenten werden als fehlgeschlagener Login gemeldet.
+Fehler bei ungültigen Zugangsdaten, fehlender Verbindung oder fehlenden
+Serverkomponenten werden als fehlgeschlagener Login gemeldet. Ein deaktiviertes
+Konto wird erst nach erfolgreicher Prüfung der Zugangsdaten mit einer eigenen
+Meldung abgewiesen, damit der Kontostatus nicht über Anmeldeversuche
+ausgespäht werden kann (siehe [Abschnitt 9.5](#95-kontostatus-aktivieren-und-deaktivieren)).
 
 ### UC-04: Berechtigungsänderung
 
@@ -377,12 +387,20 @@ schutzbedürftige Serveroperation muss die Berechtigung nochmals validieren.
 
 ### UC-05: Benutzer deaktivieren oder entfernen
 
-Der vorhandene Client-SDK stellt `RemoveUser()` als permanente Löschung bereit.
-Vor dem Löschen sind fachliche Aufbewahrungs- und Audit-Anforderungen zu
-prüfen. Rollen- und Gruppenzuordnungen werden mit dem Benutzer entfernt.
-Für eine zeitweise Sperre ist die in der konkreten Administrationsoberfläche
-angebotene Kontostatusfunktion zu verwenden; andernfalls Zugriff über
-Rollenzuordnung und Sitzungsmanagement entziehen.
+Für den dauerhaften Entzug des Zugangs stehen zwei Wege zur Verfügung:
+
+1. **Konto deaktivieren (bevorzugt):** Der Superuser setzt den Kontostatus im
+   Benutzereditor auf deaktiviert. Der Benutzerdatensatz, seine Rollen und
+   Gruppenzuordnungen bleiben erhalten, eine Anmeldung ist aber nicht mehr
+   möglich. Laufende Sitzungen und PATs des Kontos werden sofort abgewiesen.
+   Einzelheiten beschreibt [Abschnitt 9.5](#95-kontostatus-aktivieren-und-deaktivieren).
+2. **Konto entfernen:** Das Client-SDK stellt `RemoveUser()` als permanente
+   Löschung bereit. Rollen- und Gruppenzuordnungen werden mit dem Benutzer
+   entfernt. Vor dem Löschen sind fachliche Aufbewahrungs- und
+   Audit-Anforderungen zu prüfen.
+
+Soll nur eine einzelne Funktion entzogen werden, genügt es, die entsprechende
+Rollen- oder Gruppenzuordnung zu entfernen.
 
 ### UC-06: Eigene Anwendung anbinden
 
@@ -605,7 +623,8 @@ Sitzung angemeldet.
 2. Zielbenutzer und Produkt-ID festlegen.
 3. Nur die minimal nötigen Scopes auswählen.
 4. Möglichst ein Ablaufdatum im ISO-8601-Format setzen.
-5. Secret unmittelbar in einem Secret Store speichern.
+5. Secret unmittelbar in einem Secret Store speichern. Es beginnt mit dem in
+   der Serverkomposition konfigurierten Präfix, standardmäßig `imt_pat_`.
 6. Secret nicht in Quellcode, Build-Protokolle oder Tickets kopieren.
 
 Anonyme Aufrufer dürfen keine PATs erstellen. Ein normaler Benutzer kann
@@ -634,6 +653,13 @@ sequenceDiagram
 ```
 
 *Abbildung 17: Validierung eines PAT für einen automatisierten Zugriff.*
+
+`GetTokenPermissions()` akzeptiert inzwischen sowohl Sitzungstoken als auch
+PATs. Für ein PAT liefert der Server die Schnittmenge aus den Berechtigungen
+des Benutzers und den Scopes des Tokens und berücksichtigt dabei die
+Produktbindung des Tokens. Berechtigungen, die der Benutzer zwar über eine
+Rolle besitzt, die aber nicht im Scope des Tokens liegen, werden nicht
+zurückgegeben. Wird ein Konto deaktiviert, werden auch seine PATs abgewiesen.
 
 ### 8.5 PAT widerrufen
 
@@ -670,7 +696,7 @@ flowchart TB
 
 ### 9.2 Regelmäßige Kontrollen
 
-- Benutzer ohne aktuellen fachlichen Bedarf entfernen oder sperren.
+- Benutzer ohne aktuellen fachlichen Bedarf deaktivieren oder entfernen.
 - Rollen und Gruppen nach dem Least-Privilege-Prinzip prüfen.
 - Alte, nie verwendete oder abgelaufene PATs widerrufen.
 - Administratorrechte personenbezogen vergeben.
@@ -687,6 +713,98 @@ Nach einer Wiederherstellung sind Datenbankmigrationen, Login, Rollen,
 Gruppen, Sitzungsbehandlung und PAT-Validierung in einer kontrollierten
 Umgebung zu testen.
 
+### 9.4 Passwortrichtlinie
+
+Puma prüft Passwörter beim Anlegen eines Benutzers, beim Ändern eines
+Passworts und bei der Initialisierung des Superusers gegen die
+Passwortrichtlinie der ImtCore-Benutzerverwaltung. Sie ist in der
+ausgelieferten Puma-Komposition bereits verdrahtet und wirkt ohne weitere
+Konfiguration mit diesen Vorgaben:
+
+| Regel | Standardwert |
+|---|---|
+| Mindestlänge | 8 Zeichen |
+| Maximallänge | 128 Zeichen |
+| Klein-, Groß-, Ziffern- und Sonderzeichenpflicht | jeweils nicht erzwungen |
+| Login als Passwort | abgelehnt |
+| Blockliste bekannter Passwörter | nicht gesetzt; optional als Datei hinterlegbar |
+| Passworthistorie | letzte 5 Passwörter dürfen nicht wiederverwendet werden |
+| Mindestalter des Passworts | 0 Tage, also keine Wartezeit vor der nächsten Änderung |
+| Höchstalter des Passworts | 0 Tage, also kein Ablauf |
+| Warnfrist vor Ablauf | 14 Tage |
+
+Weitere Hinweise:
+
+- Eine Ablehnung nennt die verletzten Regeln, zum Beispiel Mindestlänge,
+  fehlende Zeichenklasse, Login als Passwort, Eintrag in der Blockliste,
+  Wiederverwendung oder Mindestalter. Die Administrationsoberfläche zeigt sie
+  als Klartextmeldung an.
+- Ein Leerzeichen zählt nicht als Sonderzeichen.
+- Ein Administrator setzt das Passwort eines anderen Benutzers ohne dessen
+  altes Passwort und unterliegt dabei nicht dem Mindestalter.
+- Für Benutzer aus der Windows-Domäne gilt die Richtlinie nicht; ihr Passwort
+  wird in der Domäne verwaltet und dort geprüft.
+- Die Ablaufprüfung bei der Anmeldung und die Abfrage der Regeln durch den
+  Client sind serverseitig vorhanden, in der ausgelieferten Puma-Komposition
+  jedoch nicht mit dem Anmeldecontroller verbunden. Sie wirken erst, wenn die
+  Richtlinie dort zusätzlich verdrahtet wird.
+
+### 9.5 Kontostatus aktivieren und deaktivieren
+
+Jedes Konto besitzt zusätzlich zu seinen Rollen einen Kontostatus. Ein
+deaktiviertes Konto bleibt mit allen Zuordnungen erhalten, kann sich aber
+nicht anmelden.
+
+```mermaid
+stateDiagram-v2
+    [*] --> Aktiv: Konto anlegen
+    Aktiv --> Deaktiviert: Superuser deaktiviert das Konto
+    Deaktiviert --> Aktiv: Superuser aktiviert das Konto
+    Aktiv --> [*]: Konto entfernen
+    Deaktiviert --> [*]: Konto entfernen
+```
+
+*Abbildung 19: Kontostatus und die vom Superuser ausgelösten Übergänge.*
+
+Regeln:
+
+- Nur der Superuser sieht und bedient den Schalter für den Kontostatus im
+  Benutzereditor. Für alle anderen Administratoren wird er nicht angezeigt,
+  und ihre Änderungen am Benutzer lassen den Status unverändert.
+- Nur der Superuser kann ein Konto bereits deaktiviert anlegen. Eine
+  Selbstregistrierung erzeugt immer ein aktives Konto.
+- Bei der Anmeldung werden zuerst die Zugangsdaten geprüft. Erst danach führt
+  ein deaktiviertes Konto zu einer eigenen Meldung, dass das Konto deaktiviert
+  wurde. Ein falsches Passwort liefert weiterhin die allgemeine Meldung, sodass
+  der Kontostatus nicht über Anmeldeversuche ermittelt werden kann.
+- Laufende Sitzungen und PATs eines deaktivierten Kontos werden ab sofort
+  abgewiesen; eine Abmeldung ist dafür nicht erforderlich.
+- Konten aus älteren Datenbeständen ohne gespeicherten Status gelten als aktiv.
+
+Das Deaktivieren ist dem Löschen vorzuziehen, wenn Zuordnungen, Nachweise oder
+Zuständigkeiten erhalten bleiben sollen.
+
+### 9.6 Sperre nach fehlgeschlagenen Anmeldeversuchen
+
+ImtCore stellt eine Kontosperre bereit, die ein Konto nach mehreren
+aufeinanderfolgenden Fehlversuchen vorübergehend abweist. Ihre Vorgaben lauten:
+
+| Einstellung | Standardwert | Bedeutung |
+|---|---|---|
+| Maximale Fehlversuche | 5 | Anzahl aufeinanderfolgender Fehlversuche bis zur Sperre; 0 schaltet die Sperre ab |
+| Beobachtungszeitraum | 300 Sekunden | Zeitfenster, in dem Fehlversuche gezählt werden |
+| Sperrdauer | 900 Sekunden | Dauer der Abweisung; 0 bedeutet Sperre bis zur Entsperrung durch einen Administrator |
+
+Die Zähler und Sperren werden im Arbeitsspeicher gehalten und beim Neustart
+des Servers zurückgesetzt. Ein Administrator kann ein Konto vorzeitig
+entsperren. Der Anmeldeweg über die Windows-Domäne wird nicht mitgezählt.
+
+> **Hinweis:** In der ausgelieferten Puma-Komposition ist die Sperrkomponente
+> nicht verdrahtet; eine automatische Sperre findet daher nicht statt. Wird sie
+> benötigt, ist sie in der Serverkomposition zu ergänzen. Bis dahin sind
+> fehlgeschlagene Anmeldungen über die Protokolle zu überwachen
+> (siehe [Abschnitt 9.2](#92-regelmäßige-kontrollen)).
+
 ## 10. Fehlerdiagnose
 
 ```mermaid
@@ -702,13 +820,15 @@ flowchart TD
     P -->|Ja| LOG[Server- und Anwendungsprotokoll prüfen]
 ```
 
-*Abbildung 19: Entscheidungsbaum zur Fehlerdiagnose.*
+*Abbildung 20: Entscheidungsbaum zur Fehlerdiagnose.*
 
 | Problem | Wahrscheinliche Ursache | Maßnahme |
 |---|---|---|
 | Verbindung abgelehnt | Falscher Host/Port oder Server nicht gestartet | HTTP- und WS-Port sowie Prozess prüfen |
 | TLS-Fehler | Zertifikat nicht vertrauenswürdig oder Name falsch | Zertifikatskette, Hostname und Uhrzeit prüfen |
 | Login schlägt fehl | Zugangsdaten, Kontostatus oder LDAP | Authentifizierungsweg gezielt prüfen |
+| Login meldet ein deaktiviertes Konto | Konto wurde deaktiviert | Kontostatus durch den Superuser prüfen lassen (Abschnitt 9.5) |
+| Passwortänderung wird abgelehnt | Verstoß gegen die Passwortrichtlinie | Gemeldete Regeln auswerten (Abschnitt 9.4) |
 | `HasPermission()` bleibt `false` | Falsche Produkt-ID oder fehlende Rolle | Produkt-ID und effektive Rollen prüfen |
 | Benutzeroperation liefert leere ID | Login bereits vorhanden oder Rechte fehlen | Eindeutigkeit und Adminrechte prüfen |
 | PAT-Erstellung liefert leeres Secret | Nicht angemeldet, falscher Eigentümer oder leere Scopes | Sitzung, Benutzer-ID und Scopes prüfen |
@@ -733,6 +853,8 @@ flowchart TD
 - [ ] Rollen nach Aufgaben statt Personen modelliert
 - [ ] Gruppen für wiederkehrende Teams angelegt
 - [ ] Personalisierte Administratorkonten eingerichtet
+- [ ] Verfahren zum Deaktivieren nicht mehr benötigter Konten festgelegt
+- [ ] Passwortrichtlinie geprüft und den Benutzern bekannt gemacht
 - [ ] Negativtests für verweigerte Aktionen durchgeführt
 
 ### LDAP

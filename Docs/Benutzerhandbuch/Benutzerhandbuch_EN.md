@@ -18,6 +18,7 @@ This manual describes:
 - the integration of custom servers via `AuthServerSdk`,
 - Windows domain login via the LDAP layer implemented in ImtCore,
 - Personal Access Tokens (PATs) for non-interactive access,
+- password policy, account status, and lockout after failed attempts,
 - typical operational, security, and error scenarios.
 
 The description is based on Puma and the underlying authentication
@@ -137,6 +138,11 @@ assignment.
 > **Important:** Administrative operations use the internal user ID, not the
 > login name. An application sets its product ID before login.
 
+The administration page reads and writes roles and permissions exclusively in
+the context of the current product ID. If a user holds permissions in several
+products, the assignments of the other products remain unchanged when the user
+is saved.
+
 ### 3.1 Mandatory and Optional Elements
 
 | Element | Mandatory or optional? |
@@ -233,7 +239,8 @@ During initialization, the superuser's password and contact email are set.
 client composition as `SuperuserMail` of the `RemoteSuperuserController` and is
 transmitted when the account is created. The Puma tests use the login `su` for
 the initial account; production credentials and a reachable contact email must
-be chosen securely and kept safe.
+be chosen securely and kept safe. The superuser password is already subject to
+the password policy described in [Section 9.4](#94-password-policy).
 
 ### 4.4 Transport Encryption
 
@@ -351,8 +358,11 @@ sequenceDiagram
 
 *Figure 11: Login, permission check, and logout of an application.*
 
-Invalid credentials, a locked account, a missing connection, or missing
-server components are reported as a failed login.
+Invalid credentials, a missing connection, or missing server components are
+reported as a failed login. A disabled account is rejected with a dedicated
+message only after the credentials have been verified, so that the account
+status cannot be probed through login attempts (see
+[Section 9.5](#95-enable-and-disable-an-account)).
 
 ### UC-04: Change Permissions
 
@@ -366,11 +376,19 @@ protected server operation must validate the permission again.
 
 ### UC-05: Deactivate or Remove a User
 
-The existing client SDK provides `RemoveUser()` for permanent deletion. Before
-deleting a user, check the applicable retention and audit requirements. Role
-and group assignments are removed with the user. For a temporary lockout, use
-the account status function provided by the specific administration interface;
-otherwise, revoke access through role assignments and session management.
+Two options are available for permanently revoking access:
+
+1. **Disable the account (preferred):** The superuser sets the account status
+   in the user editor to disabled. The user record, its roles, and its group
+   memberships are retained, but login is no longer possible. Active sessions
+   and PATs of the account are rejected immediately. See
+   [Section 9.5](#95-enable-and-disable-an-account) for details.
+2. **Remove the account:** The client SDK provides `RemoveUser()` for permanent
+   deletion. Role and group assignments are removed with the user. Before
+   deleting a user, check the applicable retention and audit requirements.
+
+If only a single function must be revoked, removing the corresponding role or
+group assignment is sufficient.
 
 ### UC-06: Integrate a Custom Application
 
@@ -592,7 +610,8 @@ inactive.
 2. Specify the target user and product ID.
 3. Select only the minimum necessary scopes.
 4. Set an expiration date in ISO 8601 format whenever possible.
-5. Store the secret in a secret store immediately.
+5. Store the secret in a secret store immediately. It starts with the prefix
+   configured in the server composition, `imt_pat_` by default.
 6. Do not copy the secret into source code, build logs, or tickets.
 
 Anonymous callers may not create PATs. A regular user can manage their own
@@ -620,6 +639,12 @@ sequenceDiagram
 ```
 
 *Figure 17: Validation of a PAT for automated access.*
+
+`GetTokenPermissions()` now accepts both session tokens and PATs. For a PAT,
+the server returns the intersection of the user's permissions and the token's
+scopes and honors the product binding of the token. Permissions that the user
+holds through a role but that are not part of the token scope are not
+returned. When an account is disabled, its PATs are rejected as well.
 
 ### 8.5 Revoke a PAT
 
@@ -654,7 +679,7 @@ flowchart TB
 
 ### 9.2 Regular Checks
 
-- Remove or lock users who no longer have a current business need.
+- Disable or remove users who no longer have a current business need.
 - Review roles and groups according to the principle of least privilege.
 - Revoke old, unused, or expired PATs.
 - Assign administrator permissions to named individuals.
@@ -669,6 +694,94 @@ A consistent backup includes at least the database and Puma settings.
 Certificates and keys must be backed up separately with special protection.
 After recovery, test database migrations, login, roles, groups, session
 handling, and PAT validation in a controlled environment.
+
+### 9.4 Password Policy
+
+Puma validates passwords when a user is created, when a password is changed,
+and when the superuser is initialized. The check uses the password policy of
+the ImtCore user administration, which is already wired in the shipped Puma
+composition and takes effect without further configuration:
+
+| Rule | Default value |
+|---|---|
+| Minimum length | 8 characters |
+| Maximum length | 128 characters |
+| Lowercase, uppercase, digit, and special character requirement | not enforced |
+| Login used as password | rejected |
+| Blocklist of known passwords | not set; can optionally be provided as a file |
+| Password history | the last 5 passwords must not be reused |
+| Minimum password age | 0 days, no waiting period before the next change |
+| Maximum password age | 0 days, no expiration |
+| Warning period before expiration | 14 days |
+
+Additional notes:
+
+- A rejection names the violated rules, for example minimum length, a missing
+  character class, login used as password, a blocklist entry, reuse, or the
+  minimum age. The administration interface shows them as plain text.
+- A space does not count as a special character.
+- An administrator sets another user's password without that user's old
+  password and is not subject to the minimum password age.
+- The policy does not apply to users from the Windows domain; their password
+  is managed and verified in the domain.
+- Expiration checks at login and the client-side query of the rules exist on
+  the server, but they are not connected to the login controller in the
+  shipped Puma composition. They take effect only after the policy is wired
+  there as well.
+
+### 9.5 Enable and Disable an Account
+
+In addition to its roles, every account has an account status. A disabled
+account is retained with all its assignments but cannot log in.
+
+```mermaid
+stateDiagram-v2
+    [*] --> Enabled: Create account
+    Enabled --> Disabled: Superuser disables the account
+    Disabled --> Enabled: Superuser enables the account
+    Enabled --> [*]: Remove account
+    Disabled --> [*]: Remove account
+```
+
+*Figure 19: Account status and the transitions triggered by the superuser.*
+
+Rules:
+
+- Only the superuser sees and operates the account status switch in the user
+  editor. It is not displayed to other administrators, and their changes to a
+  user leave the status unchanged.
+- Only the superuser can create an account in the disabled state.
+  Self-registration always creates an enabled account.
+- The credentials are checked first during login. Only afterwards does a
+  disabled account lead to a dedicated message stating that the account has
+  been deactivated. An incorrect password still returns the generic message,
+  so the account status cannot be determined through login attempts.
+- Active sessions and PATs of a disabled account are rejected immediately; a
+  logout is not required for this.
+- Accounts from older data sets without a stored status are treated as enabled.
+
+Disabling is preferable to deletion whenever assignments, evidence, or
+responsibilities must be retained.
+
+### 9.6 Lockout After Failed Login Attempts
+
+ImtCore provides an account lockout that temporarily rejects an account after
+several consecutive failed attempts. Its defaults are:
+
+| Setting | Default value | Meaning |
+|---|---|---|
+| Maximum failed attempts | 5 | Number of consecutive failed attempts before the lockout; 0 disables the lockout |
+| Observation period | 300 seconds | Time window in which failed attempts are counted |
+| Lockout duration | 900 seconds | Duration of the rejection; 0 means locked until an administrator unlocks the account |
+
+Counters and locks are kept in memory and are reset when the server restarts.
+An administrator can unlock an account early. The login path through the
+Windows domain is not counted.
+
+> **Note:** The lockout component is not wired in the shipped Puma
+> composition, so no automatic lockout takes place. If it is required, it must
+> be added to the server composition. Until then, monitor failed logins
+> through the logs (see [Section 9.2](#92-regular-checks)).
 
 ## 10. Troubleshooting
 
@@ -685,13 +798,15 @@ flowchart TD
     P -->|Yes| LOG[Check server and application logs]
 ```
 
-*Figure 19: Decision tree for error diagnosis.*
+*Figure 20: Decision tree for error diagnosis.*
 
 | Problem | Probable cause | Action |
 |---|---|---|
 | Connection refused | Incorrect host/port or server not started | Check the HTTP and WS ports and the process |
 | TLS error | Certificate is not trusted or name is incorrect | Check the certificate chain, host name, and time |
 | Login fails | Credentials, account status, or LDAP | Check the authentication path systematically |
+| Login reports a deactivated account | The account was disabled | Have the superuser check the account status (Section 9.5) |
+| Password change is rejected | Violation of the password policy | Evaluate the reported rules (Section 9.4) |
 | `HasPermission()` remains `false` | Incorrect product ID or missing role | Check the product ID and effective roles |
 | User operation returns an empty ID | Login already exists or permissions are missing | Check uniqueness and administrator permissions |
 | PAT creation returns an empty secret | Not logged in, incorrect owner, or empty scopes | Check the session, user ID, and scopes |
@@ -716,6 +831,8 @@ flowchart TD
 - [ ] Roles modeled by tasks rather than individuals
 - [ ] Groups created for recurring teams
 - [ ] Personalized administrator accounts configured
+- [ ] Procedure defined for disabling accounts that are no longer needed
+- [ ] Password policy reviewed and communicated to the users
 - [ ] Negative tests performed for denied actions
 
 ### LDAP

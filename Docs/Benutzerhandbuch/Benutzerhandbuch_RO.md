@@ -19,6 +19,7 @@ Acest manual descrie:
 - integrarea propriilor servere prin `AuthServerSdk`,
 - autentificarea în domeniul Windows prin stratul LDAP implementat în ImtCore,
 - tokenurile de acces personal (PAT-uri) pentru acces neinteractiv,
+- politica de parole, starea contului și blocarea după încercări eșuate,
 - cazurile uzuale de operare, securitate și eroare.
 
 Descrierea se bazează pe Puma și pe implementarea de autentificare
@@ -141,6 +142,10 @@ singură dată; o atribuire nu scade nicio autorizare dintr-o altă atribuire.
 > **Important:** Operațiunile de administrare folosesc ID-ul intern al utilizatorului, nu
 > numele de autentificare. O aplicație își setează ID-ul produsului înainte de autentificare.
 
+Pagina de administrare citește și scrie rolurile și autorizările exclusiv în
+contextul ID-ului de produs curent. Dacă un utilizator are autorizări în mai
+multe produse, atribuirile celorlalte produse rămân neschimbate la salvare.
+
 ### 3.1 Elemente obligatorii și opționale
 
 | Element | Obligatoriu sau opțional? |
@@ -239,7 +244,9 @@ inițializare se stabilesc parola superutilizatorului și e-mailul său de conta
 compoziția clientului drept `SuperuserMail` al `RemoteSuperuserController` și
 este transmis la creare. Testele Puma folosesc pentru contul inițial numele de
 autentificare `su`; datele de acces pentru producție și un e-mail de contact
-accesibil trebuie alese în mod sigur și păstrate în siguranță.
+accesibil trebuie alese în mod sigur și păstrate în siguranță. Parola
+superutilizatorului este supusă deja politicii de parole din
+[secțiunea 9.4](#94-politica-de-parole).
 
 ### 4.4 Criptarea transportului
 
@@ -358,8 +365,12 @@ sequenceDiagram
 *Figura 11: Autentificarea, verificarea autorizărilor și deconectarea unei
 aplicații.*
 
-Erorile cauzate de date de acces nevalide, un cont blocat, lipsa conexiunii
-sau lipsa componentelor serverului sunt raportate ca autentificare eșuată.
+Erorile cauzate de date de acces nevalide, lipsa conexiunii sau lipsa
+componentelor serverului sunt raportate ca autentificare eșuată. Un cont
+dezactivat este respins cu un mesaj propriu abia după verificarea cu succes a
+datelor de acces, astfel încât starea contului să nu poată fi aflată prin
+încercări de autentificare (vezi
+[secțiunea 9.5](#95-activarea-și-dezactivarea-contului)).
 
 ### UC-04: Modificarea autorizărilor
 
@@ -373,12 +384,21 @@ operațiune de server care necesită protecție trebuie să valideze din nou aut
 
 ### UC-05: Dezactivarea sau eliminarea unui utilizator
 
-SDK-ul client existent oferă `RemoveUser()` pentru ștergerea permanentă.
-Înainte de ștergere trebuie verificate cerințele operaționale de
-păstrare și audit. Atribuirile de roluri și grupuri sunt eliminate împreună cu utilizatorul.
-Pentru o blocare temporară trebuie utilizată funcția de stare a contului oferită
-în interfața de administrare concretă; în caz contrar, retrageți accesul prin
-atribuirea rolurilor și gestionarea sesiunii.
+Pentru retragerea definitivă a accesului există două căi:
+
+1. **Dezactivarea contului (recomandat):** Superutilizatorul comută starea
+   contului în editorul de utilizatori pe dezactivat. Înregistrarea
+   utilizatorului, rolurile și apartenențele la grupuri se păstrează, dar
+   autentificarea nu mai este posibilă. Sesiunile active și PAT-urile contului
+   sunt respinse imediat. Detaliile sunt descrise în
+   [secțiunea 9.5](#95-activarea-și-dezactivarea-contului).
+2. **Eliminarea contului:** SDK-ul client oferă `RemoveUser()` pentru ștergerea
+   permanentă. Atribuirile de roluri și grupuri sunt eliminate împreună cu
+   utilizatorul. Înainte de ștergere trebuie verificate cerințele operaționale
+   de păstrare și audit.
+
+Dacă trebuie retrasă doar o singură funcție, este suficientă eliminarea
+atribuirii corespunzătoare de rol sau de grup.
 
 ### UC-06: Integrarea propriei aplicații
 
@@ -601,7 +621,8 @@ sesiune.
 2. Stabiliți utilizatorul-țintă și ID-ul produsului.
 3. Selectați numai scope-urile minim necesare.
 4. Dacă este posibil, setați o dată de expirare în format ISO-8601.
-5. Salvați imediat secretul într-un depozit de secrete.
+5. Salvați imediat secretul într-un depozit de secrete. Acesta începe cu
+   prefixul configurat în compoziția serverului, implicit `imt_pat_`.
 6. Nu copiați secretul în codul-sursă, jurnalele de compilare sau tichete.
 
 Apelanții anonimi nu pot crea PAT-uri. Un utilizator obișnuit își poate
@@ -630,6 +651,13 @@ sequenceDiagram
 ```
 
 *Figura 17: Validarea unui PAT pentru un acces automatizat.*
+
+`GetTokenPermissions()` acceptă între timp atât tokenuri de sesiune, cât și
+PAT-uri. Pentru un PAT, serverul returnează intersecția dintre autorizările
+utilizatorului și scope-urile tokenului și ține cont de legătura tokenului cu
+produsul. Autorizările pe care utilizatorul le deține printr-un rol, dar care
+nu fac parte din scope-ul tokenului, nu sunt returnate. Dacă un cont este
+dezactivat, sunt respinse și PAT-urile acestuia.
 
 ### 8.5 Revocarea unui PAT
 
@@ -666,7 +694,7 @@ flowchart TB
 
 ### 9.2 Verificări periodice
 
-- Eliminați sau blocați utilizatorii fără o necesitate operațională actuală.
+- Dezactivați sau eliminați utilizatorii fără o necesitate operațională actuală.
 - Verificați rolurile și grupurile conform principiului privilegiului minim.
 - Revocați PAT-urile vechi, neutilizate vreodată sau expirate.
 - Atribuiți drepturile de administrator nominal.
@@ -683,6 +711,99 @@ După o restaurare, migrările bazei de date, autentificarea, rolurile,
 grupurile, gestionarea sesiunilor și validarea PAT-urilor trebuie testate într-un mediu
 controlat.
 
+### 9.4 Politica de parole
+
+Puma verifică parolele la crearea unui utilizator, la modificarea unei parole
+și la inițializarea superutilizatorului, folosind politica de parole a
+administrării de utilizatori din ImtCore. Aceasta este deja conectată în
+compoziția Puma livrată și acționează fără configurare suplimentară, cu
+următoarele valori:
+
+| Regulă | Valoare implicită |
+|---|---|
+| Lungime minimă | 8 caractere |
+| Lungime maximă | 128 de caractere |
+| Obligativitatea literelor mici, a majusculelor, a cifrelor și a caracterelor speciale | nu este impusă |
+| Numele de autentificare folosit ca parolă | respins |
+| Lista de blocare a parolelor cunoscute | nesetată; opțional poate fi furnizată ca fișier |
+| Istoricul parolelor | ultimele 5 parole nu pot fi reutilizate |
+| Vechimea minimă a parolei | 0 zile, deci fără perioadă de așteptare până la următoarea schimbare |
+| Vechimea maximă a parolei | 0 zile, deci fără expirare |
+| Perioada de avertizare înainte de expirare | 14 zile |
+
+Indicații suplimentare:
+
+- O respingere indică regulile încălcate, de exemplu lungimea minimă, o clasă
+  de caractere lipsă, numele de autentificare folosit ca parolă, o intrare în
+  lista de blocare, reutilizarea sau vechimea minimă. Interfața de administrare
+  le afișează ca text clar.
+- Un spațiu nu este considerat caracter special.
+- Un administrator setează parola altui utilizator fără parola veche a acestuia
+  și nu este supus vechimii minime.
+- Politica nu se aplică utilizatorilor din domeniul Windows; parola lor este
+  gestionată și verificată în domeniu.
+- Verificarea expirării la autentificare și interogarea regulilor de către
+  client există pe server, dar nu sunt conectate la controlerul de
+  autentificare în compoziția Puma livrată. Ele acționează abia după ce
+  politica este conectată și acolo.
+
+### 9.5 Activarea și dezactivarea contului
+
+Pe lângă roluri, fiecare cont are și o stare a contului. Un cont dezactivat se
+păstrează cu toate atribuirile sale, dar nu se mai poate autentifica.
+
+```mermaid
+stateDiagram-v2
+    [*] --> Activ: Crearea contului
+    Activ --> Dezactivat: Superutilizatorul dezactivează contul
+    Dezactivat --> Activ: Superutilizatorul activează contul
+    Activ --> [*]: Eliminarea contului
+    Dezactivat --> [*]: Eliminarea contului
+```
+
+*Figura 19: Starea contului și tranzițiile declanșate de superutilizator.*
+
+Reguli:
+
+- Numai superutilizatorul vede și acționează comutatorul pentru starea contului
+  în editorul de utilizatori. Pentru ceilalți administratori acesta nu este
+  afișat, iar modificările lor asupra utilizatorului lasă starea neschimbată.
+- Numai superutilizatorul poate crea un cont deja dezactivat. O
+  autoînregistrare creează întotdeauna un cont activ.
+- La autentificare sunt verificate mai întâi datele de acces. Abia apoi un cont
+  dezactivat conduce la un mesaj propriu care arată că respectivul cont a fost
+  dezactivat. O parolă greșită returnează în continuare mesajul general, astfel
+  încât starea contului nu poate fi determinată prin încercări de
+  autentificare.
+- Sesiunile active și PAT-urile unui cont dezactivat sunt respinse imediat; nu
+  este necesară o deconectare.
+- Conturile din seturi de date mai vechi, fără stare salvată, sunt considerate
+  active.
+
+Dezactivarea este de preferat ștergerii atunci când atribuirile, dovezile sau
+responsabilitățile trebuie păstrate.
+
+### 9.6 Blocarea după încercări de autentificare eșuate
+
+ImtCore pune la dispoziție o blocare a contului care respinge temporar un cont
+după mai multe încercări eșuate consecutive. Valorile sale implicite sunt:
+
+| Setare | Valoare implicită | Semnificație |
+|---|---|---|
+| Număr maxim de încercări eșuate | 5 | Numărul de încercări eșuate consecutive până la blocare; 0 dezactivează blocarea |
+| Perioadă de observare | 300 de secunde | Fereastra de timp în care sunt numărate încercările eșuate |
+| Durata blocării | 900 de secunde | Durata respingerii; 0 înseamnă blocare până la deblocarea de către un administrator |
+
+Contoarele și blocările sunt păstrate în memorie și sunt resetate la
+repornirea serverului. Un administrator poate debloca un cont mai devreme.
+Calea de autentificare prin domeniul Windows nu este luată în calcul.
+
+> **Notă:** Componenta de blocare nu este conectată în compoziția Puma
+> livrată, deci nu are loc nicio blocare automată. Dacă este necesară, trebuie
+> adăugată în compoziția serverului. Până atunci, autentificările eșuate
+> trebuie monitorizate prin jurnale
+> (vezi [secțiunea 9.2](#92-verificări-periodice)).
+
 ## 10. Diagnosticarea erorilor
 
 ```mermaid
@@ -698,13 +819,15 @@ flowchart TD
     P -->|Da| LOG[Verificarea jurnalului serverului și aplicației]
 ```
 
-*Figura 19: Arbore de decizie pentru diagnosticarea erorilor.*
+*Figura 20: Arbore de decizie pentru diagnosticarea erorilor.*
 
 | Problemă | Cauză probabilă | Măsură |
 |---|---|---|
 | Conexiune refuzată | Gazdă/port greșit sau server nepornit | Verificați porturile HTTP și WS, precum și procesul |
 | Eroare TLS | Certificatul nu este de încredere sau numele este greșit | Verificați lanțul de certificate, numele gazdei și ora |
 | Autentificarea eșuează | Date de acces, starea contului sau LDAP | Verificați în mod țintit calea de autentificare |
+| Autentificarea semnalează un cont dezactivat | Contul a fost dezactivat | Solicitați superutilizatorului verificarea stării contului (secțiunea 9.5) |
+| Schimbarea parolei este respinsă | Încălcarea politicii de parole | Evaluați regulile raportate (secțiunea 9.4) |
 | `HasPermission()` rămâne `false` | ID de produs greșit sau rol lipsă | Verificați ID-ul produsului și rolurile efective |
 | Operațiunea asupra utilizatorului furnizează un ID gol | Numele de autentificare există deja sau lipsesc drepturile | Verificați unicitatea și drepturile de administrator |
 | Crearea PAT-ului furnizează un secret gol | Lipsa autentificării, proprietar greșit sau scope-uri goale | Verificați sesiunea, ID-ul utilizatorului și scope-urile |
@@ -729,6 +852,8 @@ flowchart TD
 - [ ] Rolurile sunt modelate după sarcini, nu după persoane
 - [ ] Au fost create grupuri pentru echipe recurente
 - [ ] Au fost configurate conturi de administrator personalizate
+- [ ] A fost stabilită procedura de dezactivare a conturilor care nu mai sunt necesare
+- [ ] Politica de parole a fost verificată și comunicată utilizatorilor
 - [ ] Au fost efectuate teste negative pentru acțiunile refuzate
 
 ### LDAP
