@@ -109,6 +109,19 @@ Puma includes an automated Git-based version management system. See [Build/Git/R
 - **Russian User Manual** - [Markdown](Docs/Benutzerhandbuch/Benutzerhandbuch_RU.md) · [PDF](Docs/Benutzerhandbuch/Benutzerhandbuch_RU.pdf) - Russian translation
 - **Swedish User Manual** - [Markdown](Docs/Benutzerhandbuch/Benutzerhandbuch_SV.md) · [PDF](Docs/Benutzerhandbuch/Benutzerhandbuch_SV.pdf) - Swedish translation
 - **Deutsche Kompaktpräsentation** - [Docs/Benutzerhandbuch/Puma_Kompakt_DE.pptx](Docs/Benutzerhandbuch/Puma_Kompakt_DE.pptx) - Visualisierte Zusammenfassung des Benutzerhandbuchs
+
+### Administration UI Documentation
+
+Pure user interface reference for the user, role and group administration screens (UI components provided by ImtCore).
+
+- **Deutsch** - [Markdown](Docs/Administrationsoberflaeche/Administrationsoberflaeche_DE.md) · [PDF](Docs/Administrationsoberflaeche/Administrationsoberflaeche_DE.pdf)
+- **Chinese** - [Markdown](Docs/Administrationsoberflaeche/Administrationsoberflaeche_ZH.md) · [PDF](Docs/Administrationsoberflaeche/Administrationsoberflaeche_ZH.pdf)
+- **English** - [Markdown](Docs/Administrationsoberflaeche/Administrationsoberflaeche_EN.md) · [PDF](Docs/Administrationsoberflaeche/Administrationsoberflaeche_EN.pdf)
+- **Romanian** - [Markdown](Docs/Administrationsoberflaeche/Administrationsoberflaeche_RO.md) · [PDF](Docs/Administrationsoberflaeche/Administrationsoberflaeche_RO.pdf)
+- **Russian** - [Markdown](Docs/Administrationsoberflaeche/Administrationsoberflaeche_RU.md) · [PDF](Docs/Administrationsoberflaeche/Administrationsoberflaeche_RU.pdf)
+- **Swedish** - [Markdown](Docs/Administrationsoberflaeche/Administrationsoberflaeche_SV.md) · [PDF](Docs/Administrationsoberflaeche/Administrationsoberflaeche_SV.pdf)
+
+### SDK Reference
 - **AuthServerSdk** - [Docs/AuthServerSdk.md](Docs/AuthServerSdk.md) - Complete guide for embedding authorization server functionality
 - **AuthClientSdk** - [Docs/AuthClientSdk.md](Docs/AuthClientSdk.md) - Complete guide for client authentication and user management
 
