@@ -40,6 +40,10 @@ Gränssnittet är inte en del av Puma självt utan hämtas som en färdig QML-ko
 
 Alla etiketter som citeras i detta dokument är gränssnittets **engelska originaltexter**, så som de visas utan installerat språkpaket. De går att översätta; finns en översättning för programmet visas texterna på respektive språk. Sidornas struktur påverkas inte.
 
+### 1.5 Om skärmbilderna
+
+Skärmbilderna i detta dokument är layouttrogna återgivningar av gränssnittet, härledda ur QML-definitionerna i modulen `Qml/imtauthgui`. De visar kontrollernas placering, etiketter och tillstånd; de användare, roller, grupper och token som visas är fritt valda exempeldata. Färger, typsnitt och ikoner följer respektive applikations utseende och kan därför avvika från bilderna.
+
 ---
 
 ## 2. Administrationssidans uppbyggnad
@@ -87,6 +91,10 @@ Varje flik följer samma mönster:
 
 Inuti fliken bär listvyn ännu en gång samlingens namn (**”Roles”**, **”Users”**, **”Groups”**).
 
+![Administrationssidan, fliken ”Users” – flikrad, kommandorad, sökfält och användarlista.](Bilder/01-administration-users.png)
+
+*Bild 1: Administrationssidan, fliken ”Users” – flikrad, kommandorad, sökfält och användarlista.*
+
 ---
 
 ## 3. Gemensamma kontroller
@@ -109,6 +117,10 @@ Ett kommando som saknar nödvändig behörighet är inte tillgängligt. Behörig
 
 Före radering visas en bekräftelsedialog. För roller lyder den **”Deleting a role”** / **”Delete the selected role ?”**, för användare och grupper används den generella texten **”Deleting a selected element”** / **”Remove selected item from the collection ?”**. Raderas hela det filtrerade beståndet lyder frågan **”Deleting elements”** / **”Delete all items with the current filter ?”**.
 
+![Bekräftelse innan ett markerat objekt raderas.](Bilder/02-delete-confirmation.png)
+
+*Bild 2: Bekräftelse innan ett markerat objekt raderas.*
+
 ### 3.3 Sök, sortera, filtrera
 
 - Varje lista har ett sökfält ovanför tabellen.
@@ -118,6 +130,10 @@ Före radering visas en bekräftelsedialog. För roller lyder den **”Deleting 
 ### 3.4 Uppdateringsnotis
 
 Listorna försörjs av servern. Ändrar en annan arbetsplats samma data visar listan notisen **”This table has been modified from another computer”** med knappen **”Update”**. Först efter att **Update** använts visar tabellen aktuellt läge.
+
+![Uppdateringsnotis ovanför en lista med knappen ”Update”.](Bilder/03-table-update-notice.png)
+
+*Bild 3: Uppdateringsnotis ovanför en lista med knappen ”Update”.*
 
 ### 3.5 Editor
 
@@ -187,9 +203,17 @@ Skiljer sig de båda lösenordsfälten åt eller lämnas det nya lösenordet tom
 
 **Avsnittet ”System Information”:** En enkolumnstabell med kolumnrubriken **”System Name”** där exakt en post kan väljas. Avsnittet döljs om kontot är bundet till högst ett inloggningssystem.
 
+![Användareditorn, undersidan ”General” med stamdata, växlingsknappen ”Account enabled” som endast superanvändaren ser och knappen ”Change”.](Bilder/04-user-editor-general.png)
+
+*Bild 4: Användareditorn, undersidan ”General” med stamdata, växlingsknappen ”Account enabled” som endast superanvändaren ser och knappen ”Change”.*
+
 ### 4.5 Undersidan ”Assigned Roles”
 
 Rubrik **”Assigned Roles”**, därunder urvalskontrollen med beteckningen **”Roles”** och knappen **”Add Role”**. Antalet tilldelade roller visas också. Urvalslistan är sökbar och sorterad efter rollnamn och innehåller endast roller för den aktuella produkten.
+
+![Användareditorn, undersidan ”Assigned Roles” med listan över tilldelade roller och knappen ”Add Role”.](Bilder/05-user-editor-assigned-roles.png)
+
+*Bild 5: Användareditorn, undersidan ”Assigned Roles” med listan över tilldelade roller och knappen ”Add Role”.*
 
 ### 4.6 Undersidan ”Group Membership”
 
@@ -225,6 +249,10 @@ Fälten visas i denna ordning:
 
 Fälten för det nya lösenordet förblir skrivskyddade så länge det tidigare lösenordet inte angetts. Under fälten visar gränssnittet fortlöpande de gällande lösenordskraven.
 
+![Dialogen ”Change Password” med de tre lösenordsfälten och gällande lösenordskrav.](Bilder/06-change-password-dialog.png)
+
+*Bild 6: Dialogen ”Change Password” med de tre lösenordsfälten och gällande lösenordskrav.*
+
 ---
 
 ## 5. Fliken ”Roles” (roller)
@@ -236,6 +264,10 @@ Fälten för det nya lösenordet förblir skrivskyddade så länge det tidigare 
 | `roleName` | **Role Name** | ja | Rollens beskrivande namn. |
 | `roleId` | **Role-ID** | ja | Rollens tekniska identifierare. |
 | `roleDescription` | **Description** | ja | Fritextbeskrivning. |
+
+![Administrationssidan, fliken ”Roles” – utan markering är Edit, Remove, Export och Revision inaktiverade.](Bilder/07-administration-roles.png)
+
+*Bild 7: Administrationssidan, fliken ”Roles” – utan markering är Edit, Remove, Export och Revision inaktiverade.*
 
 ### 5.2 Kommandon
 
@@ -291,6 +323,10 @@ graph TD
 
 *Figur 3: Behörighetsurvalets uppbyggnad i rolleditorn – grupper ger överblick, de enskilda behörigheterna sparas.*
 
+![Rolleditorn, undersidan ”Permissions” med tvånivåträd, treläges-kryssrutor och kontrollrad.](Bilder/08-role-editor-permissions.png)
+
+*Bild 8: Rolleditorn, undersidan ”Permissions” med tvånivåträd, treläges-kryssrutor och kontrollrad.*
+
 ---
 
 ## 6. Fliken ”Groups” (grupper)
@@ -301,6 +337,10 @@ graph TD
 | --- | --- | --- | --- |
 | `name` | **Group Name** | ja | Gruppens namn. |
 | `description` | **Description** | ja | Fritextbeskrivning. |
+
+![Administrationssidan, fliken ”Groups” med grupplistan.](Bilder/09-administration-groups.png)
+
+*Bild 9: Administrationssidan, fliken ”Groups” med grupplistan.*
 
 ### 6.2 Kommandon
 
@@ -404,6 +444,14 @@ graph TD
 
 *Figur 4: Skapande av ett personligt åtkomsttoken på profilsidan – tokenvärdet visas endast en gång.*
 
+![Profilsidan, undersidan ”Access Tokens” med tokentabellen och åtgärderna per rad.](Bilder/10-profile-access-tokens.png)
+
+*Bild 10: Profilsidan, undersidan ”Access Tokens” med tokentabellen och åtgärderna per rad.*
+
+![Dialogen ”New Personal Access Token” – ”Generate Token” förblir inaktiv tills namn och minst en behörighet är angivna.](Bilder/11-new-access-token-dialog.png)
+
+*Bild 11: Dialogen ”New Personal Access Token” – ”Generate Token” förblir inaktiv tills namn och minst en behörighet är angivna.*
+
 ---
 
 ## 8. Inloggning och första start
@@ -420,6 +468,10 @@ Inloggningsbilden är uppbyggd som ett kort och innehåller uppifrån och ned:
 6. Länken **”Sign up”** – synlig endast om självregistrering är aktiverad. Den öppnar dialogen **”Sign up”** med knapparna **”Sign up”** och **”Close”**, innehållande samma stamdatafält som användareditorn.
 
 **Misslyckad inloggning:** Lösenordsfältet töms, inloggningsnamnet står kvar och serverns meddelande visas, annars **”Username or password is incorrect”**. Är kontot inaktiverat lyder meddelandet **”This account has been deactivated. Please contact your administrator.”**
+
+![Inloggningsbilden med ”Username”, ”Password”, ”Remember me” och ”Sign in”.](Bilder/12-sign-in.png)
+
+*Bild 12: Inloggningsbilden med ”Username”, ”Password”, ”Remember me” och ”Sign in”.*
 
 ### 8.2 Lösenordsåterställning
 
@@ -458,6 +510,10 @@ graph TD
 ```
 
 *Figur 5: Vägen från första start via inloggning till administrationssidan.*
+
+![Första start: sidan ”Create the administrator account” med det skrivskyddade användarnamnet `su`.](Bilder/13-superuser-setup.png)
+
+*Bild 13: Första start: sidan ”Create the administrator account” med det skrivskyddade användarnamnet `su`.*
 
 ---
 

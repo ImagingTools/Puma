@@ -40,6 +40,10 @@ The user interface is not part of Puma itself. It is a ready-made QML component 
 
 All labels quoted in this document are the **original English texts** of the user interface as they appear without an installed language pack. They are translatable; if a translation is provided for the application, the texts appear in the respective language. The structure of the pages is unaffected.
 
+### 1.5 Note on the screenshots
+
+The screenshots in this document are true-to-layout reproductions of the user interface, derived from the QML definitions of the `Qml/imtauthgui` module. They show the arrangement, the labels and the states of the controls; the users, roles, groups and tokens shown are freely chosen sample data. Colours, fonts and icons follow the appearance of the respective application and may therefore differ from the screenshots.
+
 ---
 
 ## 2. Structure of the administration page
@@ -87,6 +91,10 @@ Every tab follows the same pattern:
 
 Inside the tab the list view carries the name of the collection once more (**“Roles”**, **“Users”**, **“Groups”**).
 
+![Administration page, “Users” tab – tab bar, command bar, search field and user list.](Bilder/01-administration-users.png)
+
+*Screenshot 1: Administration page, “Users” tab – tab bar, command bar, search field and user list.*
+
 ---
 
 ## 3. Common controls
@@ -109,6 +117,10 @@ A command for which the required permission is missing is not available. The per
 
 A confirmation dialog appears before deleting. For roles it reads **“Deleting a role”** / **“Delete the selected role ?”**; for users and groups the generic text **“Deleting a selected element”** / **“Remove selected item from the collection ?”** is used. When the whole filtered set is deleted, the question is **“Deleting elements”** / **“Delete all items with the current filter ?”**.
 
+![Confirmation shown before a selected element is deleted.](Bilder/02-delete-confirmation.png)
+
+*Screenshot 2: Confirmation shown before a selected element is deleted.*
+
 ### 3.3 Search, sort, filter
 
 - Every list has a search field above the table.
@@ -118,6 +130,10 @@ A confirmation dialog appears before deleting. For roles it reads **“Deleting 
 ### 3.4 Refresh notice
 
 The lists are served by the server. If another workstation changes the same data, the list shows the notice **“This table has been modified from another computer”** together with an **“Update”** button. The table only shows the current state after **Update** has been pressed.
+
+![Refresh notice above a list, with the “Update” button.](Bilder/03-table-update-notice.png)
+
+*Screenshot 3: Refresh notice above a list, with the “Update” button.*
 
 ### 3.5 Editor
 
@@ -187,9 +203,17 @@ If the two password fields differ or the new password is left empty, the hint **
 
 **Section “System Information”:** A single-column table with the column header **“System Name”** in which exactly one entry can be selected. The section is hidden if the account is bound to at most one authentication system.
 
+![User editor, sub-page “General” with the master data, the superuser-only “Account enabled” switch and the “Change” button.](Bilder/04-user-editor-general.png)
+
+*Screenshot 4: User editor, sub-page “General” with the master data, the superuser-only “Account enabled” switch and the “Change” button.*
+
 ### 4.5 Sub-page “Assigned Roles”
 
 Heading **“Assigned Roles”**, below it the selection control labelled **“Roles”** with the button **“Add Role”**. The number of assigned roles is shown as well. The pick list is searchable and sorted by role name and only contains roles of the current product.
+
+![User editor, sub-page “Assigned Roles” with the list of assigned roles and the “Add Role” button.](Bilder/05-user-editor-assigned-roles.png)
+
+*Screenshot 5: User editor, sub-page “Assigned Roles” with the list of assigned roles and the “Add Role” button.*
 
 ### 4.6 Sub-page “Group Membership”
 
@@ -225,6 +249,10 @@ The fields appear in this order:
 
 The fields for the new password stay read-only as long as the previous password has not been entered. Below the fields the user interface continuously shows the applicable password requirements.
 
+![“Change Password” dialog with the three password fields and the applicable password requirements.](Bilder/06-change-password-dialog.png)
+
+*Screenshot 6: “Change Password” dialog with the three password fields and the applicable password requirements.*
+
 ---
 
 ## 5. “Roles” tab
@@ -236,6 +264,10 @@ The fields for the new password stay read-only as long as the previous password 
 | `roleName` | **Role Name** | yes | Descriptive name of the role. |
 | `roleId` | **Role-ID** | yes | Technical identifier of the role. |
 | `roleDescription` | **Description** | yes | Free-text description. |
+
+![Administration page, “Roles” tab – without a selection, Edit, Remove, Export and Revision are disabled.](Bilder/07-administration-roles.png)
+
+*Screenshot 7: Administration page, “Roles” tab – without a selection, Edit, Remove, Export and Revision are disabled.*
 
 ### 5.2 Commands
 
@@ -291,6 +323,10 @@ graph TD
 
 *Figure 3: Structure of the permission selection in the role editor – groups provide the overview, the individual permissions are saved.*
 
+![Role editor, sub-page “Permissions” with the two-level tree, tri-state check boxes and the control bar.](Bilder/08-role-editor-permissions.png)
+
+*Screenshot 8: Role editor, sub-page “Permissions” with the two-level tree, tri-state check boxes and the control bar.*
+
 ---
 
 ## 6. “Groups” tab
@@ -301,6 +337,10 @@ graph TD
 | --- | --- | --- | --- |
 | `name` | **Group Name** | yes | Name of the group. |
 | `description` | **Description** | yes | Free-text description. |
+
+![Administration page, “Groups” tab with the group list.](Bilder/09-administration-groups.png)
+
+*Screenshot 9: Administration page, “Groups” tab with the group list.*
 
 ### 6.2 Commands
 
@@ -404,6 +444,14 @@ graph TD
 
 *Figure 4: Creating a personal access token on the profile page – the token value is shown only once.*
 
+![Profile page, sub-page “Access Tokens” with the token table and the per-row actions.](Bilder/10-profile-access-tokens.png)
+
+*Screenshot 10: Profile page, sub-page “Access Tokens” with the token table and the per-row actions.*
+
+![“New Personal Access Token” dialog – “Generate Token” stays disabled until a name and at least one permission are set.](Bilder/11-new-access-token-dialog.png)
+
+*Screenshot 11: “New Personal Access Token” dialog – “Generate Token” stays disabled until a name and at least one permission are set.*
+
 ---
 
 ## 8. Sign-in and first start
@@ -420,6 +468,10 @@ The sign-in screen is laid out as a card and contains, from top to bottom:
 6. Link **“Sign up”** – only visible if self-registration is enabled. It opens the dialog **“Sign up”** with the buttons **“Sign up”** and **“Close”**, containing the same master data fields as the user editor.
 
 **Failed sign-in:** The password field is cleared, the login name is kept, and the server message is shown, with the fallback **“Username or password is incorrect”**. If the account is disabled, the message reads **“This account has been deactivated. Please contact your administrator.”**
+
+![Sign-in screen with “Username”, “Password”, “Remember me” and “Sign in”.](Bilder/12-sign-in.png)
+
+*Screenshot 12: Sign-in screen with “Username”, “Password”, “Remember me” and “Sign in”.*
 
 ### 8.2 Password recovery
 
@@ -458,6 +510,10 @@ graph TD
 ```
 
 *Figure 5: Path from the first start through sign-in to the administration page.*
+
+![First start: the “Create the administrator account” page with the read-only user name `su`.](Bilder/13-superuser-setup.png)
+
+*Screenshot 13: First start: the “Create the administrator account” page with the read-only user name `su`.*
 
 ---
 

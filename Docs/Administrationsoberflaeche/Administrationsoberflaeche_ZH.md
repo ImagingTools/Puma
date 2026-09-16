@@ -40,6 +40,10 @@
 
 本文档中引用的所有标签均为界面的**英文原文**，即未安装语言包时显示的文本。这些文本可翻译；若应用程序提供了译文，则以相应语言显示。页面结构不受影响。
 
+### 1.5 关于截图的说明
+
+本文档中的截图是依据模块 `Qml/imtauthgui` 的 QML 定义还原的界面布局图，用于展示各操作元素的排列、标签和状态；其中的用户、角色、组和令牌均为示例数据。颜色、字体和图标取决于各应用程序的外观，因此可能与截图有所差异。
+
 ---
 
 ## 2. 管理页面的结构
@@ -87,6 +91,10 @@ graph TD
 
 在选项卡内部，列表视图会再次显示该集合的名称（**“Roles”**、**“Users”**、**“Groups”**）。
 
+![管理页面“Users”选项卡——选项卡栏、命令栏、搜索框和用户列表。](Bilder/01-administration-users.png)
+
+*截图 1: 管理页面“Users”选项卡——选项卡栏、命令栏、搜索框和用户列表。*
+
 ---
 
 ## 3. 通用操作元素
@@ -109,6 +117,10 @@ graph TD
 
 删除前会出现确认对话框。对于角色，其文本为 **“Deleting a role”** / **“Delete the selected role ?”**；对于用户和组，使用通用文本 **“Deleting a selected element”** / **“Remove selected item from the collection ?”**。若删除整个筛选结果，提示为 **“Deleting elements”** / **“Delete all items with the current filter ?”**。
 
+![删除选中条目前的确认对话框。](Bilder/02-delete-confirmation.png)
+
+*截图 2: 删除选中条目前的确认对话框。*
+
 ### 3.3 搜索、排序、筛选
 
 - 每个列表在表格上方均有搜索框。
@@ -118,6 +130,10 @@ graph TD
 ### 3.4 更新提示
 
 列表数据由服务器提供。若其他工作站修改了相同的数据，列表会显示提示 **“This table has been modified from another computer”** 及按钮 **“Update”**。只有点击 **Update** 之后，表格才显示最新状态。
+
+![列表上方的更新提示及“Update”按钮。](Bilder/03-table-update-notice.png)
+
+*截图 3: 列表上方的更新提示及“Update”按钮。*
 
 ### 3.5 编辑器
 
@@ -187,9 +203,17 @@ graph TD
 
 **“System Information”区：** 一个单列表格，列标题为 **“System Name”**，其中恰好可选择一项。若账户至多关联一个认证系统，则隐藏该区。
 
+![用户编辑器子页“General”，包含基本数据、仅超级用户可见的“Account enabled”开关以及“Change”按钮。](Bilder/04-user-editor-general.png)
+
+*截图 4: 用户编辑器子页“General”，包含基本数据、仅超级用户可见的“Account enabled”开关以及“Change”按钮。*
+
 ### 4.5 子页“Assigned Roles”
 
 标题 **“Assigned Roles”**，其下为名称为 **“Roles”** 的选择控件和按钮 **“Add Role”**，同时显示已分配角色的数量。选择列表可按角色名称搜索并已排序，且仅包含当前产品的角色。
+
+![用户编辑器子页“Assigned Roles”，包含已分配角色列表和“Add Role”按钮。](Bilder/05-user-editor-assigned-roles.png)
+
+*截图 5: 用户编辑器子页“Assigned Roles”，包含已分配角色列表和“Add Role”按钮。*
 
 ### 4.6 子页“Group Membership”
 
@@ -225,6 +249,10 @@ graph TD
 
 在未输入原密码之前，新密码字段保持只读。字段下方持续显示当前生效的密码要求。
 
+![“Change Password”对话框，包含三个密码字段和当前生效的密码要求。](Bilder/06-change-password-dialog.png)
+
+*截图 6: “Change Password”对话框，包含三个密码字段和当前生效的密码要求。*
+
 ---
 
 ## 5. “Roles”（角色）选项卡
@@ -236,6 +264,10 @@ graph TD
 | `roleName` | **Role Name** | 是 | 角色的可读名称。 |
 | `roleId` | **Role-ID** | 是 | 角色的技术标识。 |
 | `roleDescription` | **Description** | 是 | 自由文本说明。 |
+
+![管理页面“Roles”选项卡——未选中任何行时，Edit、Remove、Export 和 Revision 不可用。](Bilder/07-administration-roles.png)
+
+*截图 7: 管理页面“Roles”选项卡——未选中任何行时，Edit、Remove、Export 和 Revision 不可用。*
 
 ### 5.2 命令
 
@@ -291,6 +323,10 @@ graph TD
 
 *图 3：角色编辑器中权限选择的结构——组用于概览，保存的是单项权限。*
 
+![角色编辑器子页“Permissions”，包含两级树、三态复选框和操作栏。](Bilder/08-role-editor-permissions.png)
+
+*截图 8: 角色编辑器子页“Permissions”，包含两级树、三态复选框和操作栏。*
+
 ---
 
 ## 6. “Groups”（组）选项卡
@@ -301,6 +337,10 @@ graph TD
 | --- | --- | --- | --- |
 | `name` | **Group Name** | 是 | 组的名称。 |
 | `description` | **Description** | 是 | 自由文本说明。 |
+
+![管理页面“Groups”选项卡及组列表。](Bilder/09-administration-groups.png)
+
+*截图 9: 管理页面“Groups”选项卡及组列表。*
 
 ### 6.2 命令
 
@@ -404,6 +444,14 @@ graph TD
 
 *图 4：在个人资料页创建个人访问令牌——令牌值仅显示一次。*
 
+![个人资料页子页“Access Tokens”，包含令牌表格和每行的操作。](Bilder/10-profile-access-tokens.png)
+
+*截图 10: 个人资料页子页“Access Tokens”，包含令牌表格和每行的操作。*
+
+![“New Personal Access Token”对话框——在填写名称并至少勾选一项权限之前，“Generate Token”保持不可用。](Bilder/11-new-access-token-dialog.png)
+
+*截图 11: “New Personal Access Token”对话框——在填写名称并至少勾选一项权限之前，“Generate Token”保持不可用。*
+
 ---
 
 ## 8. 登录与首次启动
@@ -420,6 +468,10 @@ graph TD
 6. 链接 **“Sign up”**——仅在启用自助注册时可见。它打开标题为 **“Sign up”** 的对话框，含按钮 **“Sign up”** 和 **“Close”**，其中包含与用户编辑器相同的主数据字段。
 
 **登录失败：** 密码字段被清空，登录名保留，并显示服务器消息，否则显示 **“Username or password is incorrect”**。若账户被停用，消息为 **“This account has been deactivated. Please contact your administrator.”**
+
+![登录界面，包含“Username”“Password”“Remember me”和“Sign in”。](Bilder/12-sign-in.png)
+
+*截图 12: 登录界面，包含“Username”“Password”“Remember me”和“Sign in”。*
 
 ### 8.2 密码找回
 
@@ -458,6 +510,10 @@ graph TD
 ```
 
 *图 5：从首次启动经登录到管理页面的路径。*
+
+![首次启动：“Create the administrator account”页面，用户名 `su` 为只读。](Bilder/13-superuser-setup.png)
+
+*截图 13: 首次启动：“Create the administrator account”页面，用户名 `su` 为只读。*
 
 ---
 

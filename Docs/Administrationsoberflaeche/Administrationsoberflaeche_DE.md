@@ -40,6 +40,10 @@ Die Oberfläche ist kein Bestandteil von Puma selbst, sondern wird als fertige Q
 
 Alle in diesem Dokument zitierten Beschriftungen sind die **englischen Originaltexte** der Oberfläche, so wie sie ohne installiertes Sprachpaket erscheinen. Sie sind übersetzbar; ist für die Anwendung eine Übersetzung hinterlegt, erscheinen die Texte in der jeweiligen Landessprache. Die Struktur der Seiten bleibt davon unberührt.
 
+### 1.5 Hinweis zu den Abbildungen
+
+Die Bildschirmabbildungen dieses Dokuments sind maßstabsgetreue Nachbildungen der Oberfläche, die aus den QML-Definitionen des Moduls `Qml/imtauthgui` abgeleitet wurden. Sie zeigen Anordnung, Beschriftung und Zustand der Bedienelemente; die dargestellten Benutzer, Rollen, Gruppen und Token sind frei gewählte Beispieldaten. Farben, Schriften und Symbole folgen dem Erscheinungsbild der jeweiligen Anwendung und können daher von den Abbildungen abweichen.
+
 ---
 
 ## 2. Aufbau der Administrationsseite
@@ -87,6 +91,10 @@ Jede Registerkarte folgt demselben Muster:
 
 Die Listenansicht selbst trägt innerhalb der Registerkarte noch einmal den Titel der Sammlung (**„Roles“**, **„Users“**, **„Groups“**).
 
+![Administrationsseite, Registerkarte „Users“ – Registerkartenleiste, Befehlsleiste, Suchfeld und Benutzerliste.](Bilder/01-administration-users.png)
+
+*Bild 1: Administrationsseite, Registerkarte „Users“ – Registerkartenleiste, Befehlsleiste, Suchfeld und Benutzerliste.*
+
 ---
 
 ## 3. Gemeinsame Bedienelemente
@@ -109,6 +117,10 @@ Ein Befehl, für den die nötige Berechtigung fehlt, steht nicht zur Verfügung.
 
 Vor dem Löschen erscheint ein Bestätigungsdialog. Für Rollen lautet er **„Deleting a role“** / **„Delete the selected role ?“**, für Benutzer und Gruppen wird der allgemeine Text **„Deleting a selected element“** / **„Remove selected item from the collection ?“** verwendet. Wird der gesamte Filterbestand gelöscht, lautet die Rückfrage **„Deleting elements“** / **„Delete all items with the current filter ?“**.
 
+![Rückfrage vor dem Löschen eines ausgewählten Eintrags.](Bilder/02-delete-confirmation.png)
+
+*Bild 2: Rückfrage vor dem Löschen eines ausgewählten Eintrags.*
+
 ### 3.3 Suchen, Sortieren, Filtern
 
 - Jede Liste besitzt ein Suchfeld über der Tabelle.
@@ -118,6 +130,10 @@ Vor dem Löschen erscheint ein Bestätigungsdialog. Für Rollen lautet er **„D
 ### 3.4 Aktualisierungshinweis
 
 Die Listen werden vom Server versorgt. Ändert ein anderer Arbeitsplatz denselben Datenbestand, blendet die Liste den Hinweis **„This table has been modified from another computer“** mit der Schaltfläche **„Update“** ein. Erst nach Betätigen von **Update** zeigt die Tabelle den aktuellen Stand.
+
+![Aktualisierungshinweis über einer Liste mit der Schaltfläche „Update“.](Bilder/03-table-update-notice.png)
+
+*Bild 3: Aktualisierungshinweis über einer Liste mit der Schaltfläche „Update“.*
 
 ### 3.5 Editor
 
@@ -187,9 +203,17 @@ Stimmen die beiden Passwortfelder nicht überein oder bleibt das neue Passwort l
 
 **Abschnitt „System Information“:** Eine einspaltige Tabelle mit der Spaltenüberschrift **„System Name“**, in der sich genau ein Eintrag auswählen lässt. Der Abschnitt wird ausgeblendet, wenn dem Konto höchstens ein Anmeldesystem zugeordnet ist.
 
+![Benutzereditor, Unterseite „General“ mit den Stammdaten, dem nur für den Superuser sichtbaren Schalter „Account enabled“ und der Schaltfläche „Change“.](Bilder/04-user-editor-general.png)
+
+*Bild 4: Benutzereditor, Unterseite „General“ mit den Stammdaten, dem nur für den Superuser sichtbaren Schalter „Account enabled“ und der Schaltfläche „Change“.*
+
 ### 4.5 Unterseite „Assigned Roles“
 
 Überschrift **„Assigned Roles“**, darunter das Auswahlfeld mit der Bezeichnung **„Roles“** und der Schaltfläche **„Add Role“**. Die Anzahl der zugewiesenen Rollen wird mit angezeigt. Die Auswahlliste ist nach Rollennamen durchsuchbar und sortiert und zeigt ausschließlich Rollen des aktuellen Produkts.
+
+![Benutzereditor, Unterseite „Assigned Roles“ mit der Liste der zugeordneten Rollen und der Schaltfläche „Add Role“.](Bilder/05-user-editor-assigned-roles.png)
+
+*Bild 5: Benutzereditor, Unterseite „Assigned Roles“ mit der Liste der zugeordneten Rollen und der Schaltfläche „Add Role“.*
 
 ### 4.6 Unterseite „Group Membership“
 
@@ -225,6 +249,10 @@ Die Felder erscheinen in dieser Reihenfolge:
 
 Die Felder für das neue Passwort bleiben schreibgeschützt, solange das bisherige Passwort nicht eingegeben wurde. Unterhalb der Felder zeigt die Oberfläche fortlaufend die geltenden Passwortanforderungen an.
 
+![Dialog „Change Password“ mit den drei Passwortfeldern und den geltenden Passwortanforderungen.](Bilder/06-change-password-dialog.png)
+
+*Bild 6: Dialog „Change Password“ mit den drei Passwortfeldern und den geltenden Passwortanforderungen.*
+
 ---
 
 ## 5. Registerkarte „Roles“ (Rollen)
@@ -236,6 +264,10 @@ Die Felder für das neue Passwort bleiben schreibgeschützt, solange das bisheri
 | `roleName` | **Role Name** | ja | Sprechender Name der Rolle. |
 | `roleId` | **Role-ID** | ja | Technische Kennung der Rolle. |
 | `roleDescription` | **Description** | ja | Freitextbeschreibung. |
+
+![Administrationsseite, Registerkarte „Roles“ – ohne Auswahl sind Edit, Remove, Export und Revision deaktiviert.](Bilder/07-administration-roles.png)
+
+*Bild 7: Administrationsseite, Registerkarte „Roles“ – ohne Auswahl sind Edit, Remove, Export und Revision deaktiviert.*
 
 ### 5.2 Befehle
 
@@ -291,6 +323,10 @@ graph TD
 
 *Abbildung 3: Aufbau der Berechtigungsauswahl im Rolleneditor – Gruppen dienen der Übersicht, gespeichert werden die einzelnen Berechtigungen.*
 
+![Rolleneditor, Unterseite „Permissions“ mit zweistufigem Baum, dreiwertigen Kontrollkästchen und Bedienleiste.](Bilder/08-role-editor-permissions.png)
+
+*Bild 8: Rolleneditor, Unterseite „Permissions“ mit zweistufigem Baum, dreiwertigen Kontrollkästchen und Bedienleiste.*
+
 ---
 
 ## 6. Registerkarte „Groups“ (Gruppen)
@@ -301,6 +337,10 @@ graph TD
 | --- | --- | --- | --- |
 | `name` | **Group Name** | ja | Name der Gruppe. |
 | `description` | **Description** | ja | Freitextbeschreibung. |
+
+![Administrationsseite, Registerkarte „Groups“ mit der Gruppenliste.](Bilder/09-administration-groups.png)
+
+*Bild 9: Administrationsseite, Registerkarte „Groups“ mit der Gruppenliste.*
 
 ### 6.2 Befehle
 
@@ -404,6 +444,14 @@ graph TD
 
 *Abbildung 4: Anlegen eines persönlichen Zugriffstokens auf der Profilseite – der Tokenwert wird nur einmalig angezeigt.*
 
+![Profilseite, Unterseite „Access Tokens“ mit der Tokentabelle und den Aktionen je Zeile.](Bilder/10-profile-access-tokens.png)
+
+*Bild 10: Profilseite, Unterseite „Access Tokens“ mit der Tokentabelle und den Aktionen je Zeile.*
+
+![Dialog „New Personal Access Token“ – „Generate Token“ bleibt deaktiviert, bis Name und mindestens eine Berechtigung gesetzt sind.](Bilder/11-new-access-token-dialog.png)
+
+*Bild 11: Dialog „New Personal Access Token“ – „Generate Token“ bleibt deaktiviert, bis Name und mindestens eine Berechtigung gesetzt sind.*
+
 ---
 
 ## 8. Anmeldung und Erstinbetriebnahme
@@ -420,6 +468,10 @@ Die Anmeldemaske ist als Karte aufgebaut und enthält von oben nach unten:
 6. Verweis **„Sign up“** – nur sichtbar, wenn die Selbstregistrierung freigeschaltet ist. Er öffnet den Dialog **„Sign up“** mit den Schaltflächen **„Sign up“** und **„Close“**, der dieselben Stammdatenfelder wie der Benutzereditor enthält.
 
 **Fehlgeschlagene Anmeldung:** Das Passwortfeld wird geleert, der Anmeldename bleibt stehen, und es erscheint die Meldung des Servers, ersatzweise **„Username or password is incorrect“**. Ist das Konto deaktiviert, lautet die Meldung **„This account has been deactivated. Please contact your administrator.“**
+
+![Anmeldemaske mit „Username“, „Password“, „Remember me“ und „Sign in“.](Bilder/12-sign-in.png)
+
+*Bild 12: Anmeldemaske mit „Username“, „Password“, „Remember me“ und „Sign in“.*
 
 ### 8.2 Kennwortwiederherstellung
 
@@ -458,6 +510,10 @@ graph TD
 ```
 
 *Abbildung 5: Weg von der Erstinbetriebnahme über die Anmeldung bis zur Administrationsseite.*
+
+![Erstinbetriebnahme: Seite „Create the administrator account“ mit dem schreibgeschützten Anmeldenamen `su`.](Bilder/13-superuser-setup.png)
+
+*Bild 13: Erstinbetriebnahme: Seite „Create the administrator account“ mit dem schreibgeschützten Anmeldenamen `su`.*
 
 ---
 

@@ -40,6 +40,10 @@ Interfața nu face parte din Puma însuși, ci este preluată ca o componentă Q
 
 Toate etichetele citate în acest document sunt **textele originale în limba engleză** ale interfeței, așa cum apar fără un pachet de limbă instalat. Ele pot fi traduse; dacă pentru aplicație există o traducere, textele apar în limba respectivă. Structura paginilor nu este afectată.
 
+### 1.5 Observație privind capturile de ecran
+
+Capturile de ecran din acest document sunt reproduceri fidele ale interfeței, derivate din definițiile QML ale modulului `Qml/imtauthgui`. Ele arată dispunerea, etichetele și starea elementelor de comandă; utilizatorii, rolurile, grupurile și jetoanele afișate sunt date exemplificative alese liber. Culorile, fonturile și pictogramele urmează aspectul aplicației respective și pot diferi de imagini.
+
 ---
 
 ## 2. Structura paginii de administrare
@@ -87,6 +91,10 @@ Fiecare filă urmează același model:
 
 În interiorul filei, vizualizarea listei poartă încă o dată numele colecției (**„Roles”**, **„Users”**, **„Groups”**).
 
+![Pagina de administrare, fila „Users” – bara de file, bara de comenzi, câmpul de căutare și lista utilizatorilor.](Bilder/01-administration-users.png)
+
+*Imaginea 1: Pagina de administrare, fila „Users” – bara de file, bara de comenzi, câmpul de căutare și lista utilizatorilor.*
+
 ---
 
 ## 3. Elemente de comandă comune
@@ -109,6 +117,10 @@ O comandă pentru care lipsește permisiunea necesară nu este disponibilă. Per
 
 Înainte de ștergere apare un dialog de confirmare. Pentru roluri acesta este **„Deleting a role”** / **„Delete the selected role ?”**, pentru utilizatori și grupuri se folosește textul general **„Deleting a selected element”** / **„Remove selected item from the collection ?”**. Dacă se șterge întregul set filtrat, întrebarea este **„Deleting elements”** / **„Delete all items with the current filter ?”**.
 
+![Confirmarea afișată înainte de ștergerea unui element selectat.](Bilder/02-delete-confirmation.png)
+
+*Imaginea 2: Confirmarea afișată înainte de ștergerea unui element selectat.*
+
 ### 3.3 Căutare, sortare, filtrare
 
 - Fiecare listă are un câmp de căutare deasupra tabelului.
@@ -118,6 +130,10 @@ O comandă pentru care lipsește permisiunea necesară nu este disponibilă. Per
 ### 3.4 Indicația de actualizare
 
 Listele sunt alimentate de server. Dacă un alt post de lucru modifică aceleași date, lista afișează indicația **„This table has been modified from another computer”** împreună cu butonul **„Update”**. Abia după acționarea butonului **Update** tabelul arată starea actuală.
+
+![Indicația de actualizare deasupra unei liste, cu butonul „Update”.](Bilder/03-table-update-notice.png)
+
+*Imaginea 3: Indicația de actualizare deasupra unei liste, cu butonul „Update”.*
 
 ### 3.5 Editorul
 
@@ -187,9 +203,17 @@ Dacă cele două câmpuri de parolă nu coincid sau parola nouă rămâne goală
 
 **Secțiunea „System Information”:** Un tabel cu o singură coloană, cu antetul **„System Name”**, în care se poate selecta exact o intrare. Secțiunea este ascunsă dacă contul este legat de cel mult un sistem de autentificare.
 
+![Editorul de utilizatori, subpagina „General” cu datele de bază, comutatorul „Account enabled” vizibil doar pentru superutilizator și butonul „Change”.](Bilder/04-user-editor-general.png)
+
+*Imaginea 4: Editorul de utilizatori, subpagina „General” cu datele de bază, comutatorul „Account enabled” vizibil doar pentru superutilizator și butonul „Change”.*
+
 ### 4.5 Subpagina „Assigned Roles”
 
 Titlul **„Assigned Roles”**, dedesubt câmpul de selecție cu denumirea **„Roles”** și butonul **„Add Role”**. Se afișează și numărul rolurilor atribuite. Lista de selecție permite căutarea după numele rolului, este sortată după acesta și conține doar rolurile produsului curent.
+
+![Editorul de utilizatori, subpagina „Assigned Roles” cu lista rolurilor atribuite și butonul „Add Role”.](Bilder/05-user-editor-assigned-roles.png)
+
+*Imaginea 5: Editorul de utilizatori, subpagina „Assigned Roles” cu lista rolurilor atribuite și butonul „Add Role”.*
 
 ### 4.6 Subpagina „Group Membership”
 
@@ -225,6 +249,10 @@ Câmpurile apar în această ordine:
 
 Câmpurile pentru parola nouă rămân protejate la scriere cât timp parola anterioară nu a fost introdusă. Sub câmpuri interfața afișează permanent cerințele valabile pentru parolă.
 
+![Dialogul „Change Password” cu cele trei câmpuri de parolă și cerințele de parolă aplicabile.](Bilder/06-change-password-dialog.png)
+
+*Imaginea 6: Dialogul „Change Password” cu cele trei câmpuri de parolă și cerințele de parolă aplicabile.*
+
 ---
 
 ## 5. Fila „Roles” (roluri)
@@ -236,6 +264,10 @@ Câmpurile pentru parola nouă rămân protejate la scriere cât timp parola ant
 | `roleName` | **Role Name** | da | Numele descriptiv al rolului. |
 | `roleId` | **Role-ID** | da | Identificatorul tehnic al rolului. |
 | `roleDescription` | **Description** | da | Descriere în text liber. |
+
+![Pagina de administrare, fila „Roles” – fără selecție, Edit, Remove, Export și Revision sunt dezactivate.](Bilder/07-administration-roles.png)
+
+*Imaginea 7: Pagina de administrare, fila „Roles” – fără selecție, Edit, Remove, Export și Revision sunt dezactivate.*
 
 ### 5.2 Comenzi
 
@@ -291,6 +323,10 @@ graph TD
 
 *Figura 3: Structura selecției permisiunilor în editorul de roluri – grupurile servesc la orientare, se salvează permisiunile individuale.*
 
+![Editorul de roluri, subpagina „Permissions” cu arborele pe două niveluri, casetele cu trei stări și bara de comenzi.](Bilder/08-role-editor-permissions.png)
+
+*Imaginea 8: Editorul de roluri, subpagina „Permissions” cu arborele pe două niveluri, casetele cu trei stări și bara de comenzi.*
+
 ---
 
 ## 6. Fila „Groups” (grupuri)
@@ -301,6 +337,10 @@ graph TD
 | --- | --- | --- | --- |
 | `name` | **Group Name** | da | Numele grupului. |
 | `description` | **Description** | da | Descriere în text liber. |
+
+![Pagina de administrare, fila „Groups” cu lista grupurilor.](Bilder/09-administration-groups.png)
+
+*Imaginea 9: Pagina de administrare, fila „Groups” cu lista grupurilor.*
 
 ### 6.2 Comenzi
 
@@ -404,6 +444,14 @@ graph TD
 
 *Figura 4: Crearea unui jeton personal de acces pe pagina de profil – valoarea jetonului este afișată o singură dată.*
 
+![Pagina de profil, subpagina „Access Tokens” cu tabelul jetoanelor și acțiunile pe rând.](Bilder/10-profile-access-tokens.png)
+
+*Imaginea 10: Pagina de profil, subpagina „Access Tokens” cu tabelul jetoanelor și acțiunile pe rând.*
+
+![Dialogul „New Personal Access Token” – „Generate Token” rămâne dezactivat până când există un nume și cel puțin o permisiune.](Bilder/11-new-access-token-dialog.png)
+
+*Imaginea 11: Dialogul „New Personal Access Token” – „Generate Token” rămâne dezactivat până când există un nume și cel puțin o permisiune.*
+
 ---
 
 ## 8. Autentificare și prima pornire
@@ -420,6 +468,10 @@ Masca de autentificare este construită ca un card și conține, de sus în jos:
 6. Legătura **„Sign up”** – vizibilă doar dacă autoînregistrarea este activată. Deschide dialogul **„Sign up”** cu butoanele **„Sign up”** și **„Close”**, care conține aceleași câmpuri de date de bază ca editorul de utilizatori.
 
 **Autentificare eșuată:** Câmpul parolei se golește, numele de autentificare rămâne, iar mesajul serverului este afișat, altfel **„Username or password is incorrect”**. Dacă contul este dezactivat, mesajul este **„This account has been deactivated. Please contact your administrator.”**
+
+![Masca de autentificare cu „Username”, „Password”, „Remember me” și „Sign in”.](Bilder/12-sign-in.png)
+
+*Imaginea 12: Masca de autentificare cu „Username”, „Password”, „Remember me” și „Sign in”.*
 
 ### 8.2 Recuperarea parolei
 
@@ -458,6 +510,10 @@ graph TD
 ```
 
 *Figura 5: Drumul de la prima pornire, prin autentificare, până la pagina de administrare.*
+
+![Prima pornire: pagina „Create the administrator account” cu numele de utilizator `su`, protejat la scriere.](Bilder/13-superuser-setup.png)
+
+*Imaginea 13: Prima pornire: pagina „Create the administrator account” cu numele de utilizator `su`, protejat la scriere.*
 
 ---
 
