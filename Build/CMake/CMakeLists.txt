@@ -3,23 +3,20 @@ cmake_minimum_required(VERSION 3.26)
 project(Puma)
 
 
-if(NOT DEFINED QT_VERSION_MAJOR)
-	find_package(QT NAMES Qt6 Qt5 COMPONENTS Core)
-	find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Core Widgets QuickWidgets Core Gui Xml Network Svg Sql WebSockets Qml Concurrent REQUIRED)
-
-	if(QT_VERSION_MAJOR EQUAL 6)
-		find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Core5Compat REQUIRED)
-	endif()
-
-	if (BUILD_TESTING)
-		find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Test REQUIRED)
-	endif()
-endif()
-
 set(ACF_MODERN_CMAKE ON)
 set(ACF_PACKAGE_NAME "Puma")
 
 include("${CMAKE_CURRENT_LIST_DIR}/../../Config/CMake/PumaEnv.cmake")
+
+find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Core Widgets QuickWidgets Core Gui Xml Network Svg Sql WebSockets Qml Concurrent REQUIRED)
+
+if(QT_VERSION_MAJOR EQUAL 6)
+	find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Core5Compat REQUIRED)
+endif()
+
+if (BUILD_TESTING)
+	find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Test REQUIRED)
+endif()
 
 set(INCLUDE_DIR		"${PUMADIR}/Include")
 set(IMPL_DIR		"${PUMADIR}/Impl")
