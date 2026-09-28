@@ -436,8 +436,8 @@ class SubscriptionSession {
 		return this.frames.filter(f => f.type === 'data' && f.id === id);
 	}
 
-	waitForData(id, matcher) {
-		return this.waitFor(f => f.type === 'data' && f.id === id && (!matcher || matcher(f)), frameTimeoutMs);
+	waitForData(id, matcher, fromIndex) {
+		return this.waitFor(f => f.type === 'data' && f.id === id && (!matcher || matcher(f)), frameTimeoutMs, fromIndex);
 	}
 
 	close() {
@@ -652,6 +652,9 @@ async function main() {
 		requires(undoSubId, 'a live OnUndoRedoChanged subscription');
 		requires(docSubId, 'a live OnDocumentChanged subscription');
 
+		// A never-saved document is already dirty on creation, so only frames the edit caused count.
+		const editMark = session.mark();
+
 		const status = await mutate('UpdateTenantFromRepresentation',
 			'mutation UpdateTenantFromRepresentation { UpdateTenantFromRepresentation(input: {' +
 			` documentId: ${gqlString(documentId)},` +
@@ -673,14 +676,14 @@ async function main() {
 		const frame = await session.waitForData(undoSubId, f => {
 			const notification = notificationOf(f, 'OnUndoRedoChanged');
 			return !!notification && notification.documentId === documentId && notification.isDirty === true;
-		});
+		}, editMark);
 
 		const notification = notificationOf(frame, 'OnUndoRedoChanged');
 		assert(notification.availableUndoSteps >= 1,
 			`an edit must leave at least one undo step, got ${JSON.stringify(notification).slice(0, 250)}`);
 
 		// The same edit has to reach the document-scoped subscription too.
-		await session.waitForData(docSubId, f => documentNotification(f, 'OnDocumentChanged', documentId));
+		await session.waitForData(docSubId, f => documentNotification(f, 'OnDocumentChanged', documentId), editMark);
 	});
 
 	// Regression probe for "Save stays enabled after creating a tenant": the last
