@@ -399,7 +399,7 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="UserGroupCollection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="UserGroupSqlRepository"/>
+                        <Data IsEnabled="true" Value="UserGroupSqlRepository/CachedGroupCollection"/>
                     </AttributeInfo>
                     <AttributeInfo Id="UserGroupDatabaseSqlDelegate" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="UserGroupSqlRepository/SqlDatabaseDocumentDelegate"/>
