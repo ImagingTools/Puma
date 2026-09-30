@@ -185,9 +185,6 @@
                     <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="VersionInfo"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="WebSocketPort" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="18789"/>
-                    </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
