@@ -109,6 +109,9 @@
         <Element Id="PumaHandlers" PackageId="PumaVoce" ComponentId="PumaHandlers">
             <Data IsEnabled="true" Flags="2">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="AccessContextController" Type="Reference" ExportId="AccessContextController">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -355,6 +358,9 @@
         <Element Id="TenantController" PackageId="ImtUserAdministrationVoce" ComponentId="TenantController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="AccessContextController" Type="Reference" ExportId="AccessContextController">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ContractRepository" Type="Reference" ExportId="ContractRepository">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -674,6 +680,7 @@
         <Component ExportedId="AutoPersistence" ComponentId="PumaSettings/AutoPersistence"/>
         <Component ExportedId="BackupSettings" ComponentId="PumaSettings/Backup"/>
         <Component ExportedId="DatabaseAccessSettings" ComponentId="PumaSettings/DatabaseAccessSettings"/>
+        <Component ExportedId="AdminDatabaseAccessSettings" ComponentId="PumaSettings/AdminDatabaseAccessSettings"/>
         <Component ExportedId="TracingConfiguration" ComponentId="PumaSettings/TracingConfiguration"/>
         <Component ExportedId="WebSocketServerFramework" ComponentId="WebSocketServerFramework"/>
     </ExportedComponents>
