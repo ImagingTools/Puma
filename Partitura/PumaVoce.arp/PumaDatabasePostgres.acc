@@ -75,6 +75,9 @@
                     <AttributeInfo Id="AccessContext" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="AccessContext"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="AdminDatabaseAccessSettings" Type="Reference" ExportId="AdminDatabaseAccessSettings">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="BackupSettings" Type="Reference" ExportId="BackupSettings">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

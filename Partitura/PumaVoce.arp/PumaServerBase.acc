@@ -680,6 +680,7 @@
         <Component ExportedId="AutoPersistence" ComponentId="PumaSettings/AutoPersistence"/>
         <Component ExportedId="BackupSettings" ComponentId="PumaSettings/Backup"/>
         <Component ExportedId="DatabaseAccessSettings" ComponentId="PumaSettings/DatabaseAccessSettings"/>
+        <Component ExportedId="AdminDatabaseAccessSettings" ComponentId="PumaSettings/AdminDatabaseAccessSettings"/>
         <Component ExportedId="TracingConfiguration" ComponentId="PumaSettings/TracingConfiguration"/>
         <Component ExportedId="WebSocketServerFramework" ComponentId="WebSocketServerFramework"/>
     </ExportedComponents>
