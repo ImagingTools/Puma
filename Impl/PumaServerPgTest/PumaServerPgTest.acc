@@ -59,6 +59,9 @@
         <Element Id="PumaDatabasePostgres" PackageId="PumaVoce" ComponentId="PumaDatabasePostgres">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="AdminDatabaseAccessSettings" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaServerBase/AdminDatabaseAccessSettings"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="Application/ApplicationInfo"/>
                     </AttributeInfo>
@@ -83,6 +86,9 @@
         <Element Id="PumaServerBase" PackageId="PumaVoce" ComponentId="PumaServerBase">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="AccessContextController" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaDatabasePostgres/AccessContext"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="Application/ApplicationInfo"/>
                     </AttributeInfo>
