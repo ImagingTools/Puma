@@ -118,17 +118,11 @@
                     <AttributeInfo Id="AuthenticationManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="AuthenticationManager"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="BackupSettings" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="PumaSettings/Backup"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="BindingManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="TenantController/TenantEntityBindingManager"/>
                     </AttributeInfo>
                     <AttributeInfo Id="CrossOrgGrantManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="TenantController/CrossOrgGrantManager"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="DatabaseAccessSettings" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="PumaSettings/DatabaseAccessSettings"/>
                     </AttributeInfo>
                     <AttributeInfo Id="DatabaseConnectionChecker" Type="Reference" ExportId="DatabaseConnectionChecker">
                         <Data IsEnabled="false"/>

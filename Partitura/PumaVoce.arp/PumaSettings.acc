@@ -42,11 +42,27 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
+                    <AttributeInfo Id="ParametersDescription" Type="Text[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value></Value>
+                                <Value></Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
                     <AttributeInfo Id="ParametersId" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>SchedulerParams</Value>
                                 <Value>BackupFolder</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ParametersName" Type="Text[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Scheduler</Value>
+                                <Value>Backup Folder</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -132,11 +148,25 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
+                    <AttributeInfo Id="ParametersDescription" Type="Text[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value></Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
                     <AttributeInfo Id="ParametersId" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>DatabaseAccessSettings</Value>
                                 <Value>AdminDatabaseAccessSettings</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ParametersName" Type="Text[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Database Access Settings</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -216,10 +246,24 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
+                    <AttributeInfo Id="ParametersDescription" Type="Text[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value></Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
                     <AttributeInfo Id="ParametersId" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>LdapEnabled</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ParametersName" Type="Text[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Enable LDAP</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -259,6 +303,19 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
+                    <AttributeInfo Id="ParametersDescription" Type="Text[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value></Value>
+                                <Value></Value>
+                                <Value></Value>
+                                <Value></Value>
+                                <Value></Value>
+                                <Value></Value>
+                                <Value></Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
                     <AttributeInfo Id="ParametersId" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
@@ -269,6 +326,19 @@
                                 <Value>Ldap</Value>
                                 <Value>SmtpServer</Value>
                                 <Value>SslConfiguration</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ParametersName" Type="Text[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Database</Value>
+                                <Value>Server</Value>
+                                <Value>Backup</Value>
+                                <Value>Log</Value>
+                                <Value>LDAP</Value>
+                                <Value>SMTP</Value>
+                                <Value>SSL Configuration</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
