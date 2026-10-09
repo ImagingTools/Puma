@@ -9652,7 +9652,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation UpdateMembershipPermissions { UpdateMembershipPermissions(input: { membershipId: \"{{memberAMembershipId}}\", permissions: [{id: \"ViewOrganizationMembers\", direct: true}, {id: \"EditOrganizationMember\", direct: true}, {id: \"EditOrganizationMemberPermissions\", direct: true}] }) { success errorMessage } }",
+                                "query": "mutation UpdateMembershipPermissions { UpdateMembershipPermissions(input: { membershipId: \"{{memberAMembershipId}}\", permissions: [\"ViewOrganizationMembers\", \"EditOrganizationMember\", \"EditOrganizationMemberPermissions\"] }) { success errorMessage } }",
                                 "variables": ""
                             }
                         }
@@ -15583,7 +15583,10 @@
                                     "const roleEditorId = pm.environment.get(\"roleEditorId\");",
                                     "pm.test(\"GetProfile succeeds with dual grants in A\", function(){ pm.expect(hasErr).to.eql(false); pm.expect(!!payload).to.eql(true); });",
                                     "pm.test(\"currentTenantId is delegated A\", function(){ pm.expect(payload.currentTenantId).to.eql(tenantAId); });",
-                                    "pm.test(\"GetProfile.roles is an array under dual grants (delegation surfaced via GetPermissions)\", function(){ pm.expect(Array.isArray(payload.roles), 'payload.roles must be an array').to.eql(true); });"
+                                    "pm.test(\"GetProfile.roles lists both roles granted by A\", function(){",
+                                    "  const roleIds = (payload.roles || []).map(r => r.id);",
+                                    "  pm.expect(roleIds, JSON.stringify(payload.roles)).to.include.members([\"R_VIEW_ONLY\", \"R_EDITOR\"]);",
+                                    "});"
                                 ]
                             }
                         }
@@ -15821,7 +15824,7 @@
                 },
                 {
                     "id": "008c5931-f8a7-4672-9904-f543228714de",
-                    "name": "Advanced grant depth: A member permissions include union",
+                    "name": "Advanced grant depth: A member gains no delegated permissions inside the granting tenant",
                     "request": {
                         "url": {
                             "host": [
@@ -15864,8 +15867,10 @@
                                     "// inside A the grant adds nothing: A member keeps exactly their own A permissions.",
                                     "pm.test(\"A member permissions response shape is valid\", function(){ pm.expect(Array.isArray(raw)).to.eql(true); });",
                                     "pm.test(\"A member gains no delegated permissions inside the granting tenant\", function(){",
-                                    "  if (permRead) { pm.expect(perms.includes(permRead), 'unexpected delegated read permission: ' + JSON.stringify(perms)).to.eql(false); }",
-                                    "  if (permWrite) { pm.expect(perms.includes(permWrite), 'unexpected delegated write permission: ' + JSON.stringify(perms)).to.eql(false); }",
+                                    "  pm.expect(permRead, 'permReadX is not seeded').to.be.a('string').and.not.empty;",
+                                    "  pm.expect(permWrite, 'permWriteX is not seeded').to.be.a('string').and.not.empty;",
+                                    "  pm.expect(perms.includes(permRead), 'unexpected delegated read permission: ' + JSON.stringify(perms)).to.eql(false);",
+                                    "  pm.expect(perms.includes(permWrite), 'unexpected delegated write permission: ' + JSON.stringify(perms)).to.eql(false);",
                                     "});"
                                 ],
                                 "_lastExecutionId": "8e338b07-8ad7-49f9-857d-21af90888b95"
@@ -16143,7 +16148,11 @@
                                     "const roleEditorId = pm.environment.get(\"roleEditorId\");",
                                     "pm.test(\"GetProfile succeeds after partial revoke\", function(){ pm.expect(hasErr).to.eql(false); pm.expect(!!payload).to.eql(true); });",
                                     "pm.test(\"still in A context\", function(){ pm.expect(payload.currentTenantId).to.eql(tenantAId); });",
-                                    "pm.test(\"GetProfile.roles is an array after editor revoke (delegation surfaced via GetPermissions)\", function(){ pm.expect(Array.isArray(payload.roles), 'payload.roles must be an array').to.eql(true); });"
+                                    "pm.test(\"GetProfile.roles keeps the view role and drops the revoked editor role\", function(){",
+                                    "  const roleIds = (payload.roles || []).map(r => r.id);",
+                                    "  pm.expect(roleIds, JSON.stringify(payload.roles)).to.include(\"R_VIEW_ONLY\");",
+                                    "  pm.expect(roleIds, JSON.stringify(payload.roles)).to.not.include(\"R_EDITOR\");",
+                                    "});"
                                 ]
                             }
                         }
@@ -16287,7 +16296,7 @@
                 },
                 {
                     "id": "a4619c26-cc3f-4087-94c3-b4729b4342fc",
-                    "name": "Advanced grant depth: A member permissions reduced after editor revoke",
+                    "name": "Advanced grant depth: A member permissions unaffected by the editor revoke",
                     "request": {
                         "url": {
                             "host": [
@@ -16330,8 +16339,10 @@
                                     "// inside A the grant adds nothing: A member keeps exactly their own A permissions.",
                                     "pm.test(\"A member permissions response shape is valid\", function(){ pm.expect(Array.isArray(raw)).to.eql(true); });",
                                     "pm.test(\"A member permissions are unaffected by the editor revoke\", function(){",
-                                    "  if (permRead) { pm.expect(perms.includes(permRead), 'unexpected delegated read permission: ' + JSON.stringify(perms)).to.eql(false); }",
-                                    "  if (permWrite) { pm.expect(perms.includes(permWrite), 'unexpected delegated write permission: ' + JSON.stringify(perms)).to.eql(false); }",
+                                    "  pm.expect(permRead, 'permReadX is not seeded').to.be.a('string').and.not.empty;",
+                                    "  pm.expect(permWrite, 'permWriteX is not seeded').to.be.a('string').and.not.empty;",
+                                    "  pm.expect(perms.includes(permRead), 'unexpected delegated read permission: ' + JSON.stringify(perms)).to.eql(false);",
+                                    "  pm.expect(perms.includes(permWrite), 'unexpected delegated write permission: ' + JSON.stringify(perms)).to.eql(false);",
                                     "});"
                                 ],
                                 "_lastExecutionId": "e1c5534d-12d5-44a7-8806-a5296957ae98"
@@ -20452,7 +20463,8 @@
                                     "pm.test('No permission survives the round trip once the group is left', function () {",
                                     "  pm.expect(auth && auth.token, JSON.stringify(json)).to.be.a('string').and.not.empty;",
                                     "  pm.expect(permissions).to.not.include(pm.environment.get('qaRegPermission'));",
-                                    "});"
+                                    "});",
+                                    "pm.environment.set('qaRegLegacyMemberToken', auth && auth.token);"
                                 ]
                             }
                         }
@@ -20460,7 +20472,7 @@
                 },
                 {
                     "id": "5586640a-739a-42e5-b7f0-fa2b0d19e126",
-                    "name": "D-16 SetProfile renames the legacy member",
+                    "name": "D-16 SetProfile by the legacy member renames their own profile",
                     "request": {
                         "url": {
                             "host": [
@@ -20472,7 +20484,7 @@
                         "header": [
                             {
                                 "key": "x-authentication-token",
-                                "value": "{{su_token}}"
+                                "value": "{{qaRegLegacyMemberToken}}"
                             }
                         ],
                         "method": "POST",
@@ -20538,11 +20550,143 @@
                                     "const list = json.data && json.data.GetRevisionInfoList;",
                                     "const revisions = (list && list.revisions) || [];",
                                     "const latest = revisions.reduce(function (a, r) { return !a || r.revision > a.revision ? r : a; }, null);",
-                                    "pm.test('Latest revision has an author', function () {",
+                                    "pm.test('Latest revision is attributed to the member who edited the profile', function () {",
                                     "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
                                     "  pm.expect(latest, JSON.stringify(json)).to.be.an('object');",
                                     "  pm.expect(latest.revision).to.eql(list.activeRevision);",
-                                    "  pm.expect(latest.user).to.be.a('string').and.not.empty;",
+                                    "  pm.expect(latest.user, 'the member edited their own profile').to.eql('QA Regression Member');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "5586640a-739a-42e5-b7f0-fa2b0d19e126",
+                    "name": "SetProfile of another user by a non-superuser is refused",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{qaRegLegacyMemberToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SetProfile { SetProfile(input: { id: \"{{qaRegMemberId}}\", name: \"Renamed By Another User\", email: \"{{qaRegMemberLogin}}@qa.test\" }) { status } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
+                                    "pm.test('A user cannot change the profile of another user', function () {",
+                                    "  pm.expect(messages, JSON.stringify(json)).to.match(/Only the superuser can change the profile of another user/);",
+                                    "  pm.expect(json.data && json.data.SetProfile && json.data.SetProfile.status).to.not.eql(true);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "5586640a-739a-42e5-b7f0-fa2b0d19e126",
+                    "name": "UserItem of the other user keeps its name after the refused SetProfile",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query UserItem { UserItem(input: { id: \"{{qaRegMemberId}}\", productId: \"{{product_id}}\" }) { name } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const item = json.data && json.data.UserItem;",
+                                    "pm.test('The refused SetProfile did not rename the other user', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(item && item.name, JSON.stringify(json)).to.be.a('string').and.not.eql('Renamed By Another User');",
+                                    "});",
+                                    "pm.environment.set('qaRegMemberName', item && item.name);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "5586640a-739a-42e5-b7f0-fa2b0d19e126",
+                    "name": "SetProfile of another user by the superuser is accepted",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SetProfile { SetProfile(input: { id: \"{{qaRegMemberId}}\", name: \"{{qaRegMemberName}}\", email: \"{{qaRegMemberLogin}}@qa.test\" }) { status } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('The superuser can change the profile of another user', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(json.data && json.data.SetProfile && json.data.SetProfile.status).to.eql(true);",
                                     "});"
                                 ]
                             }
