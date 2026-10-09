@@ -13,6 +13,9 @@
         <Element Id="AuthorizationController" PackageId="PumaVoce" ComponentId="Authorization">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="BindingManager" Type="Reference" ExportId="BindingManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="DelegatedAccess" Type="Reference" ExportId="DelegatedAccess">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

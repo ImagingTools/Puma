@@ -21129,6 +21129,3601 @@
             ]
         },
         {
+            "name": "16 Access Control - Sessions, Self-Registration, Unlock",
+            "item": [
+                {
+                    "name": "AC seed: Auth SU",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{su_login}}\", password: \"{{su_password}}\", productId: \"{{product_id}}\" }) { token userId } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const n = pm.variables.replaceIn('{{$timestamp}}');",
+                                    "pm.environment.set('product_id', 'Puma');",
+                                    "pm.environment.set('acRoleId', pm.variables.replaceIn('{{$guid}}'));",
+                                    "pm.environment.set('acGroupId', pm.variables.replaceIn('{{$guid}}'));",
+                                    "pm.environment.set('acRoleCode', 'AC_PROBE_ROLE_' + n);",
+                                    "pm.environment.set('acGroupName', 'AC_PROBE_GROUP_' + n);",
+                                    "pm.environment.set('acPermission', 'AcProbePermission' + n);",
+                                    "pm.environment.set('acSelfLogin', 'ac_self_' + n);",
+                                    "pm.environment.set('acSuRegLogin', 'ac_su_reg_' + n);"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const auth = json.data && json.data.Authorization;",
+                                    "pm.test('SU authorized for the access control folder', function () {",
+                                    "  pm.expect(auth && auth.token, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "  pm.expect(auth.userId).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('su_token', auth.token);",
+                                    "pm.environment.set('acSuUserId', auth.userId);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "AC role granting a probe permission",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RoleAdd { RoleAdd(input: { id: \"{{acRoleId}}\", typeId: \"Role\", productId: \"{{product_id}}\", item: { id: \"{{acRoleId}}\", name: \"{{acRoleCode}}\", roleId: \"{{acRoleCode}}\", productId: \"{{product_id}}\", parentRoles: [], permissions: [{id: \"{{acPermission}}\", direct: true}] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Probe role created', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "AC group carrying the role",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation GroupAdd { GroupAdd(input: { id: \"{{acGroupId}}\", typeId: \"Group\", productId: \"{{product_id}}\", item: { id: \"{{acGroupId}}\", productId: \"{{product_id}}\", name: \"{{acGroupName}}\", description: \"Access control probe group\", roles: [{id: \"{{acRoleId}}\", direct: true}], users: [], parentGroups: [] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Probe group created', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "AC anonymous RegisterUser asking for the role and the group",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RegisterUser { RegisterUser(input: { userData: { name: \"Access Control Probe\", username: \"{{acSelfLogin}}\", password: \"AccessControl_2026!\", email: \"{{acSelfLogin}}@qa.test\", roles: [{id: \"{{acRoleId}}\", direct: true}], groups: [{id: \"{{acGroupId}}\", direct: true}] }, productId: \"{{product_id}}\" }) { id message } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.RegisterUser;",
+                                    "pm.test('Self-registration succeeds', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.id, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('acSelfUserId', payload && payload.id);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "AC self-registered user holds neither the requested role nor the group",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query UserItem { UserItem(input: { id: \"{{acSelfUserId}}\", productId: \"{{product_id}}\" }) { roles { id direct } groups { id direct } } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const item = json.data && json.data.UserItem;",
+                                    "pm.test('Self-registration ignores requested roles and groups', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect((item.roles || []).map(function (r) { return r.id; }), JSON.stringify(item)).to.not.include(pm.environment.get('acRoleId'));",
+                                    "  pm.expect((item.groups || []).map(function (g) { return g.id; }), JSON.stringify(item)).to.not.include(pm.environment.get('acGroupId'));",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "AC Authorization of the self-registered user",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{acSelfLogin}}\", password: \"AccessControl_2026!\", productId: \"{{product_id}}\" }) { token userId permissions } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const auth = json.data && json.data.Authorization;",
+                                    "const permissions = ((auth && auth.permissions) || '').split(';').filter(function (p) { return !!p; });",
+                                    "pm.test('The self-registered user is not granted the probe permission', function () {",
+                                    "  pm.expect(auth && auth.token, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "  pm.expect(auth.userId).to.eql(pm.environment.get('acSelfUserId'));",
+                                    "  pm.expect(permissions).to.not.include(pm.environment.get('acPermission'));",
+                                    "});",
+                                    "pm.environment.set('acSelfToken', auth && auth.token);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "AC superuser RegisterUser keeps the requested role and group",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RegisterUser { RegisterUser(input: { userData: { name: \"Access Control Probe\", username: \"{{acSuRegLogin}}\", password: \"AccessControl_2026!\", email: \"{{acSuRegLogin}}@qa.test\", roles: [{id: \"{{acRoleId}}\", direct: true}], groups: [{id: \"{{acGroupId}}\", direct: true}] }, productId: \"{{product_id}}\" }) { id message } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.RegisterUser;",
+                                    "pm.test('Superuser registration succeeds', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.id, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('acSuRegUserId', payload && payload.id);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "AC superuser-registered user holds the requested role and group",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query UserItem { UserItem(input: { id: \"{{acSuRegUserId}}\", productId: \"{{product_id}}\" }) { roles { id direct } groups { id direct } } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const item = json.data && json.data.UserItem;",
+                                    "pm.test('The superuser can register a user with roles and groups', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect((item.roles || []).map(function (r) { return r.id; }), JSON.stringify(item)).to.include(pm.environment.get('acRoleId'));",
+                                    "  pm.expect((item.groups || []).map(function (g) { return g.id; }), JSON.stringify(item)).to.include(pm.environment.get('acGroupId'));",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "AC anonymous CreateNewSession for the superuser is refused",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateNewSession { CreateNewSession(input: { userId: \"{{acSuUserId}}\" }) { ok errorMessage userSession { userId accessToken } } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.CreateNewSession;",
+                                    "pm.test('An anonymous caller cannot open a session for the superuser', function () {",
+                                    "  pm.expect(payload, JSON.stringify(json)).to.be.an('object');",
+                                    "  pm.expect(payload.ok).to.eql(false);",
+                                    "  pm.expect(payload.userSession && payload.userSession.accessToken, 'a session token was issued').to.not.be.ok;",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "AC CreateNewSession for another user is refused",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{acSelfToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateNewSession { CreateNewSession(input: { userId: \"{{acSuUserId}}\" }) { ok errorMessage userSession { userId accessToken } } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.CreateNewSession;",
+                                    "pm.test('A user cannot open a session for another user', function () {",
+                                    "  pm.expect(payload, JSON.stringify(json)).to.be.an('object');",
+                                    "  pm.expect(payload.ok).to.eql(false);",
+                                    "  pm.expect(payload.userSession && payload.userSession.accessToken, 'a session token was issued').to.not.be.ok;",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "AC CreateNewSession for oneself is allowed",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{acSelfToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateNewSession { CreateNewSession(input: { userId: \"{{acSelfUserId}}\" }) { ok errorMessage userSession { userId accessToken } } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.CreateNewSession;",
+                                    "pm.test('A user can open a session for themselves', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.ok, JSON.stringify(json)).to.eql(true);",
+                                    "  pm.expect(payload.userSession.accessToken).to.be.a('string').and.not.empty;",
+                                    "  pm.expect(payload.userSession.userId).to.eql(pm.environment.get('acSelfUserId'));",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "AC superuser CreateNewSession for another user is allowed",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateNewSession { CreateNewSession(input: { userId: \"{{acSelfUserId}}\" }) { ok errorMessage userSession { userId accessToken } } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.CreateNewSession;",
+                                    "pm.test('The superuser can open a session for another user', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.ok, JSON.stringify(json)).to.eql(true);",
+                                    "  pm.expect(payload.userSession.accessToken).to.be.a('string').and.not.empty;",
+                                    "  pm.expect(payload.userSession.userId).to.eql(pm.environment.get('acSelfUserId'));",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "AC anonymous UnlockUser is refused",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UnlockUser { UnlockUser(input: { login: \"{{acSelfLogin}}\" }) { success message } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.UnlockUser;",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
+                                    "pm.test('An anonymous caller cannot unlock an account', function () {",
+                                    "  pm.expect(messages, JSON.stringify(json)).to.match(/Only the superuser can unlock an account/);",
+                                    "  pm.expect(payload && payload.success).to.not.eql(true);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "AC UnlockUser by a regular user is refused",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{acSelfToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UnlockUser { UnlockUser(input: { login: \"{{acSelfLogin}}\" }) { success message } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.UnlockUser;",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
+                                    "pm.test('A regular user cannot unlock an account', function () {",
+                                    "  pm.expect(messages, JSON.stringify(json)).to.match(/Only the superuser can unlock an account/);",
+                                    "  pm.expect(payload && payload.success).to.not.eql(true);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "17 Permission Inheritance in Organization",
+            "item": [
+                {
+                    "name": "IH auth A owner",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{a_owner_login}}\", password: \"{{a_owner_password}}\", productId: \"{{product_id}}\" }) { token } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const token = json.data && json.data.Authorization && json.data.Authorization.token;",
+                                    "pm.test('A owner authorized', function () { pm.expect(token, JSON.stringify(json)).to.be.a('string').and.not.empty; });",
+                                    "pm.environment.set('ihOwnerAToken', token);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "IH A owner selects tenantAId",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{ihOwnerAToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SelectTenant { SelectTenant(input: { tenantId: \"{{tenantAId}}\" }) { ok userSession { tenantId accessToken } errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.SelectTenant;",
+                                    "pm.test('A owner works in tenantAId', function () {",
+                                    "  pm.expect(payload && payload.ok, JSON.stringify(json)).to.eql(true);",
+                                    "  pm.expect(payload.userSession.tenantId).to.eql(pm.environment.get('tenantAId'));",
+                                    "});",
+                                    "pm.environment.set('ihOwnerAToken', payload.userSession.accessToken);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "IH auth B owner",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{b_owner_login}}\", password: \"{{b_owner_password}}\", productId: \"{{product_id}}\" }) { token } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const token = json.data && json.data.Authorization && json.data.Authorization.token;",
+                                    "pm.test('B owner authorized', function () { pm.expect(token, JSON.stringify(json)).to.be.a('string').and.not.empty; });",
+                                    "pm.environment.set('ihOwnerBToken', token);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "IH B owner selects tenantBId",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{ihOwnerBToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SelectTenant { SelectTenant(input: { tenantId: \"{{tenantBId}}\" }) { ok userSession { tenantId accessToken } errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.SelectTenant;",
+                                    "pm.test('B owner works in tenantBId', function () {",
+                                    "  pm.expect(payload && payload.ok, JSON.stringify(json)).to.eql(true);",
+                                    "  pm.expect(payload.userSession.tenantId).to.eql(pm.environment.get('tenantBId'));",
+                                    "});",
+                                    "pm.environment.set('ihOwnerBToken', payload.userSession.accessToken);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "IH auth A member",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{a_member_login}}\", password: \"{{a_member_password}}\", productId: \"{{product_id}}\" }) { token } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const token = json.data && json.data.Authorization && json.data.Authorization.token;",
+                                    "pm.test('A member authorized', function () { pm.expect(token, JSON.stringify(json)).to.be.a('string').and.not.empty; });",
+                                    "pm.environment.set('ihMemberToken', token);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "IH A member selects tenantAId",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{ihMemberToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SelectTenant { SelectTenant(input: { tenantId: \"{{tenantAId}}\" }) { ok userSession { tenantId accessToken } errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.SelectTenant;",
+                                    "pm.test('A member works in tenantAId', function () {",
+                                    "  pm.expect(payload && payload.ok, JSON.stringify(json)).to.eql(true);",
+                                    "  pm.expect(payload.userSession.tenantId).to.eql(pm.environment.get('tenantAId'));",
+                                    "});",
+                                    "pm.environment.set('ihMemberToken', payload.userSession.accessToken);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "IH A member baseline permissions",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{ihMemberToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetPermissions { GetPermissions(input: { accessToken: \"{{ihMemberToken}}\" }) { permissions } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const perms = (json.data && json.data.GetPermissions && json.data.GetPermissions.permissions) || [];",
+                                    "pm.test('Baseline permissions read', function () { pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0); });",
+                                    "pm.environment.set('ihBaseline', JSON.stringify(perms));"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "IH pick tenant A permissions the member does not hold yet",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{ihOwnerAToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetTenantPermissions { GetTenantPermissions(input: { tenantId: \"{{tenantAId}}\" }) { permissionIds } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const baseline = JSON.parse(pm.environment.get('ihBaseline') || '[]');",
+                                    "const free = ((json.data && json.data.GetTenantPermissions && json.data.GetTenantPermissions.permissionIds) || []).filter(function (p) { return p && baseline.indexOf(p) < 0; });",
+                                    "pm.test('Tenant A has three permissions the member does not hold', function () {",
+                                    "  pm.expect(free.length, JSON.stringify(json)).to.be.at.least(3);",
+                                    "});",
+                                    "pm.environment.set('ihParentRolePerm', free[0]);",
+                                    "pm.environment.set('ihChildRolePerm', free[1]);",
+                                    "pm.environment.set('ihParentGroupPerm', free[2]);",
+                                    "const n = pm.variables.replaceIn('{{$timestamp}}');",
+                                    "['ihParentRole', 'ihChildRole', 'ihGroupRole', 'ihParentGroup', 'ihChildGroup', 'ihRoleGroup', 'ihForeignRole', 'ihForeignGroup'].forEach(function (k) {",
+                                    "  pm.environment.set(k, pm.variables.replaceIn('{{$guid}}'));",
+                                    "  pm.environment.set(k + 'Name', 'IH_' + k.toUpperCase() + '_' + n);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "IH pick a tenant B permission the member does not hold",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{ihOwnerBToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetTenantPermissions { GetTenantPermissions(input: { tenantId: \"{{tenantBId}}\" }) { permissionIds } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const taken = JSON.parse(pm.environment.get('ihBaseline') || '[]').concat([pm.environment.get('ihParentRolePerm'), pm.environment.get('ihChildRolePerm'), pm.environment.get('ihParentGroupPerm')]);",
+                                    "const free = ((json.data && json.data.GetTenantPermissions && json.data.GetTenantPermissions.permissionIds) || []).filter(function (p) { return p && taken.indexOf(p) < 0; });",
+                                    "pm.test('Tenant B has a permission the member does not hold', function () {",
+                                    "  pm.expect(free.length, JSON.stringify(json)).to.be.at.least(1);",
+                                    "});",
+                                    "pm.environment.set('ihForeignPerm', free[0]);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "IH create role document parent",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{ihOwnerAToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateNewDocument { CreateNewDocument(input: { collectionId: \"Roles\", typeId: \"Role\", proposedSourceDocumentId: \"{{ihParentRole}}\" }) { documentId objectId } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.CreateNewDocument;",
+                                    "pm.test('Role document parent created', function () { pm.expect(payload && payload.documentId, JSON.stringify(json)).to.be.a('string').and.not.empty; });",
+                                    "pm.environment.set('ihParentRoleDoc', payload.documentId);",
+                                    "if (payload.objectId) pm.environment.set('ihParentRole', payload.objectId);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "IH fill role parent",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{ihOwnerAToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UpdateRoleFromRepresentation { UpdateRoleFromRepresentation(input: { documentId: \"{{ihParentRoleDoc}}\", role: { id: \"{{ihParentRole}}\", name: \"{{ihParentRoleName}}\", description: \"Permission inheritance probe\", roleId: \"{{ihParentRoleName}}\", productId: \"{{product_id}}\", parentRoles: [], permissions: [{id: \"{{ihParentRolePerm}}\", direct: true}], isDefault: false, isGuest: false } }) { status message } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.UpdateRoleFromRepresentation;",
+                                    "pm.test('Role parent filled', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.status).to.eql('Success');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "IH save role parent",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{ihOwnerAToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SaveDocument { SaveDocument(input: { collectionId: \"Roles\", documentId: \"{{ihParentRoleDoc}}\", documentName: \"{{ihParentRoleName}}\" }) { status message } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Role parent saved', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(json.data.SaveDocument.status, JSON.stringify(json)).to.eql('Success');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "IH create role document child (parent role)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{ihOwnerAToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateNewDocument { CreateNewDocument(input: { collectionId: \"Roles\", typeId: \"Role\", proposedSourceDocumentId: \"{{ihChildRole}}\" }) { documentId objectId } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.CreateNewDocument;",
+                                    "pm.test('Role document child (parent role) created', function () { pm.expect(payload && payload.documentId, JSON.stringify(json)).to.be.a('string').and.not.empty; });",
+                                    "pm.environment.set('ihChildRoleDoc', payload.documentId);",
+                                    "if (payload.objectId) pm.environment.set('ihChildRole', payload.objectId);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "IH fill role child (parent role)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{ihOwnerAToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UpdateRoleFromRepresentation { UpdateRoleFromRepresentation(input: { documentId: \"{{ihChildRoleDoc}}\", role: { id: \"{{ihChildRole}}\", name: \"{{ihChildRoleName}}\", description: \"Permission inheritance probe\", roleId: \"{{ihChildRoleName}}\", productId: \"{{product_id}}\", parentRoles: [{id: \"{{ihParentRole}}\", direct: true}], permissions: [{id: \"{{ihChildRolePerm}}\", direct: true}], isDefault: false, isGuest: false } }) { status message } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.UpdateRoleFromRepresentation;",
+                                    "pm.test('Role child (parent role) filled', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.status).to.eql('Success');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "IH save role child (parent role)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{ihOwnerAToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SaveDocument { SaveDocument(input: { collectionId: \"Roles\", documentId: \"{{ihChildRoleDoc}}\", documentName: \"{{ihChildRoleName}}\" }) { status message } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Role child (parent role) saved', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(json.data.SaveDocument.status, JSON.stringify(json)).to.eql('Success');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "IH create role document of the parent group",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{ihOwnerAToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateNewDocument { CreateNewDocument(input: { collectionId: \"Roles\", typeId: \"Role\", proposedSourceDocumentId: \"{{ihGroupRole}}\" }) { documentId objectId } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.CreateNewDocument;",
+                                    "pm.test('Role document of the parent group created', function () { pm.expect(payload && payload.documentId, JSON.stringify(json)).to.be.a('string').and.not.empty; });",
+                                    "pm.environment.set('ihGroupRoleDoc', payload.documentId);",
+                                    "if (payload.objectId) pm.environment.set('ihGroupRole', payload.objectId);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "IH fill role of the parent group",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{ihOwnerAToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UpdateRoleFromRepresentation { UpdateRoleFromRepresentation(input: { documentId: \"{{ihGroupRoleDoc}}\", role: { id: \"{{ihGroupRole}}\", name: \"{{ihGroupRoleName}}\", description: \"Permission inheritance probe\", roleId: \"{{ihGroupRoleName}}\", productId: \"{{product_id}}\", parentRoles: [], permissions: [{id: \"{{ihParentGroupPerm}}\", direct: true}], isDefault: false, isGuest: false } }) { status message } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.UpdateRoleFromRepresentation;",
+                                    "pm.test('Role of the parent group filled', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.status).to.eql('Success');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "IH save role of the parent group",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{ihOwnerAToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SaveDocument { SaveDocument(input: { collectionId: \"Roles\", documentId: \"{{ihGroupRoleDoc}}\", documentName: \"{{ihGroupRoleName}}\" }) { status message } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Role of the parent group saved', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(json.data.SaveDocument.status, JSON.stringify(json)).to.eql('Success');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "IH create group document parent",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{ihOwnerAToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateNewDocument { CreateNewDocument(input: { collectionId: \"Groups\", typeId: \"Group\", proposedSourceDocumentId: \"{{ihParentGroup}}\" }) { documentId objectId } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.CreateNewDocument;",
+                                    "pm.test('Group document parent created', function () { pm.expect(payload && payload.documentId, JSON.stringify(json)).to.be.a('string').and.not.empty; });",
+                                    "pm.environment.set('ihParentGroupDoc', payload.documentId);",
+                                    "if (payload.objectId) pm.environment.set('ihParentGroup', payload.objectId);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "IH fill group parent",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{ihOwnerAToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UpdateGroupFromRepresentation { UpdateGroupFromRepresentation(input: { documentId: \"{{ihParentGroupDoc}}\", group: { id: \"{{ihParentGroup}}\", productId: \"{{product_id}}\", name: \"{{ihParentGroupName}}\", description: \"Permission inheritance probe\", roles: [{id: \"{{ihGroupRole}}\", direct: true}], users: [], parentGroups: [] } }) { status message } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.UpdateGroupFromRepresentation;",
+                                    "pm.test('Group parent filled', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.status).to.eql('Success');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "IH save group parent",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{ihOwnerAToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SaveDocument { SaveDocument(input: { collectionId: \"Groups\", documentId: \"{{ihParentGroupDoc}}\", documentName: \"{{ihParentGroupName}}\" }) { status message } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Group parent saved', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(json.data.SaveDocument.status, JSON.stringify(json)).to.eql('Success');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "IH create group document child with the member",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{ihOwnerAToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateNewDocument { CreateNewDocument(input: { collectionId: \"Groups\", typeId: \"Group\", proposedSourceDocumentId: \"{{ihChildGroup}}\" }) { documentId objectId } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.CreateNewDocument;",
+                                    "pm.test('Group document child with the member created', function () { pm.expect(payload && payload.documentId, JSON.stringify(json)).to.be.a('string').and.not.empty; });",
+                                    "pm.environment.set('ihChildGroupDoc', payload.documentId);",
+                                    "if (payload.objectId) pm.environment.set('ihChildGroup', payload.objectId);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "IH fill group child with the member",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{ihOwnerAToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UpdateGroupFromRepresentation { UpdateGroupFromRepresentation(input: { documentId: \"{{ihChildGroupDoc}}\", group: { id: \"{{ihChildGroup}}\", productId: \"{{product_id}}\", name: \"{{ihChildGroupName}}\", description: \"Permission inheritance probe\", roles: [], users: [{id: \"{{a_member_user_id}}\", direct: true}], parentGroups: [{id: \"{{ihParentGroup}}\", direct: true}] } }) { status message } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.UpdateGroupFromRepresentation;",
+                                    "pm.test('Group child with the member filled', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.status).to.eql('Success');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "IH save group child with the member",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{ihOwnerAToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SaveDocument { SaveDocument(input: { collectionId: \"Groups\", documentId: \"{{ihChildGroupDoc}}\", documentName: \"{{ihChildGroupName}}\" }) { status message } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Group child with the member saved', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(json.data.SaveDocument.status, JSON.stringify(json)).to.eql('Success');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "IH create group document carrying the child role",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{ihOwnerAToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateNewDocument { CreateNewDocument(input: { collectionId: \"Groups\", typeId: \"Group\", proposedSourceDocumentId: \"{{ihRoleGroup}}\" }) { documentId objectId } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.CreateNewDocument;",
+                                    "pm.test('Group document carrying the child role created', function () { pm.expect(payload && payload.documentId, JSON.stringify(json)).to.be.a('string').and.not.empty; });",
+                                    "pm.environment.set('ihRoleGroupDoc', payload.documentId);",
+                                    "if (payload.objectId) pm.environment.set('ihRoleGroup', payload.objectId);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "IH fill group carrying the child role",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{ihOwnerAToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UpdateGroupFromRepresentation { UpdateGroupFromRepresentation(input: { documentId: \"{{ihRoleGroupDoc}}\", group: { id: \"{{ihRoleGroup}}\", productId: \"{{product_id}}\", name: \"{{ihRoleGroupName}}\", description: \"Permission inheritance probe\", roles: [{id: \"{{ihChildRole}}\", direct: true}], users: [{id: \"{{a_member_user_id}}\", direct: true}], parentGroups: [] } }) { status message } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.UpdateGroupFromRepresentation;",
+                                    "pm.test('Group carrying the child role filled', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.status).to.eql('Success');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "IH save group carrying the child role",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{ihOwnerAToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SaveDocument { SaveDocument(input: { collectionId: \"Groups\", documentId: \"{{ihRoleGroupDoc}}\", documentName: \"{{ihRoleGroupName}}\" }) { status message } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Group carrying the child role saved', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(json.data.SaveDocument.status, JSON.stringify(json)).to.eql('Success');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "IH member gets permissions through a parent role and a parent group",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{ihMemberToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetPermissions { GetPermissions(input: { accessToken: \"{{ihMemberToken}}\" }) { permissions } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const perms = (json.data && json.data.GetPermissions && json.data.GetPermissions.permissions) || [];",
+                                    "pm.test('Parent role and parent group permissions reach the member in the organization', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(perms, 'ihParentRolePerm').to.include(pm.environment.get('ihParentRolePerm'));",
+                                    "  pm.expect(perms, 'ihChildRolePerm').to.include(pm.environment.get('ihChildRolePerm'));",
+                                    "  pm.expect(perms, 'ihParentGroupPerm').to.include(pm.environment.get('ihParentGroupPerm'));",
+                                    "  pm.expect(perms, 'ihForeignPerm').to.not.include(pm.environment.get('ihForeignPerm'));",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "IH member profile lists the inherited permissions",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{ihMemberToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetProfile { GetProfile(input: { id: \"{{a_member_user_id}}\", productId: \"{{product_id}}\" }) { currentTenantId permissions { id } } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const profile = json.data && json.data.GetProfile;",
+                                    "const ids = ((profile && profile.permissions) || []).map(function (p) { return p.id; });",
+                                    "pm.test('GetProfile in the organization includes the inherited permissions', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(profile.currentTenantId).to.eql(pm.environment.get('tenantAId'));",
+                                    "  pm.expect(ids).to.include.members([pm.environment.get('ihParentRolePerm'), pm.environment.get('ihChildRolePerm'), pm.environment.get('ihParentGroupPerm')]);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "IH child role drops its parent role",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{ihOwnerAToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RoleUpdate { RoleUpdate(input: { id: \"{{ihChildRole}}\", typeId: \"Role\", productId: \"{{product_id}}\", item: { id: \"{{ihChildRole}}\", name: \"{{ihChildRoleName}}\", roleId: \"{{ihChildRoleName}}\", productId: \"{{product_id}}\", parentRoles: [], permissions: [{id: \"{{ihChildRolePerm}}\", direct: true}] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Parent role link removed', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "IH member loses the parent role permission",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{ihMemberToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetPermissions { GetPermissions(input: { accessToken: \"{{ihMemberToken}}\" }) { permissions } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const perms = (json.data && json.data.GetPermissions && json.data.GetPermissions.permissions) || [];",
+                                    "pm.test('Removing the parent role revokes only its permission', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(perms, 'ihChildRolePerm').to.include(pm.environment.get('ihChildRolePerm'));",
+                                    "  pm.expect(perms, 'ihParentGroupPerm').to.include(pm.environment.get('ihParentGroupPerm'));",
+                                    "  pm.expect(perms, 'ihParentRolePerm').to.not.include(pm.environment.get('ihParentRolePerm'));",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "IH child group drops its parent group",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{ihOwnerAToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation GroupUpdate { GroupUpdate(input: { id: \"{{ihChildGroup}}\", typeId: \"Group\", productId: \"{{product_id}}\", item: { id: \"{{ihChildGroup}}\", productId: \"{{product_id}}\", name: \"{{ihChildGroupName}}\", description: \"Permission inheritance probe\", roles: [], users: [{id: \"{{a_member_user_id}}\", direct: true}], parentGroups: [] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Parent group link removed', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "IH member loses the parent group permission",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{ihMemberToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetPermissions { GetPermissions(input: { accessToken: \"{{ihMemberToken}}\" }) { permissions } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const perms = (json.data && json.data.GetPermissions && json.data.GetPermissions.permissions) || [];",
+                                    "pm.test('Removing the parent group revokes its permission', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(perms, 'ihChildRolePerm').to.include(pm.environment.get('ihChildRolePerm'));",
+                                    "  pm.expect(perms, 'ihParentRolePerm').to.not.include(pm.environment.get('ihParentRolePerm'));",
+                                    "  pm.expect(perms, 'ihParentGroupPerm').to.not.include(pm.environment.get('ihParentGroupPerm'));",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "IH create role document in tenant B",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{ihOwnerBToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateNewDocument { CreateNewDocument(input: { collectionId: \"Roles\", typeId: \"Role\", proposedSourceDocumentId: \"{{ihForeignRole}}\" }) { documentId objectId } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.CreateNewDocument;",
+                                    "pm.test('Role document in tenant B created', function () { pm.expect(payload && payload.documentId, JSON.stringify(json)).to.be.a('string').and.not.empty; });",
+                                    "pm.environment.set('ihForeignRoleDoc', payload.documentId);",
+                                    "if (payload.objectId) pm.environment.set('ihForeignRole', payload.objectId);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "IH fill role in tenant B",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{ihOwnerBToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UpdateRoleFromRepresentation { UpdateRoleFromRepresentation(input: { documentId: \"{{ihForeignRoleDoc}}\", role: { id: \"{{ihForeignRole}}\", name: \"{{ihForeignRoleName}}\", description: \"Permission inheritance probe\", roleId: \"{{ihForeignRoleName}}\", productId: \"{{product_id}}\", parentRoles: [], permissions: [{id: \"{{ihForeignPerm}}\", direct: true}], isDefault: false, isGuest: false } }) { status message } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.UpdateRoleFromRepresentation;",
+                                    "pm.test('Role in tenant B filled', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.status).to.eql('Success');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "IH save role in tenant B",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{ihOwnerBToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SaveDocument { SaveDocument(input: { collectionId: \"Roles\", documentId: \"{{ihForeignRoleDoc}}\", documentName: \"{{ihForeignRoleName}}\" }) { status message } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Role in tenant B saved', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(json.data.SaveDocument.status, JSON.stringify(json)).to.eql('Success');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "IH create group document in tenant B",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{ihOwnerBToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateNewDocument { CreateNewDocument(input: { collectionId: \"Groups\", typeId: \"Group\", proposedSourceDocumentId: \"{{ihForeignGroup}}\" }) { documentId objectId } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.CreateNewDocument;",
+                                    "pm.test('Group document in tenant B created', function () { pm.expect(payload && payload.documentId, JSON.stringify(json)).to.be.a('string').and.not.empty; });",
+                                    "pm.environment.set('ihForeignGroupDoc', payload.documentId);",
+                                    "if (payload.objectId) pm.environment.set('ihForeignGroup', payload.objectId);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "IH fill group in tenant B",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{ihOwnerBToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UpdateGroupFromRepresentation { UpdateGroupFromRepresentation(input: { documentId: \"{{ihForeignGroupDoc}}\", group: { id: \"{{ihForeignGroup}}\", productId: \"{{product_id}}\", name: \"{{ihForeignGroupName}}\", description: \"Permission inheritance probe\", roles: [{id: \"{{ihForeignRole}}\", direct: true}], users: [], parentGroups: [] } }) { status message } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.UpdateGroupFromRepresentation;",
+                                    "pm.test('Group in tenant B filled', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.status).to.eql('Success');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "IH save group in tenant B",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{ihOwnerBToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SaveDocument { SaveDocument(input: { collectionId: \"Groups\", documentId: \"{{ihForeignGroupDoc}}\", documentName: \"{{ihForeignGroupName}}\" }) { status message } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Group in tenant B saved', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(json.data.SaveDocument.status, JSON.stringify(json)).to.eql('Success');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "IH A owner sets a tenant B role as parent role",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{ihOwnerAToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RoleUpdate { RoleUpdate(input: { id: \"{{ihChildRole}}\", typeId: \"Role\", productId: \"{{product_id}}\", item: { id: \"{{ihChildRole}}\", name: \"{{ihChildRoleName}}\", roleId: \"{{ihChildRoleName}}\", productId: \"{{product_id}}\", parentRoles: [{id: \"{{ihForeignRole}}\", direct: true}], permissions: [{id: \"{{ihChildRolePerm}}\", direct: true}] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.environment.set('ihForeignRoleParentOutcome', JSON.stringify(json).slice(0, 400));",
+                                    "console.log('ihForeignRoleParentOutcome', JSON.stringify(json).slice(0, 400));",
+                                    "pm.test('ihForeignRoleParentOutcome answered', function () { pm.expect(json).to.be.an('object'); });"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "IH member does not inherit through a tenant B parent role",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{ihMemberToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetPermissions { GetPermissions(input: { accessToken: \"{{ihMemberToken}}\" }) { permissions } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const perms = (json.data && json.data.GetPermissions && json.data.GetPermissions.permissions) || [];",
+                                    "pm.test('A parent role of another organization grants nothing inside organization A', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(perms, 'ihChildRolePerm').to.include(pm.environment.get('ihChildRolePerm'));",
+                                    "  pm.expect(perms, 'ihForeignPerm').to.not.include(pm.environment.get('ihForeignPerm'));",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "IH child role drops the tenant B parent role",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{ihOwnerAToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RoleUpdate { RoleUpdate(input: { id: \"{{ihChildRole}}\", typeId: \"Role\", productId: \"{{product_id}}\", item: { id: \"{{ihChildRole}}\", name: \"{{ihChildRoleName}}\", roleId: \"{{ihChildRoleName}}\", productId: \"{{product_id}}\", parentRoles: [], permissions: [{id: \"{{ihChildRolePerm}}\", direct: true}] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Tenant B parent role removed', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "IH A owner sets a tenant B group as parent group",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{ihOwnerAToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation GroupUpdate { GroupUpdate(input: { id: \"{{ihChildGroup}}\", typeId: \"Group\", productId: \"{{product_id}}\", item: { id: \"{{ihChildGroup}}\", productId: \"{{product_id}}\", name: \"{{ihChildGroupName}}\", description: \"Permission inheritance probe\", roles: [], users: [{id: \"{{a_member_user_id}}\", direct: true}], parentGroups: [{id: \"{{ihForeignGroup}}\", direct: true}] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.environment.set('ihForeignGroupParentOutcome', JSON.stringify(json).slice(0, 400));",
+                                    "console.log('ihForeignGroupParentOutcome', JSON.stringify(json).slice(0, 400));",
+                                    "pm.test('ihForeignGroupParentOutcome answered', function () { pm.expect(json).to.be.an('object'); });"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "IH member does not inherit through a tenant B parent group",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{ihMemberToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetPermissions { GetPermissions(input: { accessToken: \"{{ihMemberToken}}\" }) { permissions } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const perms = (json.data && json.data.GetPermissions && json.data.GetPermissions.permissions) || [];",
+                                    "pm.test('A parent group of another organization grants nothing inside organization A', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(perms, 'ihChildRolePerm').to.include(pm.environment.get('ihChildRolePerm'));",
+                                    "  pm.expect(perms, 'ihForeignPerm').to.not.include(pm.environment.get('ihForeignPerm'));",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "18 Permission Inheritance without Organization",
+            "item": [
+                {
+                    "name": "PI seed: Auth SU",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{su_login}}\", password: \"{{su_password}}\", productId: \"{{product_id}}\" }) { token } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const n = pm.variables.replaceIn('{{$timestamp}}');",
+                                    "pm.environment.set('product_id', 'Puma');",
+                                    "[\"piR1\",\"piR2\",\"piR3\",\"piRg2\",\"piRg3\",\"piG1\",\"piG2\",\"piG3\",\"piU1\",\"piU2\",\"piRx\",\"piUx\"].forEach(function (k) { pm.environment.set(k, pm.variables.replaceIn('{{$guid}}')); pm.environment.set(k + 'Code', 'PI_' + k.toUpperCase() + '_' + n); });",
+                                    "['P1', 'P2', 'P3', 'Pg2', 'Pg3', 'Px'].forEach(function (k) { pm.environment.set('pi' + k, 'PiPermission' + k + '_' + n); });",
+                                    "pm.environment.set('piViewRoles', 'ViewRoles');",
+                                    "pm.environment.set('piU1Login', 'pi_u1_' + n);",
+                                    "pm.environment.set('piU2Login', 'pi_u2_' + n);",
+                                    "pm.environment.set('piUxLogin', 'pi_ux_' + n);"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const auth = json.data && json.data.Authorization;",
+                                    "pm.test('SU authorized for the inheritance folder', function () { pm.expect(auth && auth.token, JSON.stringify(json)).to.be.a('string').and.not.empty; });",
+                                    "pm.environment.set('su_token', auth.token);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "PI grandparent role R3",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RoleAdd { RoleAdd(input: { id: \"{{piR3}}\", typeId: \"Role\", productId: \"{{product_id}}\", item: { id: \"{{piR3}}\", name: \"{{piR3Code}}\", roleId: \"{{piR3Code}}\", productId: \"{{product_id}}\", parentRoles: [], permissions: [{id: \"{{piP3}}\", direct: true}, {id: \"ViewRoles\", direct: true}] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('R3 created', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "PI parent role R2 inherits R3",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RoleAdd { RoleAdd(input: { id: \"{{piR2}}\", typeId: \"Role\", productId: \"{{product_id}}\", item: { id: \"{{piR2}}\", name: \"{{piR2Code}}\", roleId: \"{{piR2Code}}\", productId: \"{{product_id}}\", parentRoles: [{id: \"{{piR3}}\", direct: true}], permissions: [{id: \"{{piP2}}\", direct: true}] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('R2 created', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "PI role R1 inherits R2",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RoleAdd { RoleAdd(input: { id: \"{{piR1}}\", typeId: \"Role\", productId: \"{{product_id}}\", item: { id: \"{{piR1}}\", name: \"{{piR1Code}}\", roleId: \"{{piR1Code}}\", productId: \"{{product_id}}\", parentRoles: [{id: \"{{piR2}}\", direct: true}], permissions: [{id: \"{{piP1}}\", direct: true}] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('R1 created', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "PI role of the grandparent group",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RoleAdd { RoleAdd(input: { id: \"{{piRg3}}\", typeId: \"Role\", productId: \"{{product_id}}\", item: { id: \"{{piRg3}}\", name: \"{{piRg3Code}}\", roleId: \"{{piRg3Code}}\", productId: \"{{product_id}}\", parentRoles: [], permissions: [{id: \"{{piPg3}}\", direct: true}] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Group role Rg3 created', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "PI role of the parent group",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RoleAdd { RoleAdd(input: { id: \"{{piRg2}}\", typeId: \"Role\", productId: \"{{product_id}}\", item: { id: \"{{piRg2}}\", name: \"{{piRg2Code}}\", roleId: \"{{piRg2Code}}\", productId: \"{{product_id}}\", parentRoles: [], permissions: [{id: \"{{piPg2}}\", direct: true}] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Group role Rg2 created', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "PI grandparent group G3",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation GroupAdd { GroupAdd(input: { id: \"{{piG3}}\", typeId: \"Group\", productId: \"{{product_id}}\", item: { id: \"{{piG3}}\", productId: \"{{product_id}}\", name: \"{{piG3Code}}\", description: \"Inheritance probe\", roles: [{id: \"{{piRg3}}\", direct: true}], users: [], parentGroups: [] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('G3 created', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "PI parent group G2 under G3",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation GroupAdd { GroupAdd(input: { id: \"{{piG2}}\", typeId: \"Group\", productId: \"{{product_id}}\", item: { id: \"{{piG2}}\", productId: \"{{product_id}}\", name: \"{{piG2Code}}\", description: \"Inheritance probe\", roles: [{id: \"{{piRg2}}\", direct: true}], users: [], parentGroups: [{id: \"{{piG3}}\", direct: true}] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('G2 created', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "PI group G1 under G2",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation GroupAdd { GroupAdd(input: { id: \"{{piG1}}\", typeId: \"Group\", productId: \"{{product_id}}\", item: { id: \"{{piG1}}\", productId: \"{{product_id}}\", name: \"{{piG1Code}}\", description: \"Inheritance probe\", roles: [], users: [], parentGroups: [{id: \"{{piG2}}\", direct: true}] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('G1 created', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "PI user holding R1",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UserAdd { UserAdd(input: { id: \"{{piU1}}\", typeId: \"User\", productId: \"{{product_id}}\", item: { id: \"{{piU1}}\", productId: \"{{product_id}}\", name: \"{{piU1Login}}\", username: \"{{piU1Login}}\", password: \"Inherit_2026!\", email: \"{{piU1Login}}@qa.test\", roles: [{id: \"{{piR1}}\", direct: true}], groups: [], permissions: [] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('U1 created', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "PI user in G1",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UserAdd { UserAdd(input: { id: \"{{piU2}}\", typeId: \"User\", productId: \"{{product_id}}\", item: { id: \"{{piU2}}\", productId: \"{{product_id}}\", name: \"{{piU2Login}}\", username: \"{{piU2Login}}\", password: \"Inherit_2026!\", email: \"{{piU2Login}}@qa.test\", roles: [], groups: [{id: \"{{piG1}}\", direct: true}], permissions: [] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('U2 created', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "PI auth U1",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{piU1Login}}\", password: \"Inherit_2026!\", productId: \"{{product_id}}\" }) { token permissions } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const auth = json.data && json.data.Authorization;",
+                                    "pm.test('U1 authorized', function () { pm.expect(auth && auth.token, JSON.stringify(json)).to.be.a('string').and.not.empty; });",
+                                    "pm.environment.set('piU1Token', auth.token);",
+                                    "pm.environment.set('piU1TokenLogin', auth.permissions || '');"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "PI auth U2",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{piU2Login}}\", password: \"Inherit_2026!\", productId: \"{{product_id}}\" }) { token permissions } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const auth = json.data && json.data.Authorization;",
+                                    "pm.test('U2 authorized', function () { pm.expect(auth && auth.token, JSON.stringify(json)).to.be.a('string').and.not.empty; });",
+                                    "pm.environment.set('piU2Token', auth.token);",
+                                    "pm.environment.set('piU2TokenLogin', auth.permissions || '');"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "PI U1 permissions through the role chain",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{piU1Token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetPermissions { GetPermissions(input: { accessToken: \"{{piU1Token}}\" }) { permissions } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const perms = (json.data && json.data.GetPermissions && json.data.GetPermissions.permissions) || [];",
+                                    "pm.test('A role chain grants the permissions of every level', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(perms, 'piP1').to.include(pm.environment.get('piP1'));",
+                                    "  pm.expect(perms, 'piP2').to.include(pm.environment.get('piP2'));",
+                                    "  pm.expect(perms, 'piP3').to.include(pm.environment.get('piP3'));",
+                                    "  pm.expect(perms, 'piViewRoles').to.include(pm.environment.get('piViewRoles'));",
+                                    "",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "PI U1 can list roles through the inherited ViewRoles",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{piU1Token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query RolesList { RolesList(input: { productId: \"{{product_id}}\", viewParams: { offset: 0, count: 1 } }) { items { id } } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('ViewRoles inherited from the grandparent role opens RolesList', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(json.data.RolesList.items).to.be.an('array');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "PI U2 permissions through the group chain",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{piU2Token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetPermissions { GetPermissions(input: { accessToken: \"{{piU2Token}}\" }) { permissions } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const perms = (json.data && json.data.GetPermissions && json.data.GetPermissions.permissions) || [];",
+                                    "pm.test('A group chain grants the roles of every level', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(perms, 'piPg2').to.include(pm.environment.get('piPg2'));",
+                                    "  pm.expect(perms, 'piPg3').to.include(pm.environment.get('piPg3'));",
+                                    "  pm.expect(perms, 'piP1').to.not.include(pm.environment.get('piP1'));",
+                                    "  pm.expect(perms, 'piViewRoles').to.not.include(pm.environment.get('piViewRoles'));",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "PI U2 cannot list roles",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{piU2Token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query RolesList { RolesList(input: { productId: \"{{product_id}}\", viewParams: { offset: 0, count: 1 } }) { items { id } } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
+                                    "pm.test('Without ViewRoles RolesList is refused', function () {",
+                                    "  pm.expect(messages, JSON.stringify(json)).to.match(/Invalid permissions for the user/);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "PI R2 drops its parent role",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RoleUpdate { RoleUpdate(input: { id: \"{{piR2}}\", typeId: \"Role\", productId: \"{{product_id}}\", item: { id: \"{{piR2}}\", name: \"{{piR2Code}}\", roleId: \"{{piR2Code}}\", productId: \"{{product_id}}\", parentRoles: [], permissions: [{id: \"{{piP2}}\", direct: true}] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('R2 parent removed', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "PI U1 loses the grandparent permissions",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{piU1Token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetPermissions { GetPermissions(input: { accessToken: \"{{piU1Token}}\" }) { permissions } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const perms = (json.data && json.data.GetPermissions && json.data.GetPermissions.permissions) || [];",
+                                    "pm.test('Removing a parent role revokes the permissions above it', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(perms, 'piP1').to.include(pm.environment.get('piP1'));",
+                                    "  pm.expect(perms, 'piP2').to.include(pm.environment.get('piP2'));",
+                                    "  pm.expect(perms, 'piP3').to.not.include(pm.environment.get('piP3'));",
+                                    "  pm.expect(perms, 'piViewRoles').to.not.include(pm.environment.get('piViewRoles'));",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "PI U1 can no longer list roles",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{piU1Token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query RolesList { RolesList(input: { productId: \"{{product_id}}\", viewParams: { offset: 0, count: 1 } }) { items { id } } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
+                                    "pm.test('Revoked inherited ViewRoles closes RolesList', function () {",
+                                    "  pm.expect(messages, JSON.stringify(json)).to.match(/Invalid permissions for the user/);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "PI G2 drops its parent group",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation GroupUpdate { GroupUpdate(input: { id: \"{{piG2}}\", typeId: \"Group\", productId: \"{{product_id}}\", item: { id: \"{{piG2}}\", productId: \"{{product_id}}\", name: \"{{piG2Code}}\", description: \"Inheritance probe\", roles: [{id: \"{{piRg2}}\", direct: true}], users: [], parentGroups: [] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('G2 parent removed', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "PI U2 loses the grandparent group permission",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{piU2Token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetPermissions { GetPermissions(input: { accessToken: \"{{piU2Token}}\" }) { permissions } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const perms = (json.data && json.data.GetPermissions && json.data.GetPermissions.permissions) || [];",
+                                    "pm.test('Removing a parent group revokes its roles', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(perms, 'piPg2').to.include(pm.environment.get('piPg2'));",
+                                    "  pm.expect(perms, 'piPg3').to.not.include(pm.environment.get('piPg3'));",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "PI G2 cannot take G1 as parent group (cycle)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation GroupUpdate { GroupUpdate(input: { id: \"{{piG2}}\", typeId: \"Group\", productId: \"{{product_id}}\", item: { id: \"{{piG2}}\", productId: \"{{product_id}}\", name: \"{{piG2Code}}\", description: \"Inheritance probe\", roles: [{id: \"{{piRg2}}\", direct: true}], users: [], parentGroups: [{id: \"{{piG1}}\", direct: true}] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
+                                    "pm.test('A parent group that closes a cycle is refused, not silently dropped', function () {",
+                                    "  pm.expect(messages, JSON.stringify(json)).to.match(/would create a cycle/);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "PI role of another product carrying ViewRoles",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RoleAdd { RoleAdd(input: { id: \"{{piRx}}\", typeId: \"Role\", productId: \"ProLife\", item: { id: \"{{piRx}}\", name: \"{{piRxCode}}\", roleId: \"{{piRxCode}}\", productId: \"ProLife\", parentRoles: [], permissions: [{id: \"ViewRoles\", direct: true}, {id: \"{{piPx}}\", direct: true}] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.request.headers.upsert({ key: 'productid', value: 'ProLife' });"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('ProLife role created', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "PI user holding only the ProLife role",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UserAdd { UserAdd(input: { id: \"{{piUx}}\", typeId: \"User\", productId: \"ProLife\", item: { id: \"{{piUx}}\", productId: \"ProLife\", name: \"{{piUxLogin}}\", username: \"{{piUxLogin}}\", password: \"Inherit_2026!\", email: \"{{piUxLogin}}@qa.test\", roles: [{id: \"{{piRx}}\", direct: true}], groups: [], permissions: [] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.request.headers.upsert({ key: 'productid', value: 'ProLife' });"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('ProLife user created', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "PI auth the ProLife-only user",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{piUxLogin}}\", password: \"Inherit_2026!\", productId: \"{{product_id}}\" }) { token permissions } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const auth = json.data && json.data.Authorization;",
+                                    "pm.test('the ProLife-only user authorized', function () { pm.expect(auth && auth.token, JSON.stringify(json)).to.be.a('string').and.not.empty; });",
+                                    "pm.environment.set('piUxToken', auth.token);",
+                                    "pm.environment.set('piUxTokenLogin', auth.permissions || '');"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "PI ProLife-only user has no Puma permissions",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{piUxToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetPermissions { GetPermissions(input: { accessToken: \"{{piUxToken}}\" }) { permissions } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const perms = (json.data && json.data.GetPermissions && json.data.GetPermissions.permissions) || [];",
+                                    "pm.test('Roles of another product grant no permission in Puma', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "",
+                                    "  pm.expect(perms, 'piViewRoles').to.not.include(pm.environment.get('piViewRoles'));",
+                                    "  pm.expect(perms, 'piPx').to.not.include(pm.environment.get('piPx'));",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "PI ProLife-only user cannot list Puma roles",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{piUxToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query RolesList { RolesList(input: { productId: \"{{product_id}}\", viewParams: { offset: 0, count: 1 } }) { items { id } } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
+                                    "pm.test('A ViewRoles of another product does not open a Puma command', function () {",
+                                    "  pm.expect(messages, JSON.stringify(json)).to.match(/Invalid permissions for the user/);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             "id": "664f4f89-6520-4a63-94d6-f3f7e022c2f6",
             "name": "99 Cleanup",
             "item": [
