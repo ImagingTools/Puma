@@ -2489,7 +2489,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "query GetRoleRepresentation { GetRoleRepresentation(input: { collectionId: \"Roles\", id: \"{{roleViewDocId}}\" }) { id name description roleId productId parentRoles permissions isDefault isGuest } }",
+                                "query": "query GetRoleRepresentation { GetRoleRepresentation(input: { collectionId: \"Roles\", id: \"{{roleViewDocId}}\" }) { id name description roleId productId parentRoles { id name direct sources { steps { kind id name } } } permissions { id name direct sources { steps { kind id name } } } isDefault isGuest } }",
                                 "variables": ""
                             }
                         }
@@ -2536,7 +2536,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation UpdateRoleFromRepresentation { UpdateRoleFromRepresentation(input: { documentId: \"{{roleViewDocId}}\", role: { id: \"{{roleViewId}}\", name: \"R_VIEW_ONLY\", description: \"Read only role\", roleId: \"R_VIEW_ONLY\", productId: \"{{product_id}}\", parentRoles: [], permissions: \"{{permReadX}}\", isDefault: false, isGuest: false } }) { status message documentName } }",
+                                "query": "mutation UpdateRoleFromRepresentation { UpdateRoleFromRepresentation(input: { documentId: \"{{roleViewDocId}}\", role: { id: \"{{roleViewId}}\", name: \"R_VIEW_ONLY\", description: \"Read only role\", roleId: \"R_VIEW_ONLY\", productId: \"{{product_id}}\", parentRoles: [], permissions: [{id: \"{{permReadX}}\", direct: true}], isDefault: false, isGuest: false } }) { status message documentName } }",
                                 "variables": ""
                             }
                         }
@@ -2689,7 +2689,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation UpdateRoleFromRepresentation { UpdateRoleFromRepresentation(input: { documentId: \"{{roleEditorDocId}}\", role: { id: \"{{roleEditorId}}\", name: \"R_EDITOR\", description: \"Editor role\", roleId: \"R_EDITOR\", productId: \"{{product_id}}\", parentRoles: [], permissions: \"{{permWriteX}}\", isDefault: false, isGuest: false } }) { status message documentName } }",
+                                "query": "mutation UpdateRoleFromRepresentation { UpdateRoleFromRepresentation(input: { documentId: \"{{roleEditorDocId}}\", role: { id: \"{{roleEditorId}}\", name: \"R_EDITOR\", description: \"Editor role\", roleId: \"R_EDITOR\", productId: \"{{product_id}}\", parentRoles: [], permissions: [{id: \"{{permWriteX}}\", direct: true}], isDefault: false, isGuest: false } }) { status message documentName } }",
                                 "variables": ""
                             }
                         }
@@ -2842,7 +2842,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation UpdateGroupFromRepresentation { UpdateGroupFromRepresentation(input: { documentId: \"{{groupSupportDocId}}\", group: { id: \"{{groupSupportId}}\", productId: \"{{product_id}}\", name: \"G_SUPPORT\", description: \"Support group\", roles: [\"{{roleViewId}}\"], users: [\"{{a_member_user_id}}\"], parentGroups: [] } }) { status message documentName } }",
+                                "query": "mutation UpdateGroupFromRepresentation { UpdateGroupFromRepresentation(input: { documentId: \"{{groupSupportDocId}}\", group: { id: \"{{groupSupportId}}\", productId: \"{{product_id}}\", name: \"G_SUPPORT\", description: \"Support group\", roles: [{id: \"{{roleViewId}}\", direct: true}], users: [{id: \"{{a_member_user_id}}\", direct: true}], parentGroups: [] } }) { status message documentName } }",
                                 "variables": ""
                             }
                         }
@@ -3060,7 +3060,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation UpdateUserFromRepresentation { UpdateUserFromRepresentation(input: { documentId: \"{{aMemberUserDocId}}\", tenantId: \"{{tenantAId}}\", user: { id: \"{{a_member_user_id}}\", productId: \"{{product_id}}\", name: \"A Member\", username: \"{{a_member_login}}\", password: \"\", email: \"\", groups: [\"{{groupSupportId}}\"], roles: [\"{{roleEditorId}}\"], permissions: [\"{{permReadX}}\"], systemInfos: [] } }) { status message documentName } }",
+                                "query": "mutation UpdateUserFromRepresentation { UpdateUserFromRepresentation(input: { documentId: \"{{aMemberUserDocId}}\", tenantId: \"{{tenantAId}}\", user: { id: \"{{a_member_user_id}}\", productId: \"{{product_id}}\", name: \"A Member\", username: \"{{a_member_login}}\", password: \"\", email: \"\", groups: [{id: \"{{groupSupportId}}\", direct: true}], roles: [{id: \"{{roleEditorId}}\", direct: true}], permissions: [{id: \"{{permReadX}}\", direct: true}], systemInfos: [] } }) { status message documentName } }",
                                 "variables": ""
                             }
                         }
@@ -8334,7 +8334,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation UpdateUserFromRepresentation { UpdateUserFromRepresentation(input: { documentId: \"{{aMemberUserDocId}}\", tenantId: \"{{tenantAId}}\", user: { id: \"{{a_member_user_id}}\", productId: \"{{product_id}}\", name: \"A Member\", username: \"{{a_member_login}}\", password: \"\", email: \"\", groups: [\"{{groupSupportId}}\"], roles: [\"{{roleEditorId}}\"], permissions: [], systemInfos: [] } }) { status message documentName } }",
+                                "query": "mutation UpdateUserFromRepresentation { UpdateUserFromRepresentation(input: { documentId: \"{{aMemberUserDocId}}\", tenantId: \"{{tenantAId}}\", user: { id: \"{{a_member_user_id}}\", productId: \"{{product_id}}\", name: \"A Member\", username: \"{{a_member_login}}\", password: \"\", email: \"\", groups: [{id: \"{{groupSupportId}}\", direct: true}], roles: [{id: \"{{roleEditorId}}\", direct: true}], permissions: [], systemInfos: [] } }) { status message documentName } }",
                                 "variables": ""
                             }
                         }
@@ -9652,7 +9652,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation UpdateMembershipPermissions { UpdateMembershipPermissions(input: { membershipId: \"{{memberAMembershipId}}\", permissions: [\"ViewOrganizationMembers\", \"EditOrganizationMember\", \"EditOrganizationMemberPermissions\"] }) { success errorMessage } }",
+                                "query": "mutation UpdateMembershipPermissions { UpdateMembershipPermissions(input: { membershipId: \"{{memberAMembershipId}}\", permissions: [{id: \"ViewOrganizationMembers\", direct: true}, {id: \"EditOrganizationMember\", direct: true}, {id: \"EditOrganizationMemberPermissions\", direct: true}] }) { success errorMessage } }",
                                 "variables": ""
                             }
                         }
@@ -10457,7 +10457,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "query GetUserRepresentation { GetUserRepresentation(input: { collectionId: \"Users\", id: \"{{userCoverageDocId}}\" }) { id username name roles groups } }",
+                                "query": "query GetUserRepresentation { GetUserRepresentation(input: { collectionId: \"Users\", id: \"{{userCoverageDocId}}\" }) { id username name roles { id name direct sources { steps { kind id name } } } groups { id name direct sources { steps { kind id name } } } } }",
                                 "variables": ""
                             }
                         }
@@ -10613,7 +10613,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "query GetGroupRepresentation { GetGroupRepresentation(input: { collectionId: \"Groups\", id: \"{{groupCoverageDocId}}\" }) { id name description roles users } }",
+                                "query": "query GetGroupRepresentation { GetGroupRepresentation(input: { collectionId: \"Groups\", id: \"{{groupCoverageDocId}}\" }) { id name description roles { id name direct sources { steps { kind id name } } } users { id name direct sources { steps { kind id name } } } } }",
                                 "variables": ""
                             }
                         }
@@ -10830,7 +10830,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation RoleAdd { RoleAdd(input: { id: \"11111111-1111-1111-1111-111111111111\", typeId: \"Role\", productId: \"{{product_id}}\", item: { id: \"11111111-1111-1111-1111-111111111111\", name: \"COVERAGE_ROLE\", roleId: \"COVERAGE_ROLE\", productId: \"{{product_id}}\", parentRoles: [], permissions: \"\" } }) { id } }",
+                                "query": "mutation RoleAdd { RoleAdd(input: { id: \"11111111-1111-1111-1111-111111111111\", typeId: \"Role\", productId: \"{{product_id}}\", item: { id: \"11111111-1111-1111-1111-111111111111\", name: \"COVERAGE_ROLE\", roleId: \"COVERAGE_ROLE\", productId: \"{{product_id}}\", parentRoles: [], permissions: [] } }) { id } }",
                                 "variables": ""
                             }
                         }
@@ -10876,7 +10876,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation RoleUpdate { RoleUpdate(input: { id: \"11111111-1111-1111-1111-111111111111\", typeId: \"Role\", productId: \"{{product_id}}\", item: { id: \"11111111-1111-1111-1111-111111111111\", name: \"COVERAGE_ROLE_UPD\", roleId: \"COVERAGE_ROLE_UPD\", productId: \"{{product_id}}\", parentRoles: [], permissions: \"\" } }) { id } }",
+                                "query": "mutation RoleUpdate { RoleUpdate(input: { id: \"11111111-1111-1111-1111-111111111111\", typeId: \"Role\", productId: \"{{product_id}}\", item: { id: \"11111111-1111-1111-1111-111111111111\", name: \"COVERAGE_ROLE_UPD\", roleId: \"COVERAGE_ROLE_UPD\", productId: \"{{product_id}}\", parentRoles: [], permissions: [] } }) { id } }",
                                 "variables": ""
                             }
                         }
@@ -11339,7 +11339,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation UpdateRoleFromRepresentation { UpdateRoleFromRepresentation(input: { documentId: \"{{noOrgViewerRoleDocId}}\", role: { id: \"{{noOrgViewerRoleId}}\", name: \"{{noOrgViewerRoleCode}}\", description: \"Global viewer role for NoOrg visibility probes\", roleId: \"{{noOrgViewerRoleCode}}\", productId: \"{{product_id}}\", parentRoles: [], permissions: \"ViewUsers;ViewRoles;ViewGroups\", isDefault: false, isGuest: false } }) { status message } }",
+                                "query": "mutation UpdateRoleFromRepresentation { UpdateRoleFromRepresentation(input: { documentId: \"{{noOrgViewerRoleDocId}}\", role: { id: \"{{noOrgViewerRoleId}}\", name: \"{{noOrgViewerRoleCode}}\", description: \"Global viewer role for NoOrg visibility probes\", roleId: \"{{noOrgViewerRoleCode}}\", productId: \"{{product_id}}\", parentRoles: [], permissions: [{id: \"ViewUsers\", direct: true}, {id: \"ViewRoles\", direct: true}, {id: \"ViewGroups\", direct: true}], isDefault: false, isGuest: false } }) { status message } }",
                                 "variables": ""
                             }
                         }
@@ -11424,7 +11424,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation UserUpdate { UserUpdate(input: { id: \"{{noOrgViewerUserId}}\", typeId: \"User\", productId: \"{{product_id}}\", item: { id: \"{{noOrgViewerUserId}}\", productId: \"{{product_id}}\", name: \"NoOrg Viewer\", username: \"{{noOrgViewerLogin}}\", roles: [\"{{noOrgViewerRoleId}}\"], groups: [], permissions: [] } }) { id } }",
+                                "query": "mutation UserUpdate { UserUpdate(input: { id: \"{{noOrgViewerUserId}}\", typeId: \"User\", productId: \"{{product_id}}\", item: { id: \"{{noOrgViewerUserId}}\", productId: \"{{product_id}}\", name: \"NoOrg Viewer\", username: \"{{noOrgViewerLogin}}\", roles: [{id: \"{{noOrgViewerRoleId}}\", direct: true}], groups: [], permissions: [] } }) { id } }",
                                 "variables": ""
                             }
                         }
@@ -11642,7 +11642,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation UpdateRoleFromRepresentation { UpdateRoleFromRepresentation(input: { documentId: \"{{noOrgRoleDocId}}\", role: { id: \"{{noOrgRoleId}}\", name: \"{{noOrgRoleCode}}\", description: \"NoOrg isolation role\", roleId: \"{{noOrgRoleCode}}\", productId: \"{{product_id}}\", parentRoles: [], permissions: \"\", isDefault: false, isGuest: false } }) { status message documentName } }",
+                                "query": "mutation UpdateRoleFromRepresentation { UpdateRoleFromRepresentation(input: { documentId: \"{{noOrgRoleDocId}}\", role: { id: \"{{noOrgRoleId}}\", name: \"{{noOrgRoleCode}}\", description: \"NoOrg isolation role\", roleId: \"{{noOrgRoleCode}}\", productId: \"{{product_id}}\", parentRoles: [], permissions: [], isDefault: false, isGuest: false } }) { status message documentName } }",
                                 "variables": ""
                             }
                         }
@@ -11783,7 +11783,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation UpdateGroupFromRepresentation { UpdateGroupFromRepresentation(input: { documentId: \"{{noOrgGroupDocId}}\", group: { id: \"{{noOrgGroupId}}\", productId: \"{{product_id}}\", name: \"{{noOrgGroupName}}\", description: \"NoOrg isolation probe\", roles: [\"{{noOrgRoleId}}\"], users: [], parentGroups: [] } }) { status message documentName } }",
+                                "query": "mutation UpdateGroupFromRepresentation { UpdateGroupFromRepresentation(input: { documentId: \"{{noOrgGroupDocId}}\", group: { id: \"{{noOrgGroupId}}\", productId: \"{{product_id}}\", name: \"{{noOrgGroupName}}\", description: \"NoOrg isolation probe\", roles: [{id: \"{{noOrgRoleId}}\", direct: true}], users: [], parentGroups: [] } }) { status message documentName } }",
                                 "variables": ""
                             }
                         }
@@ -17012,7 +17012,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation UpdateRoleFromRepresentation { UpdateRoleFromRepresentation(input: { documentId: \"{{role_perm_forbidden_doc_id}}\", role: { id: \"{{role_perm_probe_role_id}}\", name: \"{{role_perm_probe_role_code}}_NEG\", description: \"RolePerm forbidden probe\", roleId: \"{{role_perm_probe_role_code}}_NEG\", productId: \"{{product_id}}\", parentRoles: [], permissions: \"{{role_perm_forbidden_id}}\", isDefault: false, isGuest: false } }) { status message } }",
+                                "query": "mutation UpdateRoleFromRepresentation { UpdateRoleFromRepresentation(input: { documentId: \"{{role_perm_forbidden_doc_id}}\", role: { id: \"{{role_perm_probe_role_id}}\", name: \"{{role_perm_probe_role_code}}_NEG\", description: \"RolePerm forbidden probe\", roleId: \"{{role_perm_probe_role_code}}_NEG\", productId: \"{{product_id}}\", parentRoles: [], permissions: [{id: \"{{role_perm_forbidden_id}}\", direct: true}], isDefault: false, isGuest: false } }) { status message } }",
                                 "variables": ""
                             }
                         }
@@ -17147,7 +17147,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation UpdateRoleFromRepresentation { UpdateRoleFromRepresentation(input: { documentId: \"{{role_perm_allowed_doc_id}}\", role: { id: \"{{role_perm_probe_role_id_pos}}\", name: \"{{role_perm_probe_role_code}}_POS\", description: \"RolePerm allowed probe\", roleId: \"{{role_perm_probe_role_code}}_POS\", productId: \"{{product_id}}\", parentRoles: [], permissions: \"{{role_perm_allowed_id}}\", isDefault: false, isGuest: false } }) { status message } }",
+                                "query": "mutation UpdateRoleFromRepresentation { UpdateRoleFromRepresentation(input: { documentId: \"{{role_perm_allowed_doc_id}}\", role: { id: \"{{role_perm_probe_role_id_pos}}\", name: \"{{role_perm_probe_role_code}}_POS\", description: \"RolePerm allowed probe\", roleId: \"{{role_perm_probe_role_code}}_POS\", productId: \"{{product_id}}\", parentRoles: [], permissions: [{id: \"{{role_perm_allowed_id}}\", direct: true}], isDefault: false, isGuest: false } }) { status message } }",
                                 "variables": ""
                             }
                         }
@@ -17290,7 +17290,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation UpdateRoleFromRepresentation { UpdateRoleFromRepresentation(input: { documentId: \"{{role_perm_sysperm_doc_id}}\", role: { id: \"{{role_perm_sysperm_role_id}}\", name: \"{{role_perm_probe_role_code}}_SYS\", description: \"RolePerm system permission probe\", roleId: \"{{role_perm_probe_role_code}}_SYS\", productId: \"{{product_id}}\", parentRoles: [], permissions: \"ExportUser\", isDefault: false, isGuest: false } }) { status message } }",
+                                "query": "mutation UpdateRoleFromRepresentation { UpdateRoleFromRepresentation(input: { documentId: \"{{role_perm_sysperm_doc_id}}\", role: { id: \"{{role_perm_sysperm_role_id}}\", name: \"{{role_perm_probe_role_code}}_SYS\", description: \"RolePerm system permission probe\", roleId: \"{{role_perm_probe_role_code}}_SYS\", productId: \"{{product_id}}\", parentRoles: [], permissions: [{id: \"ExportUser\", direct: true}], isDefault: false, isGuest: false } }) { status message } }",
                                 "variables": ""
                             }
                         }
@@ -17538,7 +17538,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation RoleAdd { RoleAdd(input: { id: \"{{scopeRoleAId}}\", typeId: \"Role\", productId: \"{{product_id}}\", item: { id: \"{{scopeRoleAId}}\", name: \"{{scopeRoleACode}}\", roleId: \"{{scopeRoleACode}}\", productId: \"{{product_id}}\", parentRoles: [], permissions: \"\" } }) { id } }",
+                                "query": "mutation RoleAdd { RoleAdd(input: { id: \"{{scopeRoleAId}}\", typeId: \"Role\", productId: \"{{product_id}}\", item: { id: \"{{scopeRoleAId}}\", name: \"{{scopeRoleACode}}\", roleId: \"{{scopeRoleACode}}\", productId: \"{{product_id}}\", parentRoles: [], permissions: [] } }) { id } }",
                                 "variables": ""
                             }
                         }
@@ -17717,7 +17717,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation RoleAdd { RoleAdd(input: { id: \"{{scopeRoleBId}}\", typeId: \"Role\", productId: \"{{product_id}}\", item: { id: \"{{scopeRoleBId}}\", name: \"{{scopeRoleBCode}}\", roleId: \"{{scopeRoleBCode}}\", productId: \"{{product_id}}\", parentRoles: [], permissions: \"\" } }) { id } }",
+                                "query": "mutation RoleAdd { RoleAdd(input: { id: \"{{scopeRoleBId}}\", typeId: \"Role\", productId: \"{{product_id}}\", item: { id: \"{{scopeRoleBId}}\", name: \"{{scopeRoleBCode}}\", roleId: \"{{scopeRoleBCode}}\", productId: \"{{product_id}}\", parentRoles: [], permissions: [] } }) { id } }",
                                 "variables": ""
                             }
                         }
@@ -18373,7 +18373,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation UpdateRoleFromRepresentation { UpdateRoleFromRepresentation(input: { documentId: \"{{urtiRoleDocId}}\", role: { id: \"{{urtiRoleId}}\", name: \"{{urtiRoleCode}}\", description: \"Tenant A isolation probe role\", roleId: \"{{urtiRoleCode}}\", productId: \"{{product_id}}\", parentRoles: [], permissions: \"ViewUsers\", isDefault: false, isGuest: false } }) { status message } }",
+                                "query": "mutation UpdateRoleFromRepresentation { UpdateRoleFromRepresentation(input: { documentId: \"{{urtiRoleDocId}}\", role: { id: \"{{urtiRoleId}}\", name: \"{{urtiRoleCode}}\", description: \"Tenant A isolation probe role\", roleId: \"{{urtiRoleCode}}\", productId: \"{{product_id}}\", parentRoles: [], permissions: [{id: \"ViewUsers\", direct: true}], isDefault: false, isGuest: false } }) { status message } }",
                                 "variables": ""
                             }
                         }
@@ -18779,7 +18779,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation UpdateUserFromRepresentation { UpdateUserFromRepresentation(input: { documentId: \"{{urtiMemberDocId}}\", tenantId: \"{{tenantAId}}\", user: { id: \"{{a_member_user_id}}\", productId: \"{{product_id}}\", name: \"A Member\", username: \"{{a_member_login}}\", password: \"\", email: \"\", groups: [\"{{urtiGroupId}}\"], roles: [\"{{urtiRoleId}}\"], permissions: [], systemInfos: [] } }) { status message } }",
+                                "query": "mutation UpdateUserFromRepresentation { UpdateUserFromRepresentation(input: { documentId: \"{{urtiMemberDocId}}\", tenantId: \"{{tenantAId}}\", user: { id: \"{{a_member_user_id}}\", productId: \"{{product_id}}\", name: \"A Member\", username: \"{{a_member_login}}\", password: \"\", email: \"\", groups: [{id: \"{{urtiGroupId}}\", direct: true}], roles: [{id: \"{{urtiRoleId}}\", direct: true}], permissions: [], systemInfos: [] } }) { status message } }",
                                 "variables": ""
                             }
                         }
@@ -18861,7 +18861,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "query GetUserReprIso { GetUserRepresentation(input: { collectionId: \"Users\", id: \"{{urtiMemberDocId}}\" }) { id username roles groups permissions } }",
+                                "query": "query GetUserReprIso { GetUserRepresentation(input: { collectionId: \"Users\", id: \"{{urtiMemberDocId}}\" }) { id username roles { id name direct sources { steps { kind id name } } } groups { id name direct sources { steps { kind id name } } } permissions { id name direct sources { steps { kind id name } } } } }",
                                 "variables": ""
                             }
                         }
@@ -18873,6 +18873,8 @@
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
+                                    "function directIds(list) { return (list || []).filter(function (a) { return a.direct; }).map(function (a) { return a.id; }); }",
+                                    "function gqlAssignments(ids) { return '[' + ids.map(function (id) { return '{id: \"' + id + '\", direct: true}'; }).join(', ') + ']'; }",
                                     "// The role/group checks used to bail out with a bare `return` when the query",
                                     "// errored, which turned a failed request into a passing test.",
                                     "const json = pm.response.json();",
@@ -18886,12 +18888,12 @@
                                     "pm.test('Roles array includes tenant-A-bound isolation probe role (tenant filtered by CUserCollectionDocumentServiceComp)', function(){",
                                     "  pm.expect(!!urtiRoleId, 'fixture urtiRoleId missing - the check cannot run').to.eql(true);",
                                     "  pm.expect(Array.isArray(payload && payload.roles), 'no roles array: ' + JSON.stringify(payload)).to.eql(true);",
-                                    "  pm.expect(payload.roles.includes(urtiRoleId), 'expected roles to include ' + urtiRoleId + ' but got ' + JSON.stringify(payload.roles)).to.eql(true);",
+                                    "  pm.expect(directIds(payload.roles).includes(urtiRoleId), 'expected roles to include ' + urtiRoleId + ' but got ' + JSON.stringify(payload.roles)).to.eql(true);",
                                     "});",
                                     "pm.test('Groups array includes tenant-A-bound isolation probe group (tenant filtered)', function(){",
                                     "  pm.expect(!!urtiGroupId, 'fixture urtiGroupId missing - the check cannot run').to.eql(true);",
                                     "  pm.expect(Array.isArray(payload && payload.groups), 'no groups array: ' + JSON.stringify(payload)).to.eql(true);",
-                                    "  pm.expect(payload.groups.includes(urtiGroupId), 'expected groups to include ' + urtiGroupId + ' but got ' + JSON.stringify(payload.groups)).to.eql(true);",
+                                    "  pm.expect(directIds(payload.groups).includes(urtiGroupId), 'expected groups to include ' + urtiGroupId + ' but got ' + JSON.stringify(payload.groups)).to.eql(true);",
                                     "});"
                                 ]
                             }
@@ -19080,7 +19082,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "query GetUserReprIsoB { GetUserRepresentation(input: { collectionId: \"Users\", id: \"{{urtiMemberDocIdB}}\" }) { id username roles groups } }",
+                                "query": "query GetUserReprIsoB { GetUserRepresentation(input: { collectionId: \"Users\", id: \"{{urtiMemberDocIdB}}\" }) { id username roles { id name direct sources { steps { kind id name } } } groups { id name direct sources { steps { kind id name } } } } }",
                                 "variables": ""
                             }
                         }
@@ -19092,6 +19094,8 @@
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
+                                    "function directIds(list) { return (list || []).filter(function (a) { return a.direct; }).map(function (a) { return a.id; }); }",
+                                    "function gqlAssignments(ids) { return '[' + ids.map(function (id) { return '{id: \"' + id + '\", direct: true}'; }).join(', ') + ']'; }",
                                     "const json = pm.response.json();",
                                     "const payload = json.data ? json.data.GetUserRepresentation : null;",
                                     "const urtiRoleId = pm.environment.get('urtiRoleId');",
@@ -19103,12 +19107,12 @@
                                     "pm.test('User repr roles under foreign tenant context must not leak non-bound role IDs (core fix verification)', function(){",
                                     "  pm.expect(!!urtiRoleId, 'fixture urtiRoleId missing - leak check cannot run').to.eql(true);",
                                     "  pm.expect(Array.isArray(payload && payload.roles), 'no roles array returned - leak check cannot run').to.eql(true);",
-                                    "  pm.expect(payload.roles.includes(urtiRoleId), 'tenant-A-bound role leaked into tenant B view: ' + JSON.stringify(payload.roles)).to.eql(false);",
+                                    "  pm.expect(directIds(payload.roles).includes(urtiRoleId), 'tenant-A-bound role leaked into tenant B view: ' + JSON.stringify(payload.roles)).to.eql(false);",
                                     "});",
                                     "pm.test('User repr groups under foreign tenant context must not leak non-bound group IDs', function(){",
                                     "  pm.expect(!!urtiGroupId, 'fixture urtiGroupId missing - leak check cannot run').to.eql(true);",
                                     "  pm.expect(Array.isArray(payload && payload.groups), 'no groups array returned - leak check cannot run').to.eql(true);",
-                                    "  pm.expect(payload.groups.includes(urtiGroupId), 'tenant-A-bound group leaked into tenant B view: ' + JSON.stringify(payload.groups)).to.eql(false);",
+                                    "  pm.expect(directIds(payload.groups).includes(urtiGroupId), 'tenant-A-bound group leaked into tenant B view: ' + JSON.stringify(payload.groups)).to.eql(false);",
                                     "});"
                                 ]
                             }
@@ -19117,6 +19121,1868 @@
                 }
             ],
             "event": []
+        },
+        {
+            "id": "b3ffc3ad-04db-4517-9a53-68dfac7c1644",
+            "name": "15 QA Regression - Group roles, group search, registration",
+            "item": [
+                {
+                    "id": "f5810fca-27fc-49a4-9912-4734efab3b0f",
+                    "name": "QA Regression seed variables",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{su_login}}\", password: \"{{su_password}}\", productId: \"{{product_id}}\" }) { token } }",
+                                "variables": ""
+                            }
+                        },
+                        "description": "Seeds the ids of the regression scenarios found by the exploratory GUI QA of 2026-10-08 (ProLife Docs/QA/ProLifeGuiExploratory-2026-10-08.md)."
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "id": "960ffde9-0c7a-40c2-bd94-2773536ec367",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const n = pm.variables.replaceIn('{{$timestamp}}');",
+                                    "['qaRegRoleId', 'qaRegGroupId', 'qaRegDocGroupId', 'qaRegMemberId', 'qaRegLegacyMemberId'].forEach(function (k) { pm.environment.set(k, pm.variables.replaceIn('{{$guid}}')); });",
+                                    "pm.environment.set('product_id', 'Puma');",
+                                    "pm.environment.set('qaRegRoleCode', 'QA_REG_GROUP_ROLE_' + n);",
+                                    "pm.environment.set('qaRegPermission', 'QaRegInheritedPermission' + n);",
+                                    "pm.environment.set('qaRegGroupName', 'QA_REG_GROUP_' + n);",
+                                    "pm.environment.set('qaRegDocGroupName', 'QA_REG_DOC_GROUP_' + n);",
+                                    "pm.environment.set('qaRegMemberLogin', 'qa_reg_member_' + n);",
+                                    "pm.environment.set('qaRegLegacyMemberLogin', 'qa_reg_legacy_' + n);",
+                                    "pm.environment.set('qaRegWeakLogin', 'qa_reg_weak_' + n);"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "c72e0ee1-65ea-4711-a159-180eb4fe5e62",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const auth = json.data && json.data.Authorization;",
+                                    "pm.test('SU authorized for the QA regression folder', function () { pm.expect(auth && auth.token).to.be.a('string').and.not.empty; });",
+                                    "pm.environment.set('su_token', auth.token);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "acf68598-b1aa-4f2c-88e7-2cdebc8f2c54",
+                    "name": "QA Regression role granted only through a group",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RoleAdd { RoleAdd(input: { id: \"{{qaRegRoleId}}\", typeId: \"Role\", productId: \"{{product_id}}\", item: { id: \"{{qaRegRoleId}}\", name: \"{{qaRegRoleCode}}\", roleId: \"{{qaRegRoleCode}}\", productId: \"{{product_id}}\", parentRoles: [], permissions: [{id: \"{{qaRegPermission}}\", direct: true}] } }) { id } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "ab4a1e87-ab58-48bd-b497-6e055937783f",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Group role created', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "7e155023-a1c3-4c46-9c1a-44440387a4bd",
+                    "name": "QA Regression group carrying the role",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation GroupAdd { GroupAdd(input: { id: \"{{qaRegGroupId}}\", typeId: \"Group\", productId: \"{{product_id}}\", item: { id: \"{{qaRegGroupId}}\", productId: \"{{product_id}}\", name: \"{{qaRegGroupName}}\", description: \"QA regression group\", roles: [{id: \"{{qaRegRoleId}}\", direct: true}], users: [], parentGroups: [] } }) { id } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "dfd44c0c-d9fe-40e0-b163-be34704aa5ef",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Group created', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "d2048214-1d4d-4e53-9b6c-1987d0c99b72",
+                    "name": "D-33 GroupsList text search finds a group created with GroupAdd",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GroupsList { GroupsList(input: { productId: \"{{product_id}}\", viewParams: { offset: 0, count: 20, filterModel: { textFilter: { text: \"{{qaRegGroupName}}\", fieldIds: [\"name\"] } } } }) { items { id name } } }",
+                                "variables": ""
+                            }
+                        },
+                        "description": "Regression for D-33: a freshly created group was listed but not found by the group picker search."
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "cc661f02-e954-4936-bf80-001d1c90b1ac",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const items = (json.data && json.data.GroupsList && json.data.GroupsList.items) || [];",
+                                    "pm.test('New group is found by its name', function () {",
+                                    "  pm.expect(items.map(function (i) { return i.id; }), JSON.stringify(json)).to.include(pm.environment.get('qaRegGroupId'));",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "c954c6b1-899b-479c-a901-203e7989f173",
+                    "name": "D-33 CreateNewDocument group",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateNewDocument { CreateNewDocument(input: { collectionId: \"Groups\", typeId: \"Group\", proposedSourceDocumentId: \"{{qaRegDocGroupId}}\" }) { documentId } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "438f5455-fd39-4b00-b8ec-53a769039d31",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Group document created', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "});",
+                                    "pm.environment.set('qaRegDocGroupDocId', json.data.CreateNewDocument.documentId);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "1c75e8ed-4013-4600-ac5d-d9c0c14fb537",
+                    "name": "D-33 UpdateGroupFromRepresentation names the new group",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UpdateGroupFromRepresentation { UpdateGroupFromRepresentation(input: { documentId: \"{{qaRegDocGroupDocId}}\", group: { id: \"{{qaRegDocGroupId}}\", productId: \"{{product_id}}\", name: \"{{qaRegDocGroupName}}\", description: \"QA regression document group\", roles: [], users: [], parentGroups: [] } }) { status message } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "6c222452-f015-4d08-8102-b4bfae08885c",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Group representation accepted', function () { pm.expect(json.data.UpdateGroupFromRepresentation.status, JSON.stringify(json)).to.eql('Success'); });"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "62230bb9-ae9e-4c52-95ae-5fff7586599c",
+                    "name": "D-33 SaveDocument group",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SaveDocument { SaveDocument(input: { collectionId: \"Groups\", documentId: \"{{qaRegDocGroupDocId}}\", documentName: \"\" }) { status message } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "7be361c3-92e8-45f8-a6cf-f134d5501514",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Group document saved', function () { pm.expect(json.data.SaveDocument.status, JSON.stringify(json)).to.eql('Success'); });"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "fa8adade-546e-4b43-b7b6-b777f6b44fc8",
+                    "name": "D-33 GroupsList text search finds a group created through the document service",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GroupsList { GroupsList(input: { productId: \"{{product_id}}\", viewParams: { offset: 0, count: 20, filterModel: { textFilter: { text: \"{{qaRegDocGroupName}}\", fieldIds: [\"name\"] } } } }) { items { id name } } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "04d2ac15-e9ce-40ca-b0fe-c69253976562",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const items = (json.data && json.data.GroupsList && json.data.GroupsList.items) || [];",
+                                    "pm.test('Document-service group is found by its name', function () {",
+                                    "  pm.expect(items.map(function (i) { return i.name; }), JSON.stringify(json)).to.include(pm.environment.get('qaRegDocGroupName'));",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "910c29bc-f454-4532-a29d-e4d831132850",
+                    "name": "D-36 OpenDocument group carrying the role",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation OpenDocument { OpenDocument(input: { collectionId: \"Groups\", id: \"{{qaRegGroupId}}\" }) { documentId } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "92b5eacb-120f-4b0f-ac7e-4f62b3f635c8",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Group document opened', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "});",
+                                    "pm.environment.set('qaRegGroupDocId', json.data.OpenDocument.documentId);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "90ca912b-ef33-4239-af59-66b0ef038d7e",
+                    "name": "D-36 GetGroupRepresentation lists the granted permission with its role (waits for load)",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetGroupRepresentation { GetGroupRepresentation(input: { collectionId: \"Groups\", id: \"{{qaRegGroupDocId}}\" }) { roles { id name direct sources { steps { kind id name } } } parentGroups { id name direct sources { steps { kind id name } } } permissions { id name direct sources { steps { kind id name } } } accessWarnings { code ids message } } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "id": "5ecdc543-dbe9-494a-a401-d4789a1bd5b9",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "setTimeout(function () {}, Number(pm.environment.get('qaRegLoadAttempt') || 0) > 0 ? 250 : 0);"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "73f3f36b-1336-43d2-aec1-43fdf0a1981b",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const rep = json.data && json.data.GetGroupRepresentation;",
+                                    "function grantedItem(list, id) { return (list || []).find(function (item) { return item.id === id; }); }",
+                                    "function pathKeys(item) {",
+                                    "  return ((item && item.sources) || []).map(function (path) {",
+                                    "    return (path.steps || []).map(function (step) { return step.kind + ':' + step.id; }).join('>');",
+                                    "  });",
+                                    "}",
+                                    "const attempt = Number(pm.environment.get('qaRegLoadAttempt') || 0);",
+                                    "if (!(rep && rep.roles && rep.roles.length > 0) && attempt < 40) {",
+                                    "  pm.environment.set('qaRegLoadAttempt', attempt + 1);",
+                                    "  postman.setNextRequest(pm.info.requestName);",
+                                    "} else {",
+                                    "  pm.environment.unset('qaRegLoadAttempt');",
+                                    "  pm.test('The group role is granted directly, its permission through the role', function () {",
+                                    "    pm.expect(rep, JSON.stringify(json)).to.be.an('object');",
+                                    "    pm.expect((grantedItem(rep.roles, pm.environment.get('qaRegRoleId')) || {}).direct).to.eql(true);",
+                                    "    pm.expect(pathKeys(grantedItem(rep.permissions, pm.environment.get('qaRegPermission')))).to.eql(['Role:' + pm.environment.get('qaRegRoleId')]);",
+                                    "    pm.expect(rep.accessWarnings || []).to.have.length(0);",
+                                    "  });",
+                                    "}"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "ac3329cb-26e3-426d-abdd-8dfde72e852a",
+                    "name": "D-36 CloseDocument group",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CloseDocument { CloseDocument(input: { collectionId: \"Groups\", id: \"{{qaRegGroupDocId}}\" }) { status message } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "edeb8a97-8041-436e-917d-ba5d3ab0aadf",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Group document closed', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "bdc9dd52-af14-4522-9dce-c1556e685234",
+                    "name": "QA Regression member added only to the group",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UserAdd { UserAdd(input: { id: \"{{qaRegMemberId}}\", typeId: \"User\", productId: \"{{product_id}}\", item: { id: \"{{qaRegMemberId}}\", productId: \"{{product_id}}\", name: \"QA Regression Member\", username: \"{{qaRegMemberLogin}}\", password: \"QaRegression_2026!\", email: \"{{qaRegMemberLogin}}@qa.test\", groups: [{id: \"{{qaRegGroupId}}\", direct: true}], roles: [], permissions: [], systemInfos: [] } }) { id } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "4b565b6a-d518-49af-9c71-5b56bfa6d8bd",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Group member created', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "1d13b54a-7e94-4bbc-9a6b-a13bf84f963a",
+                    "name": "D-26 UserItem reports the group permission with its source, not the group role as a direct role",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query UserItem { UserItem(input: { id: \"{{qaRegMemberId}}\", productId: \"{{product_id}}\" }) { roles { id name direct sources { steps { kind id name } } } groups { id name direct sources { steps { kind id name } } } permissions { id name direct sources { steps { kind id name } } } accessWarnings { code ids message } } }",
+                                "variables": ""
+                            }
+                        },
+                        "description": "Regression for D-01/D-26: the effective (group-inherited) roles were returned as the user's own roles and written back as direct roles on the next save."
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "94b1cd5b-b483-45a1-8ebc-80fd38478fe4",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "function directIds(list) { return (list || []).filter(function (a) { return a.direct; }).map(function (a) { return a.id; }); }",
+                                    "function gqlAssignments(ids) { return '[' + ids.map(function (id) { return '{id: \"' + id + '\", direct: true}'; }).join(', ') + ']'; }",
+                                    "const json = pm.response.json();",
+                                    "const user = json.data && json.data.UserItem;",
+                                    "function grantedItem(list, id) { return (list || []).find(function (item) { return item.id === id; }); }",
+                                    "function pathKeys(item) {",
+                                    "  return ((item && item.sources) || []).map(function (path) {",
+                                    "    return (path.steps || []).map(function (step) { return step.kind + ':' + step.id; }).join('>');",
+                                    "  });",
+                                    "}",
+                                    "pm.test('Assigned roles contain only direct roles', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(directIds(user.roles)).to.not.include(pm.environment.get('qaRegRoleId'));",
+                                    "  pm.expect(directIds(user.groups)).to.include(pm.environment.get('qaRegGroupId'));",
+                                    "});",
+                                    "pm.test('Granted role and permission name the group as their source', function () {",
+                                    "  pm.expect((grantedItem(user.groups, pm.environment.get('qaRegGroupId')) || {}).direct, 'group source').to.eql(true);",
+                                    "  pm.expect(pathKeys(grantedItem(user.roles, pm.environment.get('qaRegRoleId'))), 'role source').to.eql(['Group:' + pm.environment.get('qaRegGroupId')]);",
+                                    "  pm.expect(pathKeys(grantedItem(user.permissions, pm.environment.get('qaRegPermission'))), 'permission source').to.eql(['Group:' + pm.environment.get('qaRegGroupId') + '>Role:' + pm.environment.get('qaRegRoleId')]);",
+                                    "  pm.expect(user.accessWarnings || []).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "8f47d392-a7fa-4a6f-89fb-c05fb3868332",
+                    "name": "D-26 GetProfile reports the role inherited from the group",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetProfile { GetProfile(input: { id: \"{{qaRegMemberId}}\", productId: \"{{product_id}}\" }) { roles { id } permissions { id } } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "5d902c6b-df3e-4a4e-8b97-3251255f3745",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const profile = json.data && json.data.GetProfile;",
+                                    "pm.test('Effective roles and permissions include the group role', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(profile.roles.map(function (r) { return r.id; })).to.include(pm.environment.get('qaRegRoleCode'));",
+                                    "  pm.expect(profile.permissions.map(function (p) { return p.id; })).to.include(pm.environment.get('qaRegPermission'));",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "2094fcac-8df8-4496-a4e5-1b8d07c83123",
+                    "name": "D-26 Authorization of the member grants the inherited permission",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{qaRegMemberLogin}}\", password: \"QaRegression_2026!\", productId: \"{{product_id}}\" }) { token permissions } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "54d19c18-12a5-49f3-8a0f-010ab4d4e17c",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const auth = json.data && json.data.Authorization;",
+                                    "const permissions = ((auth && auth.permissions) || '').split(';').filter(function (p) { return !!p; });",
+                                    "pm.test('Group membership grants the role permission', function () {",
+                                    "  pm.expect(permissions, JSON.stringify(json)).to.include(pm.environment.get('qaRegPermission'));",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "72964933-dc72-4a5b-9e2a-9455ce3dd563",
+                    "name": "D-26 OpenDocument member",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation OpenDocument { OpenDocument(input: { collectionId: \"Users\", id: \"{{qaRegMemberId}}\" }) { documentId } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "4f7006cc-362c-470b-9915-c5d1490f8e43",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Member document opened', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "});",
+                                    "pm.environment.set('qaRegMemberDocId', json.data.OpenDocument.documentId);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "f45dda2d-8f3a-406c-b736-4454aa11384d",
+                    "name": "D-26 GetUserRepresentation shows only direct roles (waits for load)",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetUserRepresentation { GetUserRepresentation(input: { collectionId: \"Users\", id: \"{{qaRegMemberDocId}}\" }) { roles { id name direct sources { steps { kind id name } } } groups { id name direct sources { steps { kind id name } } } permissions { id name direct sources { steps { kind id name } } } accessWarnings { code ids message } } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "id": "07e8e861-7e8c-458b-b74a-f6ccea1ee2e4",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "setTimeout(function () {}, Number(pm.environment.get('qaRegLoadAttempt') || 0) > 0 ? 250 : 0);"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "cf1bb946-3625-4f18-9880-d5ac85f31804",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "function directIds(list) { return (list || []).filter(function (a) { return a.direct; }).map(function (a) { return a.id; }); }",
+                                    "function gqlAssignments(ids) { return '[' + ids.map(function (id) { return '{id: \"' + id + '\", direct: true}'; }).join(', ') + ']'; }",
+                                    "const json = pm.response.json();",
+                                    "const rep = json.data && json.data.GetUserRepresentation;",
+                                    "function grantedItem(list, id) { return (list || []).find(function (item) { return item.id === id; }); }",
+                                    "function pathKeys(item) {",
+                                    "  return ((item && item.sources) || []).map(function (path) {",
+                                    "    return (path.steps || []).map(function (step) { return step.kind + ':' + step.id; }).join('>');",
+                                    "  });",
+                                    "}",
+                                    "const attempt = Number(pm.environment.get('qaRegLoadAttempt') || 0);",
+                                    "if (!(rep && rep.groups && rep.groups.length > 0) && attempt < 40) {",
+                                    "  pm.environment.set('qaRegLoadAttempt', attempt + 1);",
+                                    "  postman.setNextRequest(pm.info.requestName);",
+                                    "} else {",
+                                    "  pm.environment.unset('qaRegLoadAttempt');",
+                                    "",
+                                    "  pm.test('Editor representation contains no inherited role', function () {",
+                                    "    pm.expect(rep, JSON.stringify(json)).to.be.an('object');",
+                                    "    pm.expect(directIds(rep.groups)).to.include(pm.environment.get('qaRegGroupId'));",
+                                    "    pm.expect(directIds(rep.roles)).to.not.include(pm.environment.get('qaRegRoleId'));",
+                                    "  });",
+                                    "  pm.test('Editor representation shows where the role and the permission come from', function () {",
+                                    "    pm.expect(pathKeys(grantedItem(rep.roles, pm.environment.get('qaRegRoleId'))), 'role source').to.eql(['Group:' + pm.environment.get('qaRegGroupId')]);",
+                                    "    pm.expect(pathKeys(grantedItem(rep.permissions, pm.environment.get('qaRegPermission'))), 'permission source').to.eql(['Group:' + pm.environment.get('qaRegGroupId') + '>Role:' + pm.environment.get('qaRegRoleId')]);",
+                                    "    pm.expect(rep.accessWarnings || []).to.have.length(0);",
+                                    "  });",
+                                    "  pm.environment.set('qaRegMemberRepRoles', gqlAssignments(directIds(rep.roles)));",
+                                    "  // Sent back as the deprecated permissions field: it must be ignored.",
+                                    "  pm.environment.set('qaRegMemberRepPermissions', gqlAssignments((rep.permissions || []).map(function (item) { return item.id; })));",
+                                    "}"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "dcca794e-ffda-447c-a839-cb1095e7459c",
+                    "name": "D-26 UpdateUserFromRepresentation removes the member from the group (roles as shown in the editor)",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UpdateUserFromRepresentation { UpdateUserFromRepresentation(input: { documentId: \"{{qaRegMemberDocId}}\", user: { id: \"{{qaRegMemberId}}\", productId: \"{{product_id}}\", name: \"QA Regression Member\", username: \"{{qaRegMemberLogin}}\", password: \"\", email: \"{{qaRegMemberLogin}}@qa.test\", groups: [], roles: {{qaRegMemberRepRoles}}, permissions: {{qaRegMemberRepPermissions}}, systemInfos: [] } }) { status message } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "efb93da6-911d-402c-8236-dcb2eda68bd7",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Membership change accepted', function () { pm.expect(json.data.UpdateUserFromRepresentation.status, JSON.stringify(json)).to.eql('Success'); });"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "45594a17-5615-436a-b300-0c8f03c997a7",
+                    "name": "D-26 SaveDocument member",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SaveDocument { SaveDocument(input: { collectionId: \"Users\", documentId: \"{{qaRegMemberDocId}}\", documentName: \"\" }) { status message } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "844d1a95-4833-4008-a40d-251465d71e14",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Member saved', function () { pm.expect(json.data.SaveDocument.status, JSON.stringify(json)).to.eql('Success'); });"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "5171323d-61bb-4d18-8a3a-8d7ca8d5b86e",
+                    "name": "D-26 UserItem after leaving the group has no roles left",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query UserItem { UserItem(input: { id: \"{{qaRegMemberId}}\", productId: \"{{product_id}}\" }) { roles { id name direct sources { steps { kind id name } } } groups { id name direct sources { steps { kind id name } } } permissions { id name direct sources { steps { kind id name } } } accessWarnings { code ids message } } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "06e3ca58-c0a0-473a-b6b1-1b1a9e40a209",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "function directIds(list) { return (list || []).filter(function (a) { return a.direct; }).map(function (a) { return a.id; }); }",
+                                    "function gqlAssignments(ids) { return '[' + ids.map(function (id) { return '{id: \"' + id + '\", direct: true}'; }).join(', ') + ']'; }",
+                                    "const json = pm.response.json();",
+                                    "const user = json.data && json.data.UserItem;",
+                                    "function grantedItem(list, id) { return (list || []).find(function (item) { return item.id === id; }); }",
+                                    "function pathKeys(item) {",
+                                    "  return ((item && item.sources) || []).map(function (path) {",
+                                    "    return (path.steps || []).map(function (step) { return step.kind + ':' + step.id; }).join('>');",
+                                    "  });",
+                                    "}",
+                                    "pm.test('Leaving the group leaves no role or permission behind', function () {",
+                                    "  pm.expect(directIds(user.groups)).to.have.length(0);",
+                                    "  pm.expect(directIds(user.roles)).to.not.include(pm.environment.get('qaRegRoleId'));",
+                                    "  pm.expect(grantedItem(user.roles, pm.environment.get('qaRegRoleId'))).to.eql(undefined);",
+                                    "  pm.expect(grantedItem(user.permissions, pm.environment.get('qaRegPermission'))).to.eql(undefined);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "bea75f10-ba12-4c99-8633-319937fdb1f4",
+                    "name": "D-26 Authorization after leaving the group no longer grants the permission",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{qaRegMemberLogin}}\", password: \"QaRegression_2026!\", productId: \"{{product_id}}\" }) { token permissions } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "4d6cc108-3a51-4119-9788-80986b071d33",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const auth = json.data && json.data.Authorization;",
+                                    "const permissions = ((auth && auth.permissions) || '').split(';').filter(function (p) { return !!p; });",
+                                    "pm.test('Former group permission is revoked', function () {",
+                                    "  pm.expect(auth && auth.token, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "  pm.expect(permissions).to.not.include(pm.environment.get('qaRegPermission'));",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "7fe7d865-9efe-4a91-bc5d-e874a80afdbf",
+                    "name": "D-35 UserUpdate with a direct permission",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UserUpdate { UserUpdate(input: { id: \"{{qaRegMemberId}}\", typeId: \"User\", productId: \"{{product_id}}\", item: { id: \"{{qaRegMemberId}}\", productId: \"{{product_id}}\", name: \"QA Regression Member\", username: \"{{qaRegMemberLogin}}\", roles: [], groups: [], permissions: [{id: \"{{qaRegPermission}}\", direct: true}] } }) { id } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "1d307d60-1065-4ac9-9e0a-443afad9524d",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Update with a direct permission is accepted and ignored', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "7807c0c8-55a1-47ce-ab68-6089e9687a24",
+                    "name": "D-35 UserItem reports no permission without roles or groups",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query UserItem { UserItem(input: { id: \"{{qaRegMemberId}}\", productId: \"{{product_id}}\" }) { roles { id name direct sources { steps { kind id name } } } groups { id name direct sources { steps { kind id name } } } permissions { id name direct sources { steps { kind id name } } } accessWarnings { code ids message } } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "9540faed-2497-43cb-ab77-71dacf93832f",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const user = json.data && json.data.UserItem;",
+                                    "function grantedItem(list, id) { return (list || []).find(function (item) { return item.id === id; }); }",
+                                    "function pathKeys(item) {",
+                                    "  return ((item && item.sources) || []).map(function (path) {",
+                                    "    return (path.steps || []).map(function (step) { return step.kind + ':' + step.id; }).join('>');",
+                                    "  });",
+                                    "}",
+                                    "pm.test('A direct permission is not granted', function () {",
+                                    "  pm.expect(user, JSON.stringify(json)).to.be.an('object');",
+                                    "  pm.expect(grantedItem(user.permissions, pm.environment.get('qaRegPermission'))).to.eql(undefined);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "7c432911-ba39-420e-9a8f-ff7c0bd592ee",
+                    "name": "D-35 Authorization does not grant a direct permission",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{qaRegMemberLogin}}\", password: \"QaRegression_2026!\", productId: \"{{product_id}}\" }) { token permissions } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "6d459b32-b97d-468b-bcc4-8f3e443e7506",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const auth = json.data && json.data.Authorization;",
+                                    "const permissions = ((auth && auth.permissions) || '').split(';').filter(function (p) { return !!p; });",
+                                    "pm.test('Roles are the only source of permissions', function () {",
+                                    "  pm.expect(auth && auth.token, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "  pm.expect(permissions).to.not.include(pm.environment.get('qaRegPermission'));",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "0df93d1f-5796-4c7e-a1ad-6c97eddf6c8c",
+                    "name": "QA Regression legacy member added only to the group",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UserAdd { UserAdd(input: { id: \"{{qaRegLegacyMemberId}}\", typeId: \"User\", productId: \"{{product_id}}\", item: { id: \"{{qaRegLegacyMemberId}}\", productId: \"{{product_id}}\", name: \"QA Regression Member\", username: \"{{qaRegLegacyMemberLogin}}\", password: \"QaRegression_2026!\", email: \"{{qaRegLegacyMemberLogin}}@qa.test\", groups: [{id: \"{{qaRegGroupId}}\", direct: true}], roles: [], permissions: [], systemInfos: [] } }) { id } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "93bad81d-6864-4e5a-a015-eab0f548709d",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Legacy member created', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "3251d0c2-b5d3-42c2-b604-1a1b0660b977",
+                    "name": "D-01 UserItem of the legacy member (round trip source)",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query UserItem { UserItem(input: { id: \"{{qaRegLegacyMemberId}}\", productId: \"{{product_id}}\" }) { roles { id name direct sources { steps { kind id name } } } groups { id name direct sources { steps { kind id name } } } permissions { id name direct sources { steps { kind id name } } } accessWarnings { code ids message } } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "f486c5ce-068b-4158-91c9-d1b5dec939bd",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "function directIds(list) { return (list || []).filter(function (a) { return a.direct; }).map(function (a) { return a.id; }); }",
+                                    "function gqlAssignments(ids) { return '[' + ids.map(function (id) { return '{id: \"' + id + '\", direct: true}'; }).join(', ') + ']'; }",
+                                    "const json = pm.response.json();",
+                                    "const user = json.data && json.data.UserItem;",
+                                    "function grantedItem(list, id) { return (list || []).find(function (item) { return item.id === id; }); }",
+                                    "function pathKeys(item) {",
+                                    "  return ((item && item.sources) || []).map(function (path) {",
+                                    "    return (path.steps || []).map(function (step) { return step.kind + ':' + step.id; }).join('>');",
+                                    "  });",
+                                    "}",
+                                    "const grantedIds = (user.permissions || []).map(function (item) { return item.id; });",
+                                    "pm.test('Legacy representation has no inherited role, the inherited permission is reported as granted', function () {",
+                                    "  pm.expect(directIds(user.roles)).to.not.include(pm.environment.get('qaRegRoleId'));",
+                                    "  pm.expect(grantedIds, 'the round trip below must carry the permission to prove it is ignored').to.include(pm.environment.get('qaRegPermission'));",
+                                    "});",
+                                    "pm.environment.set('qaRegLegacyRoles', gqlAssignments(directIds(user.roles)));",
+                                    "pm.environment.set('qaRegLegacyPermissions', gqlAssignments(grantedIds));"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "97b2c99d-21d4-4bdc-8c53-6c6ea9098424",
+                    "name": "D-01 UserUpdate writes back the representation and leaves the group",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UserUpdate { UserUpdate(input: { id: \"{{qaRegLegacyMemberId}}\", typeId: \"User\", productId: \"{{product_id}}\", item: { id: \"{{qaRegLegacyMemberId}}\", productId: \"{{product_id}}\", name: \"QA Regression Member\", username: \"{{qaRegLegacyMemberLogin}}\", roles: {{qaRegLegacyRoles}}, groups: [], permissions: {{qaRegLegacyPermissions}} } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "description": "Regression for D-01: UserItem exported the effective permissions and UserUpdate stored them as local permissions, so they survived role and group removal."
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "295356a4-362a-45b7-9c1d-b2adb84ea182",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Legacy update accepted', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "2a0873c6-b486-4c68-a6ce-4c695f4db9c8",
+                    "name": "D-01 Authorization after the legacy round trip no longer grants the permission",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{qaRegLegacyMemberLogin}}\", password: \"QaRegression_2026!\", productId: \"{{product_id}}\" }) { token permissions } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "68dae6fc-8f0f-4654-aea6-bbc13f36ee27",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const auth = json.data && json.data.Authorization;",
+                                    "const permissions = ((auth && auth.permissions) || '').split(';').filter(function (p) { return !!p; });",
+                                    "pm.test('No permission survives the round trip once the group is left', function () {",
+                                    "  pm.expect(auth && auth.token, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "  pm.expect(permissions).to.not.include(pm.environment.get('qaRegPermission'));",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "5586640a-739a-42e5-b7f0-fa2b0d19e126",
+                    "name": "D-16 SetProfile renames the legacy member",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SetProfile { SetProfile(input: { id: \"{{qaRegLegacyMemberId}}\", name: \"QA Regression Member Renamed\", email: \"{{qaRegLegacyMemberLogin}}@qa.test\" }) { status } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "be03626c-8078-4f6e-93dc-a06a80846739",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Profile updated', function () { pm.expect(json.data && json.data.SetProfile.status, JSON.stringify(json)).to.eql(true); });"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "34f80e65-4039-4efa-b3ef-bb9ba45f52a1",
+                    "name": "D-16 GetRevisionInfoList attributes the profile revision to the requesting user",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetRevisionInfoList { GetRevisionInfoList(input: { documentId: \"{{qaRegLegacyMemberId}}\", collectionId: \"Users\" }) { activeRevision revisions { user revision isActive } } }",
+                                "variables": ""
+                            }
+                        },
+                        "description": "Regression for D-16: profile updates were stored without an operation context, so the revision had neither user nor description."
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "59bba7c3-58dd-4766-8d89-f5b4986f3cda",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const list = json.data && json.data.GetRevisionInfoList;",
+                                    "const revisions = (list && list.revisions) || [];",
+                                    "const latest = revisions.reduce(function (a, r) { return !a || r.revision > a.revision ? r : a; }, null);",
+                                    "pm.test('Latest revision has an author', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(latest, JSON.stringify(json)).to.be.an('object');",
+                                    "  pm.expect(latest.revision).to.eql(list.activeRevision);",
+                                    "  pm.expect(latest.user).to.be.a('string').and.not.empty;",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "a56f796c-1af0-4939-a9d0-fbd2cf73ffe4",
+                    "name": "D-32 RegisterUser with a password violating the policy returns a structured failure",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RegisterUser { RegisterUser(input: { userData: { name: \"QA Weak\", username: \"{{qaRegWeakLogin}}\", password: \"1\", email: \"{{qaRegWeakLogin}}@qa.test\" }, productId: \"{{product_id}}\" }) { id message violatedRules } }",
+                                "variables": ""
+                            }
+                        },
+                        "description": "Regression for D-32: the failure payload lacked the required id, so the server answered \"Internal error. Unable to create response for command-ID: RegisterUser\"."
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "9c0fdea0-cac2-485a-ad4e-a284e9c90677",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.RegisterUser;",
+                                    "pm.test('Policy violation is reported as data, not as an internal error', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(payload, JSON.stringify(json)).to.be.an('object');",
+                                    "  pm.expect(payload.id).to.eql('');",
+                                    "  pm.expect(payload.violatedRules).to.be.an('array').that.includes('MinLength');",
+                                    "  pm.expect(payload.message).to.include('password policy');",
+                                    "  pm.expect(payload.message, 'message shown to the user as is').to.match(/^The password does not fulfill/);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "70fbf98b-73a5-43cf-81ca-638041c5651a",
+                    "name": "D-32 Authorization of the refused registration fails",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{qaRegWeakLogin}}\", password: \"1\", productId: \"{{product_id}}\" }) { token } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "621b82f3-7c7d-406e-9e2f-52cdb8abdd37",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const auth = json.data && json.data.Authorization;",
+                                    "pm.test('No account was created for the refused registration', function () {",
+                                    "  pm.expect(!!(auth && auth.token), JSON.stringify(json)).to.eql(false);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "62592242-5160-4960-8772-fae4146b99f8",
+                    "name": "D-37 Child role inheriting the group role",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RoleAdd { RoleAdd(input: { id: \"{{qaRegChildRoleId}}\", typeId: \"Role\", productId: \"{{product_id}}\", item: { id: \"{{qaRegChildRoleId}}\", name: \"{{qaRegChildRoleCode}}\", roleId: \"{{qaRegChildRoleCode}}\", productId: \"{{product_id}}\", parentRoles: [{id: \"{{qaRegRoleId}}\", direct: true}], permissions: [] } }) { id } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "id": "b717326d-e3c3-44cc-bfc4-1d6606b2c774",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const n = pm.variables.replaceIn('{{$timestamp}}');",
+                                    "pm.environment.set('qaRegChildRoleId', pm.variables.replaceIn('{{$guid}}'));",
+                                    "pm.environment.set('qaRegChildRoleCode', 'QA_REG_CHILD_ROLE_' + n);",
+                                    "pm.environment.set('qaRegChildUserId', pm.variables.replaceIn('{{$guid}}'));",
+                                    "pm.environment.set('qaRegChildUserLogin', 'qa_reg_child_' + n);"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "bb5492b3-3d7f-45fd-aeea-cae97b8c5e0f",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Child role created', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "b85f32d0-eaad-4557-b0ce-59424043824a",
+                    "name": "D-37 User holding only the child role",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UserAdd { UserAdd(input: { id: \"{{qaRegChildUserId}}\", typeId: \"User\", productId: \"{{product_id}}\", item: { id: \"{{qaRegChildUserId}}\", productId: \"{{product_id}}\", name: \"QA Regression Child Role Holder\", username: \"{{qaRegChildUserLogin}}\", password: \"QaRegression_2026!\", email: \"{{qaRegChildUserLogin}}@qa.test\", groups: [], roles: [{id: \"{{qaRegChildRoleId}}\", direct: true}], permissions: [], systemInfos: [] } }) { id } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "65add6c0-c72d-46bf-a850-32a02f80b8e2",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Child role holder created', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "e6bb164d-5598-4436-bf48-c28ebc7bedad",
+                    "name": "D-37 UserItem names the parent role as the source",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query UserItem { UserItem(input: { id: \"{{qaRegChildUserId}}\", productId: \"{{product_id}}\" }) { roles { id name direct sources { steps { kind id name } } } groups { id name direct sources { steps { kind id name } } } permissions { id name direct sources { steps { kind id name } } } accessWarnings { code ids message } } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "1d0643ad-7626-47cb-a45e-8fc4bf02d1d6",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const user = json.data && json.data.UserItem;",
+                                    "function grantedItem(list, id) { return (list || []).find(function (item) { return item.id === id; }); }",
+                                    "function pathKeys(item) {",
+                                    "  return ((item && item.sources) || []).map(function (path) {",
+                                    "    return (path.steps || []).map(function (step) { return step.kind + ':' + step.id; }).join('>');",
+                                    "  });",
+                                    "}",
+                                    "pm.test('The inherited role and permission are traced through the parent role', function () {",
+                                    "  pm.expect(user, JSON.stringify(json)).to.be.an('object');",
+                                    "  pm.expect((grantedItem(user.roles, pm.environment.get('qaRegChildRoleId')) || {}).direct).to.eql(true);",
+                                    "  pm.expect(pathKeys(grantedItem(user.roles, pm.environment.get('qaRegRoleId')))).to.eql(['Role:' + pm.environment.get('qaRegChildRoleId')]);",
+                                    "  pm.expect(pathKeys(grantedItem(user.permissions, pm.environment.get('qaRegPermission')))).to.eql(['Role:' + pm.environment.get('qaRegChildRoleId') + '>ParentRole:' + pm.environment.get('qaRegRoleId')]);",
+                                    "  pm.expect(user.accessWarnings || []).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "bad5f521-cd44-4b0f-b0a9-83251b14d6a1",
+                    "name": "D-37 RoleItem of the child role lists the inherited permission",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query RoleItem { RoleItem(input: { id: \"{{qaRegChildRoleId}}\", productId: \"{{product_id}}\" }) { parentRoles { id name direct sources { steps { kind id name } } } permissions { id name direct sources { steps { kind id name } } } accessWarnings { code ids message } } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "fbb6061e-6b55-4012-b3fe-0b6227ad8a53",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const role = json.data && json.data.RoleItem;",
+                                    "function grantedItem(list, id) { return (list || []).find(function (item) { return item.id === id; }); }",
+                                    "function pathKeys(item) {",
+                                    "  return ((item && item.sources) || []).map(function (path) {",
+                                    "    return (path.steps || []).map(function (step) { return step.kind + ':' + step.id; }).join('>');",
+                                    "  });",
+                                    "}",
+                                    "pm.test('The role shows the permission of its parent role', function () {",
+                                    "  pm.expect(role, JSON.stringify(json)).to.be.an('object');",
+                                    "  pm.expect((grantedItem(role.parentRoles, pm.environment.get('qaRegRoleId')) || {}).direct, 'parent role').to.eql(true);",
+                                    "  pm.expect(pathKeys(grantedItem(role.permissions, pm.environment.get('qaRegPermission')))).to.eql(['ParentRole:' + pm.environment.get('qaRegRoleId')]);",
+                                    "  pm.expect(role.accessWarnings || []).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "51f3274b-5dd7-4667-9782-927d4d6136b1",
+                    "name": "D-37 RoleUpdate closes a parent role cycle",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RoleUpdate { RoleUpdate(input: { id: \"{{qaRegRoleId}}\", typeId: \"Role\", productId: \"{{product_id}}\", item: { id: \"{{qaRegRoleId}}\", name: \"{{qaRegRoleCode}}\", roleId: \"{{qaRegRoleCode}}\", productId: \"{{product_id}}\", parentRoles: [{id: \"{{qaRegChildRoleId}}\", direct: true}], permissions: [{id: \"{{qaRegPermission}}\", direct: true}] } }) { id } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "ea317ff1-06b5-4273-b18f-37b9cee5f418",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Cycle stored (no cycle validation yet)', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "7c46e13a-460a-41e7-a62a-e5d4a0b1f551",
+                    "name": "D-37 Authorization with a parent role cycle still answers",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{qaRegChildUserLogin}}\", password: \"QaRegression_2026!\", productId: \"{{product_id}}\" }) { token permissions } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "63b6612a-7b73-49ac-b0d1-16fcfe09483d",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const auth = json.data && json.data.Authorization;",
+                                    "const permissions = ((auth && auth.permissions) || '').split(';').filter(function (p) { return !!p; });",
+                                    "pm.test('A parent role cycle neither hangs nor drops the permission', function () {",
+                                    "  pm.expect(auth && auth.token, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "  pm.expect(permissions).to.include(pm.environment.get('qaRegPermission'));",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "c60ded23-c347-41df-b398-f207e0206a13",
+                    "name": "D-37 UserItem reports the parent role cycle as a warning",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query UserItem { UserItem(input: { id: \"{{qaRegChildUserId}}\", productId: \"{{product_id}}\" }) { roles { id name direct sources { steps { kind id name } } } groups { id name direct sources { steps { kind id name } } } permissions { id name direct sources { steps { kind id name } } } accessWarnings { code ids message } } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "7025c6b4-a2a6-4d65-8a40-306ce75f67d8",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const user = json.data && json.data.UserItem;",
+                                    "function grantedItem(list, id) { return (list || []).find(function (item) { return item.id === id; }); }",
+                                    "function pathKeys(item) {",
+                                    "  return ((item && item.sources) || []).map(function (path) {",
+                                    "    return (path.steps || []).map(function (step) { return step.kind + ':' + step.id; }).join('>');",
+                                    "  });",
+                                    "}",
+                                    "pm.test('The cycle is reported, the permission is still granted', function () {",
+                                    "  pm.expect(user, JSON.stringify(json)).to.be.an('object');",
+                                    "  pm.expect(grantedItem(user.permissions, pm.environment.get('qaRegPermission'))).to.not.eql(undefined);",
+                                    "  const codes = (user.accessWarnings || []).map(function (warning) { return warning.code; });",
+                                    "  pm.expect(codes).to.include('CycleInParentRoles');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
         },
         {
             "id": "664f4f89-6520-4a63-94d6-f3f7e022c2f6",
