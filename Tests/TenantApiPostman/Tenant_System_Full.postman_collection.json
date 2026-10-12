@@ -21097,7 +21097,8 @@
                                 "query": "query UserItem { UserItem(input: { id: \"{{qaRegChildUserId}}\", productId: \"{{product_id}}\" }) { roles { id name direct sources { steps { kind id name } } } groups { id name direct sources { steps { kind id name } } } permissions { id name direct sources { steps { kind id name } } } accessWarnings { code ids message } } }",
                                 "variables": ""
                             }
-                        }
+                        },
+                        "description": " The warning message names the roles of the cycle."
                     },
                     "response": [],
                     "event": [
@@ -21120,6 +21121,383 @@
                                     "  pm.expect(grantedItem(user.permissions, pm.environment.get('qaRegPermission'))).to.not.eql(undefined);",
                                     "  const codes = (user.accessWarnings || []).map(function (warning) { return warning.code; });",
                                     "  pm.expect(codes).to.include('CycleInParentRoles');",
+                                    "});",
+                                    "pm.test('The cycle warning names the roles, not their ids', function () {",
+                                    "  const cycle = (user.accessWarnings || []).find(function (warning) { return warning.code === 'CycleInParentRoles'; }) || {};",
+                                    "  pm.expect(cycle.message, JSON.stringify(cycle)).to.include(pm.environment.get('qaRegRoleCode'));",
+                                    "  pm.expect(cycle.message, JSON.stringify(cycle)).to.include(pm.environment.get('qaRegChildRoleCode'));",
+                                    "  pm.expect(cycle.message, JSON.stringify(cycle)).to.not.include(pm.environment.get('qaRegRoleId'));",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "c01f42f4-d816-4944-ac70-e9241db47588",
+                    "name": "D-38 UserAdd without a top-level name",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UserAdd { UserAdd(input: { id: \"{{qaRegNamedUserId}}\", typeId: \"User\", productId: \"{{product_id}}\", item: { id: \"{{qaRegNamedUserId}}\", productId: \"{{product_id}}\", name: \"{{qaRegNamedUserName}}\", username: \"{{qaRegNamedUserLogin}}\", password: \"QaRegression_2026!\", email: \"{{qaRegNamedUserLogin}}@qa.test\", groups: [], roles: [], systemInfos: [] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "description": "Regression for D-38: users created by UserAdd without a top-level name, or renamed later, kept an empty or stale Name column, so the user list could not find or sort them and their document opened as \"<no name>\"."
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "id": "462ea311-271c-4ccf-b986-9530d2deba96",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const n = pm.variables.replaceIn('{{$timestamp}}');",
+                                    "pm.environment.set('qaRegNamedUserId', pm.variables.replaceIn('{{$guid}}'));",
+                                    "pm.environment.set('qaRegNamedUserLogin', 'qa_reg_named_' + n);",
+                                    "pm.environment.set('qaRegNamedUserName', 'QA_REG_NAMED_USER_' + n);",
+                                    "pm.environment.set('qaRegRenamedUserName', 'QA_REG_RENAMED_USER_' + n);"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "a960ccd1-2ba8-4b66-a6a2-4aac9657f60c",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('User created', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "cc59c938-52b6-49ff-ac3d-3d19c7ff2380",
+                    "name": "D-38 UsersList text search finds a user created with UserAdd",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query UsersList { UsersList(input: { productId: \"{{product_id}}\", viewParams: { offset: 0, count: 20, filterModel: { textFilter: { text: \"{{qaRegNamedUserName}}\", fieldIds: [\"name\"] } } } }) { items { id name } } }",
+                                "variables": ""
+                            }
+                        },
+                        "description": "Regression for D-38: users created by UserAdd without a top-level name, or renamed later, kept an empty or stale Name column, so the user list could not find or sort them and their document opened as \"<no name>\"."
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "9b17ebad-4b38-4f8e-95f3-76c747db142c",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const ids = ((json.data && json.data.UsersList && json.data.UsersList.items) || []).map(function (i) { return i.id; });",
+                                    "pm.test('New user is found by its name', function () {",
+                                    "  pm.expect(ids, JSON.stringify(json)).to.include(pm.environment.get('qaRegNamedUserId'));",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "42605200-e2fb-44aa-9e6c-3e414ef8b5a2",
+                    "name": "D-38 OpenDocument names a user created with UserAdd",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation OpenDocument { OpenDocument(input: { collectionId: \"Users\", id: \"{{qaRegNamedUserId}}\" }) { documentId documentName } }",
+                                "variables": ""
+                            }
+                        },
+                        "description": "Regression for D-38: users created by UserAdd without a top-level name, or renamed later, kept an empty or stale Name column, so the user list could not find or sort them and their document opened as \"<no name>\"."
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "dd9c8d87-08a2-43e9-9a9d-d3590ddad8f0",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const doc = (json.data && json.data.OpenDocument) || {};",
+                                    "pm.environment.set('qaRegNamedUserDocId', doc.documentId || '');",
+                                    "pm.test('The document carries the user name', function () {",
+                                    "  pm.expect(doc.documentName, JSON.stringify(json)).to.eql(pm.environment.get('qaRegNamedUserName'));",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "c4b62b3c-fedd-498e-9d91-1df5acbc2665",
+                    "name": "D-38 CloseDocument of the named user",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CloseDocument { CloseDocument(input: { id: \"{{qaRegNamedUserDocId}}\", collectionId: \"Users\" }) { status } }",
+                                "variables": ""
+                            }
+                        },
+                        "description": "Regression for D-38: users created by UserAdd without a top-level name, or renamed later, kept an empty or stale Name column, so the user list could not find or sort them and their document opened as \"<no name>\"."
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "4628f702-8d1e-4976-9be7-a1e74fbeb248",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Document closed', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "42296b46-d901-42ed-bcf7-793469c6c5d8",
+                    "name": "D-38 UserUpdate renames the user",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UserUpdate { UserUpdate(input: { id: \"{{qaRegNamedUserId}}\", typeId: \"User\", productId: \"{{product_id}}\", item: { id: \"{{qaRegNamedUserId}}\", productId: \"{{product_id}}\", name: \"{{qaRegRenamedUserName}}\", username: \"{{qaRegNamedUserLogin}}\", email: \"{{qaRegNamedUserLogin}}@qa.test\", roles: [], groups: [] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "description": "Regression for D-38: users created by UserAdd without a top-level name, or renamed later, kept an empty or stale Name column, so the user list could not find or sort them and their document opened as \"<no name>\"."
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "6cd2e87f-af96-42f8-a428-91ac42dbb606",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Rename accepted', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "f69be563-1746-4f84-b965-8567dfe8f056",
+                    "name": "D-38 UsersList text search finds the renamed user by its new name",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query UsersList { UsersList(input: { productId: \"{{product_id}}\", viewParams: { offset: 0, count: 20, filterModel: { textFilter: { text: \"{{qaRegRenamedUserName}}\", fieldIds: [\"name\"] } } } }) { items { id name } } }",
+                                "variables": ""
+                            }
+                        },
+                        "description": "Regression for D-38: users created by UserAdd without a top-level name, or renamed later, kept an empty or stale Name column, so the user list could not find or sort them and their document opened as \"<no name>\"."
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "4a25281a-2d93-494b-b4f2-b66f43534ff1",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const ids = ((json.data && json.data.UsersList && json.data.UsersList.items) || []).map(function (i) { return i.id; });",
+                                    "pm.test('Renamed user is found by its new name', function () {",
+                                    "  pm.expect(ids, JSON.stringify(json)).to.include(pm.environment.get('qaRegNamedUserId'));",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "83f56979-245d-43c1-98b3-7ec999f77c9e",
+                    "name": "D-38 UsersList text search no longer finds the renamed user by its old name",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query UsersList { UsersList(input: { productId: \"{{product_id}}\", viewParams: { offset: 0, count: 20, filterModel: { textFilter: { text: \"{{qaRegNamedUserName}}\", fieldIds: [\"name\"] } } } }) { items { id name } } }",
+                                "variables": ""
+                            }
+                        },
+                        "description": "Regression for D-38: users created by UserAdd without a top-level name, or renamed later, kept an empty or stale Name column, so the user list could not find or sort them and their document opened as \"<no name>\"."
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "ad415f9f-66ec-43df-973b-fda0f31d7c26",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const ids = ((json.data && json.data.UsersList && json.data.UsersList.items) || []).map(function (i) { return i.id; });",
+                                    "pm.test('Old name no longer matches', function () {",
+                                    "  pm.expect(ids, JSON.stringify(json)).to.not.include(pm.environment.get('qaRegNamedUserId'));",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "2f500139-c322-43b4-8d68-127f9effc140",
+                    "name": "D-38 cleanup: remove the named user",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RemoveElements { RemoveElements(input: { collectionId: \"Users\", elementIds: [\"{{qaRegNamedUserId}}\"] }) { success errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "description": "Regression for D-38: users created by UserAdd without a top-level name, or renamed later, kept an empty or stale Name column, so the user list could not find or sort them and their document opened as \"<no name>\"."
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "235eff8c-72f2-41e4-866e-c1774ef16f38",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('User removed', function () {",
+                                    "  pm.expect(json.data && json.data.RemoveElements && json.data.RemoveElements.success, JSON.stringify(json)).to.eql(true);",
                                     "});"
                                 ]
                             }
