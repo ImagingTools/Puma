@@ -1009,7 +1009,7 @@
                                     "try { json = pm.response.json(); } catch (e) { json = {}; }",
                                     "const payload = json && json.data && json.data.CreateNewDocument ? json.data.CreateNewDocument : null;",
                                     "const errors = json && json.errors ? json.errors : [];",
-                                    "const hasExpectedWarning = errors.some(e => /Cannot create a new tenant while switched to an organization/i.test((e && e.message) || \"\"));",
+                                    "const hasExpectedWarning = errors.some(e => /A new organization can be created only outside of any organization/i.test((e && e.message) || \"\"));",
                                     "pm.test(\"Create tenant in switched org context is rejected\", function(){ pm.expect(hasExpectedWarning).to.eql(true); });",
                                     "pm.test(\"Rejected create has no document id\", function(){ pm.expect(!(payload && payload.documentId)).to.eql(true); });"
                                 ],
@@ -2076,8 +2076,8 @@
                     ]
                 },
                 {
-                    "id": "a8cc1982-e814-4dd1-b642-23715a18efec",
-                    "name": "Direct Create relationship document",
+                    "id": "e4b9943a-bb3c-4e4f-9089-fa6a6580ff7d",
+                    "name": "Propose relationship A -> B",
                     "request": {
                         "url": {
                             "host": [
@@ -2096,7 +2096,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation CreateNewDocument { CreateNewDocument(input: { collectionId: \"TenantRelationships\", typeId: \"TenantRelationship\" }) { documentId objectId objectTypeId documentName } }",
+                                "query": "mutation CreateRelationshipProposal { CreateRelationshipProposal(input: { proposal: { id: \"\", connectionId: \"{{connectionId}}\", proposalType: Create, initiatorTenantId: \"{{tenantAId}}\", counterpartyTenantId: \"{{tenantBId}}\", proposedSourceRole: Supplier, proposedTargetRole: Customer, proposedScope: \"Orders\", proposedValidFrom: \"2026-01-01T00:00:00Z\", proposedValidUntil: \"2028-01-01T00:00:00Z\", proposedDescription: \"Relationship agreed by both organizations\", status: Pending } }) { proposalId errorMessage } }",
                                 "variables": ""
                             }
                         }
@@ -2106,25 +2106,23 @@
                         {
                             "listen": "test",
                             "script": {
-                                "id": "d9dbb31c-b4df-4d9e-9e98-fd05656a0170",
+                                "id": "0fa990ff-81c4-48e7-bb4b-03254d636e41",
                                 "type": "text/javascript",
                                 "exec": [
                                     "const json = pm.response.json();",
-                                    "pm.test(\"Direct relationship document created\", function(){",
-                                    "  pm.expect(json.data.CreateNewDocument.documentId).to.not.eql(null);",
-                                    "  pm.expect(json.data.CreateNewDocument.objectId).to.not.eql(null);",
+                                    "const payload = json.data && json.data.CreateRelationshipProposal;",
+                                    "pm.test('A proposes the relationship to B', function () {",
+                                    "  pm.expect(payload && payload.proposalId, JSON.stringify(json)).to.be.a('string').and.not.empty;",
                                     "});",
-                                    "pm.environment.set(\"relationshipDocId\", json.data.CreateNewDocument.documentId);",
-                                    "pm.environment.set(\"relationshipId\", json.data.CreateNewDocument.objectId);"
-                                ],
-                                "_lastExecutionId": "5aeaabcf-5695-4a20-8984-8bb551ac60ff"
+                                    "pm.environment.set('relationshipProposalId', payload && payload.proposalId ? payload.proposalId : '');"
+                                ]
                             }
                         }
                     ]
                 },
                 {
-                    "id": "93d64988-a82b-443d-b5d0-ad9bf53489da",
-                    "name": "Direct Update relationship representation",
+                    "id": "02b84a89-5c1d-4880-9267-7a2a3c247898",
+                    "name": "The proposal is not a relationship yet",
                     "request": {
                         "url": {
                             "host": [
@@ -2143,7 +2141,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation UpdateRelationshipFromRepresentation { UpdateRelationshipFromRepresentation(input: { documentId: \"{{relationshipDocId}}\", relationship: { id: \"{{relationshipId}}\", connectionId: \"{{connectionId}}\", sourceTenantId: \"{{tenantAId}}\", targetTenantId: \"{{tenantBId}}\", sourceRole: Supplier, targetRole: Customer, scope: \"Orders\", validFrom: \"2026-01-01T00:00:00Z\", validUntil: \"2028-01-01T00:00:00Z\", status: Active, description: \"Direct relationship creation via document service\" } }) { status message documentName } }",
+                                "query": "query GetTenantRelationships { GetTenantRelationships(input: { tenantId: \"{{tenantAId}}\" }) { relationships { id } errorMessage } }",
                                 "variables": ""
                             }
                         }
@@ -2153,22 +2151,68 @@
                         {
                             "listen": "test",
                             "script": {
-                                "id": "26481b39-45fe-489b-8697-2328225b2514",
+                                "id": "96bd8a10-bdfd-488f-9fc8-c6c52eb91839",
                                 "type": "text/javascript",
                                 "exec": [
                                     "const json = pm.response.json();",
-                                    "pm.test(\"Direct relationship representation updated\", function(){",
-                                    "  pm.expect(json.data.UpdateRelationshipFromRepresentation.status).to.eql(\"Success\");",
+                                    "const list = (json.data && json.data.GetTenantRelationships && json.data.GetTenantRelationships.relationships) || [];",
+                                    "pm.test('Nothing is related before B agrees', function () {",
+                                    "  pm.expect(list, JSON.stringify(json)).to.have.length(0);",
                                     "});"
-                                ],
-                                "_lastExecutionId": "ac9f419b-057a-4261-a88d-b5e31ca9b69b"
+                                ]
                             }
                         }
                     ]
                 },
                 {
-                    "id": "26cc45a2-a7c9-4b9e-83ce-54de031a3cf6",
-                    "name": "Direct Save relationship document",
+                    "id": "c1793616-b6b7-4658-af88-ea684b722df5",
+                    "name": "B approves the relationship proposal",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{b_owner_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation ApproveRelationshipProposal { ApproveRelationshipProposal(input: { proposalId: \"{{relationshipProposalId}}\", tenantId: \"{{tenantBId}}\" }) { success relationshipId errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "a810865a-3609-4cf4-9268-eb03c968304f",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.ApproveRelationshipProposal;",
+                                    "pm.test('B agrees and the relationship comes into force', function () {",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true);",
+                                    "  pm.expect(payload && payload.relationshipId, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('relationshipId', payload && payload.relationshipId ? payload.relationshipId : '');"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "ebd1029a-b281-44e1-a243-3d5736f09a86",
+                    "name": "Open a relationship document for a direct change",
                     "request": {
                         "url": {
                             "host": [
@@ -2187,7 +2231,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation SaveDocument { SaveDocument(input: { collectionId: \"TenantRelationships\", documentId: \"{{relationshipDocId}}\", documentName: \"REL_MAIN\" }) { status message documentName } }",
+                                "query": "mutation CreateNewDocument { CreateNewDocument(input: { collectionId: \"TenantRelationships\", typeId: \"TenantRelationship\" }) { documentId } }",
                                 "variables": ""
                             }
                         }
@@ -2197,22 +2241,112 @@
                         {
                             "listen": "test",
                             "script": {
-                                "id": "075e41b2-4c7b-4498-b5ce-282a506f2cf8",
+                                "id": "3d2d21fa-5151-4f04-80df-12e2291656ae",
                                 "type": "text/javascript",
                                 "exec": [
                                     "const json = pm.response.json();",
-                                    "pm.test(\"Direct relationship document saved\", function(){",
-                                    "  pm.expect(json.data.SaveDocument.status).to.eql(\"Success\");",
+                                    "const payload = json.data && json.data.CreateNewDocument;",
+                                    "pm.test('Relationship document opened', function () {",
+                                    "  pm.expect(payload && payload.documentId, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('relationshipDocId', payload && payload.documentId ? payload.documentId : '');"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "21a55470-adfa-439e-b259-16f7962aff6e",
+                    "name": "A relationship cannot be created without the partner",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UpdateRelationshipFromRepresentation { UpdateRelationshipFromRepresentation(input: { documentId: \"{{relationshipDocId}}\", relationship: { id: \"\", connectionId: \"{{connectionId}}\", sourceTenantId: \"{{tenantAId}}\", targetTenantId: \"{{tenantBId}}\", sourceRole: Parent, targetRole: Child, status: Active } }) { status message } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "dfcd2f17-2e61-40a4-bc60-0810fea6cdf2",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.UpdateRelationshipFromRepresentation;",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message; }).concat(payload && payload.message ? [payload.message] : []).join(' ');",
+                                    "pm.test('A one-sided relationship is refused', function () {",
+                                    "  pm.expect(payload && payload.status, JSON.stringify(json)).to.not.eql('Success');",
+                                    "  pm.expect(messages).to.match(/approved by both organizations/);",
                                     "});"
-                                ],
-                                "_lastExecutionId": "b966ec35-6a50-4fae-bc18-b698248fcc41"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "311163e5-8ce2-457e-befc-afd51d60222e",
+                    "name": "Close the relationship document",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CloseDocument { CloseDocument(input: { collectionId: \"TenantRelationships\", id: \"{{relationshipDocId}}\" }) { status message } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "5a3656cb-5fbe-4482-8e1e-ca2854ce7277",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Relationship document closed', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json)).to.have.length(0);",
+                                    "});"
+                                ]
                             }
                         }
                     ]
                 },
                 {
                     "id": "rel-resolve-id",
-                    "name": "Resolve real relationship objectId after save",
+                    "name": "The approved relationship is listed for A",
                     "request": {
                         "url": {
                             "host": [
@@ -2244,18 +2378,13 @@
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "// CreateNewDocument returns objectId='' (the object only gets an id once it is",
-                                    "// saved), so capturing relationshipId there stored an empty string and the",
-                                    "// cleanup RemoveTenantRelationship could never work. Resolve it after the save.",
                                     "const json = pm.response.json();",
                                     "const payload = json.data ? json.data.GetTenantRelationships : null;",
                                     "const list = payload && Array.isArray(payload.relationships) ? payload.relationships : [];",
-                                    "pm.test('Saved relationship is retrievable and has a real id', function(){",
+                                    "pm.test('The relationship approved by B is listed for A', function(){",
                                     "  pm.expect(!!(json.errors && json.errors.length), 'GetTenantRelationships failed: ' + JSON.stringify(json.errors)).to.eql(false);",
-                                    "  pm.expect(list.length >= 1, 'no relationship found for tenant A after saving one').to.eql(true);",
-                                    "  pm.expect(!!list[0].id).to.eql(true);",
-                                    "});",
-                                    "if (list.length && list[0].id) pm.environment.set('relationshipId', list[0].id);"
+                                    "  pm.expect(list.map(function (r) { return r.id; })).to.include(pm.environment.get('relationshipId'));",
+                                    "});"
                                 ]
                             }
                         }
@@ -20986,7 +21115,7 @@
                 },
                 {
                     "id": "51f3274b-5dd7-4667-9782-927d4d6136b1",
-                    "name": "D-37 RoleUpdate closes a parent role cycle",
+                    "name": "D-37 RoleUpdate cannot close a parent role cycle",
                     "request": {
                         "url": {
                             "host": [
@@ -21019,8 +21148,11 @@
                                 "type": "text/javascript",
                                 "exec": [
                                     "const json = pm.response.json();",
-                                    "pm.test('Cycle stored (no cycle validation yet)', function () {",
-                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "pm.test('A parent role that closes a cycle is refused, not silently stored', function () {",
+                                    "  const messages = (json.errors || []).map(function (error) { return error.message; }).join(' ');",
+                                    "  pm.expect(messages, JSON.stringify(json)).to.match(/would create a cycle/);",
+                                    "  pm.expect(messages, 'names the parent role, not its id').to.include(pm.environment.get('qaRegChildRoleCode'));",
+                                    "  pm.expect(messages).to.not.include(pm.environment.get('qaRegChildRoleId'));",
                                     "});"
                                 ]
                             }
@@ -21029,7 +21161,7 @@
                 },
                 {
                     "id": "7c46e13a-460a-41e7-a62a-e5d4a0b1f551",
-                    "name": "D-37 Authorization with a parent role cycle still answers",
+                    "name": "D-37 Authorization after the refused cycle still answers",
                     "request": {
                         "url": {
                             "host": [
@@ -21064,7 +21196,7 @@
                                     "const json = pm.response.json();",
                                     "const auth = json.data && json.data.Authorization;",
                                     "const permissions = ((auth && auth.permissions) || '').split(';').filter(function (p) { return !!p; });",
-                                    "pm.test('A parent role cycle neither hangs nor drops the permission', function () {",
+                                    "pm.test('The refused cycle neither hangs nor drops the permission', function () {",
                                     "  pm.expect(auth && auth.token, JSON.stringify(json)).to.be.a('string').and.not.empty;",
                                     "  pm.expect(permissions).to.include(pm.environment.get('qaRegPermission'));",
                                     "});"
@@ -21075,7 +21207,7 @@
                 },
                 {
                     "id": "c60ded23-c347-41df-b398-f207e0206a13",
-                    "name": "D-37 UserItem reports the parent role cycle as a warning",
+                    "name": "D-37 UserItem has no parent role cycle",
                     "request": {
                         "url": {
                             "host": [
@@ -21098,7 +21230,7 @@
                                 "variables": ""
                             }
                         },
-                        "description": " The warning message names the roles of the cycle."
+                        "description": " The refused cycle left the roles unchanged, so nothing is reported."
                     },
                     "response": [],
                     "event": [
@@ -21116,17 +21248,11 @@
                                     "    return (path.steps || []).map(function (step) { return step.kind + ':' + step.id; }).join('>');",
                                     "  });",
                                     "}",
-                                    "pm.test('The cycle is reported, the permission is still granted', function () {",
+                                    "pm.test('The permission is still granted and no cycle is reported', function () {",
                                     "  pm.expect(user, JSON.stringify(json)).to.be.an('object');",
                                     "  pm.expect(grantedItem(user.permissions, pm.environment.get('qaRegPermission'))).to.not.eql(undefined);",
                                     "  const codes = (user.accessWarnings || []).map(function (warning) { return warning.code; });",
-                                    "  pm.expect(codes).to.include('CycleInParentRoles');",
-                                    "});",
-                                    "pm.test('The cycle warning names the roles, not their ids', function () {",
-                                    "  const cycle = (user.accessWarnings || []).find(function (warning) { return warning.code === 'CycleInParentRoles'; }) || {};",
-                                    "  pm.expect(cycle.message, JSON.stringify(cycle)).to.include(pm.environment.get('qaRegRoleCode'));",
-                                    "  pm.expect(cycle.message, JSON.stringify(cycle)).to.include(pm.environment.get('qaRegChildRoleCode'));",
-                                    "  pm.expect(cycle.message, JSON.stringify(cycle)).to.not.include(pm.environment.get('qaRegRoleId'));",
+                                    "  pm.expect(codes).to.not.include('CycleInParentRoles');",
                                     "});"
                                 ]
                             }
@@ -25093,6 +25219,2027 @@
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
                                     "pm.test('A ViewRoles of another product does not open a Puma command', function () {",
                                     "  pm.expect(messages, JSON.stringify(json)).to.match(/Invalid permissions for the user/);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "19 QA Regression - Organizations GUI",
+            "description": "Regressions found while testing the Organizations GUI of ProLife.",
+            "item": [
+                {
+                    "id": "32ac6be0-6a68-4b14-9de0-8897a79e6130",
+                    "name": "ORG Find the membership of the A owner",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query FindMembership { FindMembership(input: { userId: \"{{a_owner_user_id}}\", tenantId: \"{{tenantAId}}\" }) { membership { id userId tenantId } errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "bcc6462d-7b67-4346-a41b-da6c8759ac5e",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const membership = json.data && json.data.FindMembership && json.data.FindMembership.membership;",
+                                    "pm.test('The owner of A has a membership', function () {",
+                                    "  pm.expect(membership && membership.id, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('orgOwnerMembershipId', membership && membership.id ? membership.id : '');"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "00813c6f-7ed3-4683-9e41-a3c186777a92",
+                    "name": "ORG RemoveMembership of the owner is refused with the reason",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_tenantA_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RemoveMembership { RemoveMembership(input: { membershipId: \"{{orgOwnerMembershipId}}\" }) { success errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "description": "The GUI bulk Exclude sent the owner too; the refusal must say why instead of \"Failed to remove membership\"."
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "7b9f19d9-59fe-48cc-8fa5-95c26587b819",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "function messagesOf(json, payload) {",
+                                    "  const errors = (json.errors || []).map(function (error) { return error.message; });",
+                                    "  if (payload && payload.errorMessage) errors.push(payload.errorMessage);",
+                                    "  return errors.join(' ');",
+                                    "}",
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.RemoveMembership;",
+                                    "pm.test('The owner is not excluded and the client learns why', function () {",
+                                    "  pm.expect(!!(payload && payload.success), JSON.stringify(json)).to.eql(false);",
+                                    "  pm.expect(messagesOf(json, payload)).to.match(/owner cannot leave or be excluded/i);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "765543c1-98c8-4cb1-abfc-3d4dafda0cb2",
+                    "name": "ORG Get connection code A",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetConnectionCode { GetConnectionCode(input: { tenantId: \"{{tenantAId}}\" }) { connectionCode { tenantId connectionCode allowConnectionsByCode } errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "57138cf1-6b45-4f8b-879d-f0c9f4b26c77",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const code = json.data && json.data.GetConnectionCode && json.data.GetConnectionCode.connectionCode;",
+                                    "pm.test('Connection code of A present', function () {",
+                                    "  pm.expect(code && code.connectionCode, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('orgConnectionCodeA', code && code.connectionCode ? code.connectionCode : '');"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "a571b63a-1eb6-402f-a51a-5449eeadbe54",
+                    "name": "ORG CreateConnectionRequest with the own code names the reason",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateConnectionRequest { CreateConnectionRequest(input: { sourceTenantId: \"{{tenantAId}}\", connectionCode: \"{{orgConnectionCodeA}}\", message: \"self\" }) { requestId errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "4375bd9d-3b6f-48ac-ac17-0ded1d218864",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "function messagesOf(json, payload) {",
+                                    "  const errors = (json.errors || []).map(function (error) { return error.message; });",
+                                    "  if (payload && payload.errorMessage) errors.push(payload.errorMessage);",
+                                    "  return errors.join(' ');",
+                                    "}",
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.CreateConnectionRequest;",
+                                    "pm.test('A request to the own organization is refused with the reason', function () {",
+                                    "  pm.expect(payload && payload.requestId, JSON.stringify(json)).to.not.be.ok;",
+                                    "  pm.expect(messagesOf(json, payload)).to.match(/own organization/i);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "92d1e282-b8cb-4c19-89bc-4f9aeb595794",
+                    "name": "ORG CreateConnectionRequest with an unknown code names the reason",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateConnectionRequest { CreateConnectionRequest(input: { sourceTenantId: \"{{tenantAId}}\", connectionCode: \"QA-UNKNOWN-CODE\", message: \"unknown\" }) { requestId errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "95ff1e40-de6e-46ef-8ae3-c7492d37eb46",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "function messagesOf(json, payload) {",
+                                    "  const errors = (json.errors || []).map(function (error) { return error.message; });",
+                                    "  if (payload && payload.errorMessage) errors.push(payload.errorMessage);",
+                                    "  return errors.join(' ');",
+                                    "}",
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.CreateConnectionRequest;",
+                                    "pm.test('An unknown code is refused with the reason', function () {",
+                                    "  pm.expect(payload && payload.requestId, JSON.stringify(json)).to.not.be.ok;",
+                                    "  pm.expect(messagesOf(json, payload)).to.match(/No organization has this connection code/);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "f0f4ee81-ab5a-4989-b9d7-532ea1baaf42",
+                    "name": "ORG Enable connect by code for B",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{b_owner_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SetAllowConnectionsByCode { SetAllowConnectionsByCode(input: { tenantId: \"{{tenantBId}}\", allow: true }) { success errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "581949ba-7ebe-4188-8937-4cf54bc11244",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Connect by code enabled for B', function () {",
+                                    "  pm.expect(json.data && json.data.SetAllowConnectionsByCode && json.data.SetAllowConnectionsByCode.success, JSON.stringify(json)).to.eql(true);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "e4e03fad-656f-4185-a572-a3b104753c1d",
+                    "name": "ORG Get connection code B",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{b_owner_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetConnectionCode { GetConnectionCode(input: { tenantId: \"{{tenantBId}}\" }) { connectionCode { tenantId connectionCode allowConnectionsByCode } errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "abbfcf81-8e48-4771-9c50-792e798cae62",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const code = json.data && json.data.GetConnectionCode && json.data.GetConnectionCode.connectionCode;",
+                                    "pm.test('Connection code of B present', function () {",
+                                    "  pm.expect(code && code.connectionCode, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('orgConnectionCodeB', code && code.connectionCode ? code.connectionCode : '');"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "d8b5aaf1-c21a-43e1-a8a8-7e801db40857",
+                    "name": "ORG CreateConnectionRequest to a connected organization names the reason",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateConnectionRequest { CreateConnectionRequest(input: { sourceTenantId: \"{{tenantAId}}\", connectionCode: \"{{orgConnectionCodeB}}\", message: \"again\" }) { requestId errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "8677f0a2-3530-4ac7-afac-7d0306acabf6",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "function messagesOf(json, payload) {",
+                                    "  const errors = (json.errors || []).map(function (error) { return error.message; });",
+                                    "  if (payload && payload.errorMessage) errors.push(payload.errorMessage);",
+                                    "  return errors.join(' ');",
+                                    "}",
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.CreateConnectionRequest;",
+                                    "pm.test('A second request between connected organizations is refused with the reason', function () {",
+                                    "  pm.expect(payload && payload.requestId, JSON.stringify(json)).to.not.be.ok;",
+                                    "  pm.expect(messagesOf(json, payload)).to.match(/already connected|already pending/);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "16d6653e-7fe5-4c1e-89c8-94e3d3bb7232",
+                    "name": "ORG Create user document with a proposed id",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_tenantA_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateNewDocument { CreateNewDocument(input: { collectionId: \"Users\", typeId: \"User\", proposedSourceDocumentId: \"{{orgNewUserId}}\" }) { documentId objectId objectTypeId documentName } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "id": "3cd3cacf-45e8-43ee-9fe2-461d685c06ad",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "// The GUI editor has its own representation UUID, different from the id proposed for the document.",
+                                    "pm.environment.set('orgNewUserId', pm.variables.replaceIn('{{$guid}}'));",
+                                    "pm.environment.set('orgNewUserReprId', pm.variables.replaceIn('{{$guid}}'));",
+                                    "pm.environment.set('orgNewUserLogin', 'qa_org_user_' + Date.now());"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "4c7c149b-469a-46d9-b98b-150a142c2ff8",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.CreateNewDocument;",
+                                    "pm.test('User document created', function () {",
+                                    "  pm.expect(payload && payload.documentId, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('orgNewUserDocId', payload && payload.documentId ? payload.documentId : '');"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "18b61d2d-2f35-4fbe-8c8d-c00bef2fd819",
+                    "name": "ORG Update the new user without a password",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_tenantA_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UpdateUserFromRepresentation { UpdateUserFromRepresentation(input: { documentId: \"{{orgNewUserDocId}}\", tenantId: \"{{tenantAId}}\", user: { id: \"{{orgNewUserReprId}}\", productId: \"{{product_id}}\", name: \"QA Org User\", username: \"{{orgNewUserLogin}}\", password: \"\", email: \"qa.org.user@example.com\", groups: [], roles: [], permissions: [], systemInfos: [] } }) { status message documentName } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "c9a03eda-11ce-4f1d-9c25-164ff1e20e4b",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.UpdateUserFromRepresentation;",
+                                    "pm.test('Representation accepted', function () {",
+                                    "  pm.expect(payload && payload.status, JSON.stringify(json)).to.eql('Success');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "308317bd-5c04-4124-82b7-4c807bed28e6",
+                    "name": "ORG Saving a new user without a password is refused",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_tenantA_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SaveDocument { SaveDocument(input: { collectionId: \"Users\", documentId: \"{{orgNewUserDocId}}\", documentName: \"\" }) { status message documentName } }",
+                                "variables": ""
+                            }
+                        },
+                        "description": "The GUI used to save an account whose password confirmation did not match."
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "ff8cf488-3380-43fe-b735-1979ec73fba2",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "function messagesOf(json, payload) {",
+                                    "  const errors = (json.errors || []).map(function (error) { return error.message; });",
+                                    "  if (payload && payload.errorMessage) errors.push(payload.errorMessage);",
+                                    "  return errors.join(' ');",
+                                    "}",
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.SaveDocument;",
+                                    "pm.test('An internal account cannot be stored without a password', function () {",
+                                    "  pm.expect(payload && payload.status, JSON.stringify(json)).to.not.eql('Success');",
+                                    "  pm.expect(messagesOf(json, payload)).to.match(/Password cannot be empty/);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "23f8869a-dba9-4807-986c-f62ef5d59363",
+                    "name": "ORG Update the new user with a password",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_tenantA_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UpdateUserFromRepresentation { UpdateUserFromRepresentation(input: { documentId: \"{{orgNewUserDocId}}\", tenantId: \"{{tenantAId}}\", user: { id: \"{{orgNewUserReprId}}\", productId: \"{{product_id}}\", name: \"QA Org User\", username: \"{{orgNewUserLogin}}\", password: \"QaOrgUser_2026!\", email: \"qa.org.user@example.com\", groups: [], roles: [], permissions: [], systemInfos: [] } }) { status message documentName } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "3154d64f-df31-448a-a891-6e906c9ab230",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.UpdateUserFromRepresentation;",
+                                    "pm.test('Representation accepted', function () {",
+                                    "  pm.expect(payload && payload.status, JSON.stringify(json)).to.eql('Success');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "61ab1d16-63c8-4891-9744-0c355c4f96fe",
+                    "name": "ORG Save the new user",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_tenantA_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SaveDocument { SaveDocument(input: { collectionId: \"Users\", documentId: \"{{orgNewUserDocId}}\", documentName: \"\" }) { status message documentName } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "e1adfcad-bfbc-4cea-9c82-825df85b9295",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.SaveDocument;",
+                                    "pm.test('New user saved', function () {",
+                                    "  pm.expect(payload && payload.status, JSON.stringify(json)).to.eql('Success');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "0cfc2559-0ad1-42c5-9dbd-4b24d4b8ba21",
+                    "name": "ORG The new user is stored under the proposed id",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query UserItem { UserItem(input: { id: \"{{orgNewUserId}}\", productId: \"{{product_id}}\" }) { id name username } }",
+                                "variables": ""
+                            }
+                        },
+                        "description": "The editor sent its own representation id; the stored user and its references must use the document id."
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "d5cdda23-c942-4156-8906-ceb3f8b4ad6c",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const user = json.data && json.data.UserItem;",
+                                    "pm.test('The user is found by the proposed id', function () {",
+                                    "  pm.expect(user && user.name, JSON.stringify(json)).to.eql('QA Org User');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "8dc2262c-9443-40c6-b837-7957aa994c52",
+                    "name": "ORG The automatic membership references the stored user",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query FindMembership { FindMembership(input: { userId: \"{{orgNewUserId}}\", tenantId: \"{{tenantAId}}\" }) { membership { id userId tenantId } errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "description": "The members list showed the UUID instead of the name because the membership used the representation id."
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "2736dc6b-50fd-4bc0-9af5-8c31eabc36af",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const membership = json.data && json.data.FindMembership && json.data.FindMembership.membership;",
+                                    "pm.test('The user created inside A is a member of A under its stored id', function () {",
+                                    "  pm.expect(membership && membership.userId, JSON.stringify(json)).to.eql(pm.environment.get('orgNewUserId'));",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "ab2a3c5e-dd3b-4c98-ba86-f8e708e36f36",
+                    "name": "ORG Create cross-org grant document",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_tenantA_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateNewDocument { CreateNewDocument(input: { collectionId: \"CrossOrgGrants\", typeId: \"CrossOrgGrant\" }) { documentId objectId objectTypeId documentName } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "6ac1e4e4-7031-4840-a49a-5edb85a2c9b0",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.CreateNewDocument;",
+                                    "pm.test('Grant document created', function () {",
+                                    "  pm.expect(payload && payload.documentId, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('orgGrantDocId', payload && payload.documentId ? payload.documentId : '');"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "d80494d0-e954-4a16-9ae1-06f735b0ea1c",
+                    "name": "ORG Saving a grant without a target names the organization",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_tenantA_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SaveDocument { SaveDocument(input: { collectionId: \"CrossOrgGrants\", documentId: \"{{orgGrantDocId}}\", documentName: \"\" }) { status message documentName } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "1f0fec17-bbed-4e31-8c07-38f91f9a553b",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "function messagesOf(json, payload) {",
+                                    "  const errors = (json.errors || []).map(function (error) { return error.message; });",
+                                    "  if (payload && payload.errorMessage) errors.push(payload.errorMessage);",
+                                    "  return errors.join(' ');",
+                                    "}",
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.SaveDocument;",
+                                    "pm.test('A grant without a target organization is refused in organization terms', function () {",
+                                    "  pm.expect(payload && payload.status, JSON.stringify(json)).to.not.eql('Success');",
+                                    "  pm.expect(messagesOf(json, payload)).to.match(/Target organization must be specified/);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "d2198ed6-9a1c-4e65-8c12-069ac03a75a2",
+                    "name": "ORG Close cross-org grant document",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_tenantA_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CloseDocument { CloseDocument(input: { collectionId: \"CrossOrgGrants\", id: \"{{orgGrantDocId}}\" }) { status message } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "8ee9d673-c8a9-4301-8a91-63142d08deac",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Unsaved grant document closed', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "834ede80-d88b-414d-bd74-54a64f30d453",
+                    "name": "ORG GroupAdd parent group for the cycle probe",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation GroupAdd { GroupAdd(input: { id: \"{{orgParentGroupId}}\", typeId: \"Group\", productId: \"{{product_id}}\", item: { id: \"{{orgParentGroupId}}\", productId: \"{{product_id}}\", name: \"{{orgParentGroupName}}\", description: \"Group cycle probe\", roles: [], users: [], parentGroups: [] } }) { id } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "id": "3eff355c-aaf4-464d-a455-f999f93a2a58",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.environment.set('orgParentGroupId', pm.variables.replaceIn('{{$guid}}'));",
+                                    "pm.environment.set('orgChildGroupId', pm.variables.replaceIn('{{$guid}}'));",
+                                    "pm.environment.set('orgParentGroupName', 'QA Cycle Parent ' + Date.now());",
+                                    "pm.environment.set('orgChildGroupName', 'QA Cycle Child ' + Date.now());"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "a6668f48-42c3-4256-92e1-3f95f00265b2",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Parent group created', function () {",
+                                    "  pm.expect(json.data && json.data.GroupAdd && json.data.GroupAdd.id, JSON.stringify(json)).to.eql(pm.environment.get('orgParentGroupId'));",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "aafa9a29-3fef-4d3a-bf66-8a9b07f430dd",
+                    "name": "ORG GroupAdd child group of the parent",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation GroupAdd { GroupAdd(input: { id: \"{{orgChildGroupId}}\", typeId: \"Group\", productId: \"{{product_id}}\", item: { id: \"{{orgChildGroupId}}\", productId: \"{{product_id}}\", name: \"{{orgChildGroupName}}\", description: \"Group cycle probe\", roles: [], users: [], parentGroups: [{id: \"{{orgParentGroupId}}\", direct: true}] } }) { id } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "f01bd516-53eb-4c4b-9869-28de0b459769",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Child group created', function () {",
+                                    "  pm.expect(json.data && json.data.GroupAdd && json.data.GroupAdd.id, JSON.stringify(json)).to.eql(pm.environment.get('orgChildGroupId'));",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "c3bf315e-f924-43b1-9e84-4aaa9e4b626b",
+                    "name": "ORG GroupUpdate cannot close a parent group cycle",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation GroupUpdate { GroupUpdate(input: { id: \"{{orgParentGroupId}}\", typeId: \"Group\", productId: \"{{product_id}}\", item: { id: \"{{orgParentGroupId}}\", productId: \"{{product_id}}\", name: \"{{orgParentGroupName}}\", description: \"Group cycle probe\", roles: [], users: [], parentGroups: [{id: \"{{orgChildGroupId}}\", direct: true}] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "description": "Group cycle checks moved out of CUserGroupInfo into the services; a cycle used to overflow the stack in GetUsers."
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "0727e984-6a9a-4045-9868-bb5a8395cbf8",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('A parent group that closes a cycle is refused by name', function () {",
+                                    "  const messages = (json.errors || []).map(function (error) { return error.message; }).join(' ');",
+                                    "  pm.expect(messages, JSON.stringify(json)).to.match(/would create a cycle/);",
+                                    "  pm.expect(messages, 'names the parent group, not its id').to.include(pm.environment.get('orgChildGroupName'));",
+                                    "  pm.expect(messages).to.not.include(pm.environment.get('orgChildGroupId'));",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "3537919f-02bf-410a-94d5-12f8c39fc0cd",
+                    "name": "ORG Authorize the A owner outside of any organization",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{a_owner_login}}\", password: \"{{a_owner_password}}\", productId: \"{{product_id}}\" }) { userId token } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "58f9bc9a-d2bb-49cd-930b-fb011a390ddd",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.Authorization;",
+                                    "pm.test('Authorized without an organization', function () {",
+                                    "  pm.expect(payload && payload.token, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('orgNoOrgToken', payload && payload.token ? payload.token : '');"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "6fd5b647-8e21-4f18-b450-ec33145eee0b",
+                    "name": "ORG Create a new organization document outside of any organization",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{orgNoOrgToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateNewDocument { CreateNewDocument(input: { collectionId: \"Tenants\", typeId: \"Tenant\", proposedSourceDocumentId: \"{{orgXId}}\" }) { documentId objectId } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "id": "1e69dcc4-c5d7-4189-91b3-9b017de763f3",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.environment.set('orgXId', pm.variables.replaceIn('{{$guid}}'));",
+                                    "pm.environment.set('orgXName', 'QA Org X ' + Date.now());"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "b8a58fb1-2c5f-4456-9575-2676ce1270f1",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.CreateNewDocument;",
+                                    "pm.test('New organization document created', function () {",
+                                    "  pm.expect(payload && payload.documentId, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('orgXDocId', payload && payload.documentId ? payload.documentId : '');",
+                                    "if (payload && payload.objectId) pm.environment.set('orgXId', payload.objectId);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "87e08ce0-b26a-4fec-950f-e784d3435876",
+                    "name": "ORG Fill the new organization",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{orgNoOrgToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UpdateTenantFromRepresentation { UpdateTenantFromRepresentation(input: { documentId: \"{{orgXDocId}}\", tenant: { id: \"{{orgXId}}\", name: \"{{orgXName}}\", description: \"Organization context probe\", isActive: true, members: [], memberOrganizationPermissions: [], tenantPermissions: [] } }) { status message } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "e5f57d91-ef0a-4fb3-94c8-a82779a4d1c3",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Unsaved organization is edited outside of any organization', function () {",
+                                    "  pm.expect(json.data && json.data.UpdateTenantFromRepresentation && json.data.UpdateTenantFromRepresentation.status, JSON.stringify(json)).to.eql('Success');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "fcc19051-86f2-4b5a-9893-2f27a00980e7",
+                    "name": "ORG Save the new organization",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{orgNoOrgToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SaveDocument { SaveDocument(input: { collectionId: \"Tenants\", documentId: \"{{orgXDocId}}\", documentName: \"{{orgXName}}\" }) { status message } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "9b0734ee-b772-4823-943e-d32ba51fc768",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('New organization stored', function () {",
+                                    "  pm.expect(json.data && json.data.SaveDocument && json.data.SaveDocument.status, JSON.stringify(json)).to.eql('Success');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "9182d8cb-3971-4ba2-b3d4-35c5ffa03c73",
+                    "name": "ORG The stored organization is not edited outside of it",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{orgNoOrgToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UpdateTenantFromRepresentation { UpdateTenantFromRepresentation(input: { documentId: \"{{orgXDocId}}\", tenant: { id: \"{{orgXId}}\", name: \"{{orgXName}} changed\", isActive: true, members: [], memberOrganizationPermissions: [], tenantPermissions: [] } }) { status message } }",
+                                "variables": ""
+                            }
+                        },
+                        "description": "The GUI kept editing a just created organization without switching into it."
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "e316faa6-7b3f-45da-80e9-7ec113310947",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "function messagesOf(json, payload) {",
+                                    "  const errors = (json.errors || []).map(function (error) { return error.message; });",
+                                    "  if (payload && payload.errorMessage) errors.push(payload.errorMessage);",
+                                    "  return errors.join(' ');",
+                                    "}",
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.UpdateTenantFromRepresentation;",
+                                    "pm.test('After creation the client has to switch into the organization', function () {",
+                                    "  pm.expect(payload && payload.status, JSON.stringify(json)).to.not.eql('Success');",
+                                    "  pm.expect(messagesOf(json, payload)).to.match(/edited only while you work in it/);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "edd71a42-80ac-4001-9ed4-6939d9912176",
+                    "name": "ORG The stored organization is not saved outside of it",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{orgNoOrgToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SaveDocument { SaveDocument(input: { collectionId: \"Tenants\", documentId: \"{{orgXDocId}}\", documentName: \"{{orgXName}}\" }) { status message } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "dcb54015-4c73-465f-aee2-3d53c2afc5cc",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "function messagesOf(json, payload) {",
+                                    "  const errors = (json.errors || []).map(function (error) { return error.message; });",
+                                    "  if (payload && payload.errorMessage) errors.push(payload.errorMessage);",
+                                    "  return errors.join(' ');",
+                                    "}",
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.SaveDocument;",
+                                    "pm.test('Saving outside of the organization is refused', function () {",
+                                    "  pm.expect(payload && payload.status, JSON.stringify(json)).to.not.eql('Success');",
+                                    "  pm.expect(messagesOf(json, payload)).to.match(/edited only while you work in it/);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "909ae2e2-d106-4641-b1f1-54dd0dd942e1",
+                    "name": "ORG Switch into the new organization",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{orgNoOrgToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SelectTenant { SelectTenant(input: { tenantId: \"{{orgXId}}\" }) { ok userSession { userId tenantId accessToken } errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "6c33518c-30b7-4cc6-98e3-3dc10cbbc7e0",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.SelectTenant;",
+                                    "const session = payload && payload.userSession;",
+                                    "pm.test('Switched to the organization', function () {",
+                                    "  pm.expect(session && session.tenantId, JSON.stringify(json)).to.eql(pm.environment.get('orgXId'));",
+                                    "});",
+                                    "pm.environment.set('orgXToken', session && session.accessToken ? session.accessToken : '');"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "184a6ec7-8e19-48c9-bf9d-908f37f3f0ba",
+                    "name": "ORG The new organization is edited from inside it",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{orgXToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetTenantRepresentation { GetTenantRepresentation(input: { collectionId: \"Tenants\", id: \"{{orgXDocId}}\" }) { id name } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "217ff384-4701-4b40-8fbf-1efd261a72b3",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Representation of the own organization', function () {",
+                                    "  pm.expect(json.data && json.data.GetTenantRepresentation && json.data.GetTenantRepresentation.name, JSON.stringify(json)).to.eql(pm.environment.get('orgXName'));",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "2eb526c1-cb37-49f8-9f2d-fcc241a07ab8",
+                    "name": "ORG Opening A from inside X is refused",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{orgXToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation OpenDocument { OpenDocument(input: { collectionId: \"Tenants\", id: \"{{tenantAId}}\" }) { documentId } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "395e2b3b-0c8c-4a14-ab08-93c9dbcdcd8e",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "function messagesOf(json, payload) {",
+                                    "  const errors = (json.errors || []).map(function (error) { return error.message; });",
+                                    "  if (payload && payload.errorMessage) errors.push(payload.errorMessage);",
+                                    "  return errors.join(' ');",
+                                    "}",
+                                    "const json = pm.response.json();",
+                                    "pm.test('Organization A is not opened from X', function () {",
+                                    "  pm.expect(json.data && json.data.OpenDocument && json.data.OpenDocument.documentId, JSON.stringify(json)).to.not.be.ok;",
+                                    "  pm.expect(messagesOf(json, null)).to.match(/edited only while you work in it/);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "36e06643-5162-4b12-9b68-bc2c550fd07e",
+                    "name": "ORG Opening A outside of any organization is refused",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{orgNoOrgToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation OpenDocument { OpenDocument(input: { collectionId: \"Tenants\", id: \"{{tenantAId}}\" }) { documentId } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "f64fa046-7ea5-420b-81ae-e42b5013e7be",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "function messagesOf(json, payload) {",
+                                    "  const errors = (json.errors || []).map(function (error) { return error.message; });",
+                                    "  if (payload && payload.errorMessage) errors.push(payload.errorMessage);",
+                                    "  return errors.join(' ');",
+                                    "}",
+                                    "const json = pm.response.json();",
+                                    "pm.test('Organization A is not opened without switching into it', function () {",
+                                    "  pm.expect(json.data && json.data.OpenDocument && json.data.OpenDocument.documentId, JSON.stringify(json)).to.not.be.ok;",
+                                    "  pm.expect(messagesOf(json, null)).to.match(/edited only while you work in it/);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "bdc0d44f-60c7-474b-9f6b-da22ff78e1ac",
+                    "name": "ORG Switch into A",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{orgNoOrgToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SelectTenant { SelectTenant(input: { tenantId: \"{{tenantAId}}\" }) { ok userSession { userId tenantId accessToken } errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "4e7f7e78-b4f8-4426-a74d-24c9aafd5379",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.SelectTenant;",
+                                    "const session = payload && payload.userSession;",
+                                    "pm.test('Switched to the organization', function () {",
+                                    "  pm.expect(session && session.tenantId, JSON.stringify(json)).to.eql(pm.environment.get('tenantAId'));",
+                                    "});",
+                                    "pm.environment.set('orgAToken', session && session.accessToken ? session.accessToken : '');"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "1a0d450c-7463-48f7-acbc-12a60df2a75c",
+                    "name": "ORG Open A from inside A",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{orgAToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation OpenDocument { OpenDocument(input: { collectionId: \"Tenants\", id: \"{{tenantAId}}\" }) { documentId } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "e6f08846-ad2a-4311-9e6b-ae0612bfe986",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.OpenDocument;",
+                                    "pm.test('Organization A opened', function () {",
+                                    "  pm.expect(payload && payload.documentId, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('orgADocId', payload && payload.documentId ? payload.documentId : '');"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "5590fe4f-bf1c-4fb8-b0ac-904da6f67837",
+                    "name": "ORG The open A document is not read from X",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{orgXToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetTenantRepresentation { GetTenantRepresentation(input: { collectionId: \"Tenants\", id: \"{{orgADocId}}\" }) { id name } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "4f66e89b-7756-491a-9830-b27e206594c5",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "function messagesOf(json, payload) {",
+                                    "  const errors = (json.errors || []).map(function (error) { return error.message; });",
+                                    "  if (payload && payload.errorMessage) errors.push(payload.errorMessage);",
+                                    "  return errors.join(' ');",
+                                    "}",
+                                    "const json = pm.response.json();",
+                                    "pm.test('A stays closed for X', function () {",
+                                    "  pm.expect(json.data && json.data.GetTenantRepresentation && json.data.GetTenantRepresentation.name, JSON.stringify(json)).to.not.be.ok;",
+                                    "  pm.expect(messagesOf(json, null)).to.match(/edited only while you work in it/);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "9e7524e0-bc42-43d9-aaa9-04213c36b5f2",
+                    "name": "ORG The open A document is not changed from X",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{orgXToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UpdateTenantFromRepresentation { UpdateTenantFromRepresentation(input: { documentId: \"{{orgADocId}}\", tenant: { id: \"{{tenantAId}}\", name: \"Changed from X\", isActive: true, members: [], memberOrganizationPermissions: [], tenantPermissions: [] } }) { status message } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "38b35568-5ec4-45bc-80a7-fc33522d9289",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "function messagesOf(json, payload) {",
+                                    "  const errors = (json.errors || []).map(function (error) { return error.message; });",
+                                    "  if (payload && payload.errorMessage) errors.push(payload.errorMessage);",
+                                    "  return errors.join(' ');",
+                                    "}",
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.UpdateTenantFromRepresentation;",
+                                    "pm.test('Changing A from X is refused', function () {",
+                                    "  pm.expect(payload && payload.status, JSON.stringify(json)).to.not.eql('Success');",
+                                    "  pm.expect(messagesOf(json, payload)).to.match(/edited only while you work in it/);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "1263530c-9b4e-4a4e-bb73-44ae4d1df402",
+                    "name": "ORG The open A document is not saved from X",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{orgXToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SaveDocument { SaveDocument(input: { collectionId: \"Tenants\", documentId: \"{{orgADocId}}\", documentName: \"Changed from X\" }) { status message } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "c81d03e0-385b-4047-9de0-3133c5f0c68e",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "function messagesOf(json, payload) {",
+                                    "  const errors = (json.errors || []).map(function (error) { return error.message; });",
+                                    "  if (payload && payload.errorMessage) errors.push(payload.errorMessage);",
+                                    "  return errors.join(' ');",
+                                    "}",
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.SaveDocument;",
+                                    "pm.test('Saving A from X is refused', function () {",
+                                    "  pm.expect(payload && payload.status, JSON.stringify(json)).to.not.eql('Success');",
+                                    "  pm.expect(messagesOf(json, payload)).to.match(/edited only while you work in it/);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "a0957c59-f1c7-4ec0-9233-8c0cb34d5667",
+                    "name": "ORG Close the A document",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{orgAToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CloseDocument { CloseDocument(input: { collectionId: \"Tenants\", id: \"{{orgADocId}}\" }) { status message } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "55582a3c-1443-40c3-9e64-f4d81ee4be4e",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('A document closed', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "0b522290-8964-4186-be21-3fa7b8ab0be3",
+                    "name": "ORG Close the X document",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{orgXToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CloseDocument { CloseDocument(input: { collectionId: \"Tenants\", id: \"{{orgXDocId}}\" }) { status message } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "fd629647-16e4-43ca-b0b6-815f8eeefaf4",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('X document closed', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "f2d09e80-14d6-4f4c-b77f-61271aade7f2",
+                    "name": "ORG Create a second organization document",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{orgNoOrgToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateNewDocument { CreateNewDocument(input: { collectionId: \"Tenants\", typeId: \"Tenant\" }) { documentId } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "4625d2a8-18b6-4a88-8c14-429f9643df23",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.CreateNewDocument;",
+                                    "pm.test('Second organization document created', function () {",
+                                    "  pm.expect(payload && payload.documentId, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('orgDupDocId', payload && payload.documentId ? payload.documentId : '');"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "c8e2fe1a-6389-4d81-b9d0-dd8c7f8ac4e2",
+                    "name": "ORG Name the second organization like X",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{orgNoOrgToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UpdateTenantFromRepresentation { UpdateTenantFromRepresentation(input: { documentId: \"{{orgDupDocId}}\", tenant: { name: \"{{orgXName}}\", isActive: true, members: [], memberOrganizationPermissions: [], tenantPermissions: [] } }) { status message } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "93c619f0-1031-4097-b82a-841364fb9aba",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Draft named', function () {",
+                                    "  pm.expect(json.data && json.data.UpdateTenantFromRepresentation && json.data.UpdateTenantFromRepresentation.status, JSON.stringify(json)).to.eql('Success');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "abe9d774-931f-44a0-bacd-0339b2edd125",
+                    "name": "ORG A duplicate organization name is refused in organization terms",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{orgNoOrgToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SaveDocument { SaveDocument(input: { collectionId: \"Tenants\", documentId: \"{{orgDupDocId}}\", documentName: \"{{orgXName}}\" }) { status message } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "fdd4e831-86fe-4eec-9b61-ba8384e3aca2",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "function messagesOf(json, payload) {",
+                                    "  const errors = (json.errors || []).map(function (error) { return error.message; });",
+                                    "  if (payload && payload.errorMessage) errors.push(payload.errorMessage);",
+                                    "  return errors.join(' ');",
+                                    "}",
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.SaveDocument;",
+                                    "pm.test('Duplicate name refused', function () {",
+                                    "  pm.expect(payload && payload.status, JSON.stringify(json)).to.not.eql('Success');",
+                                    "  pm.expect(messagesOf(json, payload)).to.match(/An organization with the same name already exists/);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "0210a043-d6d1-4439-83df-eaed6b252919",
+                    "name": "ORG Close the second organization document",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{orgNoOrgToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CloseDocument { CloseDocument(input: { collectionId: \"Tenants\", id: \"{{orgDupDocId}}\" }) { status message } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "722086ee-7b26-4b51-bce9-0e0b5ddad91f",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Second document closed', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "74700547-6602-4515-bd55-8268459f8458",
+                    "name": "ORG Remove organization X",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{orgNoOrgToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RemoveTenant { RemoveTenant(input: { tenantId: \"{{orgXId}}\" }) { success errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "561a987a-3a39-4ade-918b-d1f74e8da3ab",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Organization X removed', function () {",
+                                    "  pm.expect(json.data && json.data.RemoveTenant && json.data.RemoveTenant.success, JSON.stringify(json)).to.eql(true);",
                                     "});"
                                 ]
                             }
