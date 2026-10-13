@@ -40,12 +40,23 @@
     Where newman writes the JUnit XML report. Point TeamCity's "XML Report
     Processing" (JUnit) build feature at this same path.
 
+.PARAMETER Rls
+    Run with tenant Row Level Security enforced. The server connects as the
+    restricted role -RlsUser and gets -DbUser/-DbPassword only as its
+    administrative login: on start it creates the role and the database itself.
+    After the suites the isolation is checked in the database as -RlsUser
+    (JUnit report: -RlsJUnitReportPath). The server settings file
+    (-SettingsPath) is restored afterwards.
+
 .EXAMPLE
     powershell -ExecutionPolicy Bypass -File Run-CiTests.ps1
 
 .EXAMPLE
     powershell -ExecutionPolicy Bypass -File Run-CiTests.ps1 `
         -BuildConfig "Release_Qt6_VC17_x64" -DbPassword "%db.password%"
+
+.EXAMPLE
+    powershell -ExecutionPolicy Bypass -File Run-CiTests.ps1 -Rls
 #>
 
 [CmdletBinding()]
@@ -100,10 +111,16 @@ param(
     [string]$ServerStdOutPath = (Join-Path $ScriptDir "server-stdout.log"),
     [string]$ServerStdErrPath = (Join-Path $ScriptDir "server-stderr.log"),
     [int]$WebSocketPort = 18788,
-    [int]$StartupTimeoutSeconds = 60
+    [int]$StartupTimeoutSeconds = 60,
+    [switch]$Rls,
+    [string]$RlsUser = "imt_app",
+    [string]$RlsPassword = "Imt_App_Rls_2026!",
+    [string]$SettingsPath = "C:\Users\Public\ImagingTools\Puma\Puma Server\PumaServerPgTestSettings.xml",
+    [string]$RlsJUnitReportPath = (Join-Path $ScriptDir "junit-report-rls.xml")
 )
 
 $ErrorActionPreference = "Stop"
+. (Join-Path $ScriptDir "rls\RlsMode.ps1")
 $serverProcess = $null
 $exitCode = 1
 
@@ -281,6 +298,11 @@ Write-Host "EnvironmentPath: $EnvironmentPath"
 try {
     Stop-TestServer
     Reset-TestDatabase
+    if ($Rls) {
+        Write-Step "Enabling tenant Row Level Security"
+        Enable-RlsDatabaseSettings -SettingsPath $SettingsPath -DatabaseParameterId "DatabaseAccessSettings" -AdminParameterId "AdminDatabaseAccessSettings" `
+            -AppUser $RlsUser -AppPassword $RlsPassword -AdminUser $DbUser -AdminPassword $DbPassword
+    }
     Start-TestServer
     $exitCode = Invoke-NewmanSuite
 
@@ -289,11 +311,21 @@ try {
     if ($exitCode -eq 0) { $exitCode = $wsExitCode }
     $wsExitCode = Invoke-WsSuite "ws-notifications.js" "WebSocket notification routing suite" $WsNotificationsJUnitReportPath
     if ($exitCode -eq 0) { $exitCode = $wsExitCode }
+
+    if ($Rls) {
+        Write-Step "Checking tenant isolation in the database"
+        $rlsExitCode = Invoke-RlsIsolationCheck -PsqlPath (Resolve-PsqlPath) -DbHost $DbHost -DbPort $DbPort -DbName $DbName `
+            -AppUser $RlsUser -AppPassword $RlsPassword -ScriptPath (Join-Path $ScriptDir "rls\rls-isolation.sql") -JUnitPath $RlsJUnitReportPath
+        if ($exitCode -eq 0) { $exitCode = $rlsExitCode }
+    }
 }
 finally {
     if ($serverProcess -and -not $serverProcess.HasExited) {
         Write-Step "Stopping PumaServerPgTest.exe (PID $($serverProcess.Id))"
         Stop-Process -Id $serverProcess.Id -Force -ErrorAction SilentlyContinue
+    }
+    if ($Rls) {
+        Restore-RlsDatabaseSettings -SettingsPath $SettingsPath
     }
 }
 
