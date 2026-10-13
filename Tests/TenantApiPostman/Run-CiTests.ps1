@@ -96,6 +96,7 @@ param(
     [string]$JUnitReportPath = (Join-Path $ScriptDir "junit-report.xml"),
     [string]$JsonReportPath = (Join-Path $ScriptDir "run-report.json"),
     [string]$WsJUnitReportPath = (Join-Path $ScriptDir "junit-report-ws.xml"),
+    [string]$WsNotificationsJUnitReportPath = (Join-Path $ScriptDir "junit-report-ws-notifications.xml"),
     [string]$ServerStdOutPath = (Join-Path $ScriptDir "server-stdout.log"),
     [string]$ServerStdErrPath = (Join-Path $ScriptDir "server-stderr.log"),
     [int]$WebSocketPort = 18788,
@@ -246,22 +247,22 @@ function Invoke-NewmanSuite {
     return $LASTEXITCODE
 }
 
-function Invoke-WsSuite {
+function Invoke-WsSuite([string]$ScriptName, [string]$Title, [string]$ReportPath) {
     # Newman does not execute Postman WebSocket requests, so subscription
-    # coverage lives in a node runner speaking the same protocol, writing its
-    # own JUnit report (see ws\ws-subscriptions.js).
-    $wsScript = Join-Path $ScriptDir "ws\ws-subscriptions.js"
+    # coverage lives in node runners speaking the same protocol, each writing
+    # its own JUnit report (see ws\ws-lib.js).
+    $wsScript = Join-Path $ScriptDir "ws\$ScriptName"
     if (-not (Test-Path $wsScript)) {
         Write-Host "WebSocket suite not found at $wsScript - skipping." -ForegroundColor Yellow
         return 0
     }
 
-    Write-Step "Running WebSocket subscription suite"
+    Write-Step "Running $Title"
 
     $httpUrl = "http://localhost:$HttpPort/Puma/graphql"
     $wsUrl = "ws://localhost:$WebSocketPort"
 
-    & node $wsScript --http $httpUrl --ws $wsUrl --env $EnvironmentPath --junit $WsJUnitReportPath | Out-Host
+    & node $wsScript --http $httpUrl --ws $wsUrl --env $EnvironmentPath --junit $ReportPath | Out-Host
     return $LASTEXITCODE
 }
 
@@ -284,7 +285,9 @@ try {
     $exitCode = Invoke-NewmanSuite
 
     # Runs against the same live server, after newman has seeded users/tenants.
-    $wsExitCode = Invoke-WsSuite
+    $wsExitCode = Invoke-WsSuite "ws-subscriptions.js" "WebSocket subscription suite" $WsJUnitReportPath
+    if ($exitCode -eq 0) { $exitCode = $wsExitCode }
+    $wsExitCode = Invoke-WsSuite "ws-notifications.js" "WebSocket notification routing suite" $WsNotificationsJUnitReportPath
     if ($exitCode -eq 0) { $exitCode = $wsExitCode }
 }
 finally {

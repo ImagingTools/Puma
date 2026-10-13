@@ -34,6 +34,9 @@
                     <AttributeInfo Id="AccountLockoutController" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="AccountLockoutController"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="BindingManager" Type="Reference" ExportId="BindingManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
