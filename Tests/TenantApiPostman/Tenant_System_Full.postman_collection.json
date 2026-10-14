@@ -24054,6 +24054,213 @@
                             }
                         }
                     ]
+                },
+                {
+                    "name": "IH A owner gives the member group a tenant B role",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{ihOwnerAToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation GroupUpdate { GroupUpdate(input: { id: \"{{ihRoleGroup}}\", typeId: \"Group\", productId: \"{{product_id}}\", item: { id: \"{{ihRoleGroup}}\", productId: \"{{product_id}}\", name: \"{{ihRoleGroupName}}\", description: \"Permission inheritance probe\", roles: [{id: \"{{ihChildRole}}\", direct: true}, {id: \"{{ihForeignRole}}\", direct: true}], users: [{id: \"{{a_member_user_id}}\", direct: true}], parentGroups: [] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Group roles updated', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "IH member profile lists only the roles of organization A",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{ihMemberToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetProfile { GetProfile(input: { id: \"{{a_member_user_id}}\", productId: \"{{product_id}}\" }) { currentTenantId roles { id } } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const profile = json.data && json.data.GetProfile;",
+                                    "const ids = ((profile && profile.roles) || []).map(function (r) { return r.id; });",
+                                    "pm.test('A group role of another organization is not listed in the profile', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(profile.currentTenantId).to.eql(pm.environment.get('tenantAId'));",
+                                    "  pm.expect(ids, 'ihChildRoleName').to.include(pm.environment.get('ihChildRoleName'));",
+                                    "  pm.expect(ids, 'ihForeignRoleName').to.not.include(pm.environment.get('ihForeignRoleName'));",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "IH member reads the role it holds through its group",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{ihMemberToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query RoleItem { RoleItem(input: { id: \"{{ihChildRole}}\", productId: \"{{product_id}}\" }) { id parentRoles { id direct } accessWarnings { code ids } } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('A role held in organization A is readable', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(json.data.RoleItem.id).to.eql(pm.environment.get('ihChildRole'));",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "IH member cannot read the tenant B role of its group",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{ihMemberToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query RoleItem { RoleItem(input: { id: \"{{ihForeignRole}}\", productId: \"{{product_id}}\" }) { id parentRoles { id direct } accessWarnings { code ids } } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
+                                    "pm.test('Holding a role of another organization through a group does not open it', function () {",
+                                    "  pm.expect(messages, JSON.stringify(json)).to.match(/Invalid permissions for the user/);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "IH group drops the tenant B role",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{ihOwnerAToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation GroupUpdate { GroupUpdate(input: { id: \"{{ihRoleGroup}}\", typeId: \"Group\", productId: \"{{product_id}}\", item: { id: \"{{ihRoleGroup}}\", productId: \"{{product_id}}\", name: \"{{ihRoleGroupName}}\", description: \"Permission inheritance probe\", roles: [{id: \"{{ihChildRole}}\", direct: true}], users: [{id: \"{{a_member_user_id}}\", direct: true}], parentGroups: [] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Tenant B role removed from the group', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
                 }
             ]
         },
@@ -27240,6 +27447,2510 @@
                                     "const json = pm.response.json();",
                                     "pm.test('Organization X removed', function () {",
                                     "  pm.expect(json.data && json.data.RemoveTenant && json.data.RemoveTenant.success, JSON.stringify(json)).to.eql(true);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "9192f0ef-064a-4007-8ec8-af2ba3920ff0",
+            "name": "20 Removed roles and groups leave no references",
+            "item": [
+                {
+                    "name": "RR seed: Auth SU",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{su_login}}\", password: \"{{su_password}}\", productId: \"{{product_id}}\" }) { token } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const n = pm.variables.replaceIn('{{$timestamp}}');",
+                                    "['rrRemoved', 'rrKept', 'rrParentGroup', 'rrGroup', 'rrUser'].forEach(function (k) {",
+                                    "  pm.environment.set(k, pm.variables.replaceIn('{{$guid}}'));",
+                                    "  pm.environment.set(k + 'Code', 'RR_' + k.toUpperCase() + '_' + n);",
+                                    "});",
+                                    "pm.environment.set('rrRemovedPerm', 'RrRemovedPermission_' + n);",
+                                    "pm.environment.set('rrKeptPerm', 'RrKeptPermission_' + n);",
+                                    "pm.environment.set('rrUserLogin', 'rr_user_' + n);"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const auth = json.data && json.data.Authorization;",
+                                    "pm.test('SU authorized for the removal folder', function () { pm.expect(auth && auth.token, JSON.stringify(json)).to.be.a('string').and.not.empty; });",
+                                    "pm.environment.set('su_token', auth.token);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "RR role to be removed",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RoleAdd { RoleAdd(input: { id: \"{{rrRemoved}}\", typeId: \"Role\", productId: \"{{product_id}}\", item: { id: \"{{rrRemoved}}\", name: \"{{rrRemovedCode}}\", roleId: \"{{rrRemovedCode}}\", productId: \"{{product_id}}\", parentRoles: [], permissions: [{id: \"{{rrRemovedPerm}}\", direct: true}] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Role to be removed created', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "RR kept role inheriting the removed one",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RoleAdd { RoleAdd(input: { id: \"{{rrKept}}\", typeId: \"Role\", productId: \"{{product_id}}\", item: { id: \"{{rrKept}}\", name: \"{{rrKeptCode}}\", roleId: \"{{rrKeptCode}}\", productId: \"{{product_id}}\", parentRoles: [{id: \"{{rrRemoved}}\", direct: true}], permissions: [{id: \"{{rrKeptPerm}}\", direct: true}] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Kept role created', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "RR parent group to be removed",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation GroupAdd { GroupAdd(input: { id: \"{{rrParentGroup}}\", typeId: \"Group\", productId: \"{{product_id}}\", item: { id: \"{{rrParentGroup}}\", productId: \"{{product_id}}\", name: \"{{rrParentGroupCode}}\", description: \"Removal probe\", roles: [{id: \"{{rrKept}}\", direct: true}], users: [], parentGroups: [] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Parent group created', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "RR group holding both roles under the parent group",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation GroupAdd { GroupAdd(input: { id: \"{{rrGroup}}\", typeId: \"Group\", productId: \"{{product_id}}\", item: { id: \"{{rrGroup}}\", productId: \"{{product_id}}\", name: \"{{rrGroupCode}}\", description: \"Removal probe\", roles: [{id: \"{{rrRemoved}}\", direct: true}, {id: \"{{rrKept}}\", direct: true}], users: [], parentGroups: [{id: \"{{rrParentGroup}}\", direct: true}] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Group created', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "RR user holding the removed role directly and through the group",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UserAdd { UserAdd(input: { id: \"{{rrUser}}\", typeId: \"User\", productId: \"{{product_id}}\", item: { id: \"{{rrUser}}\", productId: \"{{product_id}}\", name: \"{{rrUserLogin}}\", username: \"{{rrUserLogin}}\", password: \"Removed_2026!\", email: \"{{rrUserLogin}}@qa.test\", roles: [{id: \"{{rrRemoved}}\", direct: true}], groups: [{id: \"{{rrGroup}}\", direct: true}], permissions: [] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('User created', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "RR user holds both permissions before the removal",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{rrUserLogin}}\", password: \"Removed_2026!\", productId: \"{{product_id}}\" }) { token permissions } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const auth = json.data && json.data.Authorization;",
+                                    "const perms = String((auth && auth.permissions) || '');",
+                                    "pm.test('The user holds the permissions of both roles', function () {",
+                                    "  pm.expect(auth && auth.token, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "  pm.expect(perms, 'rrRemovedPerm').to.include(pm.environment.get('rrRemovedPerm'));",
+                                    "  pm.expect(perms, 'rrKeptPerm').to.include(pm.environment.get('rrKeptPerm'));",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Removing the role",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RemoveElements { RemoveElements(input: { collectionId: \"Roles\", elementIds: [\"{{rrRemoved}}\"] }) { success errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.RemoveElements;",
+                                    "pm.test('Removing the role succeeded', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "RR kept role no longer names the removed parent role",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query RoleItem { RoleItem(input: { id: \"{{rrKept}}\", productId: \"{{product_id}}\" }) { id parentRoles { id direct } accessWarnings { code ids } } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.RoleItem;",
+                                    "const ids = ((payload && payload.parentRoles) || []).map(function (a) { return a.id; });",
+                                    "pm.test('The removed role is gone from the parent roles, without a warning', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(ids, 'rrRemoved').to.not.include(pm.environment.get('rrRemoved'));",
+                                    "  pm.expect(payload.accessWarnings || [], JSON.stringify(payload.accessWarnings)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "RR group no longer holds the removed role",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GroupItem { GroupItem(input: { id: \"{{rrGroup}}\", productId: \"{{product_id}}\" }) { id roles { id direct } parentGroups { id direct } users { id } accessWarnings { code ids } } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.GroupItem;",
+                                    "const ids = ((payload && payload.roles) || []).map(function (a) { return a.id; });",
+                                    "pm.test('The removed role is gone from the group roles, without a warning', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(ids, 'rrRemoved').to.not.include(pm.environment.get('rrRemoved'));",
+                                    "  pm.expect(payload.accessWarnings || [], JSON.stringify(payload.accessWarnings)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "RR user no longer holds the removed role",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query UserItem { UserItem(input: { id: \"{{rrUser}}\", productId: \"{{product_id}}\" }) { id roles { id direct } groups { id direct } accessWarnings { code ids } } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.UserItem;",
+                                    "const ids = ((payload && payload.roles) || []).map(function (a) { return a.id; });",
+                                    "pm.test('The removed role is gone from the user roles, without a warning', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(ids, 'rrRemoved').to.not.include(pm.environment.get('rrRemoved'));",
+                                    "  pm.expect(payload.accessWarnings || [], JSON.stringify(payload.accessWarnings)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "RR user lost only the permission of the removed role",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{rrUserLogin}}\", password: \"Removed_2026!\", productId: \"{{product_id}}\" }) { token permissions } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const auth = json.data && json.data.Authorization;",
+                                    "const perms = String((auth && auth.permissions) || '');",
+                                    "pm.test('The removed role grants nothing any more, the kept one still does', function () {",
+                                    "  pm.expect(auth && auth.token, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "  pm.expect(perms, 'rrKeptPerm').to.include(pm.environment.get('rrKeptPerm'));",
+                                    "  pm.expect(perms, 'rrRemovedPerm').to.not.include(pm.environment.get('rrRemovedPerm'));",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Removing the parent group",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RemoveElements { RemoveElements(input: { collectionId: \"Groups\", elementIds: [\"{{rrParentGroup}}\"] }) { success errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.RemoveElements;",
+                                    "pm.test('Removing the parent group succeeded', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "RR group no longer names the removed parent group",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GroupItem { GroupItem(input: { id: \"{{rrGroup}}\", productId: \"{{product_id}}\" }) { id roles { id direct } parentGroups { id direct } users { id } accessWarnings { code ids } } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.GroupItem;",
+                                    "const ids = ((payload && payload.parentGroups) || []).map(function (a) { return a.id; });",
+                                    "pm.test('The removed group is gone from the parent groups, without a warning', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(ids, 'rrParentGroup').to.not.include(pm.environment.get('rrParentGroup'));",
+                                    "  pm.expect(payload.accessWarnings || [], JSON.stringify(payload.accessWarnings)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "RR user still holds the kept role through its group",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{rrUserLogin}}\", password: \"Removed_2026!\", productId: \"{{product_id}}\" }) { token permissions } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const auth = json.data && json.data.Authorization;",
+                                    "const perms = String((auth && auth.permissions) || '');",
+                                    "pm.test('The remaining group still grants the kept role', function () {",
+                                    "  pm.expect(auth && auth.token, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "  pm.expect(perms, 'rrKeptPerm').to.include(pm.environment.get('rrKeptPerm'));",
+                                    "  pm.expect(perms, 'rrRemovedPerm').to.not.include(pm.environment.get('rrRemovedPerm'));",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Removing the group",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RemoveElements { RemoveElements(input: { collectionId: \"Groups\", elementIds: [\"{{rrGroup}}\"] }) { success errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.RemoveElements;",
+                                    "pm.test('Removing the group succeeded', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "RR user no longer belongs to the removed group",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query UserItem { UserItem(input: { id: \"{{rrUser}}\", productId: \"{{product_id}}\" }) { id roles { id direct } groups { id direct } accessWarnings { code ids } } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.UserItem;",
+                                    "const ids = ((payload && payload.groups) || []).map(function (a) { return a.id; });",
+                                    "pm.test('The removed group is gone from the user groups, without a warning', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(ids, 'rrGroup').to.not.include(pm.environment.get('rrGroup'));",
+                                    "  pm.expect(payload.accessWarnings || [], JSON.stringify(payload.accessWarnings)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "RR2 seed: Auth SU",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{su_login}}\", password: \"{{su_password}}\", productId: \"{{product_id}}\" }) { token } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const n = pm.variables.replaceIn('{{$timestamp}}');",
+                                    "['rr2A', 'rr2B', 'rr2C', 'rr2D', 'rr2X', 'rr2G', 'rr2Ga', 'rr2Gb', 'rr2Gc', 'rr2Gd', 'rr2U', 'rr2U2'].forEach(function (k) {",
+                                    "  pm.environment.set(k, pm.variables.replaceIn('{{$guid}}'));",
+                                    "  pm.environment.set(k + 'Code', 'RR2_' + k.toUpperCase() + '_' + n);",
+                                    "  pm.environment.set(k + 'Login', 'rr2_' + k.toLowerCase() + '_' + n);",
+                                    "});",
+                                    "['A', 'B', 'C', 'D', 'X'].forEach(function (k) { pm.environment.set('rr2Perm' + k, 'Rr2Permission' + k + '_' + n); });"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const auth = json.data && json.data.Authorization;",
+                                    "pm.test('SU authorized for the removal edge cases', function () { pm.expect(auth && auth.token, JSON.stringify(json)).to.be.a('string').and.not.empty; });",
+                                    "pm.environment.set('su_token', auth.token);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "RR2 parent role A",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RoleAdd { RoleAdd(input: { id: \"{{rr2A}}\", typeId: \"Role\", productId: \"{{product_id}}\", item: { id: \"{{rr2A}}\", name: \"{{rr2ACode}}\", roleId: \"{{rr2ACode}}\", productId: \"{{product_id}}\", parentRoles: [], permissions: [{id: \"{{rr2PermA}}\", direct: true}] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Role A created', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "RR2 role B inheriting A",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RoleAdd { RoleAdd(input: { id: \"{{rr2B}}\", typeId: \"Role\", productId: \"{{product_id}}\", item: { id: \"{{rr2B}}\", name: \"{{rr2BCode}}\", roleId: \"{{rr2BCode}}\", productId: \"{{product_id}}\", parentRoles: [{id: \"{{rr2A}}\", direct: true}], permissions: [{id: \"{{rr2PermB}}\", direct: true}] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Role B created', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "RR2 role C inheriting A",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RoleAdd { RoleAdd(input: { id: \"{{rr2C}}\", typeId: \"Role\", productId: \"{{product_id}}\", item: { id: \"{{rr2C}}\", name: \"{{rr2CCode}}\", roleId: \"{{rr2CCode}}\", productId: \"{{product_id}}\", parentRoles: [{id: \"{{rr2A}}\", direct: true}], permissions: [{id: \"{{rr2PermC}}\", direct: true}] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Role C created', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "RR2 independent role D",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RoleAdd { RoleAdd(input: { id: \"{{rr2D}}\", typeId: \"Role\", productId: \"{{product_id}}\", item: { id: \"{{rr2D}}\", name: \"{{rr2DCode}}\", roleId: \"{{rr2DCode}}\", productId: \"{{product_id}}\", parentRoles: [], permissions: [{id: \"{{rr2PermD}}\", direct: true}] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Role D created', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "RR2 role X of the ProLife product",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RoleAdd { RoleAdd(input: { id: \"{{rr2X}}\", typeId: \"Role\", productId: \"ProLife\", item: { id: \"{{rr2X}}\", name: \"{{rr2XCode}}\", roleId: \"{{rr2XCode}}\", productId: \"ProLife\", parentRoles: [], permissions: [{id: \"{{rr2PermX}}\", direct: true}] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.request.headers.upsert({ key: 'productid', value: 'ProLife' });"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('ProLife role X created', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "RR2 group holding A, C and D",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation GroupAdd { GroupAdd(input: { id: \"{{rr2G}}\", typeId: \"Group\", productId: \"{{product_id}}\", item: { id: \"{{rr2G}}\", productId: \"{{product_id}}\", name: \"{{rr2GCode}}\", description: \"Removal probe\", roles: [{id: \"{{rr2A}}\", direct: true}, {id: \"{{rr2C}}\", direct: true}, {id: \"{{rr2D}}\", direct: true}], users: [], parentGroups: [] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Group created', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "RR2 user holding B, C and D and the group",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UserAdd { UserAdd(input: { id: \"{{rr2U}}\", typeId: \"User\", productId: \"{{product_id}}\", item: { id: \"{{rr2U}}\", productId: \"{{product_id}}\", name: \"{{rr2ULogin}}\", username: \"{{rr2ULogin}}\", password: \"Removed_2026!\", email: \"{{rr2ULogin}}@qa.test\", roles: [{id: \"{{rr2B}}\", direct: true}, {id: \"{{rr2C}}\", direct: true}, {id: \"{{rr2D}}\", direct: true}], groups: [{id: \"{{rr2G}}\", direct: true}], permissions: [] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('User created', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "RR2 user also holds X in ProLife",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UserUpdate { UserUpdate(input: { id: \"{{rr2U}}\", typeId: \"User\", productId: \"ProLife\", item: { id: \"{{rr2U}}\", productId: \"ProLife\", name: \"{{rr2ULogin}}\", username: \"{{rr2ULogin}}\", password: \"\", email: \"{{rr2ULogin}}@qa.test\", roles: [{id: \"{{rr2X}}\", direct: true}], groups: [{id: \"{{rr2G}}\", direct: true}], permissions: [] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.request.headers.upsert({ key: 'productid', value: 'ProLife' });"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('ProLife role assigned', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "RR2 user revision before the removal",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetRevisionInfoList { GetRevisionInfoList(input: { documentId: \"{{rr2U}}\", collectionId: \"Users\" }) { activeRevision revisions { user revision isActive description } } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const list = json.data && json.data.GetRevisionInfoList;",
+                                    "pm.test('RR2 user revision before the removal', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(list.activeRevision, JSON.stringify(json)).to.be.a('number');",
+                                    "});",
+                                    "pm.environment.set('rr2UserRevision', list.activeRevision);",
+                                    "pm.environment.set('rr2UserAuthor', list.revisions.reduce(function (a, r) { return r.revision === 1 ? r.user : a; }, ''));"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "RR2 user holds the permissions of A, B, C and D",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{rr2ULogin}}\", password: \"Removed_2026!\", productId: \"{{product_id}}\" }) { token permissions } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const auth = json.data && json.data.Authorization;",
+                                    "const perms = String((auth && auth.permissions) || '').split(';');",
+                                    "pm.test('RR2 user holds the permissions of A, B, C and D', function () {",
+                                    "  pm.expect(auth && auth.token, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "  pm.expect(perms, 'rr2PermA').to.include(pm.environment.get('rr2PermA'));",
+                                    "  pm.expect(perms, 'rr2PermB').to.include(pm.environment.get('rr2PermB'));",
+                                    "  pm.expect(perms, 'rr2PermC').to.include(pm.environment.get('rr2PermC'));",
+                                    "  pm.expect(perms, 'rr2PermD').to.include(pm.environment.get('rr2PermD'));",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Removing a parent role together with one of its children and another role",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RemoveElements { RemoveElements(input: { collectionId: \"Roles\", elementIds: [\"{{rr2A}}\", \"{{rr2B}}\", \"{{rr2D}}\"] }) { success errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.RemoveElements;",
+                                    "pm.test('Removing a parent role together with one of its children and another role succeeded', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "RR2 surviving child role no longer names the removed parent",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query RoleItem { RoleItem(input: { id: \"{{rr2C}}\", productId: \"{{product_id}}\" }) { id parentRoles { id direct } accessWarnings { code ids } } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.RoleItem;",
+                                    "const ids = ((payload && payload.parentRoles) || []).map(function (a) { return a.id; }).sort();",
+                                    "pm.test('C has no parent roles left, without a warning', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(ids).to.eql([].sort());",
+                                    "  pm.expect(payload.accessWarnings || [], JSON.stringify(payload.accessWarnings)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "RR2 removed child role stays removed",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query RoleItem { RoleItem(input: { id: \"{{rr2B}}\", productId: \"{{product_id}}\" }) { id  accessWarnings { code ids } } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
+                                    "pm.test('RR2 removed child role stays removed', function () {",
+                                    "  pm.expect(json.data && json.data.RoleItem, JSON.stringify(json)).to.not.be.ok;",
+                                    "  pm.expect(messages).to.match(/does not exist/);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "RR2 group keeps only the surviving role",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GroupItem { GroupItem(input: { id: \"{{rr2G}}\", productId: \"{{product_id}}\" }) { id roles { id direct } accessWarnings { code ids } } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.GroupItem;",
+                                    "const ids = ((payload && payload.roles) || []).map(function (a) { return a.id; }).sort();",
+                                    "pm.test('Only C is left in the group, without a warning', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(ids).to.eql([pm.environment.get('rr2C')].sort());",
+                                    "  pm.expect(payload.accessWarnings || [], JSON.stringify(payload.accessWarnings)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "RR2 user keeps only the surviving role",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query UserItem { UserItem(input: { id: \"{{rr2U}}\", productId: \"{{product_id}}\" }) { id roles { id direct } accessWarnings { code ids } } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.UserItem;",
+                                    "const ids = ((payload && payload.roles) || []).map(function (a) { return a.id; }).sort();",
+                                    "pm.test('Only C is left for the user, without a warning', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(ids).to.eql([pm.environment.get('rr2C')].sort());",
+                                    "  pm.expect(payload.accessWarnings || [], JSON.stringify(payload.accessWarnings)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "RR2 user keeps the role of the other product",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query UserItem { UserItem(input: { id: \"{{rr2U}}\", productId: \"ProLife\" }) { id roles { id direct } accessWarnings { code ids } } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.request.headers.upsert({ key: 'productid', value: 'ProLife' });"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.UserItem;",
+                                    "const ids = ((payload && payload.roles) || []).map(function (a) { return a.id; }).sort();",
+                                    "pm.test('The ProLife role is untouched by a Puma role removal', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(ids).to.eql([pm.environment.get('rr2X')].sort());",
+                                    "  pm.expect(payload.accessWarnings || [], JSON.stringify(payload.accessWarnings)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "RR2 user got one new revision for the dropped roles",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetRevisionInfoList { GetRevisionInfoList(input: { documentId: \"{{rr2U}}\", collectionId: \"Users\" }) { activeRevision revisions { user revision isActive description } } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const list = json.data && json.data.GetRevisionInfoList;",
+                                    "const latest = ((list && list.revisions) || []).reduce(function (a, r) { return !a || r.revision > a.revision ? r : a; }, null);",
+                                    "pm.test('RR2 user got one new revision for the dropped roles', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(list.activeRevision, 'one new revision').to.eql(Number(pm.environment.get('rr2UserRevision')) + 1);",
+                                    "  pm.expect(latest.revision).to.eql(list.activeRevision);",
+                                    "  pm.expect(latest.isActive).to.eql(true);",
+                                    "  pm.expect(latest.user, 'attributed to the remover').to.eql(pm.environment.get('rr2UserAuthor'));",
+                                    "  pm.expect(latest.description, 'describes the dropped references').to.be.a('string').and.not.empty;",
+                                    "  pm.expect(latest.description.indexOf(pm.environment.get('rr2BCode')) >= 0 || latest.description.indexOf(pm.environment.get('rr2B')) >= 0, 'rr2B named in: ' + latest.description).to.eql(true);",
+                                    "  pm.expect(latest.description.indexOf(pm.environment.get('rr2DCode')) >= 0 || latest.description.indexOf(pm.environment.get('rr2D')) >= 0, 'rr2D named in: ' + latest.description).to.eql(true);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "RR2 user holds only the permission of C",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{rr2ULogin}}\", password: \"Removed_2026!\", productId: \"{{product_id}}\" }) { token permissions } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const auth = json.data && json.data.Authorization;",
+                                    "const perms = String((auth && auth.permissions) || '').split(';');",
+                                    "pm.test('RR2 user holds only the permission of C', function () {",
+                                    "  pm.expect(auth && auth.token, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "  pm.expect(perms, 'rr2PermC').to.include(pm.environment.get('rr2PermC'));",
+                                    "  pm.expect(perms, 'rr2PermA').to.not.include(pm.environment.get('rr2PermA'));",
+                                    "  pm.expect(perms, 'rr2PermB').to.not.include(pm.environment.get('rr2PermB'));",
+                                    "  pm.expect(perms, 'rr2PermD').to.not.include(pm.environment.get('rr2PermD'));",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Removing the ProLife role",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RemoveElements { RemoveElements(input: { collectionId: \"Roles\", elementIds: [\"{{rr2X}}\"] }) { success errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.request.headers.upsert({ key: 'productid', value: 'ProLife' });"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.RemoveElements;",
+                                    "pm.test('Removing the ProLife role succeeded', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "RR2 user lost the ProLife role",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query UserItem { UserItem(input: { id: \"{{rr2U}}\", productId: \"ProLife\" }) { id roles { id direct } accessWarnings { code ids } } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.request.headers.upsert({ key: 'productid', value: 'ProLife' });"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.UserItem;",
+                                    "const ids = ((payload && payload.roles) || []).map(function (a) { return a.id; }).sort();",
+                                    "pm.test('No ProLife role is left, without a warning', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(ids).to.eql([].sort());",
+                                    "  pm.expect(payload.accessWarnings || [], JSON.stringify(payload.accessWarnings)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "RR2 user keeps its Puma role",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query UserItem { UserItem(input: { id: \"{{rr2U}}\", productId: \"{{product_id}}\" }) { id roles { id direct } accessWarnings { code ids } } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.UserItem;",
+                                    "const ids = ((payload && payload.roles) || []).map(function (a) { return a.id; }).sort();",
+                                    "pm.test('The Puma role is untouched by a ProLife role removal', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(ids).to.eql([pm.environment.get('rr2C')].sort());",
+                                    "  pm.expect(payload.accessWarnings || [], JSON.stringify(payload.accessWarnings)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "RR2 group Ga",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation GroupAdd { GroupAdd(input: { id: \"{{rr2Ga}}\", typeId: \"Group\", productId: \"{{product_id}}\", item: { id: \"{{rr2Ga}}\", productId: \"{{product_id}}\", name: \"{{rr2GaCode}}\", description: \"Removal probe\", roles: [], users: [], parentGroups: [] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Group Ga created', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "RR2 group Gb",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation GroupAdd { GroupAdd(input: { id: \"{{rr2Gb}}\", typeId: \"Group\", productId: \"{{product_id}}\", item: { id: \"{{rr2Gb}}\", productId: \"{{product_id}}\", name: \"{{rr2GbCode}}\", description: \"Removal probe\", roles: [], users: [], parentGroups: [] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Group Gb created', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "RR2 group Gc under Ga and Gb",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation GroupAdd { GroupAdd(input: { id: \"{{rr2Gc}}\", typeId: \"Group\", productId: \"{{product_id}}\", item: { id: \"{{rr2Gc}}\", productId: \"{{product_id}}\", name: \"{{rr2GcCode}}\", description: \"Removal probe\", roles: [], users: [], parentGroups: [{id: \"{{rr2Ga}}\", direct: true}, {id: \"{{rr2Gb}}\", direct: true}] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Group Gc created', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "RR2 group Gd under Ga",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation GroupAdd { GroupAdd(input: { id: \"{{rr2Gd}}\", typeId: \"Group\", productId: \"{{product_id}}\", item: { id: \"{{rr2Gd}}\", productId: \"{{product_id}}\", name: \"{{rr2GdCode}}\", description: \"Removal probe\", roles: [], users: [], parentGroups: [{id: \"{{rr2Ga}}\", direct: true}] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Group Gd created', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "RR2 user in Ga and Gc",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UserAdd { UserAdd(input: { id: \"{{rr2U2}}\", typeId: \"User\", productId: \"{{product_id}}\", item: { id: \"{{rr2U2}}\", productId: \"{{product_id}}\", name: \"{{rr2U2Login}}\", username: \"{{rr2U2Login}}\", password: \"Removed_2026!\", email: \"{{rr2U2Login}}@qa.test\", roles: [], groups: [{id: \"{{rr2Ga}}\", direct: true}, {id: \"{{rr2Gc}}\", direct: true}], permissions: [] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Second user created', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "RR2 group revision before the removal",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetRevisionInfoList { GetRevisionInfoList(input: { documentId: \"{{rr2Gc}}\", collectionId: \"Groups\" }) { activeRevision revisions { user revision isActive description } } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const list = json.data && json.data.GetRevisionInfoList;",
+                                    "pm.test('RR2 group revision before the removal', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(list.activeRevision, JSON.stringify(json)).to.be.a('number');",
+                                    "});",
+                                    "pm.environment.set('rr2GroupRevision', list.activeRevision);",
+                                    "pm.environment.set('rr2GroupAuthor', list.revisions.reduce(function (a, r) { return r.revision === 1 ? r.user : a; }, ''));"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Removing a group that is a parent of two groups and a membership",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RemoveElements { RemoveElements(input: { collectionId: \"Groups\", elementIds: [\"{{rr2Ga}}\"] }) { success errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.RemoveElements;",
+                                    "pm.test('Removing a group that is a parent of two groups and a membership succeeded', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "RR2 group with two parents keeps the other one",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GroupItem { GroupItem(input: { id: \"{{rr2Gc}}\", productId: \"{{product_id}}\" }) { id parentGroups { id direct } accessWarnings { code ids } } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.GroupItem;",
+                                    "const ids = ((payload && payload.parentGroups) || []).map(function (a) { return a.id; }).sort();",
+                                    "pm.test('Only Gb is left as parent of Gc, without a warning', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(ids).to.eql([pm.environment.get('rr2Gb')].sort());",
+                                    "  pm.expect(payload.accessWarnings || [], JSON.stringify(payload.accessWarnings)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "RR2 group with the removed parent only has none left",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GroupItem { GroupItem(input: { id: \"{{rr2Gd}}\", productId: \"{{product_id}}\" }) { id parentGroups { id direct } accessWarnings { code ids } } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.GroupItem;",
+                                    "const ids = ((payload && payload.parentGroups) || []).map(function (a) { return a.id; }).sort();",
+                                    "pm.test('Gd has no parent groups left, without a warning', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(ids).to.eql([].sort());",
+                                    "  pm.expect(payload.accessWarnings || [], JSON.stringify(payload.accessWarnings)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "RR2 user keeps only its other group",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query UserItem { UserItem(input: { id: \"{{rr2U2}}\", productId: \"{{product_id}}\" }) { id groups { id direct } accessWarnings { code ids } } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.UserItem;",
+                                    "const ids = ((payload && payload.groups) || []).map(function (a) { return a.id; }).sort();",
+                                    "pm.test('Gc and its parent Gb are left, without a warning', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(ids).to.eql([pm.environment.get('rr2Gb'), pm.environment.get('rr2Gc')].sort());",
+                                    "  pm.expect(payload.accessWarnings || [], JSON.stringify(payload.accessWarnings)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "RR2 group got one new revision for the dropped parent",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetRevisionInfoList { GetRevisionInfoList(input: { documentId: \"{{rr2Gc}}\", collectionId: \"Groups\" }) { activeRevision revisions { user revision isActive description } } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const list = json.data && json.data.GetRevisionInfoList;",
+                                    "const latest = ((list && list.revisions) || []).reduce(function (a, r) { return !a || r.revision > a.revision ? r : a; }, null);",
+                                    "pm.test('RR2 group got one new revision for the dropped parent', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(list.activeRevision, 'one new revision').to.eql(Number(pm.environment.get('rr2GroupRevision')) + 1);",
+                                    "  pm.expect(latest.revision).to.eql(list.activeRevision);",
+                                    "  pm.expect(latest.isActive).to.eql(true);",
+                                    "  pm.expect(latest.user, 'attributed to the remover').to.eql(pm.environment.get('rr2GroupAuthor'));",
+                                    "  pm.expect(latest.description, 'describes the dropped references').to.be.a('string').and.not.empty;",
+                                    "  pm.expect(latest.description.indexOf(pm.environment.get('rr2GaCode')) >= 0 || latest.description.indexOf(pm.environment.get('rr2Ga')) >= 0, 'rr2Ga named in: ' + latest.description).to.eql(true);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Removing a group together with its parent group",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RemoveElements { RemoveElements(input: { collectionId: \"Groups\", elementIds: [\"{{rr2Gb}}\", \"{{rr2Gc}}\"] }) { success errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.RemoveElements;",
+                                    "pm.test('Removing a group together with its parent group succeeded', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "RR2 removed child group stays removed",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GroupItem { GroupItem(input: { id: \"{{rr2Gc}}\", productId: \"{{product_id}}\" }) { id  accessWarnings { code ids } } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
+                                    "pm.test('RR2 removed child group stays removed', function () {",
+                                    "  pm.expect(json.data && json.data.GroupItem, JSON.stringify(json)).to.not.be.ok;",
+                                    "  pm.expect(messages).to.match(/does not exist/);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "RR2 user belongs to no group any more",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query UserItem { UserItem(input: { id: \"{{rr2U2}}\", productId: \"{{product_id}}\" }) { id groups { id direct } accessWarnings { code ids } } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.UserItem;",
+                                    "const ids = ((payload && payload.groups) || []).map(function (a) { return a.id; }).sort();",
+                                    "pm.test('No group is left for the user, without a warning', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(ids).to.eql([].sort());",
+                                    "  pm.expect(payload.accessWarnings || [], JSON.stringify(payload.accessWarnings)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Cleanup: removing the edge case users",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RemoveElements { RemoveElements(input: { collectionId: \"Users\", elementIds: [\"{{rr2U}}\", \"{{rr2U2}}\"] }) { success errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.RemoveElements;",
+                                    "pm.test('Cleanup: removing the edge case users succeeded', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Cleanup: removing the edge case groups",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RemoveElements { RemoveElements(input: { collectionId: \"Groups\", elementIds: [\"{{rr2G}}\", \"{{rr2Gd}}\"] }) { success errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.RemoveElements;",
+                                    "pm.test('Cleanup: removing the edge case groups succeeded', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Cleanup: removing the edge case role",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RemoveElements { RemoveElements(input: { collectionId: \"Roles\", elementIds: [\"{{rr2C}}\"] }) { success errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.RemoveElements;",
+                                    "pm.test('Cleanup: removing the edge case role succeeded', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Cleanup: removing the user",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RemoveElements { RemoveElements(input: { collectionId: \"Users\", elementIds: [\"{{rrUser}}\"] }) { success errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.RemoveElements;",
+                                    "pm.test('Cleanup: removing the user succeeded', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Cleanup: removing the kept role",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RemoveElements { RemoveElements(input: { collectionId: \"Roles\", elementIds: [\"{{rrKept}}\"] }) { success errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.RemoveElements;",
+                                    "pm.test('Cleanup: removing the kept role succeeded', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true);",
                                     "});"
                                 ]
                             }
