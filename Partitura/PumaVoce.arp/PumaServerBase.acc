@@ -34,6 +34,72 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="ExternalLoginController" PackageId="ImtAuthVoce" ComponentId="ExternalLoginController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="AppleClientIdParam" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaSettings/ExternalLoginAppleClientIdParam"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="AppleClientSecretParam" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaSettings/ExternalLoginAppleClientSecretParam"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CallbackUrlParam" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaSettings/ExternalLoginCallbackUrlParam"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="FacebookClientIdParam" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaSettings/ExternalLoginFacebookClientIdParam"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="FacebookClientSecretParam" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaSettings/ExternalLoginFacebookClientSecretParam"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="GoogleClientIdParam" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaSettings/ExternalLoginGoogleClientIdParam"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="GoogleClientSecretParam" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaSettings/ExternalLoginGoogleClientSecretParam"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="OidcAuthorizationEndpointParam" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaSettings/ExternalLoginOidcAuthorizationEndpointParam"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="OidcClientIdParam" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaSettings/ExternalLoginOidcClientIdParam"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="OidcClientSecretParam" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaSettings/ExternalLoginOidcClientSecretParam"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="OidcIssuerParam" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaSettings/ExternalLoginOidcIssuerParam"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="OidcProviderNameParam" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaSettings/ExternalLoginOidcProviderNameParam"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="OidcTokenEndpointParam" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaSettings/ExternalLoginOidcTokenEndpointParam"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="OidcUserInfoEndpointParam" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaSettings/ExternalLoginOidcUserInfoEndpointParam"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RoleCollection" Type="Reference" ExportId="RoleRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaSettings/TracingConfiguration"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserCollection" Type="Reference" ExportId="UserRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="HttpServerFramework" PackageId="ImtHttpServerVoce" ComponentId="HttpServerFramework">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -129,6 +195,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="DocumentRepositories" Type="Reference[]" ExportId="DocumentRepositories">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ExternalLoginController" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ExternalLoginController"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ExternGqlRequestHandlers" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">

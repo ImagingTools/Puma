@@ -8,6 +8,7 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
+        <Element ComponentName="ExternalLoginCallback" X="300" Y="175" Note=""/>
         <Element ComponentName="GraphQLDemultiplexer" X="975" Y="175" Note=""/>
         <Element ComponentName="ProfileController" X="900" Y="450" Note=""/>
         <Element ComponentName="RootDataController" X="600" Y="450" Note=""/>
