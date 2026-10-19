@@ -9700,7 +9700,7 @@
                 },
                 {
                     "id": "new-get-available-org-perms-001",
-                    "name": "GetOrganizationPermissions (new org perms tree)",
+                    "name": "GetOrganizationPermissions (organization tree)",
                     "request": {
                         "url": {
                             "host": [
@@ -9734,25 +9734,13 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const groups = json.data && json.data.GetOrganizationPermissions ? json.data.GetOrganizationPermissions.groups : null;",
-                                    "pm.test('GetOrganizationPermissions succeeds and returns 6 groups', function(){",
-                                    "  pm.expect(!!(json.errors && json.errors.length)).to.eql(false);",
-                                    "  pm.expect(Array.isArray(groups)).to.eql(true);",
-                                    "  pm.expect(groups.length).to.eql(6);",
+                                    "pm.test('GetOrganizationPermissions succeeds and returns the one organization tree', function(){",
+                                    "  pm.expect(!!(json.errors && json.errors.length), 'unexpected GraphQL error: ' + JSON.stringify(json.errors)).to.eql(false);",
+                                    "  pm.expect(Array.isArray(groups) ? groups.map(function(g){ return g.groupId; }) : groups).to.eql(['OrganizationManagement']);",
                                     "});",
-                                    "pm.test('GetOrganizationPermissions has correct group IDs (no stale groups)', function(){",
-                                    "  const groupIds = (groups || []).map(g => g.groupId);",
-                                    "  ['EditOrganization','MemberManagement','RoleManagement','GroupManagement','PermissionManagement','ConnectionManagement'].forEach(function(id){",
-                                    "    pm.expect(groupIds.includes(id), 'Missing expected group: ' + id).to.eql(true);",
-                                    "  });",
-                                    "  ['OrganizationManagement','ContractManagement','MessageManagement'].forEach(function(id){",
-                                    "    pm.expect(groupIds.includes(id), 'Stale group must be absent: ' + id).to.eql(false);",
-                                    "  });",
-                                    "});",
-                                    "pm.test('PermissionManagement group contains EditOrganizationMemberPermissions', function(){",
-                                    "  const permMgmt = (groups || []).find(function(g){ return g.groupId === 'PermissionManagement'; });",
-                                    "  pm.expect(!!permMgmt).to.eql(true);",
-                                    "  const entryIds = permMgmt ? permMgmt.entries.map(function(e){ return e.permissionId; }) : [];",
-                                    "  pm.expect(entryIds.includes('EditOrganizationMemberPermissions'), 'EditOrganizationMemberPermissions missing from PermissionManagement').to.eql(true);",
+                                    "pm.test('The organization tree offers exactly its leaves, by full path', function(){",
+                                    "  const entryIds = ((groups && groups[0] && groups[0].entries) || []).map(function(e){ return e.permissionId; }).sort();",
+                                    "  pm.expect(entryIds).to.eql([\"/OrganizationManagement/Connections/Edit/Connect\",\"/OrganizationManagement/Connections/Edit/Remove\",\"/OrganizationManagement/Connections/View\",\"/OrganizationManagement/Connections/ViewCode\",\"/OrganizationManagement/Edit/ChangeDescription\",\"/OrganizationManagement/Edit/ChangeName\",\"/OrganizationManagement/Groups/Edit/Add\",\"/OrganizationManagement/Groups/Edit/Change\",\"/OrganizationManagement/Groups/Edit/Remove\",\"/OrganizationManagement/Groups/View\",\"/OrganizationManagement/Members/Edit/ChangeRole\",\"/OrganizationManagement/Members/Edit/Exclude\",\"/OrganizationManagement/Members/Edit/Invite\",\"/OrganizationManagement/Members/View\",\"/OrganizationManagement/Permissions/Change\",\"/OrganizationManagement/Permissions/View\",\"/OrganizationManagement/Roles/Edit/Add\",\"/OrganizationManagement/Roles/Edit/Change\",\"/OrganizationManagement/Roles/Edit/Remove\",\"/OrganizationManagement/Roles/View\"]);",
                                     "});"
                                 ],
                                 "_lastExecutionId": "new-uuid-001"
@@ -9781,7 +9769,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation UpdateMembershipPermissions { UpdateMembershipPermissions(input: { membershipId: \"{{memberAMembershipId}}\", permissions: [\"ViewOrganizationMembers\", \"EditOrganizationMember\", \"EditOrganizationMemberPermissions\"] }) { success errorMessage } }",
+                                "query": "mutation UpdateMembershipPermissions { UpdateMembershipPermissions(input: { membershipId: \"{{memberAMembershipId}}\", permissions: [\"/OrganizationManagement/Members/View\", \"/OrganizationManagement/Members/Edit/Invite\", \"/OrganizationManagement/Permissions/Change\"] }) { success errorMessage } }",
                                 "variables": ""
                             }
                         }
@@ -9847,7 +9835,7 @@
                                     "});",
                                     "pm.test('organizationPermissions reflects permissions set by UpdateMembershipPermissions', function(){",
                                     "  const perms = json.data.GetMembership.membership.organizationPermissions || [];",
-                                    "  ['ViewOrganizationMembers','EditOrganizationMember','EditOrganizationMemberPermissions'].forEach(function(p){",
+                                    "  ['/OrganizationManagement/Members/View','/OrganizationManagement/Members/Edit/Invite','/OrganizationManagement/Permissions/Change'].forEach(function(p){",
                                     "    pm.expect(perms.includes(p), 'Missing org permission: ' + p).to.eql(true);",
                                     "  });",
                                     "});"
@@ -11468,7 +11456,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation UpdateRoleFromRepresentation { UpdateRoleFromRepresentation(input: { documentId: \"{{noOrgViewerRoleDocId}}\", role: { id: \"{{noOrgViewerRoleId}}\", name: \"{{noOrgViewerRoleCode}}\", description: \"Global viewer role for NoOrg visibility probes\", roleId: \"{{noOrgViewerRoleCode}}\", productId: \"{{product_id}}\", parentRoles: [], permissions: [{id: \"ViewUsers\", direct: true}, {id: \"ViewRoles\", direct: true}, {id: \"ViewGroups\", direct: true}], isDefault: false, isGuest: false } }) { status message } }",
+                                "query": "mutation UpdateRoleFromRepresentation { UpdateRoleFromRepresentation(input: { documentId: \"{{noOrgViewerRoleDocId}}\", role: { id: \"{{noOrgViewerRoleId}}\", name: \"{{noOrgViewerRoleCode}}\", description: \"Global viewer role for NoOrg visibility probes\", roleId: \"{{noOrgViewerRoleCode}}\", productId: \"{{product_id}}\", parentRoles: [], permissions: [{id: \"/Administration/Users/View\", direct: true}, {id: \"/Administration/Roles/View\", direct: true}, {id: \"/Administration/Groups/View\", direct: true}], isDefault: false, isGuest: false } }) { status message } }",
                                 "variables": ""
                             }
                         }
@@ -18513,7 +18501,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation UpdateRoleFromRepresentation { UpdateRoleFromRepresentation(input: { documentId: \"{{urtiRoleDocId}}\", role: { id: \"{{urtiRoleId}}\", name: \"{{urtiRoleCode}}\", description: \"Tenant A isolation probe role\", roleId: \"{{urtiRoleCode}}\", productId: \"{{product_id}}\", parentRoles: [], permissions: [{id: \"ViewUsers\", direct: true}], isDefault: false, isGuest: false } }) { status message } }",
+                                "query": "mutation UpdateRoleFromRepresentation { UpdateRoleFromRepresentation(input: { documentId: \"{{urtiRoleDocId}}\", role: { id: \"{{urtiRoleId}}\", name: \"{{urtiRoleCode}}\", description: \"Tenant A isolation probe role\", roleId: \"{{urtiRoleCode}}\", productId: \"{{product_id}}\", parentRoles: [], permissions: [{id: \"/Administration/Users/View\", direct: true}], isDefault: false, isGuest: false } }) { status message } }",
                                 "variables": ""
                             }
                         }
@@ -24090,7 +24078,7 @@
                                     "pm.environment.set('product_id', 'Puma');",
                                     "[\"piR1\",\"piR2\",\"piR3\",\"piRg2\",\"piRg3\",\"piG1\",\"piG2\",\"piG3\",\"piU1\",\"piU2\",\"piRx\",\"piUx\"].forEach(function (k) { pm.environment.set(k, pm.variables.replaceIn('{{$guid}}')); pm.environment.set(k + 'Code', 'PI_' + k.toUpperCase() + '_' + n); });",
                                     "['P1', 'P2', 'P3', 'Pg2', 'Pg3', 'Px'].forEach(function (k) { pm.environment.set('pi' + k, 'PiPermission' + k + '_' + n); });",
-                                    "pm.environment.set('piViewRoles', 'ViewRoles');",
+                                    "pm.environment.set('piViewRoles', '/Administration/Roles/View');",
                                     "pm.environment.set('piU1Login', 'pi_u1_' + n);",
                                     "pm.environment.set('piU2Login', 'pi_u2_' + n);",
                                     "pm.environment.set('piUxLogin', 'pi_ux_' + n);"
@@ -24124,7 +24112,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation RoleAdd { RoleAdd(input: { id: \"{{piR3}}\", typeId: \"Role\", productId: \"{{product_id}}\", item: { id: \"{{piR3}}\", name: \"{{piR3Code}}\", roleId: \"{{piR3Code}}\", productId: \"{{product_id}}\", parentRoles: [], permissions: [{id: \"{{piP3}}\", direct: true}, {id: \"ViewRoles\", direct: true}] } }) { id } }",
+                                "query": "mutation RoleAdd { RoleAdd(input: { id: \"{{piR3}}\", typeId: \"Role\", productId: \"{{product_id}}\", item: { id: \"{{piR3}}\", name: \"{{piR3Code}}\", roleId: \"{{piR3Code}}\", productId: \"{{product_id}}\", parentRoles: [], permissions: [{id: \"{{piP3}}\", direct: true}, {id: \"/Administration/Roles/View\", direct: true}] } }) { id } }",
                                 "variables": ""
                             }
                         },
@@ -25019,7 +25007,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation RoleAdd { RoleAdd(input: { id: \"{{piRx}}\", typeId: \"Role\", productId: \"ProLife\", item: { id: \"{{piRx}}\", name: \"{{piRxCode}}\", roleId: \"{{piRxCode}}\", productId: \"ProLife\", parentRoles: [], permissions: [{id: \"ViewRoles\", direct: true}, {id: \"{{piPx}}\", direct: true}] } }) { id } }",
+                                "query": "mutation RoleAdd { RoleAdd(input: { id: \"{{piRx}}\", typeId: \"Role\", productId: \"ProLife\", item: { id: \"{{piRx}}\", name: \"{{piRxCode}}\", roleId: \"{{piRxCode}}\", productId: \"ProLife\", parentRoles: [], permissions: [{id: \"/Administration/Roles/View\", direct: true}, {id: \"{{piPx}}\", direct: true}] } }) { id } }",
                                 "variables": ""
                             }
                         },
@@ -27245,6 +27233,1035 @@
                             }
                         }
                     ]
+                }
+            ]
+        },
+        {
+            "name": "20 Organization permissions by path",
+            "description": "Organization permissions are checked by the permission rule (imtauth::HasPermission): a leaf granted as the full path the GUI stores opens what it names, a sibling leaf does not, and a group of the tree is no permission of its own.",
+            "item": [
+                {
+                    "name": "OPP: Authorization A member",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const auth = json.data ? json.data.Authorization : null;",
+                                    "pm.test('A member authorized', function () {",
+                                    "  pm.expect(auth && auth.token, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('oppMemberToken', auth && auth.token);"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{a_member_login}}\", password: \"{{a_member_password}}\", productId: \"{{product_id}}\" }) { token } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OPP: SelectTenant A for the member",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.SelectTenant : null;",
+                                    "const session = payload && payload.userSession ? payload.userSession : null;",
+                                    "pm.test('The member works in organization A', function () {",
+                                    "  pm.expect(!!payload && payload.ok === true && !!session && session.tenantId === pm.environment.get('tenantAId'), JSON.stringify(json)).to.eql(true);",
+                                    "});",
+                                    "pm.environment.set('oppMemberToken', session && session.accessToken);"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{oppMemberToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SelectTenant { SelectTenant(input: { tenantId: \"{{tenantAId}}\" }) { ok userSession { tenantId accessToken } errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OPP: Owner grants Members/Edit/Invite as its full path",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.UpdateMembershipPermissions : null;",
+                                    "pm.test('The owner grants Members/Edit/Invite as its full path', function () {",
+                                    "  pm.expect(!!(json.errors && json.errors.length), 'unexpected GraphQL error: ' + JSON.stringify(json.errors)).to.eql(false);",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_tenantA_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UpdateMembershipPermissions { UpdateMembershipPermissions(input: { membershipId: \"{{memberAMembershipId}}\", permissions: [\"/OrganizationManagement/Members/Edit/Invite\"] }) { success errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OPP: A leaf granted as its full path lets the member invite",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.CreateTenantInvitation : null;",
+                                    "",
+                                    "pm.test('A leaf granted as its full path lets the member invite', function () {",
+                                    "  pm.expect(!!(json.errors && json.errors.length), 'unexpected GraphQL error: ' + JSON.stringify(json.errors)).to.eql(false);",
+                                    "  pm.expect(payload && payload.invitationId, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "if (payload && payload.invitationId) pm.environment.set('oppInvitationId', payload.invitationId);"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{oppMemberToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateTenantInvitation { CreateTenantInvitation(input: { userId: \"{{outsider_user_id}}\", tenantId: \"{{tenantAId}}\" }) { invitationId errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OPP: Owner revokes that invitation",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('The invitation is revoked', function () {",
+                                    "  pm.expect(json.data && json.data.RevokeTenantInvitation && json.data.RevokeTenantInvitation.success, JSON.stringify(json)).to.eql(true);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_tenantA_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RevokeTenantInvitation { RevokeTenantInvitation(input: { invitationId: \"{{oppInvitationId}}\" }) { success errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OPP: Owner grants only Members/View",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.UpdateMembershipPermissions : null;",
+                                    "pm.test('The owner grants only Members/View', function () {",
+                                    "  pm.expect(!!(json.errors && json.errors.length), 'unexpected GraphQL error: ' + JSON.stringify(json.errors)).to.eql(false);",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_tenantA_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UpdateMembershipPermissions { UpdateMembershipPermissions(input: { membershipId: \"{{memberAMembershipId}}\", permissions: [\"/OrganizationManagement/Members/View\"] }) { success errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OPP: A sibling leaf does not let the member invite",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.CreateTenantInvitation : null;",
+                                    "",
+                                    "pm.test('A sibling leaf does not let the member invite', function () {",
+                                    "  pm.expect(!!(payload && payload.invitationId), 'an invitation was created: ' + JSON.stringify(json)).to.eql(false);",
+                                    "  pm.expect(JSON.stringify(json), 'expected a refusal').to.match(/denied|insufficient|permission/i);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{oppMemberToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateTenantInvitation { CreateTenantInvitation(input: { userId: \"{{outsider_user_id}}\", tenantId: \"{{tenantAId}}\" }) { invitationId errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OPP: Owner grants the group Members/Edit",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.UpdateMembershipPermissions : null;",
+                                    "pm.test('The owner grants the group Members/Edit', function () {",
+                                    "  pm.expect(!!(json.errors && json.errors.length), 'unexpected GraphQL error: ' + JSON.stringify(json.errors)).to.eql(false);",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_tenantA_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UpdateMembershipPermissions { UpdateMembershipPermissions(input: { membershipId: \"{{memberAMembershipId}}\", permissions: [\"/OrganizationManagement/Members/Edit\"] }) { success errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OPP: A group of the tree is no permission of its own",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.CreateTenantInvitation : null;",
+                                    "",
+                                    "pm.test('A group of the tree is no permission of its own', function () {",
+                                    "  pm.expect(!!(payload && payload.invitationId), 'an invitation was created: ' + JSON.stringify(json)).to.eql(false);",
+                                    "  pm.expect(JSON.stringify(json), 'expected a refusal').to.match(/denied|insufficient|permission/i);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{oppMemberToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateTenantInvitation { CreateTenantInvitation(input: { userId: \"{{outsider_user_id}}\", tenantId: \"{{tenantAId}}\" }) { invitationId errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OPP: Owner grants the group Edit of the members by its bare id",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.UpdateMembershipPermissions : null;",
+                                    "pm.test('The owner grants the group Edit of the members by its bare id', function () {",
+                                    "  pm.expect(!!(json.errors && json.errors.length), 'unexpected GraphQL error: ' + JSON.stringify(json.errors)).to.eql(false);",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_tenantA_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UpdateMembershipPermissions { UpdateMembershipPermissions(input: { membershipId: \"{{memberAMembershipId}}\", permissions: [\"Edit\"] }) { success errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OPP: A group named by its bare id is no permission either",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.CreateTenantInvitation : null;",
+                                    "",
+                                    "pm.test('A group named by its bare id is no permission either', function () {",
+                                    "  pm.expect(!!(payload && payload.invitationId), 'an invitation was created: ' + JSON.stringify(json)).to.eql(false);",
+                                    "  pm.expect(JSON.stringify(json), 'expected a refusal').to.match(/denied|insufficient|permission/i);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{oppMemberToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateTenantInvitation { CreateTenantInvitation(input: { userId: \"{{outsider_user_id}}\", tenantId: \"{{tenantAId}}\" }) { invitationId errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OPP: Owner grants only Members/View for the reads",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.UpdateMembershipPermissions : null;",
+                                    "pm.test('The owner grants only Members/View for the reads', function () {",
+                                    "  pm.expect(!!(json.errors && json.errors.length), 'unexpected GraphQL error: ' + JSON.stringify(json.errors)).to.eql(false);",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_tenantA_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UpdateMembershipPermissions { UpdateMembershipPermissions(input: { membershipId: \"{{memberAMembershipId}}\", permissions: [\"/OrganizationManagement/Members/View\"] }) { success errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OPP: Members/View opens the list of members",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.GetMembershipsByTenant : null;",
+                                    "",
+                                    "pm.test('Members/View opens the list of members', function () {",
+                                    "  pm.expect(!!(json.errors && json.errors.length), 'unexpected GraphQL error: ' + JSON.stringify(json.errors)).to.eql(false);",
+                                    "  pm.expect(payload && !payload.errorMessage, JSON.stringify(json)).to.eql(true);",
+                                    "  pm.expect(payload && payload.membershipIds !== undefined && payload.membershipIds !== null, 'no data: ' + JSON.stringify(json)).to.eql(true);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{oppMemberToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetMembershipsByTenant { GetMembershipsByTenant(input: { tenantId: \"{{tenantAId}}\" }) { membershipIds errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OPP: Members/View does not open the connections",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.GetConnections : null;",
+                                    "",
+                                    "pm.test('Members/View does not open the connections', function () {",
+                                    "  const refused = (payload && /denied|insufficient|permission/i.test(payload.errorMessage || '')) || /denied|insufficient|permission/i.test(JSON.stringify(json.errors || []));",
+                                    "  pm.expect(refused, 'expected a refusal: ' + JSON.stringify(json)).to.eql(true);",
+                                    "  pm.expect(!!(payload && payload.connections && (!Array.isArray(payload.connections) || payload.connections.length)), 'data leaked: ' + JSON.stringify(json)).to.eql(false);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{oppMemberToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetConnections { GetConnections(input: { tenantId: \"{{tenantAId}}\" }) { connections { id } errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OPP: Members/View does not open the permissions of another member",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.GetOrganizationPermissions : null;",
+                                    "",
+                                    "pm.test('Members/View does not open the permissions of another member', function () {",
+                                    "  const refused = (payload && /denied|insufficient|permission/i.test(payload.errorMessage || '')) || /denied|insufficient|permission/i.test(JSON.stringify(json.errors || []));",
+                                    "  pm.expect(refused, 'expected a refusal: ' + JSON.stringify(json)).to.eql(true);",
+                                    "  pm.expect(!!(payload && payload.memberPermissions && (!Array.isArray(payload.memberPermissions) || payload.memberPermissions.length)), 'data leaked: ' + JSON.stringify(json)).to.eql(false);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{oppMemberToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetOrganizationPermissions { GetOrganizationPermissions(input: { tenantId: \"{{tenantAId}}\", userId: \"{{a_owner_user_id}}\" }) { memberPermissions errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OPP: Owner grants only Connections/View",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.UpdateMembershipPermissions : null;",
+                                    "pm.test('The owner grants only Connections/View', function () {",
+                                    "  pm.expect(!!(json.errors && json.errors.length), 'unexpected GraphQL error: ' + JSON.stringify(json.errors)).to.eql(false);",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_tenantA_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UpdateMembershipPermissions { UpdateMembershipPermissions(input: { membershipId: \"{{memberAMembershipId}}\", permissions: [\"/OrganizationManagement/Connections/View\"] }) { success errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OPP: Connections/View opens the connections",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.GetConnections : null;",
+                                    "",
+                                    "pm.test('Connections/View opens the connections', function () {",
+                                    "  pm.expect(!!(json.errors && json.errors.length), 'unexpected GraphQL error: ' + JSON.stringify(json.errors)).to.eql(false);",
+                                    "  pm.expect(payload && !payload.errorMessage, JSON.stringify(json)).to.eql(true);",
+                                    "  pm.expect(payload && payload.connections !== undefined && payload.connections !== null, 'no data: ' + JSON.stringify(json)).to.eql(true);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{oppMemberToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetConnections { GetConnections(input: { tenantId: \"{{tenantAId}}\" }) { connections { id } errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OPP: Connections/View does not open the connection code",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.GetConnectionCode : null;",
+                                    "",
+                                    "pm.test('Connections/View does not open the connection code', function () {",
+                                    "  const refused = (payload && /denied|insufficient|permission/i.test(payload.errorMessage || '')) || /denied|insufficient|permission/i.test(JSON.stringify(json.errors || []));",
+                                    "  pm.expect(refused, 'expected a refusal: ' + JSON.stringify(json)).to.eql(true);",
+                                    "  pm.expect(!!(payload && payload.connectionCode && (!Array.isArray(payload.connectionCode) || payload.connectionCode.length)), 'data leaked: ' + JSON.stringify(json)).to.eql(false);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{oppMemberToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetConnectionCode { GetConnectionCode(input: { tenantId: \"{{tenantAId}}\" }) { connectionCode { connectionCode } errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OPP: Connections/View does not open the list of members",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.GetMembershipsByTenant : null;",
+                                    "",
+                                    "pm.test('Connections/View does not open the list of members', function () {",
+                                    "  const refused = (payload && /denied|insufficient|permission/i.test(payload.errorMessage || '')) || /denied|insufficient|permission/i.test(JSON.stringify(json.errors || []));",
+                                    "  pm.expect(refused, 'expected a refusal: ' + JSON.stringify(json)).to.eql(true);",
+                                    "  pm.expect(!!(payload && payload.membershipIds && (!Array.isArray(payload.membershipIds) || payload.membershipIds.length)), 'data leaked: ' + JSON.stringify(json)).to.eql(false);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{oppMemberToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetMembershipsByTenant { GetMembershipsByTenant(input: { tenantId: \"{{tenantAId}}\" }) { membershipIds errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OPP: Owner grants only Connections/ViewCode",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.UpdateMembershipPermissions : null;",
+                                    "pm.test('The owner grants only Connections/ViewCode', function () {",
+                                    "  pm.expect(!!(json.errors && json.errors.length), 'unexpected GraphQL error: ' + JSON.stringify(json.errors)).to.eql(false);",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_tenantA_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UpdateMembershipPermissions { UpdateMembershipPermissions(input: { membershipId: \"{{memberAMembershipId}}\", permissions: [\"/OrganizationManagement/Connections/ViewCode\"] }) { success errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OPP: Connections/ViewCode opens the connection code",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.GetConnectionCode : null;",
+                                    "",
+                                    "pm.test('Connections/ViewCode opens the connection code', function () {",
+                                    "  pm.expect(!!(json.errors && json.errors.length), 'unexpected GraphQL error: ' + JSON.stringify(json.errors)).to.eql(false);",
+                                    "  pm.expect(payload && !payload.errorMessage, JSON.stringify(json)).to.eql(true);",
+                                    "  pm.expect(payload && payload.connectionCode !== undefined && payload.connectionCode !== null, 'no data: ' + JSON.stringify(json)).to.eql(true);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{oppMemberToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetConnectionCode { GetConnectionCode(input: { tenantId: \"{{tenantAId}}\" }) { connectionCode { connectionCode } errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OPP: Owner grants only Permissions/View",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.UpdateMembershipPermissions : null;",
+                                    "pm.test('The owner grants only Permissions/View', function () {",
+                                    "  pm.expect(!!(json.errors && json.errors.length), 'unexpected GraphQL error: ' + JSON.stringify(json.errors)).to.eql(false);",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_tenantA_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UpdateMembershipPermissions { UpdateMembershipPermissions(input: { membershipId: \"{{memberAMembershipId}}\", permissions: [\"/OrganizationManagement/Permissions/View\"] }) { success errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OPP: Permissions/View opens the permissions of another member",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.GetOrganizationPermissions : null;",
+                                    "",
+                                    "pm.test('Permissions/View opens the permissions of another member', function () {",
+                                    "  pm.expect(!!(json.errors && json.errors.length), 'unexpected GraphQL error: ' + JSON.stringify(json.errors)).to.eql(false);",
+                                    "  pm.expect(payload && !payload.errorMessage, JSON.stringify(json)).to.eql(true);",
+                                    "  pm.expect(payload && payload.memberPermissions !== undefined && payload.memberPermissions !== null, 'no data: ' + JSON.stringify(json)).to.eql(true);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{oppMemberToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetOrganizationPermissions { GetOrganizationPermissions(input: { tenantId: \"{{tenantAId}}\", userId: \"{{a_owner_user_id}}\" }) { memberPermissions errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OPP: Owner grants nothing again",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.UpdateMembershipPermissions : null;",
+                                    "pm.test('The owner grants nothing again', function () {",
+                                    "  pm.expect(!!(json.errors && json.errors.length), 'unexpected GraphQL error: ' + JSON.stringify(json.errors)).to.eql(false);",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_tenantA_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UpdateMembershipPermissions { UpdateMembershipPermissions(input: { membershipId: \"{{memberAMembershipId}}\", permissions: [] }) { success errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
                 }
             ]
         },

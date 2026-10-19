@@ -238,7 +238,7 @@ async function main() {
 		await expectRouting(MEMBERSHIP, { notificationType: 'MembershipRoleChanged', tenantId: tenantA, userId: admin.userId }, [admin],
 			() => act('UpdateMembershipPermissions',
 				`mutation UpdateMembershipPermissions { UpdateMembershipPermissions(input: { membershipId: ${gqlString(admin.membershipId)},` +
-				' permissions: ["ViewOrganizationMembers", "InviteOrganizationMember"] }) { success errorMessage } }',
+				' permissions: ["/OrganizationManagement/Members/View", "/OrganizationManagement/Members/Edit/Invite"] }) { success errorMessage } }',
 				owner.tenantToken));
 	});
 

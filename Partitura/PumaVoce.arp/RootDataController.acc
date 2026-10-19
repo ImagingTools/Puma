@@ -94,6 +94,15 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
+                    <AttributeInfo Id="RevisionPermissionPaths" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>/Administration/Roles/Revisions</Value>
+                                <Value>/Administration/Users/Revisions</Value>
+                                <Value>/Administration/Groups/Revisions</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
                     <AttributeInfo Id="DocumentChangeGenerators" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
