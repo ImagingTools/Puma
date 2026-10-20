@@ -66,6 +66,7 @@ Total request-level scenarios: 405
 - 14 Advanced Edge - Lifecycle and delegation depth: 88 requests  [GetProfile for dual grants and revoke]
 - 14A Role permissions validation in-tenant: 12 requests
 - 14B Scope isolation - Roles/Users/Groups: 18 requests
+- 20 Organization permissions by path: 24 requests  [organization permissions are checked by imtauth::HasPermission: a leaf granted as the full path the GUI stores opens what it names, a sibling leaf or a group of the tree - by path or bare id - does not; the reads of the organization (members, connections, connection code, permissions of another member) need their own leaf]
 - 99 Cleanup: 5 requests
 
 ### Assertion policy
@@ -338,7 +339,7 @@ carried an `expectGetTenantAllowed` value, so it could only ever skip, and folde
 1. GetMembershipsByTenant coverage
 2. GetMembershipsByUser coverage
 3. GetMembership coverage
-4. GetOrganizationPermissions (new org perms tree) — verifies 6-group org permission tree (EditOrganization, MemberManagement, RoleManagement, GroupManagement, PermissionManagement, ConnectionManagement); asserts stale groups absent (OrganizationManagement, ContractManagement, MessageManagement)
+4. GetOrganizationPermissions (organization tree) — verifies 6-group org permission tree (EditOrganization, MemberManagement, RoleManagement, GroupManagement, PermissionManagement, ConnectionManagement); asserts stale groups absent (OrganizationManagement, ContractManagement, MessageManagement)
 5. UpdateMembershipPermissions + verify (new org perms)
 6. Verify organizationPermissions in GetMembership (new)
 7. IsMember coverage
@@ -490,6 +491,33 @@ feature is actually wired up.
 3. RolePerm: GetTenantPermissions A
 4. RolePerm: RoleUpdate with forbidden permission (negative)
 5. RolePerm: RoleUpdate with allowed permission (positive)
+
+### 20 Organization permissions by path (24)
+
+1. OPP: Authorization A member
+2. OPP: SelectTenant A for the member
+3. OPP: Owner grants Members/Edit/Invite as its full path
+4. OPP: A leaf granted as its full path lets the member invite
+5. OPP: Owner revokes that invitation
+6. OPP: Owner grants only Members/View
+7. OPP: A sibling leaf does not let the member invite
+8. OPP: Owner grants the group Members/Edit
+9. OPP: A group of the tree is no permission of its own
+10. OPP: Owner grants the group Edit of the members by its bare id
+11. OPP: A group named by its bare id is no permission either
+12. OPP: Owner grants only Members/View for the reads
+13. OPP: Members/View opens the list of members
+14. OPP: Members/View does not open the connections
+15. OPP: Members/View does not open the permissions of another member
+16. OPP: Owner grants only Connections/View
+17. OPP: Connections/View opens the connections
+18. OPP: Connections/View does not open the connection code
+19. OPP: Connections/View does not open the list of members
+20. OPP: Owner grants only Connections/ViewCode
+21. OPP: Connections/ViewCode opens the connection code
+22. OPP: Owner grants only Permissions/View
+23. OPP: Permissions/View opens the permissions of another member
+24. OPP: Owner grants nothing again
 
 ### 99 Cleanup (5)
 
