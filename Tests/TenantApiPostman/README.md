@@ -67,6 +67,7 @@ Total request-level scenarios: 405
 - 14A Role permissions validation in-tenant: 12 requests
 - 14B Scope isolation - Roles/Users/Groups: 18 requests
 - 20 Organization permissions by path: 24 requests  [organization permissions are checked by imtauth::HasPermission: a leaf granted as the full path the GUI stores opens what it names, a sibling leaf or a group of the tree - by path or bare id - does not; the reads of the organization (members, connections, connection code, permissions of another member) need their own leaf]
+- 21 QA Regression - Organizations GUI audit: 66 requests  [server defects found by the browser audit of the ProLife Organizations page (2026-10-22): an open organization document follows TransferTenantOwnership and saving it does not revert the ownership; GetTenantList sorts by tenantRelationScope; the Status filter as the GUI sends it (Bool, typed by __typename); user history: every revision has an author and a description, a rename is not recorded as a change of the login, joining a group is recorded as such; role and group documents saved as the editor does keep the element id as the representation id, so their history is found; the grant list reports a revoked grant as inactive]
 - 99 Cleanup: 5 requests
 
 ### Assertion policy
@@ -518,6 +519,75 @@ feature is actually wired up.
 22. OPP: Owner grants only Permissions/View
 23. OPP: Permissions/View opens the permissions of another member
 24. OPP: Owner grants nothing again
+
+### 21 QA Regression - Organizations GUI audit (66)
+
+1. AUD: Authorize the A owner outside of any organization
+2. AUD: Authorize the A member outside of any organization
+3. AUD: Create the ownership transfer organization
+4. AUD: Switch into the ownership transfer organization
+5. AUD: Invite the A member into the ownership transfer organization
+6. AUD: The A member accepts the invitation
+7. AUD: Open the organization before the transfer
+8. AUD: Wait for the organization document load
+9. AUD: Transfer the ownership to the A member
+10. AUD: GetTenant names the new owner
+11. AUD: The organization representation names the new owner
+12. AUD: The previous owner edits the open organization document
+13. AUD: Saving the open document keeps the new owner
+14. AUD: Close the ownership transfer organization document
+15. AUD: The organization list of the A owner
+16. AUD: The organization list sorts by the Role column
+17. AUD: Create the organization to deactivate
+18. AUD: Switch into the organization to deactivate
+19. AUD: Deactivate the organization
+20. AUD: The Inactive status filter lists only inactive organizations
+21. AUD: The Active status filter lists only active organizations
+22. AUD: Switch into A for the user history probe
+23. AUD: Create a user document in A
+24. AUD: Fill the new user
+25. AUD: Save the new user
+26. AUD: Every revision of the new user names its author and its change
+27. AUD: Rename the user
+28. AUD: Save the renamed user
+29. AUD: The rename is not recorded as a change of the login
+30. AUD: Close the user document
+31. AUD: Add the user to a new group
+32. AUD: The group membership revision of the user names the group
+33. AUD: Create a role document as the editor does
+34. AUD: Fill the new role
+35. AUD: Save the new role
+36. AUD: Rename the role
+37. AUD: Save the renamed role
+38. AUD: Close the new role document
+39. AUD: Open the stored role
+40. AUD: Wait for the role document load
+41. AUD: The role representation carries the stored role id
+42. AUD: The role history is found by the id of its representation
+43. AUD: Close the stored role document
+44. AUD: Create a group document as the editor does
+45. AUD: Fill the new group
+46. AUD: Save the new group
+47. AUD: Rename the group
+48. AUD: Save the renamed group
+49. AUD: Close the new group document
+50. AUD: Open the stored group
+51. AUD: Wait for the group document load
+52. AUD: The group representation carries the stored group id
+53. AUD: The group history is found by the id of its representation
+54. AUD: Close the stored group document
+55. AUD: Authorize the A member for the grant probe
+56. AUD: Switch the A member into the ownership transfer organization
+57. AUD: The ownership transfer organization accepts connections by code
+58. AUD: Connection code of the ownership transfer organization
+59. AUD: A requests a connection to the ownership transfer organization
+60. AUD: The ownership transfer organization approves the connection
+61. AUD: A grants access to the ownership transfer organization
+62. AUD: A revokes the grant
+63. AUD: The grant list reports the revoked grant as inactive
+64. AUD: Remove the audit connection
+65. AUD: Remove the deactivated organization
+66. AUD: Remove the ownership transfer organization
 
 ### 99 Cleanup (5)
 
