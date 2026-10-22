@@ -28266,6 +28266,3135 @@
             ]
         },
         {
+            "name": "21 QA Regression - Organizations GUI audit",
+            "description": "Server defects found by the browser audit of the ProLife Organizations page on 2026-10-22. Each case fails until its defect is fixed.",
+            "item": [
+                {
+                    "id": "84078498-71ee-48f7-8c93-75088a90eb6d",
+                    "name": "AUD Authorize the A owner outside of any organization",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{a_owner_login}}\", password: \"{{a_owner_password}}\", productId: \"{{product_id}}\" }) { userId token } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "ba2f97f7-9bd1-4a70-8f7a-0fef352b6761",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.Authorization;",
+                                    "pm.test('Authorized without an organization', function () {",
+                                    "  pm.expect(payload && payload.token, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('audOwnerNoOrgToken', payload && payload.token ? payload.token : '');"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "027cdf5a-4328-4633-8a6c-b6cc83b356d1",
+                    "name": "AUD Authorize the A member outside of any organization",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{a_member_login}}\", password: \"{{a_member_password}}\", productId: \"{{product_id}}\" }) { userId token } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "f0a940ae-6bc3-45f2-b338-692a12fba4de",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.Authorization;",
+                                    "pm.test('Authorized without an organization', function () {",
+                                    "  pm.expect(payload && payload.token, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('audMemberNoOrgToken', payload && payload.token ? payload.token : '');",
+                                    "if (payload && payload.userId) pm.environment.set('a_member_user_id', payload.userId);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "b707179e-1d57-4bda-878f-d6b65cb58263",
+                    "name": "AUD Create the ownership transfer organization",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audOwnerNoOrgToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateTenant { CreateTenant(input: { name: \"{{audTransferName}}\", description: \"Organizations GUI audit probe\", ownerId: \"{{a_owner_user_id}}\" }) { tenantId errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "id": "51cdec4f-87df-468f-bda1-2b21c20aedec",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.environment.set('audTransferName', 'QA Audit Transfer ' + Date.now());"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "a8d02a6d-716b-4a20-acfd-a5854bc42373",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.CreateTenant;",
+                                    "pm.test('Organization created', function () {",
+                                    "  pm.expect(payload && payload.tenantId, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('audTransferTenantId', payload && payload.tenantId ? payload.tenantId : '');"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "643044ab-21e2-464e-ba99-2e37a5af1a78",
+                    "name": "AUD Switch into the ownership transfer organization",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audOwnerNoOrgToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SelectTenant { SelectTenant(input: { tenantId: \"{{audTransferTenantId}}\" }) { ok userSession { tenantId accessToken } errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "13954d9c-2f71-4c1f-a7d9-8537c42e022f",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const session = json.data && json.data.SelectTenant && json.data.SelectTenant.userSession;",
+                                    "pm.test('Switched into the organization', function () {",
+                                    "  pm.expect(session && session.tenantId, JSON.stringify(json)).to.eql(pm.environment.get('audTransferTenantId'));",
+                                    "});",
+                                    "pm.environment.set('audTransferToken', session && session.accessToken ? session.accessToken : '');"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "a953e407-88cb-4bcf-a9d6-0ae5719f320c",
+                    "name": "AUD Invite the A member into the ownership transfer organization",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audTransferToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateTenantInvitation { CreateTenantInvitation(input: { userId: \"{{a_member_user_id}}\", tenantId: \"{{audTransferTenantId}}\" }) { invitationId errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "d5c641bf-91aa-4065-95ba-03102158eaca",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.CreateTenantInvitation;",
+                                    "pm.test('Invitation created', function () {",
+                                    "  pm.expect(payload && payload.invitationId, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('audTransferInvitationId', payload && payload.invitationId ? payload.invitationId : '');"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "0a22f379-fb1e-4d1e-ba84-1189895a22db",
+                    "name": "AUD The A member accepts the invitation",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audMemberNoOrgToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation AcceptTenantInvitation { AcceptTenantInvitation(input: { invitationId: \"{{audTransferInvitationId}}\" }) { success membershipId errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "668086dc-ce36-4739-8d5d-3dfd98a18455",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.AcceptTenantInvitation;",
+                                    "pm.test('Invitation accepted', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "1b4d9240-d427-4ba9-9993-78832682276b",
+                    "name": "AUD Open the organization before the transfer",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audTransferToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation OpenDocument { OpenDocument(input: { collectionId: \"Tenants\", id: \"{{audTransferTenantId}}\" }) { documentId } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "62d58e38-dc0b-43b4-b1d7-91694d3dad4e",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.OpenDocument;",
+                                    "pm.test('Organization document opened', function () {",
+                                    "  pm.expect(payload && payload.documentId, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('audTransferDocId', payload && payload.documentId ? payload.documentId : '');"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "5a9e3271-40d8-4e25-9a8a-38c1141ddbfa",
+                    "name": "AUD Wait for the organization document load",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audTransferToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetTenantRepresentation { GetTenantRepresentation(input: { collectionId: \"Tenants\", id: \"{{audTransferDocId}}\" }) { id } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "id": "faa0d0a6-ed87-4152-baa5-f8e468639815",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "if (parseInt(pm.environment.get('docWaitAttempt_audTransfer') || '0', 10) > 0) {",
+                                    "    const until = Date.now() + 150;",
+                                    "    while (Date.now() < until) { /* spin */ }",
+                                    "}"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "d305a133-c9b8-410d-ba2d-9a0ca4e118f8",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "// OpenDocument returns isLoading=true and loads on a background thread; see \"Wait for A member document load\".",
+                                    "const json = pm.response.json();",
+                                    "const repr = json.data && json.data.GetTenantRepresentation;",
+                                    "const loaded = !!(repr && repr.id);",
+                                    "const maxAttempts = 25;",
+                                    "const attempt = parseInt(pm.environment.get('docWaitAttempt_audTransfer') || '0', 10);",
+                                    "if (loaded) {",
+                                    "    pm.environment.set('docWaitAttempt_audTransfer', '0');",
+                                    "    pm.test('Document loaded', function () { pm.expect(loaded).to.eql(true); });",
+                                    "} else if (attempt < maxAttempts) {",
+                                    "    pm.environment.set('docWaitAttempt_audTransfer', String(attempt + 1));",
+                                    "    postman.setNextRequest('AUD Wait for the organization document load');",
+                                    "} else {",
+                                    "    pm.environment.set('docWaitAttempt_audTransfer', '0');",
+                                    "    pm.test('Document loaded', function () {",
+                                    "        pm.expect.fail('document still not readable after ' + maxAttempts + ' polls: ' + JSON.stringify(json));",
+                                    "    });",
+                                    "}"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "fa77bc9d-7084-4fae-9787-1181d45c90ef",
+                    "name": "AUD Transfer the ownership to the A member",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audTransferToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation TransferTenantOwnership { TransferTenantOwnership(input: { tenantId: \"{{audTransferTenantId}}\", newOwnerId: \"{{a_member_user_id}}\" }) { success errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "4f4332c3-caa7-4e1f-a1ed-26e6dbe8a71b",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.TransferTenantOwnership;",
+                                    "pm.test('Ownership transferred', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "748b5a6d-a3f9-4eb3-a3b8-07801148d998",
+                    "name": "AUD GetTenant names the new owner",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audTransferToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetTenant { GetTenant(input: { tenantId: \"{{audTransferTenantId}}\" }) { tenant { id ownerId creatorId } errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "34f8348a-7fe9-427f-af9d-eb0c6320302d",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const tenant = json.data && json.data.GetTenant && json.data.GetTenant.tenant;",
+                                    "pm.test('The stored organization is owned by the A member', function () {",
+                                    "  pm.expect(tenant && tenant.ownerId, JSON.stringify(json)).to.eql(pm.environment.get('a_member_user_id'));",
+                                    "  pm.expect(tenant.creatorId, 'the creator stays').to.eql(pm.environment.get('a_owner_user_id'));",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "050932b1-aac7-4de7-b5dd-453875f89f2d",
+                    "name": "AUD The organization representation names the new owner",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audTransferToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetTenantRepresentation { GetTenantRepresentation(input: { collectionId: \"Tenants\", id: \"{{audTransferDocId}}\" }) { id ownerId creatorId } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "a1a6b2e0-4fd4-4f6a-b9c0-38e5001cc77c",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "// Ownership is transferred from the Members tab of the open editor, which marks the owner from this ownerId (TenantMemberDelegate.qml).",
+                                    "const json = pm.response.json();",
+                                    "const repr = json.data && json.data.GetTenantRepresentation;",
+                                    "pm.test('The open organization document follows the transfer', function () {",
+                                    "  pm.expect(repr && repr.ownerId, JSON.stringify(json)).to.eql(pm.environment.get('a_member_user_id'));",
+                                    "  pm.expect(repr.creatorId, 'the creator stays').to.eql(pm.environment.get('a_owner_user_id'));",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "8dbc3624-f929-4776-a310-cbabe41414c7",
+                    "name": "AUD The previous owner edits the open organization document",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audTransferToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UpdateTenantFromRepresentation { UpdateTenantFromRepresentation(input: { documentId: \"{{audTransferDocId}}\", tenant: { id: \"{{audTransferTenantId}}\", name: \"{{audTransferName}}\", description: \"Edited after the transfer\", isActive: true } }) { status message } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "0396b157-a2f8-4055-b8cc-34832dcc9657",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('The creator edits the description', function () {",
+                                    "  pm.expect(json.data && json.data.UpdateTenantFromRepresentation && json.data.UpdateTenantFromRepresentation.status, JSON.stringify(json)).to.eql('Success');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "5d288938-249a-426f-b6e9-83e2fa877813",
+                    "name": "AUD Saving the open document keeps the new owner",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audTransferToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetTenant { GetTenant(input: { tenantId: \"{{audTransferTenantId}}\" }) { tenant { id ownerId description } errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "2c5a3cb4-a948-4669-b168-e632b08b2705",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "// Existing organizations are saved on every update; the document still held the previous owner.",
+                                    "const json = pm.response.json();",
+                                    "const tenant = json.data && json.data.GetTenant && json.data.GetTenant.tenant;",
+                                    "pm.test('The edit is stored and the ownership is not reverted', function () {",
+                                    "  pm.expect(tenant && tenant.description, JSON.stringify(json)).to.eql('Edited after the transfer');",
+                                    "  pm.expect(tenant.ownerId, 'owner after the save').to.eql(pm.environment.get('a_member_user_id'));",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "879c29c8-a427-4692-84ab-364129c46e41",
+                    "name": "AUD Close the ownership transfer organization document",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audTransferToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CloseDocument { CloseDocument(input: { collectionId: \"Tenants\", id: \"{{audTransferDocId}}\" }) { status message } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "cab11d9a-b63e-4fa4-ab29-e249821ed0b2",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Organization document closed', function () {",
+                                    "  pm.expect(json.data && json.data.CloseDocument && json.data.CloseDocument.status, JSON.stringify(json)).to.eql('Success');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "93e62bda-58d3-47f0-8fa5-e15e15ce0243",
+                    "name": "AUD The organization list of the A owner",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audOwnerNoOrgToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetTenantList { GetTenantList(input: { collectionId: \"Tenants\", offset: 0, count: 200, selectionParams: { parameters: [{ id: \"ComplexFilter\", typeId: \"ComplexFilter\", name: \"\", description: \"\", enabled: false, data: \"{\\\"__typename\\\":\\\"ComplexCollectionFilter\\\"}\" }] } }) { items { id name tenantRelationScope } } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "ee827e51-8db2-4542-ad70-cfc9f266af30",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const items = (json.data && json.data.GetTenantList && json.data.GetTenantList.items) || [];",
+                                    "pm.test('Unsorted list with the creator and the owner rows', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  const scopes = items.map(function (t) { return t.tenantRelationScope; });",
+                                    "  pm.expect(scopes, JSON.stringify(items)).to.include.members(['Owner', 'Creator']);",
+                                    "});",
+                                    "pm.environment.set('audOwnerTenantIds', JSON.stringify(items.map(function (t) { return t.id; }).sort()));"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "87b1b32a-1813-48a9-94ec-6cedf203c7eb",
+                    "name": "AUD The organization list sorts by the Role column",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audOwnerNoOrgToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetTenantList { GetTenantList(input: { collectionId: \"Tenants\", offset: 0, count: 200, selectionParams: { parameters: [{ id: \"ComplexFilter\", typeId: \"ComplexFilter\", name: \"\", description: \"\", enabled: false, data: \"{\\\"__typename\\\":\\\"ComplexCollectionFilter\\\",\\\"sortingInfo\\\":[{\\\"__typename\\\":\\\"FieldSortingInfo\\\",\\\"fieldId\\\":\\\"tenantRelationScope\\\",\\\"sortingOrder\\\":\\\"ASC\\\"}]}\" }] } }) { items { id name tenantRelationScope } } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "3eecadff-9477-4a22-b319-70fec2631b17",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const items = (json.data && json.data.GetTenantList && json.data.GetTenantList.items) || [];",
+                                    "pm.test('Same organizations, ordered by the role of the user', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(items.map(function (t) { return t.id; }).sort()).to.eql(JSON.parse(pm.environment.get('audOwnerTenantIds')));",
+                                    "  const scopes = items.map(function (t) { return t.tenantRelationScope; });",
+                                    "  pm.expect(scopes, 'ascending by role').to.eql(scopes.slice().sort());",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "df3460af-17c8-4972-9328-eba9878a1f55",
+                    "name": "AUD Create the organization to deactivate",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audOwnerNoOrgToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateTenant { CreateTenant(input: { name: \"{{audInactiveName}}\", description: \"Organizations GUI audit probe\", ownerId: \"{{a_owner_user_id}}\" }) { tenantId errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "id": "796ce242-c9a9-4ac1-96a4-36f507cc697d",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.environment.set('audInactiveName', 'QA Audit Inactive ' + Date.now());"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "6f479c4b-4bdd-44be-aa72-02c5f445d2c6",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.CreateTenant;",
+                                    "pm.test('Organization created', function () {",
+                                    "  pm.expect(payload && payload.tenantId, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('audInactiveTenantId', payload && payload.tenantId ? payload.tenantId : '');"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "0d442765-e271-438c-bcd2-f30b6d8558bf",
+                    "name": "AUD Switch into the organization to deactivate",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audOwnerNoOrgToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SelectTenant { SelectTenant(input: { tenantId: \"{{audInactiveTenantId}}\" }) { ok userSession { tenantId accessToken } errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "c7f8cbf1-2275-4b93-a68d-bcde46c4d426",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const session = json.data && json.data.SelectTenant && json.data.SelectTenant.userSession;",
+                                    "pm.test('Switched into the organization', function () {",
+                                    "  pm.expect(session && session.tenantId, JSON.stringify(json)).to.eql(pm.environment.get('audInactiveTenantId'));",
+                                    "});",
+                                    "pm.environment.set('audInactiveToken', session && session.accessToken ? session.accessToken : '');"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "db91a6cb-12f6-4421-bdd9-ab73e784aacd",
+                    "name": "AUD Deactivate the organization",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audInactiveToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SetTenantActive { SetTenantActive(input: { tenantId: \"{{audInactiveTenantId}}\", isActive: false }) { success errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "412960f5-5e1c-4fac-a9ed-f107d9ee3cfd",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.SetTenantActive;",
+                                    "pm.test('Organization deactivated', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "5ac6b408-e322-4b07-9f35-4bd7ae541960",
+                    "name": "AUD The Inactive status filter lists only inactive organizations",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audOwnerNoOrgToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetTenantList { GetTenantList(input: { collectionId: \"Tenants\", offset: 0, count: 200, selectionParams: { parameters: [{ id: \"ComplexFilter\", typeId: \"ComplexFilter\", name: \"\", description: \"\", enabled: false, data: \"{\\\"__typename\\\":\\\"ComplexCollectionFilter\\\",\\\"sortingInfo\\\":[{\\\"__typename\\\":\\\"FieldSortingInfo\\\",\\\"fieldId\\\":\\\"createdAt\\\",\\\"sortingOrder\\\":\\\"DESC\\\"}],\\\"fieldsFilter\\\":{\\\"__typename\\\":\\\"GroupFilter\\\",\\\"fieldFilters\\\":[{\\\"__typename\\\":\\\"FieldFilter\\\",\\\"fieldId\\\":\\\"IsActive\\\",\\\"filterValue\\\":\\\"false\\\",\\\"filterValueType\\\":\\\"Bool\\\",\\\"filterOperations\\\":[\\\"Equal\\\"]}],\\\"groupFilters\\\":[],\\\"logicalOperation\\\":\\\"And\\\"},\\\"textFilter\\\":{\\\"__typename\\\":\\\"TextFilter\\\",\\\"text\\\":\\\"\\\",\\\"fieldIds\\\":[\\\"name\\\",\\\"description\\\"]},\\\"distinctFields\\\":[]}\" }] } }) { items { id name isActive } } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "eaa541b8-7f76-4e96-b895-6fea0392f7a7",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const items = (json.data && json.data.GetTenantList && json.data.GetTenantList.items) || [];",
+                                    "pm.test('Inactive filter: the deactivated organization and nothing active', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(items.map(function (t) { return t.id; }), JSON.stringify(json)).to.include(pm.environment.get('audInactiveTenantId'));",
+                                    "  pm.expect(items.filter(function (t) { return t.isActive !== false; }).map(function (t) { return t.name; }), 'active organizations under the Inactive filter').to.eql([]);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "23094af2-f80d-4478-a69b-2b1198453846",
+                    "name": "AUD The Active status filter lists only active organizations",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audOwnerNoOrgToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetTenantList { GetTenantList(input: { collectionId: \"Tenants\", offset: 0, count: 200, selectionParams: { parameters: [{ id: \"ComplexFilter\", typeId: \"ComplexFilter\", name: \"\", description: \"\", enabled: false, data: \"{\\\"__typename\\\":\\\"ComplexCollectionFilter\\\",\\\"sortingInfo\\\":[{\\\"__typename\\\":\\\"FieldSortingInfo\\\",\\\"fieldId\\\":\\\"createdAt\\\",\\\"sortingOrder\\\":\\\"DESC\\\"}],\\\"fieldsFilter\\\":{\\\"__typename\\\":\\\"GroupFilter\\\",\\\"fieldFilters\\\":[{\\\"__typename\\\":\\\"FieldFilter\\\",\\\"fieldId\\\":\\\"IsActive\\\",\\\"filterValue\\\":\\\"true\\\",\\\"filterValueType\\\":\\\"Bool\\\",\\\"filterOperations\\\":[\\\"Equal\\\"]}],\\\"groupFilters\\\":[],\\\"logicalOperation\\\":\\\"And\\\"},\\\"textFilter\\\":{\\\"__typename\\\":\\\"TextFilter\\\",\\\"text\\\":\\\"\\\",\\\"fieldIds\\\":[\\\"name\\\",\\\"description\\\"]},\\\"distinctFields\\\":[]}\" }] } }) { items { id name isActive } } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "02a1de98-36e2-41c5-9049-54e2517582c6",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const items = (json.data && json.data.GetTenantList && json.data.GetTenantList.items) || [];",
+                                    "pm.test('Active filter: no inactive organization', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(items, JSON.stringify(json)).to.not.be.empty;",
+                                    "  pm.expect(items.map(function (t) { return t.id; }), 'the deactivated organization').to.not.include(pm.environment.get('audInactiveTenantId'));",
+                                    "  pm.expect(items.filter(function (t) { return t.isActive !== true; }).map(function (t) { return t.name; }), 'inactive organizations under the Active filter').to.eql([]);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "0a4e307c-0247-4bde-a9b0-cece3ad2c1d7",
+                    "name": "AUD Switch into A for the user history probe",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audOwnerNoOrgToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SelectTenant { SelectTenant(input: { tenantId: \"{{tenantAId}}\" }) { ok userSession { tenantId accessToken } errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "56ad4173-9a66-4514-8275-4cd5911422cc",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const session = json.data && json.data.SelectTenant && json.data.SelectTenant.userSession;",
+                                    "pm.test('Switched into the organization', function () {",
+                                    "  pm.expect(session && session.tenantId, JSON.stringify(json)).to.eql(pm.environment.get('tenantAId'));",
+                                    "});",
+                                    "pm.environment.set('audTenantAToken', session && session.accessToken ? session.accessToken : '');"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "fed53f4d-ce70-4bd1-8b0a-5d77af3ad993",
+                    "name": "AUD Create a user document in A",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audTenantAToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateNewDocument { CreateNewDocument(input: { collectionId: \"Users\", typeId: \"User\", proposedSourceDocumentId: \"{{audUserId}}\" }) { documentId objectId } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "id": "2a3d5d12-6751-44b0-994b-23ebce8cf80c",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.environment.set('audUserId', pm.variables.replaceIn('{{$guid}}'));",
+                                    "pm.environment.set('audUserReprId', pm.environment.get('audUserId'));",
+                                    "pm.environment.set('audUserLogin', 'qa_audit_user_' + Date.now());"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "05cd42a6-8196-48a5-be4a-79122aaffba8",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.CreateNewDocument;",
+                                    "pm.test('User document created', function () {",
+                                    "  pm.expect(payload && payload.documentId, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('audUserDocId', payload && payload.documentId ? payload.documentId : '');",
+                                    "if (payload && payload.objectId) pm.environment.set('audUserId', payload.objectId);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "51277b14-1b37-4111-827a-084a8d5ba8b2",
+                    "name": "AUD Fill the new user",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audTenantAToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UpdateUserFromRepresentation { UpdateUserFromRepresentation(input: { documentId: \"{{audUserDocId}}\", tenantId: \"{{tenantAId}}\", user: { id: \"{{audUserReprId}}\", productId: \"{{product_id}}\", name: \"QA Audit User\", username: \"{{audUserLogin}}\", password: \"QaAudit_2026!x\", email: \"aud.user@example.com\", groups: [], roles: [], permissions: [], systemInfos: [] } }) { status message } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "2da46cf6-88b5-4549-a407-3b5bf7dee32a",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Representation accepted', function () {",
+                                    "  pm.expect(json.data && json.data.UpdateUserFromRepresentation && json.data.UpdateUserFromRepresentation.status, JSON.stringify(json)).to.eql('Success');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "67c2f7f5-521d-4f57-a568-fa7dd37069fe",
+                    "name": "AUD Save the new user",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audTenantAToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SaveDocument { SaveDocument(input: { collectionId: \"Users\", documentId: \"{{audUserDocId}}\", documentName: \"\" }) { status message } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "c4bc2fdb-4543-401a-a149-dc4939320743",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('New user saved', function () {",
+                                    "  pm.expect(json.data && json.data.SaveDocument && json.data.SaveDocument.status, JSON.stringify(json)).to.eql('Success');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "e5ceadb6-4ead-46c0-a615-42a388b3d534",
+                    "name": "AUD Every revision of the new user names its author and its change",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audTenantAToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetRevisionInfoList { GetRevisionInfoList(input: { documentId: \"{{audUserId}}\", collectionId: \"Users\" }) { activeRevision revisions { revision user description } } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "c93f1e9b-8173-4926-b08e-b4a6a44b8758",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const revisions = (json.data && json.data.GetRevisionInfoList && json.data.GetRevisionInfoList.revisions) || [];",
+                                    "pm.environment.set('audUserRevisionCount', String(revisions.length));",
+                                    "pm.test('Each revision has an author and a description', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(revisions, JSON.stringify(json)).to.not.be.empty;",
+                                    "  const blank = revisions.filter(function (r) { return !r.user || !r.description; }).map(function (r) { return r.revision; });",
+                                    "  pm.expect(blank, 'revisions without author or description: ' + JSON.stringify(revisions)).to.eql([]);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "fe744599-59fa-4937-9afa-435b234a6e98",
+                    "name": "AUD Rename the user",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audTenantAToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UpdateUserFromRepresentation { UpdateUserFromRepresentation(input: { documentId: \"{{audUserDocId}}\", tenantId: \"{{tenantAId}}\", user: { id: \"{{audUserReprId}}\", productId: \"{{product_id}}\", name: \"QA Audit User Renamed\", username: \"{{audUserLogin}}\", password: \"\", email: \"aud.user@example.com\", groups: [], roles: [], permissions: [], systemInfos: [] } }) { status message } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "id": "6184fd52-44cf-4a9c-be6a-e2b9a2a229d8",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "// A stored user keeps its UUID whatever ID a client sends for its representation.",
+                                    "pm.environment.set('audUserReprId', pm.variables.replaceIn('{{$guid}}'));"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "719d2eec-4ff1-4e23-9522-898431d4bae1",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Representation accepted', function () {",
+                                    "  pm.expect(json.data && json.data.UpdateUserFromRepresentation && json.data.UpdateUserFromRepresentation.status, JSON.stringify(json)).to.eql('Success');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "ecd4fe31-0fb3-4ea7-ba72-5d4967183b09",
+                    "name": "AUD Save the renamed user",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audTenantAToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SaveDocument { SaveDocument(input: { collectionId: \"Users\", documentId: \"{{audUserDocId}}\", documentName: \"\" }) { status message } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "3c7bdebd-fbb8-48bd-bfd9-09e0aa0b5bd6",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Renamed user saved', function () {",
+                                    "  pm.expect(json.data && json.data.SaveDocument && json.data.SaveDocument.status, JSON.stringify(json)).to.eql('Success');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "0660e3ce-3d87-43bd-8853-f3cefe624fa9",
+                    "name": "AUD The rename is not recorded as a change of the login",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audTenantAToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetRevisionInfoList { GetRevisionInfoList(input: { documentId: \"{{audUserId}}\", collectionId: \"Users\" }) { activeRevision revisions { revision user description } } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "d7616f0e-6ecc-4dcd-8d11-421a3e450ae1",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "// CUserChangeGeneratorComp labels the display name with the \"Username\" (ru: \"Логин\") attribute.",
+                                    "const json = pm.response.json();",
+                                    "const revisions = (json.data && json.data.GetRevisionInfoList && json.data.GetRevisionInfoList.revisions) || [];",
+                                    "const rename = revisions.filter(function (r) { return (r.description || '').indexOf('QA Audit User Renamed') >= 0; });",
+                                    "pm.test('The rename revision names the old and the new name, not the login', function () {",
+                                    "  pm.expect(rename, JSON.stringify(revisions)).to.have.length(1);",
+                                    "  pm.expect(rename[0].description).to.include(\"'QA Audit User'\");",
+                                    "  pm.expect(rename[0].description, 'the login did not change').to.not.match(/Username|Логин/);",
+                                    "});",
+                                    "pm.test('The rename adds exactly one revision', function () {",
+                                    "  const before = parseInt(pm.environment.get('audUserRevisionCount') || '0', 10);",
+                                    "  pm.expect(revisions.length, JSON.stringify(revisions)).to.eql(before + 1);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "709a3d5e-29f7-40da-b4cb-e99d471fdf4c",
+                    "name": "AUD Close the user document",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audTenantAToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CloseDocument { CloseDocument(input: { collectionId: \"Users\", id: \"{{audUserDocId}}\" }) { status message } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "6dcb1819-eb49-407b-8fa5-c2ca783582af",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('User document closed', function () {",
+                                    "  pm.expect(json.data && json.data.CloseDocument && json.data.CloseDocument.status, JSON.stringify(json)).to.eql('Success');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "a060a6f0-98b5-489c-b47f-3982ab485587",
+                    "name": "AUD Add the user to a new group",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audTenantAToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation GroupAdd { GroupAdd(input: { id: \"{{audGroupId}}\", typeId: \"Group\", productId: \"{{product_id}}\", item: { id: \"{{audGroupId}}\", productId: \"{{product_id}}\", name: \"{{audGroupName}}\", description: \"Organizations GUI audit probe\", roles: [], users: [{id: \"{{audUserId}}\", direct: true}], parentGroups: [] } }) { id } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "id": "1b6ec528-5fc8-4e63-9658-4e64821e9c21",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.environment.set('audGroupId', pm.variables.replaceIn('{{$guid}}'));",
+                                    "pm.environment.set('audGroupName', 'QA Audit Group ' + Date.now());"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "29941963-3cf1-46a2-b7bb-7a7841673222",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Group with the user created', function () {",
+                                    "  pm.expect(json.data && json.data.GroupAdd && json.data.GroupAdd.id, JSON.stringify(json)).to.eql(pm.environment.get('audGroupId'));",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "f21563fb-2326-4ef4-8c53-f8d2f82f9b07",
+                    "name": "AUD The group membership revision of the user names the group",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audTenantAToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetRevisionInfoList { GetRevisionInfoList(input: { documentId: \"{{audUserId}}\", collectionId: \"Users\" }) { activeRevision revisions { revision user description } } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "fb47124b-8e3a-4368-aaa8-2541cd6bb406",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const list = json.data && json.data.GetRevisionInfoList;",
+                                    "const revisions = (list && list.revisions) || [];",
+                                    "const latest = revisions.reduce(function (a, r) { return !a || r.revision > a.revision ? r : a; }, null);",
+                                    "pm.test('The latest revision records the new group, not the creation of the user', function () {",
+                                    "  pm.expect(latest, JSON.stringify(json)).to.be.an('object');",
+                                    "  pm.expect(latest.description || '', JSON.stringify(revisions)).to.include(pm.environment.get('audGroupName'));",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "cd889411-f905-49aa-b65b-07659633bf85",
+                    "name": "AUD Create a role document as the editor does",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audTenantAToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateNewDocument { CreateNewDocument(input: { collectionId: \"Roles\", typeId: \"Role\", proposedSourceDocumentId: \"{{audRoleId}}\" }) { documentId objectId } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "id": "c841cb9c-2150-4dc7-bdf4-c33743d63f85",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.environment.set('audRoleId', pm.variables.replaceIn('{{$guid}}'));",
+                                    "pm.environment.set('audRoleReprId', pm.environment.get('audRoleId'));",
+                                    "pm.environment.set('audRoleKey', 'QaAuditRole' + Date.now());",
+                                    "pm.environment.set('audRoleName', 'QA Audit Role ' + Date.now());"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "e19b6dd6-86a4-4be6-bb52-9cafd8f6ed9d",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.CreateNewDocument;",
+                                    "pm.test('Role document created', function () {",
+                                    "  pm.expect(payload && payload.documentId, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('audRoleDocId', payload && payload.documentId ? payload.documentId : '');"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "1a7dec7b-36f8-46e0-8aa0-2d2c80dfd5ef",
+                    "name": "AUD Fill the new role",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audTenantAToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UpdateRoleFromRepresentation { UpdateRoleFromRepresentation(input: { documentId: \"{{audRoleDocId}}\", role: { id: \"{{audRoleReprId}}\", name: \"{{audRoleName}}\", description: \"Organizations GUI audit probe\", roleId: \"{{audRoleKey}}\", productId: \"{{product_id}}\", parentRoles: [], permissions: [], isDefault: false, isGuest: false } }) { status message } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "764150dc-5492-4c08-8f9c-d90d87affa2c",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Representation accepted', function () {",
+                                    "  pm.expect(json.data && json.data.UpdateRoleFromRepresentation && json.data.UpdateRoleFromRepresentation.status, JSON.stringify(json)).to.eql('Success');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "9adc0fd2-cf37-4b0d-b0a5-926f37f95206",
+                    "name": "AUD Save the new role",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audTenantAToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SaveDocument { SaveDocument(input: { collectionId: \"Roles\", documentId: \"{{audRoleDocId}}\", documentName: \"\" }) { status message } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "8cb14416-bb8c-4ce7-8a55-ce403691b842",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('New role saved', function () {",
+                                    "  pm.expect(json.data && json.data.SaveDocument && json.data.SaveDocument.status, JSON.stringify(json)).to.eql('Success');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "c41e4054-293c-41ef-a22a-2552147e82e3",
+                    "name": "AUD Rename the role",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audTenantAToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UpdateRoleFromRepresentation { UpdateRoleFromRepresentation(input: { documentId: \"{{audRoleDocId}}\", role: { id: \"{{audRoleReprId}}\", name: \"{{audRoleName}} Renamed\", description: \"Organizations GUI audit probe\", roleId: \"{{audRoleKey}}\", productId: \"{{product_id}}\", parentRoles: [], permissions: [], isDefault: false, isGuest: false } }) { status message } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "id": "6cccc879-eaa8-4257-8e5f-8b3ba540e736",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "// A stored role keeps its UUID whatever ID a client sends for its representation.",
+                                    "pm.environment.set('audRoleReprId', pm.variables.replaceIn('{{$guid}}'));"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "f68f3b7f-2cc9-4e76-a8d8-b61eadf84d50",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Representation accepted', function () {",
+                                    "  pm.expect(json.data && json.data.UpdateRoleFromRepresentation && json.data.UpdateRoleFromRepresentation.status, JSON.stringify(json)).to.eql('Success');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "96deefa5-cd29-411c-b521-b52d156bfca1",
+                    "name": "AUD Save the renamed role",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audTenantAToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SaveDocument { SaveDocument(input: { collectionId: \"Roles\", documentId: \"{{audRoleDocId}}\", documentName: \"\" }) { status message } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "c730f138-4681-47f8-bb2f-e5e9d96a8cec",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Renamed role saved', function () {",
+                                    "  pm.expect(json.data && json.data.SaveDocument && json.data.SaveDocument.status, JSON.stringify(json)).to.eql('Success');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "2c934310-b47a-459c-8c0c-a905ea2cec7d",
+                    "name": "AUD Close the new role document",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audTenantAToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CloseDocument { CloseDocument(input: { collectionId: \"Roles\", id: \"{{audRoleDocId}}\" }) { status message } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "a46a12cb-bab7-4360-8129-bb03d87c9515",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Role document closed', function () {",
+                                    "  pm.expect(json.data && json.data.CloseDocument && json.data.CloseDocument.status, JSON.stringify(json)).to.eql('Success');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "fa35a1fb-d9ca-498e-955f-d682d2990b7d",
+                    "name": "AUD Open the stored role",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audTenantAToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation OpenDocument { OpenDocument(input: { collectionId: \"Roles\", id: \"{{audRoleId}}\" }) { documentId } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "72691238-f66d-4da3-ad0a-c628caed0500",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.OpenDocument;",
+                                    "pm.test('Role document opened', function () {",
+                                    "  pm.expect(payload && payload.documentId, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('audRoleDocId', payload && payload.documentId ? payload.documentId : '');"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "ee3995fd-357a-4603-9282-3378c324c0e3",
+                    "name": "AUD Wait for the role document load",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audTenantAToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetRoleRepresentation { GetRoleRepresentation(input: { collectionId: \"Roles\", id: \"{{audRoleDocId}}\" }) { id } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "id": "6a3c086b-2c54-41c3-b6a0-262b37918b2b",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "if (parseInt(pm.environment.get('docWaitAttempt_audRole') || '0', 10) > 0) {",
+                                    "    const until = Date.now() + 150;",
+                                    "    while (Date.now() < until) { /* spin */ }",
+                                    "}"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "af4ee9b2-8147-4481-951c-c553760d2d30",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "// OpenDocument returns isLoading=true and loads on a background thread; see \"Wait for A member document load\".",
+                                    "const json = pm.response.json();",
+                                    "const repr = json.data && json.data.GetRoleRepresentation;",
+                                    "const loaded = !!(repr && repr.id);",
+                                    "const maxAttempts = 25;",
+                                    "const attempt = parseInt(pm.environment.get('docWaitAttempt_audRole') || '0', 10);",
+                                    "if (loaded) {",
+                                    "    pm.environment.set('docWaitAttempt_audRole', '0');",
+                                    "    pm.test('Document loaded', function () { pm.expect(loaded).to.eql(true); });",
+                                    "} else if (attempt < maxAttempts) {",
+                                    "    pm.environment.set('docWaitAttempt_audRole', String(attempt + 1));",
+                                    "    postman.setNextRequest('AUD Wait for the role document load');",
+                                    "} else {",
+                                    "    pm.environment.set('docWaitAttempt_audRole', '0');",
+                                    "    pm.test('Document loaded', function () {",
+                                    "        pm.expect.fail('document still not readable after ' + maxAttempts + ' polls: ' + JSON.stringify(json));",
+                                    "    });",
+                                    "}"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "1e2ec732-45a8-4773-9be2-de690ca220e2",
+                    "name": "AUD The role representation carries the stored role id",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audTenantAToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetRoleRepresentation { GetRoleRepresentation(input: { collectionId: \"Roles\", id: \"{{audRoleDocId}}\" }) { id name } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "71f792d8-2ef8-4a39-9cb5-6da444b2fa31",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const repr = json.data && json.data.GetRoleRepresentation;",
+                                    "pm.test('The representation is identified by the element the role is stored under', function () {",
+                                    "  pm.expect(repr && repr.name, JSON.stringify(json)).to.eql(pm.environment.get('audRoleName') + ' Renamed');",
+                                    "  pm.expect(repr.id, 'not the ID of the editor representation').to.eql(pm.environment.get('audRoleId'));",
+                                    "});",
+                                    "pm.environment.set('audRoleReprIdRead', repr && repr.id ? repr.id : '');"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "632024ad-cdeb-4764-b462-30d6ae8af629",
+                    "name": "AUD The role history is found by the id of its representation",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audTenantAToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetRevisionInfoList { GetRevisionInfoList(input: { documentId: \"{{audRoleReprIdRead}}\", collectionId: \"Roles\" }) { activeRevision revisions { revision user description } } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "d170835b-3fb5-43c5-84f6-6c6c52c40a02",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const revisions = (json.data && json.data.GetRevisionInfoList && json.data.GetRevisionInfoList.revisions) || [];",
+                                    "pm.test('The creation and the rename are in the history', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(revisions, JSON.stringify(json)).to.have.length(2);",
+                                    "  pm.expect(revisions.map(function (r) { return r.description || ''; }).join(' '), 'the rename').to.include(pm.environment.get('audRoleName') + ' Renamed');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "edd37fe3-8c00-405e-b129-49d9cc06b8de",
+                    "name": "AUD Close the stored role document",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audTenantAToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CloseDocument { CloseDocument(input: { collectionId: \"Roles\", id: \"{{audRoleDocId}}\" }) { status message } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "85dce2a8-e647-4147-bb9a-868946e884bd",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Role document closed', function () {",
+                                    "  pm.expect(json.data && json.data.CloseDocument && json.data.CloseDocument.status, JSON.stringify(json)).to.eql('Success');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "17053a40-d4ad-488d-a684-f2424f51cef1",
+                    "name": "AUD Create a group document as the editor does",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audTenantAToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateNewDocument { CreateNewDocument(input: { collectionId: \"Groups\", typeId: \"Group\", proposedSourceDocumentId: \"{{audGroupId}}\" }) { documentId objectId } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "id": "53bb3c7d-1246-49a0-8f31-74cf189744fe",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.environment.set('audGroupId', pm.variables.replaceIn('{{$guid}}'));",
+                                    "pm.environment.set('audGroupReprId', pm.environment.get('audGroupId'));",
+                                    "pm.environment.set('audGroupKey', 'QaAuditGroup' + Date.now());",
+                                    "pm.environment.set('audGroupName', 'QA Audit Group ' + Date.now());"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "cec0b669-45c2-4771-8d17-1e56abf1acf4",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.CreateNewDocument;",
+                                    "pm.test('Group document created', function () {",
+                                    "  pm.expect(payload && payload.documentId, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('audGroupDocId', payload && payload.documentId ? payload.documentId : '');"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "a89fe854-9012-4329-b02f-a1906e86f522",
+                    "name": "AUD Fill the new group",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audTenantAToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UpdateGroupFromRepresentation { UpdateGroupFromRepresentation(input: { documentId: \"{{audGroupDocId}}\", group: { id: \"{{audGroupReprId}}\", productId: \"{{product_id}}\", name: \"{{audGroupName}}\", description: \"Organizations GUI audit probe\", roles: [], users: [], parentGroups: [] } }) { status message } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "3254aea0-85bc-4a47-be5a-763e39db5827",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Representation accepted', function () {",
+                                    "  pm.expect(json.data && json.data.UpdateGroupFromRepresentation && json.data.UpdateGroupFromRepresentation.status, JSON.stringify(json)).to.eql('Success');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "2ef195b9-f371-44f6-a891-9e6d2f286235",
+                    "name": "AUD Save the new group",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audTenantAToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SaveDocument { SaveDocument(input: { collectionId: \"Groups\", documentId: \"{{audGroupDocId}}\", documentName: \"\" }) { status message } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "10fb39a9-285d-494f-bc98-e0d9ce5b71b3",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('New group saved', function () {",
+                                    "  pm.expect(json.data && json.data.SaveDocument && json.data.SaveDocument.status, JSON.stringify(json)).to.eql('Success');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "3c1dc9bc-9de9-476a-9d00-7d18c807198d",
+                    "name": "AUD Rename the group",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audTenantAToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UpdateGroupFromRepresentation { UpdateGroupFromRepresentation(input: { documentId: \"{{audGroupDocId}}\", group: { id: \"{{audGroupReprId}}\", productId: \"{{product_id}}\", name: \"{{audGroupName}} Renamed\", description: \"Organizations GUI audit probe\", roles: [], users: [], parentGroups: [] } }) { status message } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "id": "ae53c08c-01ce-4b8b-9f38-d3016b649bc5",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "// A stored group keeps its UUID whatever ID a client sends for its representation.",
+                                    "pm.environment.set('audGroupReprId', pm.variables.replaceIn('{{$guid}}'));"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "c6b18c5f-43a7-4a9a-9b9c-7517036cc06c",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Representation accepted', function () {",
+                                    "  pm.expect(json.data && json.data.UpdateGroupFromRepresentation && json.data.UpdateGroupFromRepresentation.status, JSON.stringify(json)).to.eql('Success');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "3dd71a44-4688-4ffc-b791-249850a65902",
+                    "name": "AUD Save the renamed group",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audTenantAToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SaveDocument { SaveDocument(input: { collectionId: \"Groups\", documentId: \"{{audGroupDocId}}\", documentName: \"\" }) { status message } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "9f27bc66-3405-4442-957a-f0e665d2eb3b",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Renamed group saved', function () {",
+                                    "  pm.expect(json.data && json.data.SaveDocument && json.data.SaveDocument.status, JSON.stringify(json)).to.eql('Success');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "e8593657-17a1-406e-a02d-6e3af705e0de",
+                    "name": "AUD Close the new group document",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audTenantAToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CloseDocument { CloseDocument(input: { collectionId: \"Groups\", id: \"{{audGroupDocId}}\" }) { status message } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "67f77cf3-1a7b-4532-85d2-87ea5781d624",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Group document closed', function () {",
+                                    "  pm.expect(json.data && json.data.CloseDocument && json.data.CloseDocument.status, JSON.stringify(json)).to.eql('Success');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "7192be1f-d16f-4add-b322-1c18ccaf7c20",
+                    "name": "AUD Open the stored group",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audTenantAToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation OpenDocument { OpenDocument(input: { collectionId: \"Groups\", id: \"{{audGroupId}}\" }) { documentId } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "9a520e4e-4e6e-4ff9-ab00-4653180a2875",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.OpenDocument;",
+                                    "pm.test('Group document opened', function () {",
+                                    "  pm.expect(payload && payload.documentId, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('audGroupDocId', payload && payload.documentId ? payload.documentId : '');"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "2bb073cf-1ae1-4ba7-a28d-cafc4add8b68",
+                    "name": "AUD Wait for the group document load",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audTenantAToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetGroupRepresentation { GetGroupRepresentation(input: { collectionId: \"Groups\", id: \"{{audGroupDocId}}\" }) { id } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "id": "35ac6744-bbc1-415b-b07e-f7ea2b46a4be",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "if (parseInt(pm.environment.get('docWaitAttempt_audGroup') || '0', 10) > 0) {",
+                                    "    const until = Date.now() + 150;",
+                                    "    while (Date.now() < until) { /* spin */ }",
+                                    "}"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "5bf69709-6c78-46d5-b2a0-abdf30154871",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "// OpenDocument returns isLoading=true and loads on a background thread; see \"Wait for A member document load\".",
+                                    "const json = pm.response.json();",
+                                    "const repr = json.data && json.data.GetGroupRepresentation;",
+                                    "const loaded = !!(repr && repr.id);",
+                                    "const maxAttempts = 25;",
+                                    "const attempt = parseInt(pm.environment.get('docWaitAttempt_audGroup') || '0', 10);",
+                                    "if (loaded) {",
+                                    "    pm.environment.set('docWaitAttempt_audGroup', '0');",
+                                    "    pm.test('Document loaded', function () { pm.expect(loaded).to.eql(true); });",
+                                    "} else if (attempt < maxAttempts) {",
+                                    "    pm.environment.set('docWaitAttempt_audGroup', String(attempt + 1));",
+                                    "    postman.setNextRequest('AUD Wait for the group document load');",
+                                    "} else {",
+                                    "    pm.environment.set('docWaitAttempt_audGroup', '0');",
+                                    "    pm.test('Document loaded', function () {",
+                                    "        pm.expect.fail('document still not readable after ' + maxAttempts + ' polls: ' + JSON.stringify(json));",
+                                    "    });",
+                                    "}"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "5ba934af-03cc-4a5e-b9e1-dbf2199109df",
+                    "name": "AUD The group representation carries the stored group id",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audTenantAToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetGroupRepresentation { GetGroupRepresentation(input: { collectionId: \"Groups\", id: \"{{audGroupDocId}}\" }) { id name } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "adb2b962-bae6-4a8b-97e7-b99bb9ab4eee",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const repr = json.data && json.data.GetGroupRepresentation;",
+                                    "pm.test('The representation is identified by the element the group is stored under', function () {",
+                                    "  pm.expect(repr && repr.name, JSON.stringify(json)).to.eql(pm.environment.get('audGroupName') + ' Renamed');",
+                                    "  pm.expect(repr.id, 'not the ID of the editor representation').to.eql(pm.environment.get('audGroupId'));",
+                                    "});",
+                                    "pm.environment.set('audGroupReprIdRead', repr && repr.id ? repr.id : '');"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "bd6c6a68-03a2-4e6e-aacb-d8b0abb57925",
+                    "name": "AUD The group history is found by the id of its representation",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audTenantAToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetRevisionInfoList { GetRevisionInfoList(input: { documentId: \"{{audGroupReprIdRead}}\", collectionId: \"Groups\" }) { activeRevision revisions { revision user description } } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "e09a8abc-c839-4291-b1ef-bd1ead6f6cc6",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const revisions = (json.data && json.data.GetRevisionInfoList && json.data.GetRevisionInfoList.revisions) || [];",
+                                    "pm.test('The creation and the rename are in the history', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(revisions, JSON.stringify(json)).to.have.length(2);",
+                                    "  pm.expect(revisions.map(function (r) { return r.description || ''; }).join(' '), 'the rename').to.include(pm.environment.get('audGroupName') + ' Renamed');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "044bfc72-8ba2-4e32-9494-c7e641a8e758",
+                    "name": "AUD Close the stored group document",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audTenantAToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CloseDocument { CloseDocument(input: { collectionId: \"Groups\", id: \"{{audGroupDocId}}\" }) { status message } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "bc7f4841-be62-4741-9912-c9b9bb1f3d07",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('Group document closed', function () {",
+                                    "  pm.expect(json.data && json.data.CloseDocument && json.data.CloseDocument.status, JSON.stringify(json)).to.eql('Success');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "735dce75-313a-4775-a4a0-33511d63bb39",
+                    "name": "AUD Authorize the A member for the grant probe",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{a_member_login}}\", password: \"{{a_member_password}}\", productId: \"{{product_id}}\" }) { userId token } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "9281d2f5-4e5e-44e8-a4bf-80a4cf01fac1",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.Authorization;",
+                                    "pm.test('Authorized without an organization', function () {",
+                                    "  pm.expect(payload && payload.token, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('audMemberGrantToken', payload && payload.token ? payload.token : '');"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "954fb159-5df8-4073-823d-c084593f6bb3",
+                    "name": "AUD Switch the A member into the ownership transfer organization",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audMemberGrantToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SelectTenant { SelectTenant(input: { tenantId: \"{{audTransferTenantId}}\" }) { ok userSession { tenantId accessToken } errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "edd8be62-f09d-468a-b272-9fec824cdc42",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const session = json.data && json.data.SelectTenant && json.data.SelectTenant.userSession;",
+                                    "pm.test('Switched into the organization', function () {",
+                                    "  pm.expect(session && session.tenantId, JSON.stringify(json)).to.eql(pm.environment.get('audTransferTenantId'));",
+                                    "});",
+                                    "pm.environment.set('audMemberTransferToken', session && session.accessToken ? session.accessToken : '');"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "64b16643-bf37-4a79-99e4-ef0c312e3453",
+                    "name": "AUD The ownership transfer organization accepts connections by code",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audMemberTransferToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SetAllowConnectionsByCode { SetAllowConnectionsByCode(input: { tenantId: \"{{audTransferTenantId}}\", allow: true }) { success errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "a8a254f7-8225-4c5a-9092-c225c3502e86",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.SetAllowConnectionsByCode;",
+                                    "pm.test('Connections by code allowed', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "8c86bb71-12fc-422b-9270-115672949ca9",
+                    "name": "AUD Connection code of the ownership transfer organization",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audMemberTransferToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetConnectionCode { GetConnectionCode(input: { tenantId: \"{{audTransferTenantId}}\" }) { connectionCode { connectionCode } errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "f02e78bd-c7b0-4e79-bee1-40ff3553cf47",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const code = json.data && json.data.GetConnectionCode && json.data.GetConnectionCode.connectionCode;",
+                                    "pm.test('Connection code present', function () {",
+                                    "  pm.expect(code && code.connectionCode, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('audTransferCode', code && code.connectionCode ? code.connectionCode : '');"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "373ff392-2ad8-4084-929b-84b97401fb5a",
+                    "name": "AUD A requests a connection to the ownership transfer organization",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audTenantAToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateConnectionRequest { CreateConnectionRequest(input: { sourceTenantId: \"{{tenantAId}}\", connectionCode: \"{{audTransferCode}}\", message: \"Organizations GUI audit\" }) { requestId errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "62d74f52-1ff5-4ddd-9ff2-a538f341a3ec",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.CreateConnectionRequest;",
+                                    "pm.test('Connection requested', function () {",
+                                    "  pm.expect(payload && payload.requestId, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('audConnectionRequestId', payload && payload.requestId ? payload.requestId : '');"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "29d1c86c-0035-48aa-91e2-f9e6eb02d27b",
+                    "name": "AUD The ownership transfer organization approves the connection",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audMemberTransferToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation ApproveConnectionRequest { ApproveConnectionRequest(input: { requestId: \"{{audConnectionRequestId}}\", tenantId: \"{{audTransferTenantId}}\" }) { connectionId errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "e4c43ae8-351f-4139-ba3f-ccebb3ac1864",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.ApproveConnectionRequest;",
+                                    "pm.test('Connection approved', function () {",
+                                    "  pm.expect(payload && payload.connectionId, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('audConnectionId', payload && payload.connectionId ? payload.connectionId : '');"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "a1f9729e-adb7-4e24-93b3-57c4171a8e68",
+                    "name": "AUD A grants access to the ownership transfer organization",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audTenantAToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateCrossOrgGrant { CreateCrossOrgGrant(input: { sourceTenantId: \"{{tenantAId}}\", targetTenantId: \"{{audTransferTenantId}}\", roleIds: [], description: \"Organizations GUI audit\", expiresAt: \"2028-01-01T00:00:00Z\" }) { grantId errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "5d44c3fd-b35d-4573-81d4-930425afeb6c",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.CreateCrossOrgGrant;",
+                                    "pm.test('Grant created', function () {",
+                                    "  pm.expect(payload && payload.grantId, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('audGrantId', payload && payload.grantId ? payload.grantId : '');"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "8d5826ae-c862-481f-bb6b-929d51874e61",
+                    "name": "AUD A revokes the grant",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audTenantAToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RevokeCrossOrgGrant { RevokeCrossOrgGrant(input: { grantId: \"{{audGrantId}}\" }) { success errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "a94eaa97-1f70-42ee-884b-f2ed448100a2",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.RevokeCrossOrgGrant;",
+                                    "pm.test('Grant revoked', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "58ace94f-09b6-4ea3-b44a-05dc526ec8cd",
+                    "name": "AUD The grant list reports the revoked grant as inactive",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audTenantAToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetSelectableItems { GetSelectableItems(input: { collectionId: \"CrossOrgGrants\", viewParams: { count: 200, offset: 0 } }) { items { id params { parameters { id data } } } } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "5873c69a-d370-4461-8628-3a8a5159fd3f",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const items = (json.data && json.data.GetSelectableItems && json.data.GetSelectableItems.items) || [];",
+                                    "const grant = items.find(function (item) { return item.id === pm.environment.get('audGrantId'); });",
+                                    "const parameters = (grant && grant.params && grant.params.parameters) || [];",
+                                    "const state = parameters.find(function (p) { return p.id === 'isActive'; });",
+                                    "pm.test('The revoked grant carries isActive = false', function () {",
+                                    "  pm.expect(grant, JSON.stringify(json)).to.be.an('object');",
+                                    "  pm.expect(state, 'isActive parameter: ' + JSON.stringify(parameters)).to.be.an('object');",
+                                    "  pm.expect(JSON.parse(state.data).text).to.eql('false');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "e497be49-414f-4780-be06-0ff09f47bb20",
+                    "name": "AUD Remove the audit connection",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audTenantAToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RemoveConnection { RemoveConnection(input: { connectionId: \"{{audConnectionId}}\", tenantId: \"{{tenantAId}}\" }) { success errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "d4bf2881-b8b9-4f66-8254-bf05fa17494d",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.RemoveConnection;",
+                                    "pm.test('Connection removed', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "14c399b6-9eba-4962-bce9-1c4f76160636",
+                    "name": "AUD Remove the deactivated organization",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audOwnerNoOrgToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RemoveTenant { RemoveTenant(input: { tenantId: \"{{audInactiveTenantId}}\" }) { success errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "b9e97cfe-36c0-43ec-be60-5921155d9d66",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.RemoveTenant;",
+                                    "pm.test('Deactivated organization removed', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "5dd93c6a-96ad-40e4-8230-2fdcd0b26f9c",
+                    "name": "AUD Remove the ownership transfer organization",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{audMemberNoOrgToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RemoveTenant { RemoveTenant(input: { tenantId: \"{{audTransferTenantId}}\" }) { success errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "5491dd3e-4010-4039-a8f6-dd006e57808c",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.RemoveTenant;",
+                                    "pm.test('Ownership transfer organization removed by its new owner', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             "id": "664f4f89-6520-4a63-94d6-f3f7e022c2f6",
             "name": "99 Cleanup",
             "item": [
