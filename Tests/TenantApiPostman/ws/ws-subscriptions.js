@@ -25,12 +25,62 @@
 
 const crypto = require('crypto');
 const {
-	httpUrl, wsUrl, suLogin, suPassword, frameTimeoutMs, registrationGraceMs,
+	httpUrl, wsUrl, suLogin, suPassword, productId, frameTimeoutMs, registrationGraceMs,
 	gqlString, gql, mutate, login,
 	SubscriptionSession, notificationOf,
-	assert, assertRefusalReason, assertRoutingRefusal, documentNotification,
+	assert, assertRefusalReason, assertRoutingRefusal, documentNotification, jwtClaim, delay,
 	test, requires, runSuite
 } = require('./ws-lib');
+
+// How long a frame that must not arrive gets to show up after the positive signal.
+const quietMs = 1000;
+
+const runTag = Date.now().toString(36);
+
+function tenantRepresentation(seedId, tenantName, userId, description) {
+	return ` tenant: { id: ${gqlString(seedId)}, name: ${gqlString(tenantName)},` +
+		` description: ${gqlString(description)},` +
+		// The owner has to be among the members, as in "01A Tenant document-service
+		// create/update" - the document validator rejects a tenant without it and
+		// the later SaveDocument then fails with a bare "Failed to save document".
+		` ownerId: ${gqlString(userId)},` +
+		` isActive: true, members: [{ id: ${gqlString(userId)}, name: ${gqlString(suLogin)} }],` +
+		' memberOrganizationPermissions: [], tenantPermissions: [] }';
+}
+
+async function updateTenant(documentId, seedId, tenantName, userId, description, token) {
+	const status = await mutate('UpdateTenantFromRepresentation',
+		'mutation UpdateTenantFromRepresentation { UpdateTenantFromRepresentation(input: {' +
+		` documentId: ${gqlString(documentId)},` + tenantRepresentation(seedId, tenantName, userId, description) + ' })' +
+		' { status message documentName } }', token);
+	assert(status.status === 'Success',
+		`UpdateTenantFromRepresentation reported ${JSON.stringify(status).slice(0, 300)}`);
+	return status;
+}
+
+async function createTenantDocument(seedId, token) {
+	const info = await mutate('CreateNewDocument',
+		'mutation CreateNewDocument { CreateNewDocument(input: { collectionId: "Tenants", typeId: "Tenant",' +
+		` proposedSourceDocumentId: ${gqlString(seedId)} }) { documentId objectId objectTypeId documentName } }`,
+		token);
+	assert(info.documentId, `CreateNewDocument returned no documentId: ${JSON.stringify(info).slice(0, 300)}`);
+	return info;
+}
+
+async function closeDocument(collectionId, documentId, token) {
+	const status = await mutate('CloseDocument',
+		`mutation CloseDocument { CloseDocument(input: { collectionId: ${gqlString(collectionId)},` +
+		` id: ${gqlString(documentId)} }) { status message } }`, token);
+	assert(status.status === 'Success', `CloseDocument reported ${JSON.stringify(status).slice(0, 300)}`);
+}
+
+async function addUser(id, loginName, password, token) {
+	await mutate('UserAdd',
+		`mutation UserAdd { UserAdd(input: { id: ${gqlString(id)}, typeId: "User", productId: ${gqlString(productId)},` +
+		` item: { id: ${gqlString(id)}, productId: ${gqlString(productId)}, name: ${gqlString(loginName)},` +
+		` username: ${gqlString(loginName)}, password: ${gqlString(password)}, email: ${gqlString(loginName + '@ws.test')},` +
+		' groups: [], roles: [], permissions: [], systemInfos: [] } }) { id } }', token);
+}
 
 // ---------------------------------------------------------------- the suite
 
@@ -67,15 +117,14 @@ async function main() {
 	let managerSubId = null;
 	let undoSubId = null;
 
+	// Registration only fails on a refusal here; delivery is proven by the cases below.
 	await test('OnDocumentManagerChanged accepts a subscription', async () => {
 		managerSubId = await session.subscribe('OnDocumentManagerChanged',
 			collectionQuery('OnDocumentManagerChanged', 'Tenants'));
-		assert(managerSubId, 'no subscription id');
 	});
 
 	await test('OnUndoRedoChanged accepts a subscription', async () => {
 		undoSubId = await session.subscribe('OnUndoRedoChanged', collectionQuery('OnUndoRedoChanged', 'Tenants'));
-		assert(undoSubId, 'no subscription id');
 	});
 
 	// Creating a tenant draft must reach subscribers of the collection.
@@ -95,11 +144,7 @@ async function main() {
 	await test('CreateNewDocument notifies OnDocumentManagerChanged', async () => {
 		requires(managerSubId, 'a live OnDocumentManagerChanged subscription');
 
-		const info = await mutate('CreateNewDocument',
-			'mutation CreateNewDocument { CreateNewDocument(input: { collectionId: "Tenants", typeId: "Tenant",' +
-			` proposedSourceDocumentId: ${gqlString(seedId)} }) { documentId objectId objectTypeId documentName } }`,
-			su.token);
-		assert(info.documentId, `CreateNewDocument returned no documentId: ${JSON.stringify(info).slice(0, 300)}`);
+		const info = await createTenantDocument(seedId, su.token);
 		documentId = info.documentId;
 		documentName = info.documentName;
 
@@ -127,7 +172,6 @@ async function main() {
 			'subscription OnDocumentChanged { OnDocumentChanged(input: { __typename: "DocumentId",' +
 			` collectionId: "Tenants", id: ${gqlString(documentId)} })` +
 			' { documentOperation documentId documentName objectId isDirty isLoading } }');
-		assert(docSubId, 'no subscription id');
 	});
 
 	await test('UpdateTenantFromRepresentation makes the document dirty over WS', async () => {
@@ -138,22 +182,7 @@ async function main() {
 		// A never-saved document is already dirty on creation, so only frames the edit caused count.
 		const editMark = session.mark();
 
-		const status = await mutate('UpdateTenantFromRepresentation',
-			'mutation UpdateTenantFromRepresentation { UpdateTenantFromRepresentation(input: {' +
-			` documentId: ${gqlString(documentId)},` +
-			` tenant: { id: ${gqlString(seedId)}, name: ${gqlString(tenantName)},` +
-			' description: "created by ws-subscriptions.js",' +
-			// The owner has to be among the members, as in "01A Tenant document-service
-			// create/update" - the document validator rejects a tenant without it and
-			// the later SaveDocument then fails with a bare "Failed to save document".
-			` ownerId: ${gqlString(su.userId)},` +
-			` isActive: true, members: [{ id: ${gqlString(su.userId)}, name: ${gqlString(suLogin)} }],` +
-			' memberOrganizationPermissions: [], tenantPermissions: [] } })' +
-			' { status message documentName } }', su.token);
-
-		assert(status.status === 'Success',
-			`UpdateTenantFromRepresentation reported ${JSON.stringify(status).slice(0, 300)}`);
-
+		const status = await updateTenant(documentId, seedId, tenantName, su.userId, 'created by ws-subscriptions.js', su.token);
 		if (status.documentName) { documentName = status.documentName; }
 
 		const frame = await session.waitForData(undoSubId, f => {
@@ -166,7 +195,46 @@ async function main() {
 			`an edit must leave at least one undo step, got ${JSON.stringify(notification).slice(0, 250)}`);
 
 		// The same edit has to reach the document-scoped subscription too.
-		await session.waitForData(docSubId, f => documentNotification(f, 'OnDocumentChanged', documentId), editMark);
+		await session.waitForData(docSubId,
+			f => documentNotification(f, 'OnDocumentChanged', documentId, 'DocumentChanged'), editMark);
+	});
+
+	// A document-scoped subscription names one document. Delivering the edits of
+	// another document of the same user to it makes an editor redraw from foreign data.
+	await test('OnDocumentChanged delivers only the document it names', async () => {
+		requires(documentId, 'a created document id');
+		requires(docSubId, 'a live OnDocumentChanged subscription');
+
+		const other = await createTenantDocument(crypto.randomUUID(), su.token);
+		const otherSubId = await session.subscribe('OnDocumentChanged',
+			'subscription OnDocumentChanged { OnDocumentChanged(input: { __typename: "DocumentId",' +
+			` collectionId: "Tenants", id: ${gqlString(other.documentId)} })` +
+			' { documentOperation documentId documentName objectId isDirty isLoading } }');
+
+		const editMark = session.mark();
+		await updateTenant(documentId, seedId, tenantName, su.userId, 'edited again by ws-subscriptions.js', su.token);
+
+		await session.waitForData(docSubId,
+			f => documentNotification(f, 'OnDocumentChanged', documentId, 'DocumentChanged'), editMark);
+		await delay(quietMs);
+
+		const foreign = session.frames.slice(editMark)
+			.filter(f => f.type === 'data' && f.id === otherSubId)
+			.map(f => notificationOf(f, 'OnDocumentChanged'));
+		const misattributed = session.frames.slice(editMark)
+			.filter(f => f.type === 'data' && f.id === docSubId)
+			.map(f => notificationOf(f, 'OnDocumentChanged'))
+			.filter(n => !n || n.documentId !== documentId);
+
+		await session.stop(otherSubId);
+		await closeDocument('Tenants', other.documentId, su.token);
+
+		assert(foreign.length === 0,
+			`the subscription for document "${other.documentId}" received the edit of "${documentId}": ` +
+			JSON.stringify(foreign).slice(0, 300));
+		assert(misattributed.length === 0,
+			`the subscription for "${documentId}" received notifications of other documents: ` +
+			JSON.stringify(misattributed).slice(0, 300));
 	});
 
 	// Regression probe for "Save stays enabled after creating a tenant": the last
@@ -176,8 +244,7 @@ async function main() {
 		requires(undoSubId, 'a live OnUndoRedoChanged subscription');
 		requires(managerSubId, 'a live OnDocumentManagerChanged subscription');
 
-		const before = session.dataFrames(undoSubId).length;
-		const managerBefore = session.dataFrames(managerSubId).length;
+		const saveMark = session.mark();
 
 		// Save under the name the document already carries. DoSaveDocument treats a
 		// *different* name as "save as" and inserts a copy instead of updating - which
@@ -198,57 +265,54 @@ async function main() {
 			`"${tenantName}" - that is a "save as" copy rather than an update`);
 		documentName = status.documentName;
 
-		// Give the server the same grace the GUI has before it reads the button state.
-		await new Promise(r => setTimeout(r, 2000));
+		// The save itself must be announced on the collection, with the object it bound
+		// to - the manager view redraws off exactly this.
+		const savedFrame = await session.waitForData(managerSubId,
+			f => documentNotification(f, 'OnDocumentManagerChanged', documentId, 'DocumentSaved'), saveMark);
+		const saved = notificationOf(savedFrame, 'OnDocumentManagerChanged');
+		assert(!!saved.objectId,
+			`the DocumentSaved notification carries no objectId, so the view cannot bind the saved row: ${JSON.stringify(saved).slice(0, 300)}`);
 
-		const frames = session.dataFrames(undoSubId).slice(before);
-		assert(frames.length > 0, 'SaveDocument produced no OnUndoRedoChanged notification at all');
+		await session.waitForData(undoSubId, f => {
+			const notification = notificationOf(f, 'OnUndoRedoChanged');
+			return !!notification && notification.documentId === documentId && notification.isDirty === false;
+		}, saveMark).catch(() => {
+			throw new Error('after SaveDocument no OnUndoRedoChanged reported isDirty=false - the Save button stays enabled: ' +
+				JSON.stringify(session.frames.slice(saveMark).filter(f => f.type === 'data' && f.id === undoSubId)
+					.map(f => notificationOf(f, 'OnUndoRedoChanged'))).slice(0, 300));
+		});
 
-		const dirtyStates = frames
+		// A dirty state still in flight after the clean one would re-enable the button.
+		await delay(quietMs);
+
+		const dirtyStates = session.frames.slice(saveMark)
+			.filter(f => f.type === 'data' && f.id === undoSubId)
 			.map(f => notificationOf(f, 'OnUndoRedoChanged'))
 			.filter(n => !!n && n.documentId === documentId)
 			.map(n => n.isDirty);
 
-		assert(dirtyStates.length > 0,
-			`SaveDocument produced OnUndoRedoChanged frames, but none for document "${documentId}"`);
 		assert(dirtyStates.every(state => typeof state === 'boolean'),
 			`OnUndoRedoChanged reported a non-boolean isDirty: ${JSON.stringify(dirtyStates)}`);
 		assert(dirtyStates[dirtyStates.length - 1] === false,
 			'after SaveDocument the last OnUndoRedoChanged still reports isDirty=true ' +
 			'(this is what keeps the Save button enabled): ' + JSON.stringify(dirtyStates));
-
-		// The save itself must also be announced on the collection, with the id, the
-		// operation and the object it bound to - the manager view redraws off exactly this.
-		const saved = session.dataFrames(managerSubId).slice(managerBefore)
-			.map(f => notificationOf(f, 'OnDocumentManagerChanged'))
-			.filter(n => !!n && n.documentId === documentId);
-
-		assert(saved.some(n => n.documentOperation === 'DocumentSaved'),
-			'no OnDocumentManagerChanged notification with documentOperation="DocumentSaved" for this document: ' +
-			JSON.stringify(saved.map(n => n.documentOperation)));
-		assert(saved.some(n => n.documentOperation === 'DocumentSaved' && !!n.objectId),
-			'the DocumentSaved notification carries no objectId, so the view cannot bind the saved row: ' +
-			JSON.stringify(saved.filter(n => n.documentOperation === 'DocumentSaved')).slice(0, 300));
 	});
 
-	// --- tenant notification subscriptions
+	// --- collection change subscriptions
 	//
-	// One case per subscription this server serves, in the shape the QML client
-	// sends it: empty input, "notification { id }" selection (taken from a live
-	// trace of a client start - the client does not pass a userId, the server
-	// takes the identity from the request context).
-	// Not listed, deliberately: PumaWsConnection is the ProLife/Lisa engines'
-	// probe *towards* Puma, so it belongs to the ProLife suite, and
-	// OnConnectionNotification is declared in Tenants.sdl but published by
-	// nothing - the client uses OnConnectionCodesNotification instead.
+	// The five channels CObjectCollectionChangeNotifierComp serves (PumaServerBase.acc,
+	// TenantCollectionController.acc), in the shape the QML client sends them
+	// (SubscriptionClient.qml): empty input, "notification { id }" selection. The
+	// notifier pushes {typeOperation, itemId, operationContext} whatever the
+	// selection. Each case causes one insertion and requires the frame naming it:
+	// a "start" is answered with silence, so registration alone proves nothing.
 	//
-	// These assert registration only - nothing here triggers the events that would
-	// make them deliver. Registered as one batch sharing a single grace window:
-	// waiting per subscription cost more than the rest of the suite put together.
-	const clientSubscriptions = [
-		'OnMembershipNotification',
-		'OnCrossTenantMessageNotification',
-		'OnConnectionCodesNotification',
+	// The tenant notification channels (OnMembershipNotification,
+	// OnConnectionCodesNotification, OnCrossTenantMessageNotification) are proven per
+	// recipient in ws-notifications.js. Not here either: PumaWsConnection is the
+	// ProLife/Lisa engines' probe *towards* Puma (ProLife suite), and
+	// OnConnectionNotification is declared in Tenants.sdl but published by nothing.
+	const collectionSubscriptions = [
 		'OnUsersCollectionChanged',
 		'OnGroupsCollectionChanged',
 		'OnRolesCollectionChanged',
@@ -259,21 +323,111 @@ async function main() {
 	const clientQuery = (commandId) =>
 		`subscription ${commandId} { ${commandId}(input: {}) { notification { id } } }`;
 
-	const clientSubIds = new Map();
-	for (const commandId of clientSubscriptions) {
-		clientSubIds.set(commandId, session.beginSubscribe(commandId, clientQuery(commandId)));
-	}
-	await new Promise(r => setTimeout(r, registrationGraceMs));
+	// A user without any role watches the same channels before the changes below
+	// happen, so the isolation case at the end sees what they leaked to him.
+	let observer = null;
+	let observerMark = null;
+	const observerSubIds = new Map();
 
-	for (const commandId of clientSubscriptions) {
-		await test(`the client subscription '${commandId}' is accepted`, async () => {
-			const id = session.confirmAccepted(clientSubIds.get(commandId));
-			const frame = await session.stop(id);
-			assert(frame.type === 'complete',
-				`stopping an accepted subscription answered ${JSON.stringify(frame).slice(0, 250)}`);
-			assert(frame.id === id, `complete carries id "${frame.id}" instead of "${id}"`);
-		});
+	await test('a user without administration rights may watch the collection channels', async () => {
+		const observerLogin = `ws_observer_${runTag}`;
+		const observerPassword = 'WsObserver_2026!';
+		await addUser(crypto.randomUUID(), observerLogin, observerPassword, su.token);
+		const auth = await login(observerLogin, observerPassword);
+
+		const watcher = new SubscriptionSession('observer', wsUrl, auth.token);
+		await watcher.connect();
+		await watcher.init();
+		observer = watcher;
+
+		for (const commandId of collectionSubscriptions) {
+			observerSubIds.set(commandId, watcher.beginSubscribe(commandId, clientQuery(commandId)));
+		}
+		observerSubIds.set('OnDocumentManagerChanged',
+			watcher.beginSubscribe('OnDocumentManagerChanged', collectionQuery('OnDocumentManagerChanged', 'Tenants')));
+		await delay(registrationGraceMs);
+		observerMark = session.mark();
+
+		// Refusing him for want of rights is as good as delivering nothing; any other refusal is a fault.
+		for (const [commandId, subId] of Array.from(observerSubIds)) {
+			const refusal = watcher.outcomeOf(subId);
+			if (refusal) {
+				assertRefusalReason(refusal, {
+					absent: `${commandId} was neither accepted nor refused`,
+					mustMatch: /^(Unauthorized|Forbidden): /,
+					mustNotMatch: [/No servlet was found/]
+				});
+				observerSubIds.delete(commandId);
+			}
+		}
+	});
+
+	const collectionSubIds = new Map();
+	for (const commandId of collectionSubscriptions) {
+		collectionSubIds.set(commandId, session.beginSubscribe(commandId, clientQuery(commandId)));
 	}
+	await delay(registrationGraceMs);
+
+	// Runs the action and requires the "inserted" frame for the item it created.
+	const expectInsertion = async (commandId, action, itemIdOf) => {
+		const subId = session.confirmAccepted(collectionSubIds.get(commandId));
+		const mark = session.mark();
+		const result = await action();
+		const itemId = requires(itemIdOf(result), `the id of the item ${commandId} has to announce`);
+
+		await session.waitForData(subId, f => {
+			const notification = notificationOf(f, commandId);
+			return !!notification && notification.typeOperation === 'inserted' && notification.itemId === itemId;
+		}, mark).catch(() => {
+			throw new Error(`${commandId} did not announce the insertion of "${itemId}"; got ` +
+				JSON.stringify(session.frames.slice(mark).filter(f => f.type === 'data' && f.id === subId)
+					.map(f => notificationOf(f, commandId))).slice(0, 400));
+		});
+		return result;
+	};
+
+	const probeLogin = `ws_probe_${runTag}`;
+	const probePassword = 'WsProbe_2026!';
+	let probeUserId = null;
+
+	await test('OnUsersCollectionChanged announces an added user', async () => {
+		const id = crypto.randomUUID();
+		await expectInsertion('OnUsersCollectionChanged', () => addUser(id, probeLogin, probePassword, su.token), () => id);
+		probeUserId = id;
+	});
+
+	await test('OnUserSessionsCollectionChanged announces the session a login opens', async () => {
+		requires(probeUserId, 'the user added by the previous case');
+		await expectInsertion('OnUserSessionsCollectionChanged', () => login(probeLogin, probePassword),
+			auth => jwtClaim(auth.token, 'sessionId'));
+	});
+
+	await test('OnGroupsCollectionChanged announces an added group', async () => {
+		const id = crypto.randomUUID();
+		await expectInsertion('OnGroupsCollectionChanged', () => mutate('GroupAdd',
+			`mutation GroupAdd { GroupAdd(input: { id: ${gqlString(id)}, typeId: "Group", productId: ${gqlString(productId)},` +
+			` item: { id: ${gqlString(id)}, productId: ${gqlString(productId)}, name: ${gqlString('WS_GROUP_' + runTag)},` +
+			' description: "ws-subscriptions.js", roles: [], users: [], parentGroups: [] } }) { id } }', su.token), () => id);
+	});
+
+	await test('OnRolesCollectionChanged announces an added role', async () => {
+		const id = crypto.randomUUID();
+		const roleCode = `WS_ROLE_${runTag}`;
+		await expectInsertion('OnRolesCollectionChanged', () => mutate('RoleAdd',
+			`mutation RoleAdd { RoleAdd(input: { id: ${gqlString(id)}, typeId: "Role", productId: ${gqlString(productId)},` +
+			` item: { id: ${gqlString(id)}, name: ${gqlString(roleCode)}, roleId: ${gqlString(roleCode)},` +
+			` productId: ${gqlString(productId)}, parentRoles: [], permissions: [] } }) { id } }`, su.token), () => id);
+	});
+
+	await test('OnTenantsCollectionChanged announces a created organization', async () => {
+		await expectInsertion('OnTenantsCollectionChanged', async () => {
+			const created = await mutate('CreateTenant',
+				`mutation CreateTenant { CreateTenant(input: { name: ${gqlString('WS_Collection_' + runTag)},` +
+				` description: "ws-subscriptions.js", ownerId: ${gqlString(su.userId)} }) { tenantId errorMessage } }`, su.token);
+			assert(!created.errorMessage, `CreateTenant was refused: ${created.errorMessage}`);
+			return created;
+		}, created => created.tenantId);
+	});
 
 	// --- routing contract the ProLife -> Puma bridge depends on
 	//
@@ -338,12 +492,17 @@ async function main() {
 			session.send(session.stopFrame(''));
 		}
 
+		// The text CWebSocketServletComp::RegisterSubscription gives for exactly this.
 		assertRefusalReason(refusal, {
 			absent: 'the server bound a subscription under an empty id',
-			mustMatch: /.+/,
+			mustMatch: /^Unable to register subscription with empty subscription-ID$/,
 			mustNotMatch: [/^Unauthorized:/, /^Forbidden:/]
 		});
 	});
+
+	// SelectTenant replaces the session the plain token belonged to, so every call
+	// after the case below goes out with the token it handed back.
+	let suActiveToken = su.token;
 
 	await test('stop of a live subscription is completed and ends delivery', async () => {
 		requires(docSubId, 'a live OnDocumentChanged subscription');
@@ -364,24 +523,19 @@ async function main() {
 			su.token);
 		const tenantToken = selected.userSession && selected.userSession.accessToken;
 		assert(tenantToken, `SelectTenant gave no token: ${JSON.stringify(selected).slice(0, 300)}`);
+		suActiveToken = tenantToken;
+		session.token = tenantToken;
 
 		const managerMark = session.mark();
 
-		await mutate('UpdateTenantFromRepresentation',
-			'mutation UpdateTenantFromRepresentation { UpdateTenantFromRepresentation(input: {' +
-			` documentId: ${gqlString(documentId)},` +
-			` tenant: { id: ${gqlString(seedId)}, name: ${gqlString(tenantName)}, description: "edit after stop",` +
-			` ownerId: ${gqlString(su.userId)},` +
-			` isActive: true, members: [{ id: ${gqlString(su.userId)}, name: ${gqlString(suLogin)} }],` +
-			' memberOrganizationPermissions: [], tenantPermissions: [] } })' +
-			' { status message } }', tenantToken);
+		await updateTenant(documentId, seedId, tenantName, su.userId, 'edit after stop', tenantToken);
 
 		// The still-live collection subscription proves the edit did reach the
 		// publisher, so the absence below is a real unregistration and not a
 		// server that simply had nothing to say.
 		await session.waitFor(f => f.type === 'data' && f.id === managerSubId &&
-			documentNotification(f, 'OnDocumentManagerChanged', documentId), frameTimeoutMs, managerMark);
-		await new Promise(r => setTimeout(r, 1000));
+			documentNotification(f, 'OnDocumentManagerChanged', documentId, 'DocumentChanged'), frameTimeoutMs, managerMark);
+		await delay(quietMs);
 
 		const leaked = session.dataFrames(docSubId).slice(stoppedAt);
 		assert(leaked.length === 0,
@@ -421,12 +575,27 @@ async function main() {
 		assert(second.type === 'complete',
 			`a repeated stop answered ${JSON.stringify(second).slice(0, 250)} instead of an idempotent "complete"`);
 
-		// The session must still serve new subscriptions afterwards.
+		// The session must still serve new subscriptions afterwards - proven by delivery,
+		// since an accepted "start" and a "complete" both look the same on a dead session.
 		const probeId = await session.subscribe('OnDocumentManagerChanged',
 			collectionQuery('OnDocumentManagerChanged', 'Tenants'));
+		const probeMark = session.mark();
+
+		// A new organization is created only outside of any organization, so su signs in again.
+		suActiveToken = (await login(suLogin, suPassword)).token;
+		session.token = suActiveToken;
+
+		const probe = await createTenantDocument(crypto.randomUUID(), suActiveToken);
+		await session.waitForData(probeId,
+			f => documentNotification(f, 'OnDocumentManagerChanged', probe.documentId, 'NewDocumentCreated'), probeMark);
+
+		await closeDocument('Tenants', probe.documentId, suActiveToken);
+		await session.waitForData(probeId,
+			f => documentNotification(f, 'OnDocumentManagerChanged', probe.documentId, 'DocumentClosed'), probeMark);
+
 		const closing = await session.stop(probeId);
 		assert(closing.type === 'complete',
-			`the session no longer serves subscriptions after a double stop: ${JSON.stringify(closing).slice(0, 250)}`);
+			`stopping the probe answered ${JSON.stringify(closing).slice(0, 250)}`);
 	});
 
 	const rogue = new SubscriptionSession('rogue', wsUrl, 'not-a-valid-token');
@@ -448,26 +617,49 @@ async function main() {
 		});
 	});
 
+	// The collection notifiers and the document publisher push to whoever subscribed:
+	// a user without rights must neither learn the ids of users, groups, roles,
+	// sessions and organizations created by others nor see another user's documents.
+	await test('a user without administration rights receives no pushes about data of others', async () => {
+		requires(observer, 'the observer session');
+		requires(observerMark, 'the point the observer had subscribed by');
+
+		const leaked = [];
+		for (const [commandId, subId] of observerSubIds) {
+			// Only meaningful when the channel did carry something after he subscribed.
+			requires(session.frames.slice(observerMark).some(f => f.type === 'data' && !!notificationOf(f, commandId)) || null,
+				`a ${commandId} push to the administrator after the observer subscribed`);
+
+			const frames = observer.dataFrames(subId);
+			if (frames.length > 0) {
+				leaked.push(`${commandId}: ${frames.length} push(es), e.g. ` +
+					JSON.stringify(notificationOf(frames[0], commandId)).slice(0, 200));
+			}
+		}
+		assert(leaked.length === 0,
+			`pushes reached a user without rights:\n        - ` + leaked.join('\n        - '));
+	});
+
+	await test('CloseDocument closes the tenant document', async () => {
+		requires(documentId, 'a created document id');
+		await closeDocument('Tenants', documentId, suActiveToken);
+	});
+
 	// Everything SubscriptionSession.audit() collected along the way: frames of an
 	// unknown type or shape, errors nobody asked for, notifications delivered to an
 	// id that holds no subscription, payloads carrying another command's data. No
 	// case above looks for these, which is the point - this is what catches a
 	// mismatch no assertion was written for.
 	await test('no unaccounted frames or protocol violations on any session', async () => {
-		const violations = session.violations.concat(rogue.violations);
+		const violations = session.violations.concat(rogue.violations, observer ? observer.violations : []);
 		assert(violations.length === 0,
 			`${violations.length} protocol violation(s):\n        - ` + violations.join('\n        - '));
 	});
 
 	rogue.close();
-
-	// --- cleanup
-
-	if (documentId) {
-		await gql('mutation CloseDocument { CloseDocument(input: { collectionId: "Tenants",' +
-			` id: ${gqlString(documentId)} }) { status message } }`, su.token).catch(() => {});
+	if (observer) {
+		observer.close();
 	}
-
 	session.close();
 }
 

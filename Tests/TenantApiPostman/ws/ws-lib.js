@@ -363,15 +363,26 @@ class SubscriptionSession {
 		return id;
 	}
 
-	// Turns an id whose grace window has passed into an accepted subscription, or
-	// throws with the refusal the server gave.
-	confirmAccepted(id) {
+	// Once the grace window of a beginSubscribe() has passed: the refusal frame, or
+	// null - and from then on the id counts as accepted, so a late error is a violation.
+	outcomeOf(id) {
 		const refusal = this.frames.find(f => f.id === id && f.type === 'error');
 		if (refusal) {
 			this.activeIds.delete(id);
-			throw new Error(`Subscription refused: ${JSON.stringify(refusal.payload).slice(0, 400)}`);
+			return refusal;
 		}
 		this.expectErrorIds.delete(id);
+		return null;
+	}
+
+	// Turns an id whose grace window has passed into an accepted subscription, or
+	// throws with the refusal the server gave. Acceptance is silence only: a case
+	// that relies on it has to prove delivery with a data frame of its own.
+	confirmAccepted(id) {
+		const refusal = this.outcomeOf(id);
+		if (refusal) {
+			throw new Error(`Subscription refused: ${JSON.stringify(refusal.payload).slice(0, 400)}`);
+		}
 		return id;
 	}
 
@@ -480,9 +491,28 @@ function assertRoutingRefusal(frame, commandId, absent) {
 	});
 }
 
-function documentNotification(frame, commandId, documentId) {
+function documentNotification(frame, commandId, documentId, documentOperation) {
 	const notification = notificationOf(frame, commandId);
-	return !!notification && notification.documentId === documentId;
+	return !!notification && notification.documentId === documentId &&
+		(documentOperation === undefined || notification.documentOperation === documentOperation);
+}
+
+// Reads one claim of a JWT access token without verifying it: the server signed it,
+// the suite only needs to know which session it names.
+function jwtClaim(token, claim) {
+	const parts = String(token || '').split('.');
+	if (parts.length !== 3) { return undefined; }
+	try {
+		const json = Buffer.from(parts[1].replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString('utf8');
+		return JSON.parse(json)[claim];
+	}
+	catch (e) {
+		return undefined;
+	}
+}
+
+function delay(ms) {
+	return new Promise(r => setTimeout(r, ms));
 }
 
 // ---------------------------------------------------------------- test harness
@@ -556,6 +586,6 @@ module.exports = {
 	httpUrl, wsUrl, suLogin, suPassword, productId, frameTimeoutMs, registrationGraceMs, envValues,
 	gqlString, gql, mutate, login,
 	SubscriptionSession, notificationOf,
-	assert, assertRefusalReason, assertRoutingRefusal, documentNotification,
+	assert, assertRefusalReason, assertRoutingRefusal, documentNotification, jwtClaim, delay,
 	test, requires, runSuite
 };
