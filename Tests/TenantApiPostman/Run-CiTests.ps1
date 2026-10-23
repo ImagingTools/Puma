@@ -253,8 +253,8 @@ function Invoke-WsSuite([string]$ScriptName, [string]$Title, [string]$ReportPath
     # its own JUnit report (see ws\ws-lib.js).
     $wsScript = Join-Path $ScriptDir "ws\$ScriptName"
     if (-not (Test-Path $wsScript)) {
-        Write-Host "WebSocket suite not found at $wsScript - skipping." -ForegroundColor Yellow
-        return 0
+        # A missing suite is lost coverage, not a pass.
+        throw "WebSocket suite not found at $wsScript"
     }
 
     Write-Step "Running $Title"
