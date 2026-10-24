@@ -97,6 +97,9 @@ param(
     [string]$JsonReportPath = (Join-Path $ScriptDir "run-report.json"),
     [string]$WsJUnitReportPath = (Join-Path $ScriptDir "junit-report-ws.xml"),
     [string]$WsNotificationsJUnitReportPath = (Join-Path $ScriptDir "junit-report-ws-notifications.xml"),
+    [string]$ExternalLoginJUnitReportPath = (Join-Path $ScriptDir "junit-report-external-login.xml"),
+    # PumaServerPgTest.acc's SettingsFilePath under the public documents (FileAutoPersistence LocationType 104).
+    [string]$ServerSettingsPath = (Join-Path $env:PUBLIC "ImagingTools\Puma\Puma Server\PumaServerPgTestSettings.xml"),
     [string]$ServerStdOutPath = (Join-Path $ScriptDir "server-stdout.log"),
     [string]$ServerStdErrPath = (Join-Path $ScriptDir "server-stderr.log"),
     [int]$WebSocketPort = 18788,
@@ -247,6 +250,18 @@ function Invoke-NewmanSuite {
     return $LASTEXITCODE
 }
 
+function Set-ExternalLoginSettings {
+    # The external sign-in suite starts its own identity provider (ws\mock-idp.js); the server
+    # reads the provider settings at start, so they are written before it starts.
+    Write-Step "Pointing the external sign-in settings to the mock identity provider"
+    if (-not (Test-Path $ServerSettingsPath)) {
+        Write-Host "Settings file not found at $ServerSettingsPath - the external sign-in suite will fail." -ForegroundColor Yellow
+        return
+    }
+
+    & node (Join-Path $ScriptDir "ws\external-login-settings.js") --file $ServerSettingsPath --callback "http://localhost:$HttpPort/Puma/ExternalLogin/Callback" | Out-Host
+}
+
 function Invoke-WsSuite([string]$ScriptName, [string]$Title, [string]$ReportPath) {
     # Newman does not execute Postman WebSocket requests, so subscription
     # coverage lives in node runners speaking the same protocol, each writing
@@ -281,6 +296,7 @@ Write-Host "EnvironmentPath: $EnvironmentPath"
 try {
     Stop-TestServer
     Reset-TestDatabase
+    Set-ExternalLoginSettings
     Start-TestServer
     $exitCode = Invoke-NewmanSuite
 
@@ -288,6 +304,8 @@ try {
     $wsExitCode = Invoke-WsSuite "ws-subscriptions.js" "WebSocket subscription suite" $WsJUnitReportPath
     if ($exitCode -eq 0) { $exitCode = $wsExitCode }
     $wsExitCode = Invoke-WsSuite "ws-notifications.js" "WebSocket notification routing suite" $WsNotificationsJUnitReportPath
+    if ($exitCode -eq 0) { $exitCode = $wsExitCode }
+    $wsExitCode = Invoke-WsSuite "external-login.js" "External sign-in suite" $ExternalLoginJUnitReportPath
     if ($exitCode -eq 0) { $exitCode = $wsExitCode }
 }
 finally {
