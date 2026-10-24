@@ -70,9 +70,6 @@
                     <AttributeInfo Id="DefaultHttpPort" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="7788"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="DefaultWebSocketPort" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="8788"/>
-                    </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
