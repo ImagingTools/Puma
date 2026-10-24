@@ -64,9 +64,20 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="AccessContext" PackageId="ImtCorePck" ComponentId="AccessContext">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
         <Element Id="DatabaseEngine" PackageId="ImtCoreVoce" ComponentId="DatabaseEngine">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="AccessContext" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="AccessContext"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="AdminDatabaseAccessSettings" Type="Reference" ExportId="AdminDatabaseAccessSettings">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="BackupSettings" Type="Reference" ExportId="BackupSettings">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -110,7 +121,7 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="DatabaseEngine"/>
+                        <Data IsEnabled="true" Value="SystemDatabaseEngine"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
@@ -172,6 +183,53 @@
                     </AttributeInfo>
                     <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SystemAccessContext" PackageId="ImtCorePck" ComponentId="SystemAccessContext">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="SystemDatabaseEngine" PackageId="ImtDatabasePck" ComponentId="SqlDatabaseEngine">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="AccessContext" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SystemAccessContext"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="AutoCreateDatabase" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="0"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="AutoCreateTables" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="0"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DatabaseAccessSettings" Type="Reference" ExportId="DatabaseAccessSettings">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DbName" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="puma"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DbType" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="QPSQL"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="HostName" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="localhost"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Pasword" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="root"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Port" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="5432"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserName" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="postgres"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -320,6 +378,41 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="TenantRowLevelSecurity" PackageId="ImtDatabasePck" ComponentId="TenantRowLevelSecurityController">
+            <Data IsEnabled="true" Flags="1">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="DatabaseEngine"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TableDelegates" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>TenantSqlRepository</Value>
+                                <Value>TenantConnectionSqlRepository</Value>
+                                <Value>TenantConnectionRequestSqlRepository</Value>
+                                <Value>TenantRelationshipSqlRepository</Value>
+                                <Value>TenantRelationshipProposalSqlRepository</Value>
+                                <Value>CrossOrgGrantSqlRepository</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantOwnedTables" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>TenantConnections:TenantAId,TenantBId</Value>
+                                <Value>TenantConnectionRequests:SourceTenantId,TargetTenantId</Value>
+                                <Value>TenantRelationships:SourceTenantId,TargetTenantId</Value>
+                                <Value>TenantRelationshipProposals:InitiatorTenantId,CounterpartyTenantId</Value>
+                                <Value>CrossOrgGrants:SourceTenantId,TargetTenantId</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="TenantSqlRepository" PackageId="ImtUserAdministrationVoce" ComponentId="TenantSqlRepository">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -420,6 +513,7 @@
         <Interface InterfaceId="imtdb::IDatabaseServerConnectionChecker" ComponentId="DatabaseEngine/PgSqlDatabaseEngine"/>
     </ExportedInterfaces>
     <ExportedComponents>
+        <Component ExportedId="AccessContext" ComponentId="AccessContext"/>
         <Component ExportedId="ContractSqlRepository" ComponentId="ContractSqlRepository"/>
         <Component ExportedId="CrossOrgGrantSqlRepository" ComponentId="CrossOrgGrantSqlRepository"/>
         <Component ExportedId="CrossTenantMessageSqlRepository" ComponentId="CrossTenantMessageSqlRepository"/>

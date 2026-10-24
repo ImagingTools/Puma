@@ -10,6 +10,27 @@
     <Description>Settings of the Puma-server</Description>
     <Keywords>Puma.Server</Keywords>
     <ElementsList>
+        <Element Id="AdminDatabaseAccessSettings" PackageId="ImtDatabasePck" ComponentId="DatabaseAccessSettings">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DbName" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="postgres"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="HostName" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="localhost"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Pasword" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value=""/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Port" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="5432"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserName" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value=""/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="Backup" PackageId="BasePck" ComponentId="ComposedParamsSet">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -123,6 +144,7 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>DatabaseAccessSettings</Value>
+                                <Value>AdminDatabaseAccessSettings</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -137,6 +159,7 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>DatabaseAccessSettings</Value>
+                                <Value>AdminDatabaseAccessSettings</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -382,6 +405,7 @@
     </ExportedInterfaces>
     <ExportedComponents>
         <Component ExportedId="AutoPersistence" ComponentId="FileAutoPersistence/AutoPersistence"/>
+        <Component ExportedId="AdminDatabaseAccessSettings" ComponentId="AdminDatabaseAccessSettings"/>
         <Component ExportedId="Backup" ComponentId="Backup"/>
         <Component ExportedId="DatabaseAccessSettings" ComponentId="DatabaseAccessSettings"/>
         <Component ExportedId="FileBasedSslConfiguration" ComponentId="FileBasedSslConfiguration"/>
