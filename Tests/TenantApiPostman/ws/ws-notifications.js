@@ -25,6 +25,7 @@
 //   RelationshipProposalReceived -> the owner of the counterparty organization
 //   RelationshipProposalApproved -> the owner of the initiating organization
 //   RelationshipProposalRejected -> the owner of the initiating organization
+//   RelationshipRemoved       -> the owners of both organizations, unless the connection ends with it
 //   MessageReceived           -> the owner of the target organization
 //   MessageStatusChanged      -> the owner of the source organization
 
@@ -743,6 +744,14 @@ async function main() {
 			() => act('RejectTenantInvitation',
 				`mutation RejectTenantInvitation { RejectTenantInvitation(input: { invitationId: ${gqlString(invitationId)} }) { success errorMessage } }`,
 				bystander.token));
+	});
+
+	await test('a removed relationship is reported to the owners of both organizations only', async () => {
+		requires(relationshipId, 'the relationship between A and B');
+		await expectRouting(CONNECTION, { notificationType: 'RelationshipRemoved', relationshipId }, [owner, partner],
+			() => act('RemoveTenantRelationship',
+				`mutation RemoveTenantRelationship { RemoveTenantRelationship(input: { tenantId: ${gqlString(tenantA)}, relationshipId: ${gqlString(relationshipId)} }) { success errorMessage } }`,
+				owner.tenantToken));
 	});
 
 	await test('a removed connection is reported to the owners of both organizations only', async () => {
