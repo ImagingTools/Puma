@@ -42100,7 +42100,11 @@
                                 "type": "text/javascript",
                                 "exec": [
                                     "const stamp = pm.variables.replaceIn('{{$timestamp}}') + '_' + Math.floor(Math.random() * 100000);",
-                                    "['P', 'C', 'X', 'Y', 'Q'].forEach(function(key){ pm.environment.set('oa' + key + 'Name', 'OA_' + key + '_' + stamp); });"
+                                    "['P', 'C', 'X', 'Y', 'Q', 'W', 'V'].forEach(function(key){ pm.environment.set('oa' + key + 'Name', 'OA_' + key + '_' + stamp); });",
+                                    "pm.environment.set('oaSemicolonNameGql', 'OA_Semi;Colon_' + stamp);",
+                                    "pm.environment.set('oaSemicolonDuplicateGql', 'oa_semi;colon_' + stamp);",
+                                    "pm.environment.set('oaBackslashNameGql', 'OA_Back\\\\\\\\Slash_' + stamp);",
+                                    "pm.environment.set('oaBackslashDuplicateGql', 'oa_back\\\\\\\\slash_' + stamp);"
                                 ]
                             }
                         },
@@ -44754,6 +44758,1884 @@
                     }
                 },
                 {
+                    "name": "OA Sign in A owner for section E",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.Authorization : null;",
+                                    "pm.test('OA Sign in A owner for section E succeeds', function(){ pm.expect(!!payload && !!payload.token, JSON.stringify(json)).to.eql(true); });",
+                                    "if (payload && payload.token) pm.environment.set('oaEOwnerToken', payload.token);",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{a_owner_login}}\", password: \"{{a_owner_password}}\", productId: \"{{product_id}}\" }) { userId token } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OA Sign in A member for section E",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.Authorization : null;",
+                                    "pm.test('OA Sign in A member for section E succeeds', function(){ pm.expect(!!payload && !!payload.token, JSON.stringify(json)).to.eql(true); });",
+                                    "if (payload && payload.token) pm.environment.set('oaEMemberToken', payload.token);",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{a_member_login}}\", password: \"{{a_member_password}}\", productId: \"{{product_id}}\" }) { userId token } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OA Sign in SU for section E",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.Authorization : null;",
+                                    "pm.test('OA Sign in SU for section E succeeds', function(){ pm.expect(!!payload && !!payload.token, JSON.stringify(json)).to.eql(true); });",
+                                    "if (payload && payload.token) pm.environment.set('oaESuToken', payload.token);",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{su_login}}\", password: \"{{su_password}}\", productId: \"{{product_id}}\" }) { userId token } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OA SU creates organization W owned by the A owner",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.CreateTenant : null;",
+                                    "pm.test('OA SU creates organization W owned by the A owner', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.errorMessage ? payload.errorMessage : '').to.eql('');",
+                                    "  pm.expect(payload && payload.tenantId, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('oaWId', payload && payload.tenantId ? payload.tenantId : '');",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateTenant { CreateTenant(input: { name: \"{{oaWName}}\", description: \"Organizations audit\", ownerId: \"{{a_owner_user_id}}\" }) { tenantId errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OA The A owner selects W",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.SelectTenant : null;",
+                                    "const session = payload ? payload.userSession : null;",
+                                    "pm.test('OA The A owner selects W succeeds', function(){",
+                                    "  pm.expect(!!payload && payload.ok === true, JSON.stringify(json)).to.eql(true);",
+                                    "  pm.expect(session && session.tenantId, JSON.stringify(json)).to.eql(pm.environment.get('oaWId'));",
+                                    "  pm.expect(session && session.accessToken).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "if (session && session.accessToken) pm.environment.set('oaAOwnerWToken', session.accessToken);",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{oaEOwnerToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SelectTenant { SelectTenant(input: { tenantId: \"{{oaWId}}\" }) { ok userSession { tenantId accessToken } errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OA The A owner invites the A member to W",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.CreateTenantInvitation : null;",
+                                    "pm.test('OA The A owner invites the A member to W', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.invitationId, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('oaWMemberInvitationId', payload && payload.invitationId ? payload.invitationId : '');",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{oaAOwnerWToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateTenantInvitation { CreateTenantInvitation(input: { userId: \"{{a_member_user_id}}\", tenantId: \"{{oaWId}}\" }) { invitationId errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OA The A member accepts the invitation to W",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.AcceptTenantInvitation : null;",
+                                    "pm.test('OA The A member accepts the invitation to W', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true);",
+                                    "});",
+                                    "pm.environment.set('oaWMemberMembershipId', payload && payload.membershipId ? payload.membershipId : '');",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{oaEMemberToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation AcceptTenantInvitation { AcceptTenantInvitation(input: { invitationId: \"{{oaWMemberInvitationId}}\" }) { membershipId success errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OA The A owner lets the A member invite to W",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.UpdateMembershipPermissions : null;",
+                                    "pm.test('OA The A owner lets the A member invite to W', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.errorMessage ? payload.errorMessage : '', JSON.stringify(json)).to.eql('');",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true);",
+                                    "});",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{oaAOwnerWToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UpdateMembershipPermissions { UpdateMembershipPermissions(input: { membershipId: \"{{oaWMemberMembershipId}}\", permissions: [\"/OrganizationManagement/Members/Edit/Invite\"] }) { success errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OA The A member selects W",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.SelectTenant : null;",
+                                    "const session = payload ? payload.userSession : null;",
+                                    "pm.test('OA The A member selects W succeeds', function(){",
+                                    "  pm.expect(!!payload && payload.ok === true, JSON.stringify(json)).to.eql(true);",
+                                    "  pm.expect(session && session.tenantId, JSON.stringify(json)).to.eql(pm.environment.get('oaWId'));",
+                                    "  pm.expect(session && session.accessToken).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "if (session && session.accessToken) pm.environment.set('oaMemberWToken', session.accessToken);",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{oaEMemberToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SelectTenant { SelectTenant(input: { tenantId: \"{{oaWId}}\" }) { ok userSession { tenantId accessToken } errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OA The A member invites the outsider to W",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.CreateTenantInvitation : null;",
+                                    "pm.test('OA The A member invites the outsider to W', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.invitationId, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('oaWOutsiderInvitationId', payload && payload.invitationId ? payload.invitationId : '');",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{oaMemberWToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateTenantInvitation { CreateTenantInvitation(input: { userId: \"{{outsider_user_id}}\", tenantId: \"{{oaWId}}\" }) { invitationId errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OA The A owner leaves the A member out of the members of W",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.UpdateTenant : null;",
+                                    "pm.test('OA The A owner leaves the A member out of the members of W', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.errorMessage ? payload.errorMessage : '', JSON.stringify(json)).to.eql('');",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true);",
+                                    "});",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{oaAOwnerWToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UpdateTenant { UpdateTenant(input: { tenantId: \"{{oaWId}}\", name: \"{{oaWName}}\", members: [{ id: \"{{a_owner_user_id}}\", name: \"{{a_owner_login}}\" }] }) { success errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OA The invitation sent by the member left out of W is revoked",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.GetTenantInvitations : null;",
+                                    "const invitations = payload && payload.invitations ? payload.invitations : [];",
+                                    "const statusOf = function(id){ const invitation = invitations.find(i => i.id === id); return invitation ? invitation.status : null; };",
+                                    "pm.test('OA The invitation sent by the member left out of W is revoked', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(statusOf(pm.environment.get('oaWOutsiderInvitationId')), JSON.stringify(invitations)).to.eql('Revoked');",
+                                    "  pm.expect(statusOf(pm.environment.get('oaWMemberInvitationId')), JSON.stringify(invitations)).to.eql('Accepted');",
+                                    "});",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{oaAOwnerWToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetTenantInvitations { GetTenantInvitations(input: { tenantId: \"{{oaWId}}\", statuses: [Pending, Accepted, Rejected, Revoked] }) { invitations { id status } errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OA The A owner cannot remove the unrelated Y by a filter",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.RemoveElementSet : null;",
+                                    "pm.test('OA The A owner cannot remove the unrelated Y by a filter', function(){",
+                                    "  pm.expect(!!(payload && payload.success === true), JSON.stringify(json)).to.eql(false);",
+                                    "  pm.expect(errors.map(e => e.message), JSON.stringify(json)).to.include('Object does not exist');",
+                                    "});",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{oaAOwnerWToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RemoveElementSet { RemoveElementSet(input: { collectionId: \"Tenants\", selectionParams: { parameters: [{ id: \"ComplexFilter\", typeId: \"ComplexFilter\", name: \"\", description: \"\", data: \"{\\\"fieldsFilter\\\":{\\\"fieldFilters\\\":[{\\\"__typename\\\":\\\"FieldFilter\\\",\\\"fieldId\\\":\\\"Id\\\",\\\"filterValue\\\":\\\"{{oaYId}}\\\",\\\"filterValueType\\\":\\\"String\\\",\\\"filterOperations\\\":[\\\"Equal\\\"]}],\\\"groupFilters\\\":[],\\\"logicalOperation\\\":\\\"And\\\"}}\" }] } }) { success } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OA Y is still stored",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.GetTenant : null;",
+                                    "pm.test('OA Y is still stored', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.tenant ? payload.tenant.id : null, JSON.stringify(json)).to.eql(pm.environment.get('oaYId'));",
+                                    "});",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetTenant { GetTenant(input: { tenantId: \"{{oaYId}}\" }) { tenant { id } errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OA SU selects W",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.SelectTenant : null;",
+                                    "const session = payload ? payload.userSession : null;",
+                                    "pm.test('OA SU selects W succeeds', function(){",
+                                    "  pm.expect(!!payload && payload.ok === true, JSON.stringify(json)).to.eql(true);",
+                                    "  pm.expect(session && session.tenantId, JSON.stringify(json)).to.eql(pm.environment.get('oaWId'));",
+                                    "  pm.expect(session && session.accessToken).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "if (session && session.accessToken) pm.environment.set('oaSuWToken', session.accessToken);",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{oaESuToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SelectTenant { SelectTenant(input: { tenantId: \"{{oaWId}}\" }) { ok userSession { tenantId accessToken } errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OA The users of W filtered by the A owner are the A owner only",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.GetElementIds : null;",
+                                    "pm.test('OA The users of W filtered by the A owner are the A owner only', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.elementIds, JSON.stringify(json)).to.eql([pm.environment.get('a_owner_user_id')]);",
+                                    "});",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{oaSuWToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetElementIds { GetElementIds(input: { collectionId: \"Users\", offset: 0, count: -1, selectionParams: { parameters: [{ id: \"ComplexFilter\", typeId: \"ComplexFilter\", name: \"\", description: \"\", data: \"{\\\"fieldsFilter\\\":{\\\"fieldFilters\\\":[{\\\"__typename\\\":\\\"FieldFilter\\\",\\\"fieldId\\\":\\\"DocumentId\\\",\\\"filterValue\\\":\\\"{{a_owner_user_id}}\\\",\\\"filterValueType\\\":\\\"String\\\",\\\"filterOperations\\\":[\\\"Equal\\\"]}],\\\"groupFilters\\\":[],\\\"logicalOperation\\\":\\\"And\\\"}}\" }] } }) { elementIds } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OA The count of the users of W filtered by the A owner is 1",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.GetElementsCount : null;",
+                                    "pm.test('OA The count of the users of W filtered by the A owner is 1', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.count, JSON.stringify(json)).to.eql(1);",
+                                    "});",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{oaSuWToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetElementsCount { GetElementsCount(input: { collectionId: \"Users\", selectionParams: { parameters: [{ id: \"ComplexFilter\", typeId: \"ComplexFilter\", name: \"\", description: \"\", data: \"{\\\"fieldsFilter\\\":{\\\"fieldFilters\\\":[{\\\"__typename\\\":\\\"FieldFilter\\\",\\\"fieldId\\\":\\\"DocumentId\\\",\\\"filterValue\\\":\\\"{{a_owner_user_id}}\\\",\\\"filterValueType\\\":\\\"String\\\",\\\"filterOperations\\\":[\\\"Equal\\\"]}],\\\"groupFilters\\\":[],\\\"logicalOperation\\\":\\\"And\\\"}}\" }] } }) { count } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OA A filter for a user outside W selects nobody",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.GetElementIds : null;",
+                                    "pm.test('OA A filter for a user outside W selects nobody', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.elementIds, JSON.stringify(json)).to.eql([]);",
+                                    "});",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{oaSuWToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetElementIds { GetElementIds(input: { collectionId: \"Users\", offset: 0, count: -1, selectionParams: { parameters: [{ id: \"ComplexFilter\", typeId: \"ComplexFilter\", name: \"\", description: \"\", data: \"{\\\"fieldsFilter\\\":{\\\"fieldFilters\\\":[{\\\"__typename\\\":\\\"FieldFilter\\\",\\\"fieldId\\\":\\\"DocumentId\\\",\\\"filterValue\\\":\\\"{{outsider_user_id}}\\\",\\\"filterValueType\\\":\\\"String\\\",\\\"filterOperations\\\":[\\\"Equal\\\"]}],\\\"groupFilters\\\":[],\\\"logicalOperation\\\":\\\"And\\\"}}\" }] } }) { elementIds } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OA The users of W without a filter are its people",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.GetElementIds : null;",
+                                    "const ids = payload && payload.elementIds ? payload.elementIds : [];",
+                                    "pm.test('OA The users of W without a filter are its people', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(ids, JSON.stringify(json)).to.include(pm.environment.get('a_owner_user_id'));",
+                                    "  pm.expect(ids.length, 'the filtered requests above must select a subset: ' + JSON.stringify(ids)).to.be.above(1);",
+                                    "  pm.expect(ids, 'the outsider is no member of W').to.not.include(pm.environment.get('outsider_user_id'));",
+                                    "});",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{oaSuWToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetElementIds { GetElementIds(input: { collectionId: \"Users\", offset: 0, count: -1 }) { elementIds } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OA SU creates an organization with a semicolon in the name",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.CreateTenant : null;",
+                                    "pm.test('OA SU creates an organization with a semicolon in the name', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.errorMessage ? payload.errorMessage : '').to.eql('');",
+                                    "  pm.expect(payload && payload.tenantId, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('oaSemicolonId', payload && payload.tenantId ? payload.tenantId : '');",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateTenant { CreateTenant(input: { name: \"{{oaSemicolonNameGql}}\", description: \"Organizations audit\", ownerId: \"{{a_owner_user_id}}\" }) { tenantId errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OA The same name with a semicolon in another case is refused",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.CreateTenant : null;",
+                                    "pm.test('OA The same name with a semicolon in another case is refused', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.errorMessage ? payload.errorMessage : '', JSON.stringify(json)).to.eql('An organization with this name already exists');",
+                                    "  pm.expect(!!(payload && payload.tenantId), 'a duplicate organization was created').to.eql(false);",
+                                    "});",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateTenant { CreateTenant(input: { name: \"{{oaSemicolonDuplicateGql}}\", description: \"duplicate\", ownerId: \"{{a_owner_user_id}}\" }) { tenantId errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OA SU creates an organization with a backslash in the name",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.CreateTenant : null;",
+                                    "pm.test('OA SU creates an organization with a backslash in the name', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.errorMessage ? payload.errorMessage : '').to.eql('');",
+                                    "  pm.expect(payload && payload.tenantId, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('oaBackslashId', payload && payload.tenantId ? payload.tenantId : '');",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateTenant { CreateTenant(input: { name: \"{{oaBackslashNameGql}}\", description: \"Organizations audit\", ownerId: \"{{a_owner_user_id}}\" }) { tenantId errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OA The same name with a backslash in another case is refused",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.CreateTenant : null;",
+                                    "pm.test('OA The same name with a backslash in another case is refused', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.errorMessage ? payload.errorMessage : '', JSON.stringify(json)).to.eql('An organization with this name already exists');",
+                                    "  pm.expect(!!(payload && payload.tenantId), 'a duplicate organization was created').to.eql(false);",
+                                    "});",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateTenant { CreateTenant(input: { name: \"{{oaBackslashDuplicateGql}}\", description: \"duplicate\", ownerId: \"{{a_owner_user_id}}\" }) { tenantId errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OA Sign in B owner for section F",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.Authorization : null;",
+                                    "pm.test('OA Sign in B owner for section F succeeds', function(){ pm.expect(!!payload && !!payload.token, JSON.stringify(json)).to.eql(true); });",
+                                    "if (payload && payload.token) pm.environment.set('oaFBOwnerToken', payload.token);",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{b_owner_login}}\", password: \"{{b_owner_password}}\", productId: \"{{product_id}}\" }) { userId token } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OA SU creates organization V owned by the B owner",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.CreateTenant : null;",
+                                    "pm.test('OA SU creates organization V owned by the B owner', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.errorMessage ? payload.errorMessage : '').to.eql('');",
+                                    "  pm.expect(payload && payload.tenantId, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('oaVId', payload && payload.tenantId ? payload.tenantId : '');",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateTenant { CreateTenant(input: { name: \"{{oaVName}}\", description: \"Organizations audit\", ownerId: \"{{b_owner_user_id}}\" }) { tenantId errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OA The B owner selects V",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.SelectTenant : null;",
+                                    "const session = payload ? payload.userSession : null;",
+                                    "pm.test('OA The B owner selects V succeeds', function(){",
+                                    "  pm.expect(!!payload && payload.ok === true, JSON.stringify(json)).to.eql(true);",
+                                    "  pm.expect(session && session.tenantId, JSON.stringify(json)).to.eql(pm.environment.get('oaVId'));",
+                                    "  pm.expect(session && session.accessToken).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "if (session && session.accessToken) pm.environment.set('oaBOwnerVToken', session.accessToken);",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{oaFBOwnerToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SelectTenant { SelectTenant(input: { tenantId: \"{{oaVId}}\" }) { ok userSession { tenantId accessToken } errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OA V accepts connections by code",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.SetAllowConnectionsByCode : null;",
+                                    "pm.test('OA V accepts connections by code', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.errorMessage ? payload.errorMessage : '', JSON.stringify(json)).to.eql('');",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true);",
+                                    "});",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{oaBOwnerVToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SetAllowConnectionsByCode { SetAllowConnectionsByCode(input: { tenantId: \"{{oaVId}}\", allow: true }) { success errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OA The B owner reads the connection code of V",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.GetConnectionCode : null;",
+                                    "const code = payload && payload.connectionCode ? payload.connectionCode.connectionCode : '';",
+                                    "pm.test('OA The B owner reads the connection code of V', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(code, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('oaVCode', code || '');",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{oaBOwnerVToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetConnectionCode { GetConnectionCode(input: { tenantId: \"{{oaVId}}\" }) { connectionCode { connectionCode } errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OA W asks V for a connection",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.CreateConnectionRequest : null;",
+                                    "pm.test('OA W asks V for a connection', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.requestId, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('oaWVRequestId', payload && payload.requestId ? payload.requestId : '');",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{oaAOwnerWToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateConnectionRequest { CreateConnectionRequest(input: { sourceTenantId: \"{{oaWId}}\", connectionCode: \"{{oaVCode}}\", message: \"audit\" }) { requestId errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OA V approves the connection",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.ApproveConnectionRequest : null;",
+                                    "pm.test('OA V approves the connection', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.connectionId, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('oaWVConnectionId', payload && payload.connectionId ? payload.connectionId : '');",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{oaBOwnerVToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation ApproveConnectionRequest { ApproveConnectionRequest(input: { requestId: \"{{oaWVRequestId}}\", tenantId: \"{{oaVId}}\" }) { connectionId errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OA W proposes a relationship to V",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.CreateRelationshipProposal : null;",
+                                    "pm.test('OA W proposes a relationship to V', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.errorMessage ? payload.errorMessage : '').to.eql('');",
+                                    "  pm.expect(payload && payload.proposalId, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('oaWVCreateProposalId', payload && payload.proposalId ? payload.proposalId : '');",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{oaAOwnerWToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateRelationshipProposal { CreateRelationshipProposal(input: { proposal: { id: \"\", connectionId: \"{{oaWVConnectionId}}\", proposalType: Create, initiatorTenantId: \"{{oaWId}}\", counterpartyTenantId: \"{{oaVId}}\", proposedSourceRole: Supplier, proposedTargetRole: Customer, proposedScope: \"Orders\", proposedValidFrom: \"2026-01-01T00:00:00Z\", proposedValidUntil: \"2028-01-01T00:00:00Z\", proposedDescription: \"Create terms\", status: Pending } }) { proposalId errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OA V approves the relationship",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.ApproveRelationshipProposal : null;",
+                                    "pm.test('OA V approves the relationship', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.relationshipId, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('oaWVRelationshipId', payload && payload.relationshipId ? payload.relationshipId : '');",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{oaBOwnerVToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation ApproveRelationshipProposal { ApproveRelationshipProposal(input: { proposalId: \"{{oaWVCreateProposalId}}\", tenantId: \"{{oaVId}}\" }) { success relationshipId errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OA W proposes new terms of the relationship",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.CreateRelationshipProposal : null;",
+                                    "pm.test('OA W proposes new terms of the relationship', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.errorMessage ? payload.errorMessage : '').to.eql('');",
+                                    "  pm.expect(payload && payload.proposalId, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('oaWVUpdateProposalId', payload && payload.proposalId ? payload.proposalId : '');",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{oaAOwnerWToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateRelationshipProposal { CreateRelationshipProposal(input: { proposal: { id: \"\", connectionId: \"{{oaWVConnectionId}}\", proposalType: Update, initiatorTenantId: \"{{oaWId}}\", counterpartyTenantId: \"{{oaVId}}\", proposedSourceRole: Supplier, proposedTargetRole: Customer, proposedScope: \"Orders\", proposedValidFrom: \"2026-01-01T00:00:00Z\", proposedValidUntil: \"2028-01-01T00:00:00Z\", proposedDescription: \"Update terms\", existingRelationshipId: \"{{oaWVRelationshipId}}\", status: Pending } }) { proposalId errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OA W ends the relationship",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.RemoveTenantRelationship : null;",
+                                    "pm.test('OA W ends the relationship', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.errorMessage ? payload.errorMessage : '', JSON.stringify(json)).to.eql('');",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true);",
+                                    "});",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{oaAOwnerWToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RemoveTenantRelationship { RemoveTenantRelationship(input: { tenantId: \"{{oaWId}}\", relationshipId: \"{{oaWVRelationshipId}}\" }) { success errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OA W proposes a second relationship to V after a gap",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.CreateRelationshipProposal : null;",
+                                    "pm.test('OA W proposes a second relationship to V after a gap', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.errorMessage ? payload.errorMessage : '').to.eql('');",
+                                    "  pm.expect(payload && payload.proposalId, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('oaWVSecondProposalId', payload && payload.proposalId ? payload.proposalId : '');",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{oaAOwnerWToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateRelationshipProposal { CreateRelationshipProposal(input: { proposal: { id: \"\", connectionId: \"{{oaWVConnectionId}}\", proposalType: Create, initiatorTenantId: \"{{oaWId}}\", counterpartyTenantId: \"{{oaVId}}\", proposedSourceRole: Supplier, proposedTargetRole: Customer, proposedScope: \"Orders\", proposedValidFrom: \"2026-01-01T00:00:00Z\", proposedValidUntil: \"2028-01-01T00:00:00Z\", proposedDescription: \"Create terms\", status: Pending } }) { proposalId errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OA V approves the second relationship",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.ApproveRelationshipProposal : null;",
+                                    "pm.test('OA V approves the second relationship', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.relationshipId, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('oaWVSecondRelationshipId', payload && payload.relationshipId ? payload.relationshipId : '');",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{oaBOwnerVToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation ApproveRelationshipProposal { ApproveRelationshipProposal(input: { proposalId: \"{{oaWVSecondProposalId}}\", tenantId: \"{{oaVId}}\" }) { success relationshipId errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OA The second relationship starts the period anew",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.GetTenantRelationships : null;",
+                                    "const relationships = payload && payload.relationships ? payload.relationships : [];",
+                                    "const relationship = relationships.find(r => r.id === pm.environment.get('oaWVSecondRelationshipId'));",
+                                    "pm.test('OA The second relationship starts the period anew', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(!!relationship, JSON.stringify(relationships)).to.eql(true);",
+                                    "  pm.expect(relationship.relatedSince).to.be.a('string').and.not.empty;",
+                                    "  pm.environment.set('oaWVRelatedSince', relationship.relatedSince);",
+                                    "});",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{oaAOwnerWToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetTenantRelationships { GetTenantRelationships(input: { tenantId: \"{{oaWId}}\" }) { relationships { id status relatedSince description } errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OA Ending the first relationship again is no error",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.RemoveTenantRelationship : null;",
+                                    "pm.test('OA Ending the first relationship again is no error', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.errorMessage ? payload.errorMessage : '', JSON.stringify(json)).to.eql('');",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true);",
+                                    "});",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{oaBOwnerVToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RemoveTenantRelationship { RemoveTenantRelationship(input: { tenantId: \"{{oaVId}}\", relationshipId: \"{{oaWVRelationshipId}}\" }) { success errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OA Ending it again keeps the period of the second relationship",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.GetTenantRelationships : null;",
+                                    "const relationships = payload && payload.relationships ? payload.relationships : [];",
+                                    "const relationship = relationships.find(r => r.id === pm.environment.get('oaWVSecondRelationshipId'));",
+                                    "pm.test('OA Ending it again keeps the period of the second relationship', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(!!relationship, JSON.stringify(relationships)).to.eql(true);",
+                                    "  pm.expect(relationship.relatedSince).to.be.a('string').and.not.empty;",
+                                    "  pm.expect(relationship.relatedSince, 'the end of the first relationship moved').to.eql(pm.environment.get('oaWVRelatedSince'));",
+                                    "});",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{oaAOwnerWToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetTenantRelationships { GetTenantRelationships(input: { tenantId: \"{{oaWId}}\" }) { relationships { id status relatedSince description } errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OA V cannot approve new terms of the ended relationship",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.ApproveRelationshipProposal : null;",
+                                    "pm.test('OA V cannot approve new terms of the ended relationship', function(){",
+                                    "  pm.expect(!!(payload && payload.success === true), JSON.stringify(json)).to.eql(false);",
+                                    "  pm.expect(payload && payload.relationshipId ? payload.relationshipId : '', JSON.stringify(json)).to.eql('');",
+                                    "});",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{oaBOwnerVToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation ApproveRelationshipProposal { ApproveRelationshipProposal(input: { proposalId: \"{{oaWVUpdateProposalId}}\", tenantId: \"{{oaVId}}\" }) { success relationshipId errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OA Refused new terms keep the period of the second relationship",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.GetTenantRelationships : null;",
+                                    "const relationships = payload && payload.relationships ? payload.relationships : [];",
+                                    "const relationship = relationships.find(r => r.id === pm.environment.get('oaWVSecondRelationshipId'));",
+                                    "pm.test('OA Refused new terms keep the period of the second relationship', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(!!relationship, JSON.stringify(relationships)).to.eql(true);",
+                                    "  pm.expect(relationship.relatedSince).to.be.a('string').and.not.empty;",
+                                    "  pm.expect(relationship.relatedSince).to.eql(pm.environment.get('oaWVRelatedSince'));",
+                                    "  pm.expect(relationship.description).to.eql('Create terms');",
+                                    "});",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{oaAOwnerWToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetTenantRelationships { GetTenantRelationships(input: { tenantId: \"{{oaWId}}\" }) { relationships { id status relatedSince description } errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
                     "name": "OA Cleanup: SU removes X",
                     "event": [
                         {
@@ -44879,6 +46761,190 @@
                             "mode": "graphql",
                             "graphql": {
                                 "query": "mutation RemoveTenant { RemoveTenant(input: { tenantId: \"{{oaQId}}\" }) { success errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OA Cleanup: SU removes W",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.RemoveTenant : null;",
+                                    "pm.test('OA Cleanup: SU removes W', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.errorMessage ? payload.errorMessage : '', JSON.stringify(json)).to.eql('');",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true);",
+                                    "});",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RemoveTenant { RemoveTenant(input: { tenantId: \"{{oaWId}}\" }) { success errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OA Cleanup: SU removes V",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.RemoveTenant : null;",
+                                    "pm.test('OA Cleanup: SU removes V', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.errorMessage ? payload.errorMessage : '', JSON.stringify(json)).to.eql('');",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true);",
+                                    "});",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RemoveTenant { RemoveTenant(input: { tenantId: \"{{oaVId}}\" }) { success errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OA Cleanup: SU removes Semicolon",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.RemoveTenant : null;",
+                                    "pm.test('OA Cleanup: SU removes Semicolon', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.errorMessage ? payload.errorMessage : '', JSON.stringify(json)).to.eql('');",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true);",
+                                    "});",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RemoveTenant { RemoveTenant(input: { tenantId: \"{{oaSemicolonId}}\" }) { success errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OA Cleanup: SU removes Backslash",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.RemoveTenant : null;",
+                                    "pm.test('OA Cleanup: SU removes Backslash', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.errorMessage ? payload.errorMessage : '', JSON.stringify(json)).to.eql('');",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true);",
+                                    "});",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RemoveTenant { RemoveTenant(input: { tenantId: \"{{oaBackslashId}}\" }) { success errorMessage } }",
                                 "variables": ""
                             }
                         },
@@ -46825,6 +48891,93 @@
                             "mode": "graphql",
                             "graphql": {
                                 "query": "mutation ChangePassword { ChangePassword(input: { login: \"{{uiUnknownLogin}}\", oldPassword: \"Wrong_2026!x\", newPassword: \"Hijacked_2026!x\" }) { success message violatedRules } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "UI A wrong password by an unknown e-mail is refused",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.ChangePassword : null;",
+                                    "pm.test('UI A wrong password by an unknown e-mail is refused', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.success === true, JSON.stringify(json)).to.eql(false);",
+                                    "});",
+                                    "pm.environment.set('uiUnknownMailMessage', payload && payload.message ? payload.message : '');",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation ChangePassword { ChangePassword(input: { login: \"{{uiUnknownLogin}}@isolation.local\", oldPassword: \"Wrong_2026!x\", newPassword: \"Hijacked_2026!x\" }) { success message violatedRules } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "UI A wrong password by the e-mail of V answers like an unknown e-mail",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.ChangePassword : null;",
+                                    "const knownMail = pm.environment.get('uiVLogin') + '@isolation.local';",
+                                    "const unknownMail = pm.environment.get('uiUnknownLogin') + '@isolation.local';",
+                                    "const message = payload && payload.message ? payload.message : '';",
+                                    "pm.test('UI A wrong password by the e-mail of V answers like an unknown e-mail', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.success === true, JSON.stringify(json)).to.eql(false);",
+                                    "  pm.expect(message, 'the login of V is revealed').to.not.include(\"'\" + pm.environment.get('uiVLogin') + \"'\");",
+                                    "  pm.expect(message.split(knownMail).join(unknownMail)).to.eql(pm.environment.get('uiUnknownMailMessage'));",
+                                    "  pm.expect(payload.violatedRules).to.eql(['InvalidCredentials']);",
+                                    "});",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation ChangePassword { ChangePassword(input: { login: \"{{uiVLogin}}@isolation.local\", oldPassword: \"Wrong_2026!x\", newPassword: \"Hijacked_2026!x\" }) { success message violatedRules } }",
                                 "variables": ""
                             }
                         },
