@@ -11584,7 +11584,7 @@
                                     "});",
                                     "pm.test('The organization tree offers exactly its leaves, by full path', function(){",
                                     "  const entryIds = ((groups && groups[0] && groups[0].entries) || []).map(function(e){ return e.permissionId; }).sort();",
-                                    "  pm.expect(entryIds).to.eql([\"/OrganizationManagement/Connections/Edit/Connect\",\"/OrganizationManagement/Connections/Edit/Remove\",\"/OrganizationManagement/Connections/View\",\"/OrganizationManagement/Connections/ViewCode\",\"/OrganizationManagement/Edit/ChangeDescription\",\"/OrganizationManagement/Edit/ChangeName\",\"/OrganizationManagement/Groups/Edit/Add\",\"/OrganizationManagement/Groups/Edit/Change\",\"/OrganizationManagement/Groups/Edit/Remove\",\"/OrganizationManagement/Groups/View\",\"/OrganizationManagement/Members/Edit/ChangeRole\",\"/OrganizationManagement/Members/Edit/Exclude\",\"/OrganizationManagement/Members/Edit/Invite\",\"/OrganizationManagement/Members/View\",\"/OrganizationManagement/Permissions/Change\",\"/OrganizationManagement/Permissions/View\",\"/OrganizationManagement/Roles/Edit/Add\",\"/OrganizationManagement/Roles/Edit/Change\",\"/OrganizationManagement/Roles/Edit/Remove\",\"/OrganizationManagement/Roles/View\"]);",
+                                    "  pm.expect(entryIds).to.eql([\"/OrganizationManagement/Connections/Edit/Connect\",\"/OrganizationManagement/Connections/Edit/Remove\",\"/OrganizationManagement/Connections/View\",\"/OrganizationManagement/Connections/ViewCode\",\"/OrganizationManagement/Edit/ChangeDescription\",\"/OrganizationManagement/Edit/ChangeName\",\"/OrganizationManagement/Groups/Edit/Add\",\"/OrganizationManagement/Groups/Edit/Change\",\"/OrganizationManagement/Groups/Edit/Remove\",\"/OrganizationManagement/Groups/View\",\"/OrganizationManagement/Members/Edit/Add\",\"/OrganizationManagement/Members/Edit/Change\",\"/OrganizationManagement/Members/Edit/ChangeRole\",\"/OrganizationManagement/Members/Edit/Exclude\",\"/OrganizationManagement/Members/Edit/Invite\",\"/OrganizationManagement/Members/View\",\"/OrganizationManagement/Permissions/Change\",\"/OrganizationManagement/Permissions/View\",\"/OrganizationManagement/Roles/Edit/Add\",\"/OrganizationManagement/Roles/Edit/Change\",\"/OrganizationManagement/Roles/Edit/Remove\",\"/OrganizationManagement/Roles/View\"]);",
                                     "});"
                                 ],
                                 "_lastExecutionId": "new-uuid-001"
@@ -47857,6 +47857,1041 @@
                             "mode": "graphql",
                             "graphql": {
                                 "query": "mutation RemoveTenant { RemoveTenant(input: { tenantId: \"{{oaBackslashId}}\" }) { success errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "26 Organization management of users, roles and groups",
+            "item": [
+                {
+                    "name": "OM SU creates the organization W owned by the A owner",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "exec": [
+                                    "pm.environment.set('omWName', 'OM_W_' + Date.now());",
+                                    "pm.environment.set('omOwnerRoleId', pm.variables.replaceIn('{{$guid}}'));",
+                                    "pm.environment.set('omOwnerGroupId', pm.variables.replaceIn('{{$guid}}'));",
+                                    "pm.environment.set('omOwnerUserId', pm.variables.replaceIn('{{$guid}}'));",
+                                    "pm.environment.set('omMemberRoleId', pm.variables.replaceIn('{{$guid}}'));",
+                                    "pm.environment.set('omMemberGroupId', pm.variables.replaceIn('{{$guid}}'));",
+                                    "pm.environment.set('omOutsideRoleId', pm.variables.replaceIn('{{$guid}}'));",
+                                    "pm.environment.set('omOwnerRoleCode', 'OmOwnerRole' + Date.now());",
+                                    "pm.environment.set('omOwnerGroupName', 'OM owner group ' + Date.now());",
+                                    "pm.environment.set('omOwnerUserLogin', 'om_member_' + Date.now());",
+                                    "pm.environment.set('omMemberRoleCode', 'OmMemberRole' + Date.now());",
+                                    "pm.environment.set('omMemberGroupName', 'OM member group ' + Date.now());",
+                                    "pm.environment.set('omOutsideRoleCode', 'OmOutsideRole' + Date.now());"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.CreateTenant : null;",
+                                    "pm.test('OM SU creates the organization W owned by the A owner', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.tenantId, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('omWId', payload && payload.tenantId ? payload.tenantId : '');",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateTenant { CreateTenant(input: { name: \"{{omWName}}\", description: \"Organization management\", ownerId: \"{{a_owner_user_id}}\" }) { tenantId errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OM SU, the creator, empties the permission scope of W",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.UpdateTenant : null;",
+                                    "pm.test('OM SU, the creator, empties the permission scope of W', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true);",
+                                    "});",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UpdateTenant { UpdateTenant(input: { tenantId: \"{{omWId}}\", name: \"{{omWName}}\", tenantPermissions: [] }) { success errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OM The permission scope of W is empty",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.GetTenantPermissions : null;",
+                                    "pm.test('OM The permission scope of W is empty', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload ? payload.permissionIds || [] : null, JSON.stringify(json)).to.eql([]);",
+                                    "});",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetTenantPermissions { GetTenantPermissions(input: { tenantId: \"{{omWId}}\" }) { permissionIds errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OM Sign in the A owner",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.Authorization : null;",
+                                    "pm.test('OM Sign in the A owner succeeds', function(){ pm.expect(!!payload && !!payload.token, JSON.stringify(json)).to.eql(true); });",
+                                    "if (payload && payload.token) pm.environment.set('omOwnerToken', payload.token);",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{a_owner_login}}\", password: \"{{a_owner_password}}\", productId: \"{{product_id}}\" }) { userId token } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OM The A owner selects W",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.SelectTenant : null;",
+                                    "const session = payload ? payload.userSession : null;",
+                                    "pm.test('OM The A owner selects W succeeds', function(){",
+                                    "  pm.expect(!!payload && payload.ok === true, JSON.stringify(json)).to.eql(true);",
+                                    "  pm.expect(session && session.tenantId, JSON.stringify(json)).to.eql(pm.environment.get('omWId'));",
+                                    "});",
+                                    "if (session && session.accessToken) pm.environment.set('omOwnerWToken', session.accessToken);",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{omOwnerToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SelectTenant { SelectTenant(input: { tenantId: \"{{omWId}}\" }) { ok userSession { tenantId accessToken } errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OM The owner creates a role in W",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.RoleAdd : null;",
+                                    "pm.test('OM The owner creates a role in W', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.id, JSON.stringify(json)).to.eql(pm.environment.get('omOwnerRoleId'));",
+                                    "});",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{omOwnerWToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RoleAdd { RoleAdd(input: { id: \"{{omOwnerRoleId}}\", typeId: \"Role\", productId: \"{{product_id}}\", item: { id: \"{{omOwnerRoleId}}\", name: \"{{omOwnerRoleCode}}\", roleId: \"{{omOwnerRoleCode}}\", productId: \"{{product_id}}\", parentRoles: [], permissions: [] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OM The owner creates a group in W",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.GroupAdd : null;",
+                                    "pm.test('OM The owner creates a group in W', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.id, JSON.stringify(json)).to.eql(pm.environment.get('omOwnerGroupId'));",
+                                    "});",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{omOwnerWToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation GroupAdd { GroupAdd(input: { id: \"{{omOwnerGroupId}}\", typeId: \"Group\", productId: \"{{product_id}}\", item: { id: \"{{omOwnerGroupId}}\", productId: \"{{product_id}}\", name: \"{{omOwnerGroupName}}\", description: \"Organization management\", roles: [], users: [], parentGroups: [] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OM The owner creates a member of W",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.UserAdd : null;",
+                                    "pm.test('OM The owner creates a member of W', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.id, JSON.stringify(json)).to.eql(pm.environment.get('omOwnerUserId'));",
+                                    "});",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{omOwnerWToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UserAdd { UserAdd(input: { id: \"{{omOwnerUserId}}\", typeId: \"User\", productId: \"{{product_id}}\", item: { id: \"{{omOwnerUserId}}\", productId: \"{{product_id}}\", name: \"Organization Member\", username: \"{{omOwnerUserLogin}}\", password: \"OrgMember_2026!\", email: \"{{omOwnerUserLogin}}@om.test\", groups: [], roles: [], permissions: [], systemInfos: [] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OM The owner invites the A member to W",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.CreateTenantInvitation : null;",
+                                    "pm.test('OM The owner invites the A member to W', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.invitationId, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('omInvitationId', payload && payload.invitationId ? payload.invitationId : '');",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{omOwnerWToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateTenantInvitation { CreateTenantInvitation(input: { userId: \"{{a_member_user_id}}\", tenantId: \"{{omWId}}\" }) { invitationId errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OM Sign in the A member",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.Authorization : null;",
+                                    "pm.test('OM Sign in the A member succeeds', function(){ pm.expect(!!payload && !!payload.token, JSON.stringify(json)).to.eql(true); });",
+                                    "if (payload && payload.token) pm.environment.set('omMemberToken', payload.token);",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{a_member_login}}\", password: \"{{a_member_password}}\", productId: \"{{product_id}}\" }) { userId token } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OM The A member accepts the invitation to W",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.AcceptTenantInvitation : null;",
+                                    "pm.test('OM The A member accepts the invitation to W', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true);",
+                                    "});",
+                                    "pm.environment.set('omMembershipId', payload && payload.membershipId ? payload.membershipId : '');",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{omMemberToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation AcceptTenantInvitation { AcceptTenantInvitation(input: { invitationId: \"{{omInvitationId}}\" }) { membershipId success errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OM Sign in the A member again",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.Authorization : null;",
+                                    "pm.test('OM Sign in the A member again succeeds', function(){ pm.expect(!!payload && !!payload.token, JSON.stringify(json)).to.eql(true); });",
+                                    "if (payload && payload.token) pm.environment.set('omMemberToken', payload.token);",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{a_member_login}}\", password: \"{{a_member_password}}\", productId: \"{{product_id}}\" }) { userId token } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OM The A member selects W",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.SelectTenant : null;",
+                                    "const session = payload ? payload.userSession : null;",
+                                    "pm.test('OM The A member selects W succeeds', function(){",
+                                    "  pm.expect(!!payload && payload.ok === true, JSON.stringify(json)).to.eql(true);",
+                                    "  pm.expect(session && session.tenantId, JSON.stringify(json)).to.eql(pm.environment.get('omWId'));",
+                                    "});",
+                                    "if (session && session.accessToken) pm.environment.set('omMemberWToken', session.accessToken);",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{omMemberToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SelectTenant { SelectTenant(input: { tenantId: \"{{omWId}}\" }) { ok userSession { tenantId accessToken } errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OM A member without organization permissions cannot create a role",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.RoleAdd : null;",
+                                    "pm.test('OM A member without organization permissions cannot create a role', function(){",
+                                    "  pm.expect(!!(payload && payload.id), 'created although refused: ' + JSON.stringify(json)).to.eql(false);",
+                                    "  pm.expect(pm.response.code === 403 || errors.length > 0, 'a refusal is reported: ' + JSON.stringify(json)).to.eql(true);",
+                                    "});",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{omMemberWToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RoleAdd { RoleAdd(input: { id: \"{{omMemberRoleId}}\", typeId: \"Role\", productId: \"{{product_id}}\", item: { id: \"{{omMemberRoleId}}\", name: \"{{omMemberRoleCode}}\", roleId: \"{{omMemberRoleCode}}\", productId: \"{{product_id}}\", parentRoles: [], permissions: [] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OM The owner lets the A member add roles",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.UpdateMembershipPermissions : null;",
+                                    "pm.test('OM The owner lets the A member add roles', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true);",
+                                    "});",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{omOwnerWToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UpdateMembershipPermissions { UpdateMembershipPermissions(input: { membershipId: \"{{omMembershipId}}\", permissions: [\"/OrganizationManagement/Roles/Edit/Add\"] }) { success errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OM Sign in the A member with the new permission",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.Authorization : null;",
+                                    "pm.test('OM Sign in the A member with the new permission succeeds', function(){ pm.expect(!!payload && !!payload.token, JSON.stringify(json)).to.eql(true); });",
+                                    "if (payload && payload.token) pm.environment.set('omMemberToken', payload.token);",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{a_member_login}}\", password: \"{{a_member_password}}\", productId: \"{{product_id}}\" }) { userId token } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OM The A member selects W again",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.SelectTenant : null;",
+                                    "const session = payload ? payload.userSession : null;",
+                                    "pm.test('OM The A member selects W again succeeds', function(){",
+                                    "  pm.expect(!!payload && payload.ok === true, JSON.stringify(json)).to.eql(true);",
+                                    "  pm.expect(session && session.tenantId, JSON.stringify(json)).to.eql(pm.environment.get('omWId'));",
+                                    "});",
+                                    "if (session && session.accessToken) pm.environment.set('omMemberWToken', session.accessToken);",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{omMemberToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SelectTenant { SelectTenant(input: { tenantId: \"{{omWId}}\" }) { ok userSession { tenantId accessToken } errorMessage } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OM The member creates a role in W",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.RoleAdd : null;",
+                                    "pm.test('OM The member creates a role in W', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.id, JSON.stringify(json)).to.eql(pm.environment.get('omMemberRoleId'));",
+                                    "});",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{omMemberWToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RoleAdd { RoleAdd(input: { id: \"{{omMemberRoleId}}\", typeId: \"Role\", productId: \"{{product_id}}\", item: { id: \"{{omMemberRoleId}}\", name: \"{{omMemberRoleCode}}\", roleId: \"{{omMemberRoleCode}}\", productId: \"{{product_id}}\", parentRoles: [], permissions: [] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OM The member still cannot create a group",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.GroupAdd : null;",
+                                    "pm.test('OM The member still cannot create a group', function(){",
+                                    "  pm.expect(!!(payload && payload.id), 'created although refused: ' + JSON.stringify(json)).to.eql(false);",
+                                    "  pm.expect(pm.response.code === 403 || errors.length > 0, 'a refusal is reported: ' + JSON.stringify(json)).to.eql(true);",
+                                    "});",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{omMemberWToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation GroupAdd { GroupAdd(input: { id: \"{{omMemberGroupId}}\", typeId: \"Group\", productId: \"{{product_id}}\", item: { id: \"{{omMemberGroupId}}\", productId: \"{{product_id}}\", name: \"{{omMemberGroupName}}\", description: \"Organization management\", roles: [], users: [], parentGroups: [] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OM Sign in the A owner outside of any organization",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.Authorization : null;",
+                                    "pm.test('OM Sign in the A owner outside of any organization succeeds', function(){ pm.expect(!!payload && !!payload.token, JSON.stringify(json)).to.eql(true); });",
+                                    "if (payload && payload.token) pm.environment.set('omOwnerNoOrgToken', payload.token);",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{a_owner_login}}\", password: \"{{a_owner_password}}\", productId: \"{{product_id}}\" }) { userId token } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OM The owner of W cannot create a role of the product",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.RoleAdd : null;",
+                                    "pm.test('OM The owner of W cannot create a role of the product', function(){",
+                                    "  pm.expect(!!(payload && payload.id), 'created although refused: ' + JSON.stringify(json)).to.eql(false);",
+                                    "  pm.expect(pm.response.code === 403 || errors.length > 0, 'a refusal is reported: ' + JSON.stringify(json)).to.eql(true);",
+                                    "});",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{omOwnerNoOrgToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RoleAdd { RoleAdd(input: { id: \"{{omOutsideRoleId}}\", typeId: \"Role\", productId: \"{{product_id}}\", item: { id: \"{{omOutsideRoleId}}\", name: \"{{omOutsideRoleCode}}\", roleId: \"{{omOutsideRoleCode}}\", productId: \"{{product_id}}\", parentRoles: [], permissions: [] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OM Cleanup: SU removes the member created in W",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.RemoveElements : null;",
+                                    "pm.test('OM Cleanup: SU removes the member created in W', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true);",
+                                    "});",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RemoveElements { RemoveElements(input: { collectionId: \"Users\", elementIds: [\"{{omOwnerUserId}}\"] }) { success } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "OM Cleanup: SU removes W",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.RemoveTenant : null;",
+                                    "pm.test('OM Cleanup: SU removes W', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true);",
+                                    "});",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RemoveTenant { RemoveTenant(input: { tenantId: \"{{omWId}}\" }) { success errorMessage } }",
                                 "variables": ""
                             }
                         },
