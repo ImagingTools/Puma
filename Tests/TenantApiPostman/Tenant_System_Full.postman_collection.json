@@ -30123,6 +30123,180 @@
                     ]
                 },
                 {
+                    "id": "f74b5af1-4de2-4d50-a474-e68a1703c217",
+                    "name": "ORG Read the current name of A",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_owner_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetTenant { GetTenant(input: { tenantId: \"{{tenantAId}}\" }) { tenant { id name } errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const tenant = json.data && json.data.GetTenant ? json.data.GetTenant.tenant : null;",
+                                    "pm.test('The name of A is read', function () {",
+                                    "  pm.expect(tenant && tenant.name, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('orgANameNow', tenant && tenant.name ? tenant.name : '');"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "0d2bd2fb-42b9-47bc-913d-5be1b8c9c162",
+                    "name": "ORG Renaming the open organization to a taken name is refused",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{orgXToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UpdateTenantFromRepresentation { UpdateTenantFromRepresentation(input: { documentId: \"{{orgXDocId}}\", tenant: { id: \"{{orgXId}}\", name: \"{{orgANameNow}}\", description: \"Organization context probe\", isActive: true, members: [], memberOrganizationPermissions: [] } }) { status message } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.UpdateTenantFromRepresentation;",
+                                    "const messages = (json.errors || []).map(function (error) { return error.message; }).concat(payload && payload.message ? [payload.message] : []).join(' ');",
+                                    "pm.test('The taken name is refused', function () {",
+                                    "  pm.expect(payload && payload.status, JSON.stringify(json)).to.not.eql('Success');",
+                                    "  pm.expect(messages).to.match(/An organization with the same name already exists/);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "13957799-ee74-467c-8445-0a889e2e3207",
+                    "name": "ORG The refused name does not stay in the open document",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{orgXToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetTenantRepresentation { GetTenantRepresentation(input: { collectionId: \"Tenants\", id: \"{{orgXDocId}}\" }) { id name } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('The document keeps the stored name', function () {",
+                                    "  pm.expect(json.data && json.data.GetTenantRepresentation && json.data.GetTenantRepresentation.name, JSON.stringify(json)).to.eql(pm.environment.get('orgXName'));",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "2fba1243-b0c7-4890-a257-2167f063c834",
+                    "name": "ORG The refused change leaves no unsaved change",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{orgXToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetUndoInfo { GetUndoInfo(input: { collectionId: \"Tenants\", id: \"{{orgXDocId}}\" }) { isDirty availableUndoSteps availableRedoSteps } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const info = json.data && json.data.GetUndoInfo;",
+                                    "pm.test('The open document is not dirty', function () {",
+                                    "  pm.expect(info && info.isDirty, JSON.stringify(json)).to.eql(false);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
                     "id": "2eb526c1-cb37-49f8-9f2d-fcc241a07ab8",
                     "name": "ORG Opening A from inside X is refused",
                     "request": {
