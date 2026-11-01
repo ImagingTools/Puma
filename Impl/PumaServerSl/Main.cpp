@@ -8,6 +8,7 @@
 // ImtCore includes
 #include <imtcore/CApplicationRunner.h>
 #include <imtcore/CImtCoreAuthorizableServerInitializer.h>
+#include <imtcore/CImtCoreNotifyInitializer.h>
 
 // Puma includes
 #include <GeneratedFiles/PumaServerSl/CPumaServerSl.h>
@@ -52,6 +53,7 @@ int main(int argc, char* argv[])
 	s_previousMessageHandler = qInstallMessageHandler(MaskingMessageHandler);
 
 	InitializeImtCoreAuthorizableServer();
+	ImtCoreInitNotifySqlResources();
 	Q_INIT_RESOURCE(imtresthtml);
 	Q_INIT_RESOURCE(PumaServerSl);
 

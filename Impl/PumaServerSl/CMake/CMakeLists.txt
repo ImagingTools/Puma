@@ -28,6 +28,7 @@ target_link_libraries(PumaServerSl PRIVATE
 	ImtCore::imtserverapp
 	ImtCore::imtauthgql
 	ImtCore::imtauthdb
+	ImtCore::imtnotifydb
 	ImtCore::imtlog
 	ImtCore::imtchat
 	ImtCore::ImtCoreLoc

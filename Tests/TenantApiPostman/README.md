@@ -597,6 +597,53 @@ feature is actually wired up.
 4. Remove tenant B
 5. Remove tenant created via document service
 
+## Notification center (`Notification_Center.postman_collection.json`, `ws/ws-notification-center.js`)
+
+The user notification center of Puma (`ImtCore/Docs/Notifications/NotificationCenter.md`), in two suites that create
+their own users, organizations and server tokens, so they run on any system, after the tenant suite or alone:
+
+```powershell
+newman run Notification_Center.postman_collection.json -e Tenant_System_Full.postman_environment.json --env-var base_url=http://localhost:17788/Puma/graphql
+node ws/ws-notification-center.js --http http://localhost:17788/Puma/graphql --env Tenant_System_Full.postman_environment.json
+```
+
+(add `--env-var su_password=...` / `--su-password ...` when su has another password, e.g. `1` after a restore from a
+ProLife backup). `Run-CiTests.ps1` runs both after the tenant suites, `Run-CiTests-Sqlite.ps1` runs the collection on
+SQLite.
+
+The collection (183 requests):
+
+- `00 Bootstrap` - four users, organizations A (alice) and B (bob), tenant sessions, server tokens with the send scope
+  of Puma, of Lisa and of ProLife.
+- `01 Access` - every inbox command refuses an anonymous caller; a user session, an administrator session and a token
+  of another product may not send; a token sends only to the product of its request and to at most 100 users.
+- `02 Validation` - the length limits of type, keys, subject and actor; arguments: id characters and length, repeated
+  ids, more than 10, the standard values, a `Number` that is no number, a `DateTime` that is no time - a refused
+  notification stores nothing; long names, values and body are cut; every kind of argument comes back as sent.
+- `03 Inboxes` - a personal notification is seen in every tenant of the user, a tenant one only in that tenant, a
+  product one only in that product; a non-member gets no tenant notification; nobody sees another user's; the actor is
+  not notified; a repeated recipient gets one.
+- `04 Groups, dedup and withdrawal` - a group counts its events, keeps the three latest actors newest first and the
+  content of its latest event; a read group is closed; a dedup key is stored once and outlives a removal; a withdrawn
+  group leaves every inbox and may be told again.
+- `05 Inbox operations` - pages newest first, the counts, read and remove only in the own inbox, mark all read up to a
+  time (no ids answered), the sync at login (newest undelivered, their count, the server time) and the acknowledgements.
+- `06 Catalog` - the types, icons and messages of the organization types in English and Russian.
+- `07 Notifications page` - the collection `Notifications`: the inbox of the caller only, filters, search, sorting,
+  removal.
+- `08 Organization notifications` - invitations (from whom, withdrawn when revoked or answered, the answer to the
+  inviter), removed member (personal to the member, `member` to the owner, the organization notifications of the
+  member removed), connection requests and relationship proposals (`partner`, withdrawn when answered), a message
+  between organizations, the ownership transfer.
+
+The WebSocket suite (`OnNotificationEvent`): every event reaches exactly the sessions that see its inbox and nothing
+else - a personal one every session of the user (unread count -1), a tenant one the sessions in that tenant, an update
+of a group, read, all read (per inbox, with `createdUntil`, no ids), removed, withdrawn from two users; a notification
+of another product and an acknowledged delivery reach no session.
+
+Known red: on SQLite the message between organizations fails (`no such table: CrossTenantMessages`), a defect of the
+organizations on SQLite, not of the notification center.
+
 ## WebSocket subscriptions (`ws/ws-subscriptions.js`)
 
 Newman does not execute Postman WebSocket requests — it runs HTTP requests only —
