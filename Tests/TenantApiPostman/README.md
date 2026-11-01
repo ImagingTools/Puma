@@ -638,7 +638,8 @@ The collection (183 requests):
 
 The WebSocket suite (`OnNotificationEvent`): every event reaches exactly the sessions that see its inbox and nothing
 else - a personal one every session of the user (unread count -1), a tenant one the sessions in that tenant, an update
-of a group, read, all read (per inbox, with `createdUntil`, no ids), removed, withdrawn from two users; a notification
+of a group, read, all read (a tenant inbox with `createdUntil` and no ids to its sessions, the notifications of the
+personal inbox by their ids to every session of the user), removed, withdrawn from two users; a notification
 of another product and an acknowledged delivery reach no session.
 
 Known red: on SQLite the message between organizations fails (`no such table: CrossTenantMessages`), a defect of the

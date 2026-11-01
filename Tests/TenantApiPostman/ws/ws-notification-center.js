@@ -7,7 +7,8 @@
 // that every other session received nothing:
 //   Created / Updated -> the sessions of the recipient that see the scope of the notification
 //                        (a personal one every session of the user, a tenant one the sessions in that tenant)
-//   Read / AllRead / Removed -> the same, for the change of the own inbox; AllRead carries createdUntil, no ids
+//   Read / AllRead / Removed -> the same, for the change of the own inbox; AllRead carries createdUntil, no ids,
+//                        and only for a tenant inbox: a personal one is read by ids
 //   Withdraw          -> Removed to every inbox of the group
 //   a product of another product, a delivered acknowledgement -> nothing at all
 // The unread count of an event is the count of its inbox, or -1 for a personal notification: it reaches sessions of
@@ -198,15 +199,18 @@ runSuite({ name: 'Notification center WebSocket suite', className: 'Notification
 		});
 	});
 
-	await test('marking all read in a tenant is told per inbox: the tenant one there, the personal one everywhere', async () => {
+	await test('marking all read in a tenant is told per inbox: a bound to the tenant sessions, the ids of the personal ones everywhere', async () => {
 		await send(`tenantId: ${gqlString(tenantA)}, userIds: [${gqlString(alice.userId)}], typeId: "wsnc.Unread"`);
 		await new Promise(r => setTimeout(r, quietMs));
-		const allRead = (personal) => (e) => e.kind === 'AllRead' && !!e.createdUntil && !isNaN(Date.parse(e.createdUntil)) &&
-			(e.ids || []).length === 0 && (personal ? e.unreadCount === -1 : e.unreadCount === 0);
+		const personalId = requires((await inboxItems(aliceHome.token, 'wsnc.Personal'))[0], 'the personal notification').id;
+		// The other sessions hold notifications of other inboxes: a bound would mark them read too
+		const personalRead = (e) => e.kind === 'Read' && JSON.stringify(e.ids) === JSON.stringify([personalId]) && e.unreadCount === -1;
+		const tenantAllRead = (e) => e.kind === 'AllRead' && !!e.createdUntil && !isNaN(Date.parse(e.createdUntil)) &&
+			(e.ids || []).length === 0 && e.unreadCount === 0;
 		await expectEvents(new Map([
-			[aliceHome, allRead(true)],
-			[aliceSecond, allRead(true)],
-			[aliceInA, [allRead(false), allRead(true)]]
+			[aliceHome, personalRead],
+			[aliceSecond, personalRead],
+			[aliceInA, [tenantAllRead, personalRead]]
 		]), () => act('MarkAllNotificationsRead',
 			'mutation MarkAllNotificationsRead { MarkAllNotificationsRead(input: {}) { unreadCount } }', aliceInA.token));
 	});
