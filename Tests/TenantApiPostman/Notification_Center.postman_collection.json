@@ -2707,6 +2707,72 @@
 					]
 				},
 				{
+					"id": "dee2fd0d-b1e5-4c5a-a9b3-7a56029dff5b",
+					"name": "A Number over 200 characters",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-authentication-token",
+								"value": "{{pat_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}",
+							"host": [
+								"{{base_url}}"
+							]
+						},
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation SendNotification { SendNotification(input: { productId: \"Puma\", userIds: [\"{{nc_dave_id}}\"], typeId: \"nc.Bad\", arguments: [{ id: \"n\", kind: Number, value: \"{{nc_long_number}}\" }] }) { success } }",
+								"variables": ""
+							}
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "a67946ea-807f-4ace-87c1-8e2f09da0627",
+								"type": "text/javascript",
+								"exec": [
+									"pm.variables.set('nc_long_number', '0.' + '0'.repeat(198) + '1');"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "01b15581-89e4-4abe-969f-fa3a6ebb1904",
+								"type": "text/javascript",
+								"exec": [
+									"const __json = (function () { try { return pm.response.json(); } catch (e) { return {}; } })();",
+									"const __data = (__json && __json.data) || {};",
+									"const __errors = (__json && __json.errors) || [];",
+									"function payload(command) {",
+									"  pm.test(command + ': no GraphQL errors', function () { pm.expect(__errors, JSON.stringify(__errors)).to.eql([]); });",
+									"  pm.test(command + ': has a payload', function () { pm.expect(__data[command], JSON.stringify(__json).slice(0, 300)).to.be.an('object'); });",
+									"  return __data[command] || {};",
+									"}",
+									"function refused(command, reason) {",
+									"  pm.test(command + ' is refused: ' + reason, function () {",
+									"    pm.expect(__errors.length, 'expected a refusal, got ' + JSON.stringify(__json).slice(0, 300)).to.be.above(0);",
+									"    pm.expect(__errors[0].message).to.match(reason);",
+									"  });",
+									"}",
+									"function env(key) { return pm.environment.get(key); }",
+									"function ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }",
+									"function argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }",
+									"refused('SendNotification', /could not be sent/);"
+								]
+							}
+						}
+					]
+				},
+				{
 					"id": "00bc3f19-062f-42a6-8a77-578a0f0dcb30",
 					"name": "A DateTime that is no time",
 					"request": {
@@ -2956,6 +3022,73 @@
 					]
 				},
 				{
+					"id": "33538e37-965e-46d3-8f04-08aaae413ada",
+					"name": "A name is not cut in the middle of a character",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-authentication-token",
+								"value": "{{pat_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}",
+							"host": [
+								"{{base_url}}"
+							]
+						},
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation SendNotification { SendNotification(input: { productId: \"Puma\", userIds: [\"{{nc_dave_id}}\"], typeId: \"nc.Emoji\", subject: { id: \"s\", typeId: \"Tenant\", name: \"{{nc_emoji_name}}\" } }) { success } }",
+								"variables": ""
+							}
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "c8a1c854-d367-4f20-aa8a-5bfd57340ad9",
+								"type": "text/javascript",
+								"exec": [
+									"pm.variables.set('nc_emoji_name', 'n'.repeat(199) + '\\uD83D\\uDE00' + 'x');"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "256c086b-e7a6-4d54-b267-cd9eced7a2c9",
+								"type": "text/javascript",
+								"exec": [
+									"const __json = (function () { try { return pm.response.json(); } catch (e) { return {}; } })();",
+									"const __data = (__json && __json.data) || {};",
+									"const __errors = (__json && __json.errors) || [];",
+									"function payload(command) {",
+									"  pm.test(command + ': no GraphQL errors', function () { pm.expect(__errors, JSON.stringify(__errors)).to.eql([]); });",
+									"  pm.test(command + ': has a payload', function () { pm.expect(__data[command], JSON.stringify(__json).slice(0, 300)).to.be.an('object'); });",
+									"  return __data[command] || {};",
+									"}",
+									"function refused(command, reason) {",
+									"  pm.test(command + ' is refused: ' + reason, function () {",
+									"    pm.expect(__errors.length, 'expected a refusal, got ' + JSON.stringify(__json).slice(0, 300)).to.be.above(0);",
+									"    pm.expect(__errors[0].message).to.match(reason);",
+									"  });",
+									"}",
+									"function env(key) { return pm.environment.get(key); }",
+									"function ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }",
+									"function argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }",
+									"const p = payload('SendNotification');",
+									"pm.test('sent', function () { pm.expect(p.success).to.eql(true); });"
+								]
+							}
+						}
+					]
+				},
+				{
 					"id": "eb9a2966-b77e-410f-b7bf-1693de7123c0",
 					"name": "Names are cut to 200, the body to 500",
 					"request": {
@@ -3012,7 +3145,9 @@
 									"pm.test('subject name 200', function () { pm.expect(item.subject.name.length).to.eql(200); });",
 									"pm.test('actor name 200', function () { pm.expect(item.actors[0].name.length).to.eql(200); });",
 									"pm.test('argument value 200', function () { pm.expect(argumentOf(item, 'note').value.length).to.eql(200); });",
-									"pm.test('body 500', function () { pm.expect(item.body.length).to.eql(500); });"
+									"pm.test('body 500', function () { pm.expect(item.body.length).to.eql(500); });",
+									"const emojiItem = ofType(items, 'nc.Emoji')[0] || { subject: {} };",
+									"pm.test('a name ends before a character it cannot keep whole', function () { pm.expect(emojiItem.subject.name).to.eql('n'.repeat(199)); });"
 								]
 							}
 						}
