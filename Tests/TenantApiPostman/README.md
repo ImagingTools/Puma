@@ -633,17 +633,14 @@ The collection (183 requests):
   removal.
 - `08 Organization notifications` - invitations (from whom, withdrawn when revoked or answered, the answer to the
   inviter), removed member (personal to the member, `member` to the owner, the organization notifications of the
-  member removed), connection requests and relationship proposals (`partner`, withdrawn when answered), a message
-  between organizations, the ownership transfer.
+  member removed), connection requests and relationship proposals (`partner`, withdrawn when answered), the ownership
+  transfer.
 
 The WebSocket suite (`OnNotificationEvent`): every event reaches exactly the sessions that see its inbox and nothing
 else - a personal one every session of the user (unread count -1), a tenant one the sessions in that tenant, an update
 of a group, read, all read (a tenant inbox with `createdUntil` and no ids to its sessions, the notifications of the
 personal inbox by their ids to every session of the user), removed, withdrawn from two users; a notification
 of another product and an acknowledged delivery reach no session.
-
-Known red: on SQLite the message between organizations fails (`no such table: CrossTenantMessages`), a defect of the
-organizations on SQLite, not of the notification center.
 
 ## WebSocket subscriptions (`ws/ws-subscriptions.js`)
 
@@ -689,7 +686,6 @@ The WS port defaults to the HTTP port + 1000 (17788 → 18788, matching
 | `OnUndoRedoChanged` | `imtbase/CollectionDocumentService.sdl` |
 | `OnMembershipNotification` | `imtauth/TenantMemberships.sdl` |
 | `OnConnectionCodesNotification` | `imtauth/Tenants.sdl` |
-| `OnCrossTenantMessageNotification` | `imtauth/Tenants.sdl` |
 
 Beyond "does it deliver", the suite pins down the protocol behaviour that has
 actually broken in the field: an error frame must carry the id of the subscription

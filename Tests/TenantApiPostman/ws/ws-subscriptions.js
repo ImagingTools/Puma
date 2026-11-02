@@ -308,8 +308,7 @@ async function main() {
 	// a "start" is answered with silence, so registration alone proves nothing.
 	//
 	// The tenant notification channels (OnMembershipNotification,
-	// OnConnectionCodesNotification, OnCrossTenantMessageNotification) are proven per
-	// recipient in ws-notifications.js. Not here either: PumaWsConnection is the
+	// OnConnectionCodesNotification) are proven per recipient in ws-notifications.js. Not here either: PumaWsConnection is the
 	// ProLife/Lisa engines' probe *towards* Puma (ProLife suite), and
 	// OnConnectionNotification is declared in Tenants.sdl but published by nothing.
 	const collectionSubscriptions = [
