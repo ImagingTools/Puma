@@ -11,7 +11,7 @@
 	"item": [
 		{
 			"name": "00 Bootstrap",
-			"description": "The users, organizations and access tokens of the scenarios. Every run creates its own, so the suite needs no empty system.",
+			"description": "The users and organizations of the scenarios. Every run creates its own, so the suite needs no empty system.",
 			"item": [
 				{
 					"id": "c3857c0c-591c-4220-956d-8501c4cc6163",
@@ -1025,186 +1025,12 @@
 							}
 						}
 					]
-				},
-				{
-					"id": "58b8b6be-07e2-4b16-88e3-fafdaefc692b",
-					"name": "Server token notifications:send:Puma",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "x-authentication-token",
-								"value": "{{nc_su_token}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}",
-							"host": [
-								"{{base_url}}"
-							]
-						},
-						"body": {
-							"mode": "graphql",
-							"graphql": {
-								"query": "mutation CreateToken { CreateToken(input: { userId: \"{{nc_su_id}}\", productId: \"{{product_id}}\", name: \"nc_pat_token_{{nc_run}}\", scopes: [\"notifications:send:Puma\"] }) { token success message } }",
-								"variables": ""
-							}
-						}
-					},
-					"response": [],
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "3a91f90f-1c85-49d1-be8a-8614d0664f59",
-								"type": "text/javascript",
-								"exec": [
-									"const __json = (function () { try { return pm.response.json(); } catch (e) { return {}; } })();",
-									"const __data = (__json && __json.data) || {};",
-									"const __errors = (__json && __json.errors) || [];",
-									"function payload(command) {",
-									"  pm.test(command + ': no GraphQL errors', function () { pm.expect(__errors, JSON.stringify(__errors)).to.eql([]); });",
-									"  pm.test(command + ': has a payload', function () { pm.expect(__data[command], JSON.stringify(__json).slice(0, 300)).to.be.an('object'); });",
-									"  return __data[command] || {};",
-									"}",
-									"function refused(command, reason) {",
-									"  pm.test(command + ' is refused: ' + reason, function () {",
-									"    pm.expect(__errors.length, 'expected a refusal, got ' + JSON.stringify(__json).slice(0, 300)).to.be.above(0);",
-									"    pm.expect(__errors[0].message).to.match(reason);",
-									"  });",
-									"}",
-									"function env(key) { return pm.environment.get(key); }",
-									"function ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }",
-									"function argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }",
-									"const p = payload('CreateToken');",
-									"pm.test('issued', function () { pm.expect(p.success).to.eql(true); pm.expect(p.token).to.be.a('string').and.not.empty; });",
-									"pm.environment.set('pat_token', p.token);"
-								]
-							}
-						}
-					]
-				},
-				{
-					"id": "670231ab-4288-48a5-90da-b55c7954ba65",
-					"name": "Server token notifications:send:Lisa",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "x-authentication-token",
-								"value": "{{nc_su_token}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}",
-							"host": [
-								"{{base_url}}"
-							]
-						},
-						"body": {
-							"mode": "graphql",
-							"graphql": {
-								"query": "mutation CreateToken { CreateToken(input: { userId: \"{{nc_su_id}}\", productId: \"{{product_id}}\", name: \"nc_pat_lisa_token_{{nc_run}}\", scopes: [\"notifications:send:Lisa\"] }) { token success message } }",
-								"variables": ""
-							}
-						}
-					},
-					"response": [],
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "e8c43a1e-6972-4f37-8d80-82b8f3ec15b7",
-								"type": "text/javascript",
-								"exec": [
-									"const __json = (function () { try { return pm.response.json(); } catch (e) { return {}; } })();",
-									"const __data = (__json && __json.data) || {};",
-									"const __errors = (__json && __json.errors) || [];",
-									"function payload(command) {",
-									"  pm.test(command + ': no GraphQL errors', function () { pm.expect(__errors, JSON.stringify(__errors)).to.eql([]); });",
-									"  pm.test(command + ': has a payload', function () { pm.expect(__data[command], JSON.stringify(__json).slice(0, 300)).to.be.an('object'); });",
-									"  return __data[command] || {};",
-									"}",
-									"function refused(command, reason) {",
-									"  pm.test(command + ' is refused: ' + reason, function () {",
-									"    pm.expect(__errors.length, 'expected a refusal, got ' + JSON.stringify(__json).slice(0, 300)).to.be.above(0);",
-									"    pm.expect(__errors[0].message).to.match(reason);",
-									"  });",
-									"}",
-									"function env(key) { return pm.environment.get(key); }",
-									"function ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }",
-									"function argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }",
-									"const p = payload('CreateToken');",
-									"pm.test('issued', function () { pm.expect(p.success).to.eql(true); pm.expect(p.token).to.be.a('string').and.not.empty; });",
-									"pm.environment.set('pat_lisa_token', p.token);"
-								]
-							}
-						}
-					]
-				},
-				{
-					"id": "cee39ce1-08c7-4905-bb9a-7c134ef9d403",
-					"name": "Server token notifications:send:ProLife",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "x-authentication-token",
-								"value": "{{nc_su_token}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}",
-							"host": [
-								"{{base_url}}"
-							]
-						},
-						"body": {
-							"mode": "graphql",
-							"graphql": {
-								"query": "mutation CreateToken { CreateToken(input: { userId: \"{{nc_su_id}}\", productId: \"{{product_id}}\", name: \"nc_pat_prolife_token_{{nc_run}}\", scopes: [\"notifications:send:ProLife\"] }) { token success message } }",
-								"variables": ""
-							}
-						}
-					},
-					"response": [],
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "3c7dd3c9-1621-417d-be1b-fdddd00a05ca",
-								"type": "text/javascript",
-								"exec": [
-									"const __json = (function () { try { return pm.response.json(); } catch (e) { return {}; } })();",
-									"const __data = (__json && __json.data) || {};",
-									"const __errors = (__json && __json.errors) || [];",
-									"function payload(command) {",
-									"  pm.test(command + ': no GraphQL errors', function () { pm.expect(__errors, JSON.stringify(__errors)).to.eql([]); });",
-									"  pm.test(command + ': has a payload', function () { pm.expect(__data[command], JSON.stringify(__json).slice(0, 300)).to.be.an('object'); });",
-									"  return __data[command] || {};",
-									"}",
-									"function refused(command, reason) {",
-									"  pm.test(command + ' is refused: ' + reason, function () {",
-									"    pm.expect(__errors.length, 'expected a refusal, got ' + JSON.stringify(__json).slice(0, 300)).to.be.above(0);",
-									"    pm.expect(__errors[0].message).to.match(reason);",
-									"  });",
-									"}",
-									"function env(key) { return pm.environment.get(key); }",
-									"function ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }",
-									"function argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }",
-									"const p = payload('CreateToken');",
-									"pm.test('issued', function () { pm.expect(p.success).to.eql(true); pm.expect(p.token).to.be.a('string').and.not.empty; });",
-									"pm.environment.set('pat_prolife_token', p.token);"
-								]
-							}
-						}
-					]
 				}
 			]
 		},
 		{
 			"name": "01 Access",
-			"description": "Only a signed-in user reads an inbox; only a token with the send scope of the product sends, for that product and at most 100 users.",
+			"description": "Only a signed-in user reads an inbox or sends; any signed-in user sends, for the product of the request and at most 100 users (a known hole until ImagingTools/ImtCore#1059).",
 			"item": [
 				{
 					"id": "a10be250-3716-43bd-9b1a-be7386e564bc",
@@ -1564,8 +1390,59 @@
 					]
 				},
 				{
+					"id": "95ec194c-b89d-42d1-8da9-7e7e8496dd2e",
+					"name": "An anonymous request may not send",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}",
+							"host": [
+								"{{base_url}}"
+							]
+						},
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation SendNotification { SendNotification(input: { productId: \"Puma\", userIds: [\"{{nc_bob_id}}\"], typeId: \"nc.Access\" }) { success } }",
+								"variables": ""
+							}
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "d8eaecc8-682c-488e-81f5-8c754636ab5e",
+								"type": "text/javascript",
+								"exec": [
+									"const __json = (function () { try { return pm.response.json(); } catch (e) { return {}; } })();",
+									"const __data = (__json && __json.data) || {};",
+									"const __errors = (__json && __json.errors) || [];",
+									"function payload(command) {",
+									"  pm.test(command + ': no GraphQL errors', function () { pm.expect(__errors, JSON.stringify(__errors)).to.eql([]); });",
+									"  pm.test(command + ': has a payload', function () { pm.expect(__data[command], JSON.stringify(__json).slice(0, 300)).to.be.an('object'); });",
+									"  return __data[command] || {};",
+									"}",
+									"function refused(command, reason) {",
+									"  pm.test(command + ' is refused: ' + reason, function () {",
+									"    pm.expect(__errors.length, 'expected a refusal, got ' + JSON.stringify(__json).slice(0, 300)).to.be.above(0);",
+									"    pm.expect(__errors[0].message).to.match(reason);",
+									"  });",
+									"}",
+									"function env(key) { return pm.environment.get(key); }",
+									"function ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }",
+									"function argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }",
+									"refused('SendNotification', /signed-in user/);"
+								]
+							}
+						}
+					]
+				},
+				{
 					"id": "4a46e241-4ab9-4d50-a4bf-00fc73936d1c",
-					"name": "A user session may not send",
+					"name": "A signed-in user may send for the product of the request (until ImtCore#1059)",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -1583,7 +1460,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation SendNotification { SendNotification(input: { productId: \"Puma\", userIds: [\"{{nc_bob_id}}\"], typeId: \"nc.Access\" }) { success } }",
+								"query": "mutation SendNotification { SendNotification(input: { productId: \"Puma\", userIds: [\"{{nc_su_id}}\"], typeId: \"nc.Access\" }) { success } }",
 								"variables": ""
 							}
 						}
@@ -1613,119 +1490,8 @@
 									"function env(key) { return pm.environment.get(key); }",
 									"function ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }",
 									"function argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }",
-									"refused('SendNotification', /may not send notifications of the product/);"
-								]
-							}
-						}
-					]
-				},
-				{
-					"id": "9a1ca399-41e0-4396-a626-6fa77407e677",
-					"name": "An administrator session may not send",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "x-authentication-token",
-								"value": "{{nc_su_token}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}",
-							"host": [
-								"{{base_url}}"
-							]
-						},
-						"body": {
-							"mode": "graphql",
-							"graphql": {
-								"query": "mutation SendNotification { SendNotification(input: { productId: \"Puma\", userIds: [\"{{nc_bob_id}}\"], typeId: \"nc.Access\" }) { success } }",
-								"variables": ""
-							}
-						}
-					},
-					"response": [],
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "458fa2d4-70af-4c40-9821-6f9f2d8a5580",
-								"type": "text/javascript",
-								"exec": [
-									"const __json = (function () { try { return pm.response.json(); } catch (e) { return {}; } })();",
-									"const __data = (__json && __json.data) || {};",
-									"const __errors = (__json && __json.errors) || [];",
-									"function payload(command) {",
-									"  pm.test(command + ': no GraphQL errors', function () { pm.expect(__errors, JSON.stringify(__errors)).to.eql([]); });",
-									"  pm.test(command + ': has a payload', function () { pm.expect(__data[command], JSON.stringify(__json).slice(0, 300)).to.be.an('object'); });",
-									"  return __data[command] || {};",
-									"}",
-									"function refused(command, reason) {",
-									"  pm.test(command + ' is refused: ' + reason, function () {",
-									"    pm.expect(__errors.length, 'expected a refusal, got ' + JSON.stringify(__json).slice(0, 300)).to.be.above(0);",
-									"    pm.expect(__errors[0].message).to.match(reason);",
-									"  });",
-									"}",
-									"function env(key) { return pm.environment.get(key); }",
-									"function ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }",
-									"function argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }",
-									"refused('SendNotification', /may not send notifications of the product/);"
-								]
-							}
-						}
-					]
-				},
-				{
-					"id": "3504af07-5726-4552-a06b-663dccd40bc3",
-					"name": "A token of another product may not send",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "x-authentication-token",
-								"value": "{{pat_lisa_token}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}",
-							"host": [
-								"{{base_url}}"
-							]
-						},
-						"body": {
-							"mode": "graphql",
-							"graphql": {
-								"query": "mutation SendNotification { SendNotification(input: { productId: \"Puma\", userIds: [\"{{nc_bob_id}}\"], typeId: \"nc.Access\" }) { success } }",
-								"variables": ""
-							}
-						}
-					},
-					"response": [],
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "639b031d-c419-4cec-8253-736e56b4fa43",
-								"type": "text/javascript",
-								"exec": [
-									"const __json = (function () { try { return pm.response.json(); } catch (e) { return {}; } })();",
-									"const __data = (__json && __json.data) || {};",
-									"const __errors = (__json && __json.errors) || [];",
-									"function payload(command) {",
-									"  pm.test(command + ': no GraphQL errors', function () { pm.expect(__errors, JSON.stringify(__errors)).to.eql([]); });",
-									"  pm.test(command + ': has a payload', function () { pm.expect(__data[command], JSON.stringify(__json).slice(0, 300)).to.be.an('object'); });",
-									"  return __data[command] || {};",
-									"}",
-									"function refused(command, reason) {",
-									"  pm.test(command + ' is refused: ' + reason, function () {",
-									"    pm.expect(__errors.length, 'expected a refusal, got ' + JSON.stringify(__json).slice(0, 300)).to.be.above(0);",
-									"    pm.expect(__errors[0].message).to.match(reason);",
-									"  });",
-									"}",
-									"function env(key) { return pm.environment.get(key); }",
-									"function ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }",
-									"function argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }",
-									"refused('SendNotification', /may not send notifications of the product/);"
+									"const p = payload('SendNotification');",
+									"pm.test('sent', function () { pm.expect(p.success).to.eql(true); });"
 								]
 							}
 						}
@@ -1739,7 +1505,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{pat_token}}"
+								"value": "{{nc_su_token}}"
 							}
 						],
 						"url": {
@@ -1789,7 +1555,7 @@
 				},
 				{
 					"id": "7c514fb4-a095-47eb-857f-c500f721436e",
-					"name": "A user session may not withdraw",
+					"name": "A signed-in user may withdraw for the product of the request (until ImtCore#1059)",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -1837,7 +1603,8 @@
 									"function env(key) { return pm.environment.get(key); }",
 									"function ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }",
 									"function argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }",
-									"refused('WithdrawNotifications', /may not send notifications of the product/);"
+									"const p = payload('WithdrawNotifications');",
+									"pm.test('withdrawn', function () { pm.expect(p.success).to.eql(true); });"
 								]
 							}
 						}
@@ -1851,7 +1618,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{pat_token}}"
+								"value": "{{nc_su_token}}"
 							}
 						],
 						"url": {
@@ -1982,7 +1749,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{pat_token}}"
+								"value": "{{nc_su_token}}"
 							}
 						],
 						"url": {
@@ -2048,7 +1815,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{pat_token}}"
+								"value": "{{nc_su_token}}"
 							}
 						],
 						"url": {
@@ -2114,7 +1881,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{pat_token}}"
+								"value": "{{nc_su_token}}"
 							}
 						],
 						"url": {
@@ -2180,7 +1947,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{pat_token}}"
+								"value": "{{nc_su_token}}"
 							}
 						],
 						"url": {
@@ -2246,7 +2013,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{pat_token}}"
+								"value": "{{nc_su_token}}"
 							}
 						],
 						"url": {
@@ -2312,7 +2079,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{pat_token}}"
+								"value": "{{nc_su_token}}"
 							}
 						],
 						"url": {
@@ -2368,7 +2135,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{pat_token}}"
+								"value": "{{nc_su_token}}"
 							}
 						],
 						"url": {
@@ -2434,7 +2201,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{pat_token}}"
+								"value": "{{nc_su_token}}"
 							}
 						],
 						"url": {
@@ -2490,7 +2257,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{pat_token}}"
+								"value": "{{nc_su_token}}"
 							}
 						],
 						"url": {
@@ -2546,7 +2313,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{pat_token}}"
+								"value": "{{nc_su_token}}"
 							}
 						],
 						"url": {
@@ -2602,7 +2369,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{pat_token}}"
+								"value": "{{nc_su_token}}"
 							}
 						],
 						"url": {
@@ -2658,7 +2425,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{pat_token}}"
+								"value": "{{nc_su_token}}"
 							}
 						],
 						"url": {
@@ -2714,7 +2481,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{pat_token}}"
+								"value": "{{nc_su_token}}"
 							}
 						],
 						"url": {
@@ -2780,7 +2547,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{pat_token}}"
+								"value": "{{nc_su_token}}"
 							}
 						],
 						"url": {
@@ -2836,7 +2603,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{pat_token}}"
+								"value": "{{nc_su_token}}"
 							}
 						],
 						"url": {
@@ -2961,7 +2728,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{pat_token}}"
+								"value": "{{nc_su_token}}"
 							}
 						],
 						"url": {
@@ -3029,7 +2796,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{pat_token}}"
+								"value": "{{nc_su_token}}"
 							}
 						],
 						"url": {
@@ -3161,7 +2928,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{pat_token}}"
+								"value": "{{nc_su_token}}"
 							}
 						],
 						"url": {
@@ -3287,7 +3054,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{pat_token}}"
+								"value": "{{nc_su_token}}"
 							}
 						],
 						"url": {
@@ -3460,7 +3227,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{pat_token}}"
+								"value": "{{nc_su_token}}"
 							}
 						],
 						"url": {
@@ -3633,7 +3400,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{pat_token}}"
+								"value": "{{nc_su_token}}"
 							}
 						],
 						"url": {
@@ -3747,7 +3514,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{pat_prolife_token}}"
+								"value": "{{nc_su_token}}"
 							}
 						],
 						"url": {
@@ -3940,7 +3707,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{pat_token}}"
+								"value": "{{nc_su_token}}"
 							}
 						],
 						"url": {
@@ -4115,7 +3882,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{pat_token}}"
+								"value": "{{nc_su_token}}"
 							}
 						],
 						"url": {
@@ -4236,7 +4003,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{pat_token}}"
+								"value": "{{nc_su_token}}"
 							}
 						],
 						"url": {
@@ -4293,7 +4060,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{pat_token}}"
+								"value": "{{nc_su_token}}"
 							}
 						],
 						"url": {
@@ -4350,7 +4117,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{pat_token}}"
+								"value": "{{nc_su_token}}"
 							}
 						],
 						"url": {
@@ -4470,7 +4237,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{pat_token}}"
+								"value": "{{nc_su_token}}"
 							}
 						],
 						"url": {
@@ -4527,7 +4294,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{pat_token}}"
+								"value": "{{nc_su_token}}"
 							}
 						],
 						"url": {
@@ -4584,7 +4351,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{pat_token}}"
+								"value": "{{nc_su_token}}"
 							}
 						],
 						"url": {
@@ -4641,7 +4408,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{pat_token}}"
+								"value": "{{nc_su_token}}"
 							}
 						],
 						"url": {
@@ -4815,7 +4582,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{pat_token}}"
+								"value": "{{nc_su_token}}"
 							}
 						],
 						"url": {
@@ -4933,7 +4700,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{pat_token}}"
+								"value": "{{nc_su_token}}"
 							}
 						],
 						"url": {
@@ -4990,7 +4757,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{pat_token}}"
+								"value": "{{nc_su_token}}"
 							}
 						],
 						"url": {
@@ -5164,7 +4931,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{pat_token}}"
+								"value": "{{nc_su_token}}"
 							}
 						],
 						"url": {
@@ -5279,7 +5046,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{pat_token}}"
+								"value": "{{nc_su_token}}"
 							}
 						],
 						"url": {
@@ -5394,7 +5161,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{pat_token}}"
+								"value": "{{nc_su_token}}"
 							}
 						],
 						"url": {
@@ -5567,7 +5334,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{pat_token}}"
+								"value": "{{nc_su_token}}"
 							}
 						],
 						"url": {
@@ -5682,7 +5449,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{pat_token}}"
+								"value": "{{nc_su_token}}"
 							}
 						],
 						"url": {
@@ -5744,7 +5511,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{pat_token}}"
+								"value": "{{nc_su_token}}"
 							}
 						],
 						"url": {
@@ -5801,7 +5568,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{pat_token}}"
+								"value": "{{nc_su_token}}"
 							}
 						],
 						"url": {
@@ -5858,7 +5625,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{pat_token}}"
+								"value": "{{nc_su_token}}"
 							}
 						],
 						"url": {
@@ -5915,7 +5682,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{pat_token}}"
+								"value": "{{nc_su_token}}"
 							}
 						],
 						"url": {
@@ -5972,7 +5739,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{pat_token}}"
+								"value": "{{nc_su_token}}"
 							}
 						],
 						"url": {
@@ -6842,7 +6609,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{pat_token}}"
+								"value": "{{nc_su_token}}"
 							}
 						],
 						"url": {
@@ -6899,7 +6666,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{pat_token}}"
+								"value": "{{nc_su_token}}"
 							}
 						],
 						"url": {
@@ -6956,7 +6723,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{pat_token}}"
+								"value": "{{nc_su_token}}"
 							}
 						],
 						"url": {
@@ -7516,7 +7283,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{pat_token}}"
+								"value": "{{nc_su_token}}"
 							}
 						],
 						"url": {
@@ -7573,7 +7340,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{pat_token}}"
+								"value": "{{nc_su_token}}"
 							}
 						],
 						"url": {
@@ -9026,7 +8793,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{pat_token}}"
+								"value": "{{nc_su_token}}"
 							}
 						],
 						"url": {

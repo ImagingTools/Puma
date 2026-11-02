@@ -48,11 +48,12 @@ async function act(label, query, token) {
 	return payload;
 }
 
-let serverToken = null;
+// Any signed-in user may send until a product server has an identity of its own (ImagingTools/ImtCore#1059)
+let senderToken = null;
 
 function send(fields) {
 	return act('SendNotification',
-		`mutation SendNotification { SendNotification(input: { productId: ${gqlString(productId)}, ${fields} }) { success } }`, serverToken);
+		`mutation SendNotification { SendNotification(input: { productId: ${gqlString(productId)}, ${fields} }) { success } }`, senderToken);
 }
 
 // --- the sessions
@@ -147,9 +148,7 @@ runSuite({ name: 'Notification center WebSocket suite', className: 'Notification
 		`mutation SelectTenant { SelectTenant(input: { tenantId: ${gqlString(tenantA)} }) { ok userSession { tenantId accessToken } errorMessage } }`,
 		aliceTenantLogin.token);
 
-	serverToken = (await act('CreateToken',
-		`mutation CreateToken { CreateToken(input: { userId: ${gqlString(su.userId)}, productId: ${gqlString(productId)}, name: ${gqlString('wsnc_' + runTag)},` +
-		` scopes: [${gqlString('notifications:send:' + productId)}] }) { token success message } }`, su.token)).token;
+	senderToken = su.token;
 
 	const aliceHome = await openSession('alice without an organization', (await login(alice.login, password)).token);
 	const aliceInA = await openSession('alice in organization A', selected.userSession.accessToken);
@@ -236,17 +235,14 @@ runSuite({ name: 'Notification center WebSocket suite', className: 'Notification
 			[bobHome, removed(bobId)]
 		]), () => act('WithdrawNotifications',
 			`mutation WithdrawNotifications { WithdrawNotifications(input: { productId: ${gqlString(productId)}, groupKey: "wsnc-withdraw" }) { success } }`,
-			serverToken));
+			senderToken));
 	});
 
 	await test('a notification of another product reaches no session of this product', async () => {
 		const otherProduct = productId === 'ProLife' ? 'Lisa' : 'ProLife';
-		const otherToken = (await act('CreateToken',
-			`mutation CreateToken { CreateToken(input: { userId: ${gqlString(su.userId)}, productId: ${gqlString(productId)}, name: ${gqlString('wsnc_other_' + runTag)},` +
-			` scopes: [${gqlString('notifications:send:' + otherProduct)}] }) { token success message } }`, su.token)).token;
 		await expectEvents(new Map(), async () => {
 			const res = await gql(`mutation SendNotification { SendNotification(input: { productId: ${gqlString(otherProduct)},` +
-				` userIds: [${gqlString(alice.userId)}], typeId: "wsnc.Other" }) { success } }`, otherToken, otherProduct);
+				` userIds: [${gqlString(alice.userId)}], typeId: "wsnc.Other" }) { success } }`, senderToken, otherProduct);
 			assert(res && res.data && res.data.SendNotification && res.data.SendNotification.success === true,
 				`the notification of ${otherProduct} was not sent: ${JSON.stringify(res).slice(0, 300)}`);
 		});

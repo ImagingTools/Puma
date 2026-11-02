@@ -600,7 +600,7 @@ feature is actually wired up.
 ## Notification center (`Notification_Center.postman_collection.json`, `ws/ws-notification-center.js`)
 
 The user notification center of Puma (`ImtCore/Docs/Notifications/NotificationCenter.md`), in two suites that create
-their own users, organizations and server tokens, so they run on any system, after the tenant suite or alone:
+their own users and organizations, so they run on any system, after the tenant suite or alone:
 
 ```powershell
 newman run Notification_Center.postman_collection.json -e Tenant_System_Full.postman_environment.json --env-var base_url=http://localhost:17788/Puma/graphql
@@ -613,10 +613,10 @@ SQLite.
 
 The collection (183 requests):
 
-- `00 Bootstrap` - four users, organizations A (alice) and B (bob), tenant sessions, server tokens with the send scope
-  of Puma, of Lisa and of ProLife.
-- `01 Access` - every inbox command refuses an anonymous caller; a user session, an administrator session and a token
-  of another product may not send; a token sends only to the product of its request and to at most 100 users.
+- `00 Bootstrap` - four users, organizations A (alice) and B (bob), tenant sessions.
+- `01 Access` - every inbox command and sending refuse an anonymous caller; any signed-in user may send and withdraw,
+  only for the product of the request and to at most 100 users. This is a known hole kept until a product server has
+  an identity of its own (ImagingTools/ImtCore#1059); the senders of the other folders use the session of su.
 - `02 Validation` - the length limits of type, keys, subject and actor; arguments: id characters and length, repeated
   ids, more than 10, the standard values, a `Number` that is no number, a `DateTime` that is no time - a refused
   notification stores nothing; long names, values and body are cut; every kind of argument comes back as sent.
