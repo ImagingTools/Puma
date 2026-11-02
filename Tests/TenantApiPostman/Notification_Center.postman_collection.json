@@ -1678,6 +1678,73 @@
 					]
 				},
 				{
+					"id": "11fce3cd-a7b3-4602-a52e-e6ec79cfca35",
+					"name": "A group is withdrawn from at most 100 users",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-authentication-token",
+								"value": "{{nc_su_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}",
+							"host": [
+								"{{base_url}}"
+							]
+						},
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation WithdrawNotifications { WithdrawNotifications(input: { productId: \"Puma\", groupKey: \"nc-many\", userIds: {{nc_many_users}} }) { success } }",
+								"variables": ""
+							}
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "974e89df-6fdc-47f8-8a3e-1bc3481a565e",
+								"type": "text/javascript",
+								"exec": [
+									"const ids = []; for (let i = 0; i < 101; i++) { ids.push('\"u' + i + '\"'); }",
+									"pm.variables.set('nc_many_users', '[' + ids.join(', ') + ']');"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "4356a9b3-f5f2-4437-aaad-3dd23b440017",
+								"type": "text/javascript",
+								"exec": [
+									"const __json = (function () { try { return pm.response.json(); } catch (e) { return {}; } })();",
+									"const __data = (__json && __json.data) || {};",
+									"const __errors = (__json && __json.errors) || [];",
+									"function payload(command) {",
+									"  pm.test(command + ': no GraphQL errors', function () { pm.expect(__errors, JSON.stringify(__errors)).to.eql([]); });",
+									"  pm.test(command + ': has a payload', function () { pm.expect(__data[command], JSON.stringify(__json).slice(0, 300)).to.be.an('object'); });",
+									"  return __data[command] || {};",
+									"}",
+									"function refused(command, reason) {",
+									"  pm.test(command + ' is refused: ' + reason, function () {",
+									"    pm.expect(__errors.length, 'expected a refusal, got ' + JSON.stringify(__json).slice(0, 300)).to.be.above(0);",
+									"    pm.expect(__errors[0].message).to.match(reason);",
+									"  });",
+									"}",
+									"function env(key) { return pm.environment.get(key); }",
+									"function ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }",
+									"function argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }",
+									"refused('WithdrawNotifications', /at most 100 users/);"
+								]
+							}
+						}
+					]
+				},
+				{
 					"id": "14b21985-846c-4f1b-a181-71557cc4721f",
 					"name": "Nothing refused reached an inbox",
 					"request": {
@@ -5126,6 +5193,179 @@
 							"listen": "test",
 							"script": {
 								"id": "710ac788-8b1c-4ac2-8490-d1b542ccbfad",
+								"type": "text/javascript",
+								"exec": [
+									"const __json = (function () { try { return pm.response.json(); } catch (e) { return {}; } })();",
+									"const __data = (__json && __json.data) || {};",
+									"const __errors = (__json && __json.errors) || [];",
+									"function payload(command) {",
+									"  pm.test(command + ': no GraphQL errors', function () { pm.expect(__errors, JSON.stringify(__errors)).to.eql([]); });",
+									"  pm.test(command + ': has a payload', function () { pm.expect(__data[command], JSON.stringify(__json).slice(0, 300)).to.be.an('object'); });",
+									"  return __data[command] || {};",
+									"}",
+									"function refused(command, reason) {",
+									"  pm.test(command + ' is refused: ' + reason, function () {",
+									"    pm.expect(__errors.length, 'expected a refusal, got ' + JSON.stringify(__json).slice(0, 300)).to.be.above(0);",
+									"    pm.expect(__errors[0].message).to.match(reason);",
+									"  });",
+									"}",
+									"function env(key) { return pm.environment.get(key); }",
+									"function ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }",
+									"function argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }",
+									"const p = payload('NotificationsList');",
+									"const items = p.items || [];",
+									"pm.test('one', function () { pm.expect(ofType(items, 'nc.Withdraw')).to.have.lengthOf(1); });"
+								]
+							}
+						}
+					]
+				},
+				{
+					"id": "ecb1ca2d-1c85-4caa-8571-86a09d3035b1",
+					"name": "Withdraw the group from alice only",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-authentication-token",
+								"value": "{{nc_su_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}",
+							"host": [
+								"{{base_url}}"
+							]
+						},
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation WithdrawNotifications { WithdrawNotifications(input: { productId: \"Puma\", groupKey: \"withdraw-1\", userIds: [\"{{nc_alice_id}}\"] }) { success } }",
+								"variables": ""
+							}
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "2295ad30-855a-4bbd-bedc-4f0ee6a1777b",
+								"type": "text/javascript",
+								"exec": [
+									"const __json = (function () { try { return pm.response.json(); } catch (e) { return {}; } })();",
+									"const __data = (__json && __json.data) || {};",
+									"const __errors = (__json && __json.errors) || [];",
+									"function payload(command) {",
+									"  pm.test(command + ': no GraphQL errors', function () { pm.expect(__errors, JSON.stringify(__errors)).to.eql([]); });",
+									"  pm.test(command + ': has a payload', function () { pm.expect(__data[command], JSON.stringify(__json).slice(0, 300)).to.be.an('object'); });",
+									"  return __data[command] || {};",
+									"}",
+									"function refused(command, reason) {",
+									"  pm.test(command + ' is refused: ' + reason, function () {",
+									"    pm.expect(__errors.length, 'expected a refusal, got ' + JSON.stringify(__json).slice(0, 300)).to.be.above(0);",
+									"    pm.expect(__errors[0].message).to.match(reason);",
+									"  });",
+									"}",
+									"function env(key) { return pm.environment.get(key); }",
+									"function ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }",
+									"function argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }",
+									"const p = payload('WithdrawNotifications');",
+									"pm.test('withdrawn', function () { pm.expect(p.success).to.eql(true); });"
+								]
+							}
+						}
+					]
+				},
+				{
+					"id": "304f800e-2884-4e4f-ab7b-86c35263b526",
+					"name": "Alice lost it",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-authentication-token",
+								"value": "{{nc_alice_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}",
+							"host": [
+								"{{base_url}}"
+							]
+						},
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query NotificationsList { NotificationsList(input: { pageSize: 100 }) { totalCount unreadCount items { id typeId severity body groupCount createdAt isDelivered isRead actors { id typeId name } subject { id typeId name } arguments { id kind value objectId objectTypeId } } } }",
+								"variables": ""
+							}
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "73eaa537-6979-44bb-b25f-00ded958c26f",
+								"type": "text/javascript",
+								"exec": [
+									"const __json = (function () { try { return pm.response.json(); } catch (e) { return {}; } })();",
+									"const __data = (__json && __json.data) || {};",
+									"const __errors = (__json && __json.errors) || [];",
+									"function payload(command) {",
+									"  pm.test(command + ': no GraphQL errors', function () { pm.expect(__errors, JSON.stringify(__errors)).to.eql([]); });",
+									"  pm.test(command + ': has a payload', function () { pm.expect(__data[command], JSON.stringify(__json).slice(0, 300)).to.be.an('object'); });",
+									"  return __data[command] || {};",
+									"}",
+									"function refused(command, reason) {",
+									"  pm.test(command + ' is refused: ' + reason, function () {",
+									"    pm.expect(__errors.length, 'expected a refusal, got ' + JSON.stringify(__json).slice(0, 300)).to.be.above(0);",
+									"    pm.expect(__errors[0].message).to.match(reason);",
+									"  });",
+									"}",
+									"function env(key) { return pm.environment.get(key); }",
+									"function ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }",
+									"function argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }",
+									"const p = payload('NotificationsList');",
+									"const items = p.items || [];",
+									"pm.test('none', function () { pm.expect(ofType(items, 'nc.Withdraw')).to.have.lengthOf(0); });"
+								]
+							}
+						}
+					]
+				},
+				{
+					"id": "4b252dac-9a78-4024-82ab-93c6352f83d3",
+					"name": "Carol still has it",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-authentication-token",
+								"value": "{{nc_carol_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}",
+							"host": [
+								"{{base_url}}"
+							]
+						},
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query NotificationsList { NotificationsList(input: { pageSize: 100 }) { totalCount unreadCount items { id typeId severity body groupCount createdAt isDelivered isRead actors { id typeId name } subject { id typeId name } arguments { id kind value objectId objectTypeId } } } }",
+								"variables": ""
+							}
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f017cd9d-8618-4ad3-b7af-952b1a5d2706",
 								"type": "text/javascript",
 								"exec": [
 									"const __json = (function () { try { return pm.response.json(); } catch (e) { return {}; } })();",
@@ -9009,7 +9249,9 @@
 									"function argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }",
 									"const p = payload('NotificationsList');",
 									"const items = p.items || [];",
-									"pm.test('one', function () { pm.expect(items.filter(function (i) { return i.typeId === 'imtauth.MembershipEnded' && i.subject && i.subject.id === env('nc_tenant_a'); })).to.have.lengthOf(1); });"
+									"const found = items.filter(function (i) { return i.typeId === 'imtauth.MembershipEnded' && i.subject && i.subject.id === env('nc_tenant_a'); });",
+									"pm.test('one', function () { pm.expect(found).to.have.lengthOf(1); });",
+									"pm.test('by alice, named', function () { pm.expect(found[0].actors[0].id).to.eql(env('nc_alice_id')); pm.expect(found[0].actors[0].name).to.not.be.empty; });"
 								]
 							}
 						}
@@ -9017,7 +9259,7 @@
 				},
 				{
 					"id": "f2c6563b-19f7-41d9-97b5-9489a8451f00",
-					"name": "Alice learns who left",
+					"name": "Alice is not told that she removed carol",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -9067,9 +9309,7 @@
 									"function argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }",
 									"const p = payload('NotificationsList');",
 									"const items = p.items || [];",
-									"const found = items.filter(function (i) { return i.typeId === 'imtauth.MemberLeft' && i.subject && i.subject.id === env('nc_tenant_a'); });",
-									"pm.test('one', function () { pm.expect(found).to.have.lengthOf(1); });",
-									"pm.test('the member', function () { const m = argumentOf(found[0], 'member'); pm.expect(m.kind).to.eql('Object'); pm.expect(m.objectId).to.eql(env('nc_carol_id')); pm.expect(m.objectTypeId).to.eql('User'); pm.expect(m.value).to.not.be.empty; });"
+									"pm.test('none', function () { pm.expect(items.filter(function (i) { return i.typeId === 'imtauth.MemberLeft' && i.subject && i.subject.id === env('nc_tenant_a'); })).to.have.lengthOf(0); });"
 								]
 							}
 						}
@@ -10296,6 +10536,181 @@
 					]
 				},
 				{
+					"id": "7e5fb2d1-f001-4383-9637-5d541719764d",
+					"name": "Alice ends the relationship with B",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-authentication-token",
+								"value": "{{nc_alice_a_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}",
+							"host": [
+								"{{base_url}}"
+							]
+						},
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation RemoveTenantRelationship { RemoveTenantRelationship(input: { tenantId: \"{{nc_tenant_a}}\", relationshipId: \"{{nc_relationship}}\" }) { success errorMessage } }",
+								"variables": ""
+							}
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "26b9e833-8851-45b5-8640-6828277b362a",
+								"type": "text/javascript",
+								"exec": [
+									"const __json = (function () { try { return pm.response.json(); } catch (e) { return {}; } })();",
+									"const __data = (__json && __json.data) || {};",
+									"const __errors = (__json && __json.errors) || [];",
+									"function payload(command) {",
+									"  pm.test(command + ': no GraphQL errors', function () { pm.expect(__errors, JSON.stringify(__errors)).to.eql([]); });",
+									"  pm.test(command + ': has a payload', function () { pm.expect(__data[command], JSON.stringify(__json).slice(0, 300)).to.be.an('object'); });",
+									"  return __data[command] || {};",
+									"}",
+									"function refused(command, reason) {",
+									"  pm.test(command + ' is refused: ' + reason, function () {",
+									"    pm.expect(__errors.length, 'expected a refusal, got ' + JSON.stringify(__json).slice(0, 300)).to.be.above(0);",
+									"    pm.expect(__errors[0].message).to.match(reason);",
+									"  });",
+									"}",
+									"function env(key) { return pm.environment.get(key); }",
+									"function ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }",
+									"function argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }",
+									"const p = payload('RemoveTenantRelationship');",
+									"pm.test('ended', function () { pm.expect(p.success).to.eql(true); });"
+								]
+							}
+						}
+					]
+				},
+				{
+					"id": "0f199d59-4424-471e-a315-ffc5d7f4b3a7",
+					"name": "Bob learns that the relationship ended, from alice",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-authentication-token",
+								"value": "{{nc_bob_b_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}",
+							"host": [
+								"{{base_url}}"
+							]
+						},
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query NotificationsList { NotificationsList(input: { pageSize: 100 }) { totalCount unreadCount items { id typeId severity body groupCount createdAt isDelivered isRead actors { id typeId name } subject { id typeId name } arguments { id kind value objectId objectTypeId } } } }",
+								"variables": ""
+							}
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "6a3c29dd-2e5d-4415-bbe9-1c096060c253",
+								"type": "text/javascript",
+								"exec": [
+									"const __json = (function () { try { return pm.response.json(); } catch (e) { return {}; } })();",
+									"const __data = (__json && __json.data) || {};",
+									"const __errors = (__json && __json.errors) || [];",
+									"function payload(command) {",
+									"  pm.test(command + ': no GraphQL errors', function () { pm.expect(__errors, JSON.stringify(__errors)).to.eql([]); });",
+									"  pm.test(command + ': has a payload', function () { pm.expect(__data[command], JSON.stringify(__json).slice(0, 300)).to.be.an('object'); });",
+									"  return __data[command] || {};",
+									"}",
+									"function refused(command, reason) {",
+									"  pm.test(command + ' is refused: ' + reason, function () {",
+									"    pm.expect(__errors.length, 'expected a refusal, got ' + JSON.stringify(__json).slice(0, 300)).to.be.above(0);",
+									"    pm.expect(__errors[0].message).to.match(reason);",
+									"  });",
+									"}",
+									"function env(key) { return pm.environment.get(key); }",
+									"function ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }",
+									"function argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }",
+									"const p = payload('NotificationsList');",
+									"const items = p.items || [];",
+									"const found = items.filter(function (i) { return i.typeId === 'imtauth.RelationshipRemoved' && i.subject && i.subject.id === env('nc_relationship'); });",
+									"pm.test('one', function () { pm.expect(found).to.have.lengthOf(1); });",
+									"pm.test('by alice, named', function () { pm.expect(found[0].actors[0].id).to.eql(env('nc_alice_id')); pm.expect(found[0].actors[0].name).to.not.be.empty; });"
+								]
+							}
+						}
+					]
+				},
+				{
+					"id": "54b27667-4d08-487c-ab5a-41d688f533d4",
+					"name": "Alice is not told that she ended it",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-authentication-token",
+								"value": "{{nc_alice_a_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}",
+							"host": [
+								"{{base_url}}"
+							]
+						},
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query NotificationsList { NotificationsList(input: { pageSize: 100 }) { totalCount unreadCount items { id typeId severity body groupCount createdAt isDelivered isRead actors { id typeId name } subject { id typeId name } arguments { id kind value objectId objectTypeId } } } }",
+								"variables": ""
+							}
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c364b5e3-cc65-4f47-b66d-c9f9ac1dc66b",
+								"type": "text/javascript",
+								"exec": [
+									"const __json = (function () { try { return pm.response.json(); } catch (e) { return {}; } })();",
+									"const __data = (__json && __json.data) || {};",
+									"const __errors = (__json && __json.errors) || [];",
+									"function payload(command) {",
+									"  pm.test(command + ': no GraphQL errors', function () { pm.expect(__errors, JSON.stringify(__errors)).to.eql([]); });",
+									"  pm.test(command + ': has a payload', function () { pm.expect(__data[command], JSON.stringify(__json).slice(0, 300)).to.be.an('object'); });",
+									"  return __data[command] || {};",
+									"}",
+									"function refused(command, reason) {",
+									"  pm.test(command + ' is refused: ' + reason, function () {",
+									"    pm.expect(__errors.length, 'expected a refusal, got ' + JSON.stringify(__json).slice(0, 300)).to.be.above(0);",
+									"    pm.expect(__errors[0].message).to.match(reason);",
+									"  });",
+									"}",
+									"function env(key) { return pm.environment.get(key); }",
+									"function ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }",
+									"function argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }",
+									"const p = payload('NotificationsList');",
+									"const items = p.items || [];",
+									"pm.test('none', function () { pm.expect(items.filter(function (i) { return i.typeId === 'imtauth.RelationshipRemoved' && i.subject && i.subject.id === env('nc_relationship'); })).to.have.lengthOf(0); });"
+								]
+							}
+						}
+					]
+				},
+				{
 					"id": "c3f6b144-1829-40f2-9861-ebf0ed6b4301",
 					"name": "Alice hands A over to carol",
 					"request": {
@@ -10404,7 +10819,9 @@
 									"function argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }",
 									"const p = payload('NotificationsList');",
 									"const items = p.items || [];",
-									"pm.test('one', function () { pm.expect(items.filter(function (i) { return i.typeId === 'imtauth.OwnershipReceived' && i.subject && i.subject.id === env('nc_tenant_a'); })).to.have.lengthOf(1); });"
+									"const found = items.filter(function (i) { return i.typeId === 'imtauth.OwnershipReceived' && i.subject && i.subject.id === env('nc_tenant_a'); });",
+									"pm.test('one', function () { pm.expect(found).to.have.lengthOf(1); });",
+									"pm.test('handed over by alice', function () { pm.expect(found[0].actors[0].id).to.eql(env('nc_alice_id')); });"
 								]
 							}
 						}
@@ -10412,7 +10829,7 @@
 				},
 				{
 					"id": "073777e2-2bbd-4f0f-b76a-d486f95f52fe",
-					"name": "Alice learns who the new owner is",
+					"name": "Alice is not told that she handed A over",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -10462,9 +10879,240 @@
 									"function argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }",
 									"const p = payload('NotificationsList');",
 									"const items = p.items || [];",
-									"const found = items.filter(function (i) { return i.typeId === 'imtauth.OwnershipTransferred' && i.subject && i.subject.id === env('nc_tenant_a'); });",
+									"pm.test('none', function () { pm.expect(items.filter(function (i) { return i.typeId === 'imtauth.OwnershipTransferred' && i.subject && i.subject.id === env('nc_tenant_a'); })).to.have.lengthOf(0); });"
+								]
+							}
+						}
+					]
+				},
+				{
+					"id": "3185dcc5-a5b6-4a1c-8fb4-77150698005b",
+					"name": "Alice's membership in A",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-authentication-token",
+								"value": "{{nc_su_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}",
+							"host": [
+								"{{base_url}}"
+							]
+						},
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query FindMembership { FindMembership(input: { userId: \"{{nc_alice_id}}\", tenantId: \"{{nc_tenant_a}}\" }) { membership { id } errorMessage } }",
+								"variables": ""
+							}
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f1e0994b-70c1-4541-993d-266521bd484b",
+								"type": "text/javascript",
+								"exec": [
+									"const __json = (function () { try { return pm.response.json(); } catch (e) { return {}; } })();",
+									"const __data = (__json && __json.data) || {};",
+									"const __errors = (__json && __json.errors) || [];",
+									"function payload(command) {",
+									"  pm.test(command + ': no GraphQL errors', function () { pm.expect(__errors, JSON.stringify(__errors)).to.eql([]); });",
+									"  pm.test(command + ': has a payload', function () { pm.expect(__data[command], JSON.stringify(__json).slice(0, 300)).to.be.an('object'); });",
+									"  return __data[command] || {};",
+									"}",
+									"function refused(command, reason) {",
+									"  pm.test(command + ' is refused: ' + reason, function () {",
+									"    pm.expect(__errors.length, 'expected a refusal, got ' + JSON.stringify(__json).slice(0, 300)).to.be.above(0);",
+									"    pm.expect(__errors[0].message).to.match(reason);",
+									"  });",
+									"}",
+									"function env(key) { return pm.environment.get(key); }",
+									"function ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }",
+									"function argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }",
+									"const p = payload('FindMembership');",
+									"pm.test('found', function () { pm.expect(p.membership && p.membership.id).to.be.a('string').and.not.empty; });",
+									"pm.environment.set('nc_alice_membership', p.membership.id);"
+								]
+							}
+						}
+					]
+				},
+				{
+					"id": "b1b1fef6-9fe3-4e62-9150-71b55f843745",
+					"name": "Alice leaves A",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-authentication-token",
+								"value": "{{nc_alice_a_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}",
+							"host": [
+								"{{base_url}}"
+							]
+						},
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation RemoveMembership { RemoveMembership(input: { membershipId: \"{{nc_alice_membership}}\" }) { success errorMessage } }",
+								"variables": ""
+							}
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "961887c7-f6d0-4f8c-88c4-08e268a37cb1",
+								"type": "text/javascript",
+								"exec": [
+									"const __json = (function () { try { return pm.response.json(); } catch (e) { return {}; } })();",
+									"const __data = (__json && __json.data) || {};",
+									"const __errors = (__json && __json.errors) || [];",
+									"function payload(command) {",
+									"  pm.test(command + ': no GraphQL errors', function () { pm.expect(__errors, JSON.stringify(__errors)).to.eql([]); });",
+									"  pm.test(command + ': has a payload', function () { pm.expect(__data[command], JSON.stringify(__json).slice(0, 300)).to.be.an('object'); });",
+									"  return __data[command] || {};",
+									"}",
+									"function refused(command, reason) {",
+									"  pm.test(command + ' is refused: ' + reason, function () {",
+									"    pm.expect(__errors.length, 'expected a refusal, got ' + JSON.stringify(__json).slice(0, 300)).to.be.above(0);",
+									"    pm.expect(__errors[0].message).to.match(reason);",
+									"  });",
+									"}",
+									"function env(key) { return pm.environment.get(key); }",
+									"function ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }",
+									"function argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }",
+									"const p = payload('RemoveMembership');",
+									"pm.test('removed', function () { pm.expect(p.success).to.eql(true); });"
+								]
+							}
+						}
+					]
+				},
+				{
+					"id": "c45d0851-9af5-4199-9fa6-f241429b570a",
+					"name": "Carol learns that alice left, from alice",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-authentication-token",
+								"value": "{{nc_carol_a_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}",
+							"host": [
+								"{{base_url}}"
+							]
+						},
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query NotificationsList { NotificationsList(input: { pageSize: 100 }) { totalCount unreadCount items { id typeId severity body groupCount createdAt isDelivered isRead actors { id typeId name } subject { id typeId name } arguments { id kind value objectId objectTypeId } } } }",
+								"variables": ""
+							}
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "030c6756-6318-4577-abd6-4f0f74273e82",
+								"type": "text/javascript",
+								"exec": [
+									"const __json = (function () { try { return pm.response.json(); } catch (e) { return {}; } })();",
+									"const __data = (__json && __json.data) || {};",
+									"const __errors = (__json && __json.errors) || [];",
+									"function payload(command) {",
+									"  pm.test(command + ': no GraphQL errors', function () { pm.expect(__errors, JSON.stringify(__errors)).to.eql([]); });",
+									"  pm.test(command + ': has a payload', function () { pm.expect(__data[command], JSON.stringify(__json).slice(0, 300)).to.be.an('object'); });",
+									"  return __data[command] || {};",
+									"}",
+									"function refused(command, reason) {",
+									"  pm.test(command + ' is refused: ' + reason, function () {",
+									"    pm.expect(__errors.length, 'expected a refusal, got ' + JSON.stringify(__json).slice(0, 300)).to.be.above(0);",
+									"    pm.expect(__errors[0].message).to.match(reason);",
+									"  });",
+									"}",
+									"function env(key) { return pm.environment.get(key); }",
+									"function ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }",
+									"function argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }",
+									"const p = payload('NotificationsList');",
+									"const items = p.items || [];",
+									"const found = items.filter(function (i) { return i.typeId === 'imtauth.MemberLeft' && i.subject && i.subject.id === env('nc_tenant_a'); });",
 									"pm.test('one', function () { pm.expect(found).to.have.lengthOf(1); });",
-									"pm.test('the member', function () { pm.expect(argumentOf(found[0], 'member').objectId).to.eql(env('nc_carol_id')); });"
+									"pm.test('the member and the actor', function () { pm.expect(argumentOf(found[0], 'member').objectId).to.eql(env('nc_alice_id')); pm.expect(found[0].actors[0].id).to.eql(env('nc_alice_id')); });"
+								]
+							}
+						}
+					]
+				},
+				{
+					"id": "40ef74fc-e1ae-4985-94c2-aa3f06860497",
+					"name": "Alice is not told that she left",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-authentication-token",
+								"value": "{{nc_alice_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}",
+							"host": [
+								"{{base_url}}"
+							]
+						},
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query NotificationsList { NotificationsList(input: { pageSize: 100 }) { totalCount unreadCount items { id typeId severity body groupCount createdAt isDelivered isRead actors { id typeId name } subject { id typeId name } arguments { id kind value objectId objectTypeId } } } }",
+								"variables": ""
+							}
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "2210ed34-a726-4044-9a7d-b2f165af9026",
+								"type": "text/javascript",
+								"exec": [
+									"const __json = (function () { try { return pm.response.json(); } catch (e) { return {}; } })();",
+									"const __data = (__json && __json.data) || {};",
+									"const __errors = (__json && __json.errors) || [];",
+									"function payload(command) {",
+									"  pm.test(command + ': no GraphQL errors', function () { pm.expect(__errors, JSON.stringify(__errors)).to.eql([]); });",
+									"  pm.test(command + ': has a payload', function () { pm.expect(__data[command], JSON.stringify(__json).slice(0, 300)).to.be.an('object'); });",
+									"  return __data[command] || {};",
+									"}",
+									"function refused(command, reason) {",
+									"  pm.test(command + ' is refused: ' + reason, function () {",
+									"    pm.expect(__errors.length, 'expected a refusal, got ' + JSON.stringify(__json).slice(0, 300)).to.be.above(0);",
+									"    pm.expect(__errors[0].message).to.match(reason);",
+									"  });",
+									"}",
+									"function env(key) { return pm.environment.get(key); }",
+									"function ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }",
+									"function argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }",
+									"const p = payload('NotificationsList');",
+									"const items = p.items || [];",
+									"pm.test('none', function () { pm.expect(items.filter(function (i) { return i.typeId === 'imtauth.MembershipEnded' && i.subject && i.subject.id === env('nc_tenant_a'); })).to.have.lengthOf(0); });"
 								]
 							}
 						}
