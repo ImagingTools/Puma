@@ -59,6 +59,59 @@
                             }
                         }
                     ]
+                },
+                {
+                    "id": "b3f0c2a1-6d4e-4f1a-9c7b-2e5d8a1f4c63",
+                    "name": "GetApplicationInfo reports the version and build time of Puma",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetApplicationInfo { GetApplicationInfo { applicationId applicationName version versionKind buildTime dependencies { serviceId } } }",
+                                "variables": ""
+                            }
+                        },
+                        "description": "Sent without a token, the way a product server asks Puma after its WebSocket to Puma connects (CRemoteServiceInfoComp, AuthServerVersionInfo in PumaGQLClientEngine.acc). The answer is the AuthServer entry of the dependencies of the product, its applicationName labels the row on the About page. buildTime is the modification time of the Puma executable. Puma depends on no other service, so it reports no dependencies."
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "c71e9a54-2b8f-4d36-a0e1-5f9b3c7d2e18",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const info = json.data && json.data.GetApplicationInfo ? json.data.GetApplicationInfo : null;",
+                                    "pm.test('GetApplicationInfo is answered without a token', function(){",
+                                    "  pm.expect(json.errors || [], 'unexpected GraphQL error: ' + JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(info, JSON.stringify(json)).to.be.an('object');",
+                                    "});",
+                                    "pm.test('GetApplicationInfo reports the name and version of Puma', function(){",
+                                    "  pm.expect(info.applicationName, 'applicationName').to.be.a('string').and.not.empty;",
+                                    "  pm.expect(info.version, 'version').to.match(/^\\d+\\.\\d+\\.\\d+/);",
+                                    "});",
+                                    "pm.test('GetApplicationInfo reports the build time of Puma as an ISO date in UTC that is not in the future', function(){",
+                                    "  pm.expect(info.buildTime, 'buildTime').to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$/);",
+                                    "  const time = Date.parse(info.buildTime);",
+                                    "  pm.expect(time, 'buildTime').to.be.above(Date.parse('2020-01-01T00:00:00Z'));",
+                                    "  pm.expect(time, 'buildTime').to.be.at.most(Date.now() + 60000);",
+                                    "});",
+                                    "pm.test('Puma reports no services it depends on', function(){",
+                                    "  pm.expect(!info.dependencies || info.dependencies.length === 0, 'dependencies: ' + JSON.stringify(info.dependencies)).to.eql(true);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
                 }
             ],
             "event": []
