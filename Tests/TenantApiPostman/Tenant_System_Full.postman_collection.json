@@ -51376,7 +51376,7 @@
                     }
                 },
                 {
-                    "name": "UI V changes the own password with the old one",
+                    "name": "UI V cannot change the own password before the minimum password age",
                     "event": [
                         {
                             "listen": "test",
@@ -51386,9 +51386,10 @@
                                     "const json = pm.response.json();",
                                     "const errors = json.errors || [];",
                                     "const payload = json.data ? json.data.ChangePassword : null;",
-                                    "pm.test('UI V changes the own password with the old one', function(){",
+                                    "pm.test('UI V cannot change the own password right after the registration', function(){",
                                     "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
-                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true);",
+                                    "  pm.expect(payload && payload.success === true, JSON.stringify(json)).to.eql(false);",
+                                    "  pm.expect(payload && payload.violatedRules ? payload.violatedRules : [], JSON.stringify(json)).to.eql(['MinPasswordAge']);",
                                     "});",
                                     "})();"
                                 ],
@@ -51408,6 +51409,51 @@
                             "mode": "graphql",
                             "graphql": {
                                 "query": "mutation ChangePassword { ChangePassword(input: { login: \"{{uiVLogin}}\", oldPassword: \"{{uiVPassword}}\", newPassword: \"{{uiVNewPassword}}\" }) { success message violatedRules } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "UI su sets the new password of V",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.ChangePassword : null;",
+                                    "pm.test('UI su sets the new password of V regardless of the minimum password age', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true);",
+                                    "});",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation ChangePassword { ChangePassword(input: { login: \"{{uiVLogin}}\", oldPassword: \"\", newPassword: \"{{uiVNewPassword}}\" }) { success message violatedRules } }",
                                 "variables": ""
                             }
                         },

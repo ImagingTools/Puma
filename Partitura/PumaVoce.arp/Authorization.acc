@@ -66,6 +66,9 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="PasswordPolicy" Type="Reference" ExportId="PasswordPolicy">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="PatPrefix" Type="Id" ExportId="PatPrefix">
                         <Data IsEnabled="true" Value="imt_pat_"/>
                     </AttributeInfo>
