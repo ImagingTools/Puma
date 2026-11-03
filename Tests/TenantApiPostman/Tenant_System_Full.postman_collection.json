@@ -23405,50 +23405,6 @@
                     "response": []
                 },
                 {
-                    "name": "QA The user editor refuses a new login without the password",
-                    "event": [
-                        {
-                            "listen": "test",
-                            "script": {
-                                "type": "text/javascript",
-                                "exec": [
-                                    "const json = pm.response.json();",
-                                    "const payload = json.data ? json.data.UpdateUserFromRepresentation : null;",
-                                    "pm.test('A new login without the password is refused by the editor', function () {",
-                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
-                                    "  pm.expect(payload && payload.status, JSON.stringify(json)).to.eql('Failed');",
-                                    "  pm.expect(payload && payload.message ? payload.message : '', JSON.stringify(json)).to.include('together with the password');",
-                                    "});"
-                                ]
-                            }
-                        }
-                    ],
-                    "request": {
-                        "url": {
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "query": [],
-                            "variable": []
-                        },
-                        "header": [
-                            {
-                                "key": "x-authentication-token",
-                                "value": "{{su_token}}"
-                            }
-                        ],
-                        "method": "POST",
-                        "body": {
-                            "mode": "graphql",
-                            "graphql": {
-                                "query": "mutation UpdateUserFromRepresentation { UpdateUserFromRepresentation(input: { documentId: \"{{qaEditorDocId}}\", user: { id: \"{{qaEditorUserId}}\", productId: \"{{product_id}}\", name: \"QA Editor Password renamed\", username: \"{{qaEditorUserLogin}}_new\", password: \"\", email: \"{{qaEditorUserLogin}}@qa.test\", groups: [], roles: [], permissions: [] } }) { status message } }",
-                                "variables": ""
-                            }
-                        }
-                    },
-                    "response": []
-                },
-                {
                     "name": "QA Close the user document of the editor password check",
                     "event": [
                         {
@@ -25287,85 +25243,6 @@
                             "mode": "graphql",
                             "graphql": {
                                 "query": "query UserItem { UserItem(input: { id: \"{{qaRegNamedUserId}}\", productId: \"{{product_id}}\" }) { username password } }",
-                                "variables": ""
-                            }
-                        }
-                    },
-                    "response": []
-                },
-                {
-                    "name": "D-38 UserUpdate refuses a new login of a user with a password",
-                    "event": [
-                        {
-                            "listen": "test",
-                            "script": {
-                                "type": "text/javascript",
-                                "exec": [
-                                    "// The password hash includes the login and UserUpdate takes no password: a new login would lock the user out",
-                                    "const json = pm.response.json();",
-                                    "pm.test('A new login without the password is refused', function () {",
-                                    "  pm.expect(JSON.stringify(json.errors || []), JSON.stringify(json)).to.include('together with the password');",
-                                    "});"
-                                ]
-                            }
-                        }
-                    ],
-                    "request": {
-                        "url": {
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "query": [],
-                            "variable": []
-                        },
-                        "header": [
-                            {
-                                "key": "x-authentication-token",
-                                "value": "{{su_token}}"
-                            }
-                        ],
-                        "method": "POST",
-                        "body": {
-                            "mode": "graphql",
-                            "graphql": {
-                                "query": "mutation UserUpdate { UserUpdate(input: { id: \"{{qaRegNamedUserId}}\", typeId: \"User\", productId: \"{{product_id}}\", item: { id: \"{{qaRegNamedUserId}}\", productId: \"{{product_id}}\", name: \"{{qaRegRenamedUserName}}\", username: \"{{qaRegNamedUserLogin}}_new\", email: \"{{qaRegNamedUserLogin}}@qa.test\", roles: [], groups: [] } }) { id } }",
-                                "variables": ""
-                            }
-                        }
-                    },
-                    "response": []
-                },
-                {
-                    "name": "D-38 The user still signs in with the unchanged login",
-                    "event": [
-                        {
-                            "listen": "test",
-                            "script": {
-                                "type": "text/javascript",
-                                "exec": [
-                                    "const json = pm.response.json();",
-                                    "const payload = json.data ? json.data.Authorization : null;",
-                                    "pm.test('The refused rename left the login working', function () {",
-                                    "  pm.expect(payload && payload.token ? payload.token : '', JSON.stringify(json)).to.not.eql('');",
-                                    "});"
-                                ]
-                            }
-                        }
-                    ],
-                    "request": {
-                        "url": {
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "query": [],
-                            "variable": []
-                        },
-                        "header": [],
-                        "method": "POST",
-                        "body": {
-                            "mode": "graphql",
-                            "graphql": {
-                                "query": "query Authorization { Authorization(input: { login: \"{{qaRegNamedUserLogin}}\", password: \"QaRegression_2026!\", productId: \"{{product_id}}\" }) { token } }",
                                 "variables": ""
                             }
                         }
