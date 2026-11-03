@@ -32,6 +32,9 @@
                                 <Value>PumaDatabasePostgres/DatabaseEngine</Value>
                                 <Value>PumaServerBase</Value>
                                 <Value>PumaServerBase/WebSocketServerFramework</Value>
+                                <Value>PumaServerBase/TenantNotificationPublisher</Value>
+                                <Value>PumaServerBase/ConnectionCodesNotificationPublisher</Value>
+                                <Value>PumaServerBase/CrossTenantMessageNotificationPublisher</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

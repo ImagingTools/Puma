@@ -97,6 +97,10 @@ param(
     [string]$JsonReportPath = (Join-Path $ScriptDir "run-report.json"),
     [string]$WsJUnitReportPath = (Join-Path $ScriptDir "junit-report-ws.xml"),
     [string]$WsNotificationsJUnitReportPath = (Join-Path $ScriptDir "junit-report-ws-notifications.xml"),
+    [string]$NotificationCenterCollectionPath = (Join-Path $ScriptDir "Notification_Center.postman_collection.json"),
+    [string]$NotificationCenterJUnitReportPath = (Join-Path $ScriptDir "junit-report-notification-center.xml"),
+    [string]$NotificationCenterJsonReportPath = (Join-Path $ScriptDir "run-report-notification-center.json"),
+    [string]$WsNotificationCenterJUnitReportPath = (Join-Path $ScriptDir "junit-report-ws-notification-center.xml"),
     [string]$ServerStdOutPath = (Join-Path $ScriptDir "server-stdout.log"),
     [string]$ServerStdErrPath = (Join-Path $ScriptDir "server-stderr.log"),
     [int]$WebSocketPort = 18788,
@@ -230,18 +234,22 @@ function Install-NewmanIfNeeded {
     return $newmanCmd
 }
 
-function Invoke-NewmanSuite {
+function Invoke-NewmanSuite(
+        [string]$Collection = $CollectionPath,
+        [string]$JUnitReport = $JUnitReportPath,
+        [string]$JsonReport = $JsonReportPath,
+        [string]$Title = "newman suite") {
     $newmanCmd = Install-NewmanIfNeeded
 
-    Write-Step "Running newman suite"
+    Write-Step "Running $Title"
     $baseUrl = "http://localhost:$HttpPort/Puma/graphql"
     $newmanArgs = @(
-        "run", $CollectionPath,
+        "run", $Collection,
         "-e", $EnvironmentPath,
         "--env-var", "base_url=$baseUrl",
         "--reporters", "cli,junit,json",
-        "--reporter-junit-export", $JUnitReportPath,
-        "--reporter-json-export", $JsonReportPath
+        "--reporter-junit-export", $JUnitReport,
+        "--reporter-json-export", $JsonReport
     )
     & $newmanCmd @newmanArgs | Out-Host
     return $LASTEXITCODE
@@ -288,6 +296,12 @@ try {
     $wsExitCode = Invoke-WsSuite "ws-subscriptions.js" "WebSocket subscription suite" $WsJUnitReportPath
     if ($exitCode -eq 0) { $exitCode = $wsExitCode }
     $wsExitCode = Invoke-WsSuite "ws-notifications.js" "WebSocket notification routing suite" $WsNotificationsJUnitReportPath
+    if ($exitCode -eq 0) { $exitCode = $wsExitCode }
+
+    # The notification center creates its own users and organizations, it needs nothing of the suites before it
+    $centerExitCode = Invoke-NewmanSuite $NotificationCenterCollectionPath $NotificationCenterJUnitReportPath $NotificationCenterJsonReportPath "notification center suite"
+    if ($exitCode -eq 0) { $exitCode = $centerExitCode }
+    $wsExitCode = Invoke-WsSuite "ws-notification-center.js" "WebSocket notification center suite" $WsNotificationCenterJUnitReportPath
     if ($exitCode -eq 0) { $exitCode = $wsExitCode }
 }
 finally {

@@ -72,7 +72,8 @@ function gqlString(value) {
 	return JSON.stringify(String(value));
 }
 
-function gql(query, token) {
+// productOverride: the product of this request instead of the one of the run.
+function gql(query, token, productOverride) {
 	return new Promise((resolve, reject) => {
 		const u = new URL(httpUrl);
 		const body = JSON.stringify({ query });
@@ -81,7 +82,7 @@ function gql(query, token) {
 			'Content-Length': Buffer.byteLength(body)
 		};
 		if (token) { headers['x-authentication-token'] = token; }
-		if (productId) { headers['productId'] = productId; }
+		if (productOverride || productId) { headers['productId'] = productOverride || productId; }
 
 		const lib = u.protocol === 'https:' ? https : http;
 		const req = lib.request({

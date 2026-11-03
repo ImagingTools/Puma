@@ -26,8 +26,6 @@
 //   RelationshipProposalApproved -> the owner of the initiating organization
 //   RelationshipProposalRejected -> the owner of the initiating organization
 //   RelationshipRemoved       -> the owners of both organizations, unless the connection ends with it
-//   MessageReceived           -> the owner of the target organization
-//   MessageStatusChanged      -> the owner of the source organization
 
 'use strict';
 
@@ -41,8 +39,7 @@ const {
 
 const MEMBERSHIP = 'OnMembershipNotification';
 const CONNECTION = 'OnConnectionCodesNotification';
-const MESSAGE = 'OnCrossTenantMessageNotification';
-const CHANNELS = [MEMBERSHIP, CONNECTION, MESSAGE];
+const CHANNELS = [MEMBERSHIP, CONNECTION];
 
 // How long a misrouted notification gets to show up after the expected ones arrived.
 const quietMs = 1500;
@@ -83,11 +80,10 @@ async function selectTenant(p, tenantId) {
 }
 
 // The selection names every field a case asserts on (MembershipNotification,
-// ConnectionNotification, CrossTenantMessageNotification in the SDL).
+// ConnectionNotification in the SDL).
 const SELECTIONS = {
 	[MEMBERSHIP]: 'notificationType membershipId userId tenantId',
-	[CONNECTION]: 'notificationType tenantId connectionId requestId proposalId',
-	[MESSAGE]: 'notificationType messageId sourceTenantId targetTenantId relationshipId status'
+	[CONNECTION]: 'notificationType tenantId connectionId requestId proposalId'
 };
 
 function subscriptionQuery(commandId, input) {
@@ -228,23 +224,6 @@ function proposeRelationshipBetween(connectionId, initiatorTenantId, counterpart
 			`connectionId: ${gqlString(connectionId)}, proposalType: Create, initiatorTenantId: ${gqlString(initiatorTenantId)},` +
 			` counterpartyTenantId: ${gqlString(counterpartyTenantId)}, proposedSourceRole: Customer, proposedTargetRole: Supplier,` +
 			' status: Pending, message: "ws" } }) { proposalId errorMessage } }', token));
-}
-
-function sendMessageBetween(sourceTenantId, targetTenantId, relationshipId, recipients, token) {
-	return expectRouting(MESSAGE,
-		sent => ({ notificationType: 'MessageReceived', messageId: sent.messageId, sourceTenantId, targetTenantId, relationshipId }), recipients,
-		() => act('SendCrossTenantMessage',
-			`mutation SendCrossTenantMessage { SendCrossTenantMessage(input: { sourceTenantId: ${gqlString(sourceTenantId)},` +
-			` targetTenantId: ${gqlString(targetTenantId)}, relationshipId: ${gqlString(relationshipId)}, messageType: Custom, payload: "ws" }) { messageId errorMessage } }`,
-			token));
-}
-
-function acknowledgeMessage(messageId, sourceTenantId, targetTenantId, recipients, token) {
-	return expectRouting(MESSAGE,
-		{ notificationType: 'MessageStatusChanged', messageId, sourceTenantId, targetTenantId, status: 'Acknowledged' }, recipients,
-		() => act('UpdateCrossTenantMessageStatus',
-			`mutation UpdateCrossTenantMessageStatus { UpdateCrossTenantMessageStatus(input: { messageId: ${gqlString(messageId)}, status: Acknowledged }) { success errorMessage } }`,
-			token));
 }
 
 // --- the suite
@@ -462,21 +441,6 @@ async function main() {
 		relationshipId = approved.relationshipId;
 	});
 
-	// --- cross-tenant messages
-
-	let messageId = null;
-
-	await test('a cross-tenant message reaches the owner of the target organization only', async () => {
-		requires(relationshipId, 'the applied relationship');
-		const sent = await sendMessageBetween(tenantA, tenantB, relationshipId, [partner], owner.tenantToken);
-		messageId = sent.messageId;
-	});
-
-	await test('a message status change is reported to the owner of the source organization only', async () => {
-		requires(messageId, 'the sent message');
-		await acknowledgeMessage(messageId, tenantA, tenantB, [owner], partner.tenantToken);
-	});
-
 	// --- cross-organization access: a user acts only for the organizations he belongs to
 
 	const refused = async (label, query, token, reason) => {
@@ -529,29 +493,6 @@ async function main() {
 		await refused('ApproveRelationshipProposal',
 			`mutation ApproveRelationshipProposal { ApproveRelationshipProposal(input: { proposalId: ${gqlString(proposalId)}, tenantId: ${gqlString(tenantB)} }) { success errorMessage } }`,
 			partner.tenantToken, /not waiting for approval/);
-	});
-
-	await test('nobody sends, reads or settles messages of other organizations', async () => {
-		requires(relationshipId, 'the relationship between A and B');
-		requires(messageId, 'the message from A to B');
-		await refused('SendCrossTenantMessage',
-			`mutation SendCrossTenantMessage { SendCrossTenantMessage(input: { sourceTenantId: ${gqlString(tenantA)}, targetTenantId: ${gqlString(tenantB)},` +
-			` relationshipId: ${gqlString(relationshipId)}, messageType: Custom, payload: "forged" }) { messageId errorMessage } }`,
-			bystander.token);
-		await refused('GetCrossTenantMessage',
-			`query GetCrossTenantMessage { GetCrossTenantMessage(input: { messageId: ${gqlString(messageId)} }) { message { id } errorMessage } }`,
-			bystander.token);
-		await refused('GetCrossTenantMessages',
-			`query GetCrossTenantMessages { GetCrossTenantMessages(input: { tenantId: ${gqlString(tenantB)} }) { messages { id } errorMessage } }`,
-			bystander.token);
-		await refused('UpdateCrossTenantMessageStatus',
-			`mutation UpdateCrossTenantMessageStatus { UpdateCrossTenantMessageStatus(input: { messageId: ${gqlString(messageId)}, status: Processed }) { success errorMessage } }`,
-			bystander.token);
-
-		const own = await act('GetCrossTenantMessage',
-			`query GetCrossTenantMessage { GetCrossTenantMessage(input: { messageId: ${gqlString(messageId)} }) { message { id } errorMessage } }`,
-			partner.tenantToken);
-		assert(own.message && own.message.id === messageId, `the recipient cannot read its message: ${JSON.stringify(own).slice(0, 300)}`);
 	});
 
 	await test('nobody manages contracts or relationships of other organizations', async () => {
@@ -695,22 +636,13 @@ async function main() {
 		connectionCD = approved.connectionId;
 	});
 
-	let relationshipCD = null;
-
 	await test('a relationship proposal from C reaches both sessions of the owner of D, and only them', async () => {
 		requires(connectionCD, 'the connection between C and D');
 		const proposalCD = (await proposeRelationshipBetween(connectionCD, tenantC, tenantD, [bystander, spy], stranger.tenantToken)).proposalId;
-		const approved = await expectRouting(CONNECTION, { notificationType: 'RelationshipProposalApproved', tenantId: tenantC, proposalId: proposalCD }, [stranger],
+		await expectRouting(CONNECTION, { notificationType: 'RelationshipProposalApproved', tenantId: tenantC, proposalId: proposalCD }, [stranger],
 			() => act('ApproveRelationshipProposal',
 				`mutation ApproveRelationshipProposal { ApproveRelationshipProposal(input: { proposalId: ${gqlString(proposalCD)}, tenantId: ${gqlString(tenantD)} }) { success relationshipId errorMessage } }`,
 				bystander.tenantToken));
-		relationshipCD = approved.relationshipId;
-	});
-
-	await test('a message from C reaches both sessions of the owner of D, and only them', async () => {
-		requires(relationshipCD, 'the relationship between C and D');
-		const messageCD = (await sendMessageBetween(tenantC, tenantD, relationshipCD, [bystander, spy], stranger.tenantToken)).messageId;
-		await acknowledgeMessage(messageCD, tenantC, tenantD, [stranger], bystander.tenantToken);
 	});
 
 	// The grantor is the organization of the request context: UpdateGrantFromRepresentation

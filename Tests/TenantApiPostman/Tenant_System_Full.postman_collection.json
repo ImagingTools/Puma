@@ -984,6 +984,192 @@
                     ]
                 },
                 {
+                    "id": "2d6fccc4-1b7a-4b6b-b511-87f83d95ee8d",
+                    "name": "Tenant list created this year contains A",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetTenantList { GetTenantList(input: { viewParams: { offset: 0, count: 1000, filterModel: { timeFilter: { timeUnit: \"Year\", interpretationMode: \"Current\" } } } }) { items { id name } } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "75ff9993-ae6b-4f14-b3cc-7c790f8239d2",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const items = json.data && json.data.GetTenantList ? (json.data.GetTenantList.items || []) : [];",
+                                    "const tenantAId = pm.environment.get('tenantAId');",
+                                    "pm.test('no GraphQL error', function () { pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0); });",
+                                    "pm.test('tenant A is listed', function () { pm.expect(items.some(t => t.id === tenantAId), JSON.stringify(items.map(t => t.name)).slice(0, 300)).to.eql(true); });"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "d83c3219-dcfa-43f2-a9ac-c542200f793f",
+                    "name": "Tenant list created last year leaves A out",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetTenantList { GetTenantList(input: { viewParams: { offset: 0, count: 1000, filterModel: { timeFilter: { timeUnit: \"Year\", interpretationMode: \"Last\" } } } }) { items { id name } } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "71033ac9-854f-4329-9fdd-67a78fd3c264",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const items = json.data && json.data.GetTenantList ? (json.data.GetTenantList.items || []) : [];",
+                                    "const tenantAId = pm.environment.get('tenantAId');",
+                                    "pm.test('no GraphQL error', function () { pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0); });",
+                                    "pm.test('tenant A is not listed', function () { pm.expect(items.some(t => t.id === tenantAId), JSON.stringify(items.map(t => t.name)).slice(0, 300)).to.eql(false); });"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "3b059b66-cb04-4c16-9553-32f3cd58fd87",
+                    "name": "Tenant list created from today to today contains A",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetTenantList { GetTenantList(input: { viewParams: { offset: 0, count: 1000, filterModel: { timeFilter: { timeRange: { Begin: \"{{tf_today}}\", End: \"{{tf_today}}\" } } } } }) { items { id name } } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "id": "90e3a1fc-c400-45cd-829b-9a6e3b20a62b",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.variables.set('tf_today', new Date().toISOString().slice(0, 10));"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "ff9cc9d1-874f-471b-90aa-55b5e4760d85",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const items = json.data && json.data.GetTenantList ? (json.data.GetTenantList.items || []) : [];",
+                                    "const tenantAId = pm.environment.get('tenantAId');",
+                                    "pm.test('no GraphQL error', function () { pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0); });",
+                                    "pm.test('tenant A is listed', function () { pm.expect(items.some(t => t.id === tenantAId), JSON.stringify(items.map(t => t.name)).slice(0, 300)).to.eql(true); });"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "72955349-272e-49c9-970d-58806e42bdc2",
+                    "name": "Tenant list created in 2020 leaves A out",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetTenantList { GetTenantList(input: { viewParams: { offset: 0, count: 1000, filterModel: { timeFilter: { timeRange: { Begin: \"2020-01-01\", End: \"2020-12-31\" } } } } }) { items { id name } } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "a12704a2-2197-4f9c-99e6-050915a0215d",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const items = json.data && json.data.GetTenantList ? (json.data.GetTenantList.items || []) : [];",
+                                    "const tenantAId = pm.environment.get('tenantAId');",
+                                    "pm.test('no GraphQL error', function () { pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0); });",
+                                    "pm.test('tenant A is not listed', function () { pm.expect(items.some(t => t.id === tenantAId), JSON.stringify(items.map(t => t.name)).slice(0, 300)).to.eql(false); });"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
                     "id": "f5d7e7d0-20d8-44e5-9cbf-3f72d58a3da1",
                     "name": "SelectTenant A Owner context (post-lookup)",
                     "request": {
