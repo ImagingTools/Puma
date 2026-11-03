@@ -206,5 +206,7 @@
         <Interface InterfaceId="imtgql::IGqlRequestProvider" ComponentId="StandardGraphQlHandlers"/>
         <Interface InterfaceId="imtrest::IRequestServlet" ComponentId="StandardGraphQlHandlers"/>
     </ExportedInterfaces>
-    <ExportedComponents/>
+    <ExportedComponents>
+        <Component ExportedId="PasswordPolicy" ComponentId="RootDataController/PasswordPolicy"/>
+    </ExportedComponents>
 </Acf>

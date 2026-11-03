@@ -473,5 +473,7 @@
     <ExportedInterfaces>
         <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="Demultiplexer"/>
     </ExportedInterfaces>
-    <ExportedComponents/>
+    <ExportedComponents>
+        <Component ExportedId="PasswordPolicy" ComponentId="Pages/PasswordPolicy"/>
+    </ExportedComponents>
 </Acf>
