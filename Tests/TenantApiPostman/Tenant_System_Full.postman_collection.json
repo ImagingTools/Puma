@@ -75,11 +75,11 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "query GetApplicationInfo { GetApplicationInfo { applicationId version versionKind buildTime authServer { version } } }",
+                                "query": "query GetApplicationInfo { GetApplicationInfo { applicationId applicationName version versionKind buildTime dependencies { serviceId } } }",
                                 "variables": ""
                             }
                         },
-                        "description": "Sent without a token, the way a product server asks Puma after its WebSocket to Puma connects (CRemoteServerVersionInfoComp, AuthServerVersionInfo in PumaGQLClientEngine.acc). The answer is shown as Puma Version on the About page of the product. buildTime is the modification time of the Puma executable. Puma itself has no authorization server, so authServer is not set."
+                        "description": "Sent without a token, the way a product server asks Puma after its WebSocket to Puma connects (CRemoteServiceInfoComp, AuthServerVersionInfo in PumaGQLClientEngine.acc). The answer is the AuthServer entry of the dependencies of the product, its applicationName labels the row on the About page. buildTime is the modification time of the Puma executable. Puma depends on no other service, so it reports no dependencies."
                     },
                     "response": [],
                     "event": [
@@ -95,7 +95,8 @@
                                     "  pm.expect(json.errors || [], 'unexpected GraphQL error: ' + JSON.stringify(json.errors)).to.have.length(0);",
                                     "  pm.expect(info, JSON.stringify(json)).to.be.an('object');",
                                     "});",
-                                    "pm.test('GetApplicationInfo reports the version of Puma', function(){",
+                                    "pm.test('GetApplicationInfo reports the name and version of Puma', function(){",
+                                    "  pm.expect(info.applicationName, 'applicationName').to.be.a('string').and.not.empty;",
                                     "  pm.expect(info.version, 'version').to.match(/^\\d+\\.\\d+\\.\\d+/);",
                                     "});",
                                     "pm.test('GetApplicationInfo reports the build time of Puma as an ISO date in UTC that is not in the future', function(){",
@@ -104,8 +105,8 @@
                                     "  pm.expect(time, 'buildTime').to.be.above(Date.parse('2020-01-01T00:00:00Z'));",
                                     "  pm.expect(time, 'buildTime').to.be.at.most(Date.now() + 60000);",
                                     "});",
-                                    "pm.test('Puma reports no authorization server of its own', function(){",
-                                    "  pm.expect(info.authServer == null, 'authServer: ' + JSON.stringify(info.authServer)).to.eql(true);",
+                                    "pm.test('Puma reports no services it depends on', function(){",
+                                    "  pm.expect(!info.dependencies || info.dependencies.length === 0, 'dependencies: ' + JSON.stringify(info.dependencies)).to.eql(true);",
                                     "});"
                                 ]
                             }
