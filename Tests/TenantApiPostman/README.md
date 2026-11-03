@@ -40,9 +40,9 @@ newman run Tenant_System_Full.postman_collection.json -e Tenant_System_Full.post
 
 ## Scenario Coverage Summary
 
-Total request-level scenarios: 405
+Total request-level scenarios: 406
 
-- 00 System bootstrap: 1 requests
+- 00 System bootstrap: 2 requests
 - 00A Auth SU: 1 requests
 - 00B Register users: 4 requests
 - 00C Auth all users: 4 requests
@@ -86,9 +86,10 @@ document handle carried across folders expires on any run slower than ~30s.
 
 ## Full Scenario Catalog (All Request-Level Scenarios)
 
-### 00 System bootstrap (1)
+### 00 System bootstrap (2)
 
 1. Ensure superuser exists (su)
+2. GetApplicationInfo reports the version and build time of Puma
 
 ### 00A Auth SU (1)
 
