@@ -38,6 +38,8 @@ Minimal run:
 newman run Tenant_System_Full.postman_collection.json -e Tenant_System_Full.postman_environment.json
 ```
 
+`Run-CiTests.ps1` (Postgres) and `Run-CiTests-Sqlite.ps1` also fail the run if the server log (`server-stdout.log`/`server-stderr.log`, `server-sqlite-*.log` for SQLite) has a database error - see `ServerLogCheck.ps1`. A server can answer every request correctly while it loses data behind them; the log is the only place that shows it.
+
 ## Scenario Coverage Summary
 
 Total request-level scenarios: 406
@@ -129,19 +131,20 @@ document handle carried across folders expires on any run slower than ~30s.
 7. Save Tenant document (final)
 8. GetTenant by id (verify document-service tenant)
 
-### 02 Memberships and invitations (11)
+### 02 Memberships and invitations (12)
 
 1. Create invitation A -> member
 2. Get my invitations (A member)
-3. Accept invitation (A member)
-4. Find membership after accept
-5. Refresh auth A member after accept
-6. SelectTenant A member context after accept
-7. GetTenantList A member after accept
-8. Create invitation A -> outsider
-9. Get my invitations (outsider pending)
-10. Reject invitation (outsider)
-11. Get my invitations (outsider pending after reject)
+3. Invitation notification reached the member (A member) - the first notification of a fresh database
+4. Accept invitation (A member)
+5. Find membership after accept
+6. Refresh auth A member after accept
+7. SelectTenant A member context after accept
+8. GetTenantList A member after accept
+9. Create invitation A -> outsider
+10. Get my invitations (outsider pending)
+11. Reject invitation (outsider)
+12. Get my invitations (outsider pending after reject)
 
 ### 03 Connections, relationships, grants (9)
 

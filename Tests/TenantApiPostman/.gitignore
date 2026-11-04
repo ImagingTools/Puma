@@ -2,3 +2,5 @@ server-stdout.log
 server-stderr.log
 junit-report-ws.xml
 junit-report-ws-notifications.xml
+server-sqlite-stdout.log
+server-sqlite-stderr.log
