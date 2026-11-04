@@ -111,6 +111,8 @@ $ErrorActionPreference = "Stop"
 $serverProcess = $null
 $exitCode = 1
 
+. (Join-Path $ScriptDir "ServerLogCheck.ps1")
+
 if ([string]::IsNullOrWhiteSpace($ServerExePath)) {
     $ServerExePath = Join-Path $RepoRoot "Bin\$BuildConfig\PumaServerPgTest.exe"
 }
@@ -310,6 +312,8 @@ finally {
         Stop-Process -Id $serverProcess.Id -Force -ErrorAction SilentlyContinue
     }
 }
+
+if (-not (Test-ServerLogs @($ServerStdOutPath, $ServerStdErrPath)) -and $exitCode -eq 0) { $exitCode = 1 }
 
 if ($exitCode -eq 0) {
     Write-Host "`nAll tests passed." -ForegroundColor Green

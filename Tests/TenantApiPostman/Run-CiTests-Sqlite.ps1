@@ -86,12 +86,16 @@ param(
     [string]$NotificationCenterCollectionPath = (Join-Path $ScriptDir "Notification_Center.postman_collection.json"),
     [string]$NotificationCenterJUnitReportPath = (Join-Path $ScriptDir "junit-report-notification-center-sqlite.xml"),
     [string]$NotificationCenterJsonReportPath = (Join-Path $ScriptDir "run-report-notification-center-sqlite.json"),
+    [string]$ServerStdOutPath = (Join-Path $ScriptDir "server-sqlite-stdout.log"),
+    [string]$ServerStdErrPath = (Join-Path $ScriptDir "server-sqlite-stderr.log"),
     [int]$StartupTimeoutSeconds = 60
 )
 
 $ErrorActionPreference = "Stop"
 $serverProcess = $null
 $exitCode = 1
+
+. (Join-Path $ScriptDir "ServerLogCheck.ps1")
 
 if ([string]::IsNullOrWhiteSpace($ServerExePath)) {
     $ServerExePath = Join-Path $RepoRoot "Bin\$BuildConfig\PumaServerSlTest.exe"
@@ -133,8 +137,14 @@ function Start-TestServer {
         throw "Server executable not found: $ServerExePath"
     }
     $workDir = Split-Path -Parent $ServerExePath
-    $script:serverProcess = Start-Process -FilePath $ServerExePath -WorkingDirectory $workDir -PassThru -WindowStyle Hidden
+    # Redirected to files for the same reasons as in Run-CiTests.ps1: a hidden Debug
+    # console stalls the server under load, and the log is checked after the run
+    $script:serverProcess = Start-Process -FilePath $ServerExePath -WorkingDirectory $workDir -PassThru `
+        -WindowStyle Hidden `
+        -RedirectStandardOutput $ServerStdOutPath `
+        -RedirectStandardError $ServerStdErrPath
     Write-Host "Started PID $($script:serverProcess.Id)"
+    Write-Host "Server stdout: $ServerStdOutPath"
 
     $deadline = (Get-Date).AddSeconds($StartupTimeoutSeconds)
     $ready = $false
@@ -227,6 +237,8 @@ finally {
         Stop-Process -Id $serverProcess.Id -Force -ErrorAction SilentlyContinue
     }
 }
+
+if (-not (Test-ServerLogs @($ServerStdOutPath, $ServerStdErrPath)) -and $exitCode -eq 0) { $exitCode = 1 }
 
 if ($exitCode -eq 0) {
     Write-Host "`nAll tests passed." -ForegroundColor Green

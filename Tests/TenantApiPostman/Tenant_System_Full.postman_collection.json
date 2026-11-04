@@ -1920,6 +1920,53 @@
                     ]
                 },
                 {
+                    "name": "Invitation notification reached the member (A member)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{a_member_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query NotificationsList { NotificationsList(input: { pageSize: 100 }) { items { typeId actors { id } subject { id typeId } } } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "description": "The first invitation of the suite runs on a fresh database. Its notification is stored in the same request, and it used to be lost there: the notification tables did not exist until the notification collection was first read."
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.NotificationsList;",
+                                    "const items = (payload && payload.items) || [];",
+                                    "const found = items.filter(i => i.typeId === 'imtauth.InvitationReceived' && i.subject && i.subject.id === pm.environment.get('tenantAId'));",
+                                    "pm.test('The invitation reached the inbox of the member', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(found, JSON.stringify(json).slice(0, 500)).to.have.lengthOf(1);",
+                                    "  pm.expect(found[0].subject.typeId).to.eql('Tenant');",
+                                    "  pm.expect(found[0].actors.map(a => a.id)).to.eql([pm.environment.get('a_owner_user_id')]);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
                     "id": "dbaf2698-1319-45aa-b5a4-a897db701231",
                     "name": "Accept invitation (A member)",
                     "request": {
