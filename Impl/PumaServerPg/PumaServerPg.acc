@@ -125,6 +125,12 @@
                     <AttributeInfo Id="LogPath" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="Application/LogFilePath"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="ProductRepository" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaDatabasePostgres/ProductRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SnapshotRepository" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaDatabasePostgres/SnapshotRepository"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="RoleInfoProvider" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaDatabasePostgres/RoleDocumentSqlRepository"/>
                     </AttributeInfo>

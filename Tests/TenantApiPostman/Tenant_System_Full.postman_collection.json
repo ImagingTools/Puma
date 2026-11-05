@@ -54039,6 +54039,333 @@
                     "response": []
                 },
                 {
+                    "name": "ST: a token for a product outside the catalog is refused",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
+                                    "pm.test(\"refused\", function () { pm.expect(messages, JSON.stringify(json)).to.match(/is not connected/); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"StNoProduct\", productId: \"Puma\", name: \"st StNoProduct for Puma\", scopes: [\"/ProductServer/Collections/Watch\"] }) { id token success } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "ST: su adds the product to the catalog",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.environment.set('stCard', pm.variables.replaceIn('{{$guid}}')); pm.environment.set('stCard2', pm.variables.replaceIn('{{$guid}}')); pm.environment.set('stRun', pm.variables.replaceIn('{{$timestamp}}'));"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test(\"added\", function () { pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation ConnectedProductAdd { ConnectedProductAdd(input: { id: \"{{stCard}}\", typeId: \"ConnectedProduct\", item: { id: \"{{stCard}}\", productId: \"ProLife\", name: \"ProLife\", description: \"catalog probe\" } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "ST: the same product cannot be added twice",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
+                                    "pm.test(\"refused\", function () { pm.expect(messages, JSON.stringify(json)).to.match(/is already connected/); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation ConnectedProductAdd { ConnectedProductAdd(input: { id: \"{{stCard2}}\", typeId: \"ConnectedProduct\", item: { id: \"{{stCard2}}\", productId: \"ProLife\", name: \"ProLife again\" } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "ST: a product needs an ID",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
+                                    "pm.test(\"refused\", function () { pm.expect(messages, JSON.stringify(json)).to.match(/Product-ID can.t be empty/); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation ConnectedProductAdd { ConnectedProductAdd(input: { id: \"{{stCard2}}\", typeId: \"ConnectedProduct\", item: { id: \"{{stCard2}}\", name: \"No id\" } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "ST: the catalog lists the product",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('listed', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  const item = json.data.ConnectedProductsList.items.filter(function (i) { return i.id === pm.environment.get('stCard'); })[0];",
+                                    "  pm.expect(item, 'catalog entry').to.be.an('object');",
+                                    "  pm.expect(item.productId).to.eql('ProLife');",
+                                    "  pm.expect(item.productName).to.eql('ProLife');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query ConnectedProductsList { ConnectedProductsList(input: { viewParams: { offset: 0, count: 100 } }) { items { id productId productName } } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "ST: su renames the product",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test(\"renamed\", function () { pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation ConnectedProductUpdate { ConnectedProductUpdate(input: { id: \"{{stCard}}\", typeId: \"ConnectedProduct\", item: { id: \"{{stCard}}\", productId: \"ProLife\", name: \"ProLife renamed\", description: \"catalog probe\" } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "ST: the rename is stored",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('read back', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(json.data.ConnectedProductItem.name).to.eql('ProLife renamed');",
+                                    "  pm.expect(json.data.ConnectedProductItem.productId).to.eql('ProLife');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query ConnectedProductItem { ConnectedProductItem(input: { id: \"{{stCard}}\" }) { id productId name description } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "ST: the product ID cannot be changed",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
+                                    "pm.test(\"refused\", function () { pm.expect(messages, JSON.stringify(json)).to.match(/product ID cannot be changed/); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation ConnectedProductUpdate { ConnectedProductUpdate(input: { id: \"{{stCard}}\", typeId: \"ConnectedProduct\", item: { id: \"{{stCard}}\", productId: \"StOther\", name: \"x\" } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
                     "name": "ST: su issues a token of ProLife for Puma",
                     "event": [
                         {
@@ -54259,6 +54586,84 @@
                             "mode": "graphql",
                             "graphql": {
                                 "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"ProLife\", productId: \"Puma\", name: \"st ProLife for Puma\", scopes: [\"/ProductServer/Collections/Watch\"] }) { id token success } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "ST: an ordinary user does not see the catalog",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
+                                    "pm.test(\"refused\", function () { pm.expect(messages, JSON.stringify(json)).to.match(/Invalid permissions/); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{stUserToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query ConnectedProductsList { ConnectedProductsList(input: { viewParams: { offset: 0, count: 1 } }) { items { id } } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "ST: an ordinary user does not change the catalog",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
+                                    "pm.test(\"refused\", function () { pm.expect(messages, JSON.stringify(json)).to.match(/Invalid permissions/); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{stUserToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation ConnectedProductUpdate { ConnectedProductUpdate(input: { id: \"{{stCard}}\", typeId: \"ConnectedProduct\", item: { id: \"{{stCard}}\", productId: \"ProLife\", name: \"hacked\" } }) { id } }",
                                 "variables": ""
                             }
                         },
@@ -54824,6 +55229,82 @@
                             "mode": "graphql",
                             "graphql": {
                                 "query": "query ValidateToken { ValidateToken(input: { token: \"{{stLisaToken}}\" }) { valid } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "ST: removing the product revokes its tokens",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('removed', function () { pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0); pm.expect(json.data.RemoveElements.success).to.eql(true); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RemoveElements { RemoveElements(input: { collectionId: \"ConnectedProducts\", elementIds: [\"{{stCard}}\"] }) { success } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "ST: the token of a removed product is invalid",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('invalid', function () { pm.expect(json.data.ValidateToken.valid).to.eql(false); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query ValidateToken { ValidateToken(input: { token: \"{{stToken}}\" }) { valid } }",
                                 "variables": ""
                             }
                         },
