@@ -53992,6 +53992,853 @@
             ]
         },
         {
+            "name": "28 Server tokens",
+            "description": "The token of a product server: no owner, a fixed set of permissions, valid for one server and one client product.",
+            "item": [
+                {
+                    "name": "ST seed: auth su",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.environment.set('product_id', 'Puma');"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const auth = pm.response.json().data.Authorization;",
+                                    "pm.test('su authorized', function () { pm.expect(auth.token).to.be.a('string').and.not.empty; });",
+                                    "pm.environment.set('su_token', auth.token);"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{su_login}}\", password: \"{{su_password}}\", productId: \"{{product_id}}\" }) { token } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "ST: su issues a token of ProLife for Puma",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.CreateServerToken;",
+                                    "pm.test('created', function () { pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true); pm.expect(payload.token).to.match(/^imt_pat_/); });",
+                                    "pm.environment.set('stId', payload.id);",
+                                    "pm.environment.set('stToken', payload.token);"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"ProLife\", productId: \"Puma\", name: \"st ProLife for Puma\", scopes: [\"/ProductServer/Collections/Watch\"] }) { id token success } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "ST: su issues a token of ProLife for Lisa",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.CreateServerToken;",
+                                    "pm.test('created', function () { pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true); pm.expect(payload.token).to.match(/^imt_pat_/); });",
+                                    "pm.environment.set('stLisaId', payload.id);",
+                                    "pm.environment.set('stLisaToken', payload.token);"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"ProLife\", productId: \"Lisa\", name: \"st ProLife for Lisa\", scopes: [\"/ProductServer/Collections/Watch\"] }) { id token success } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "ST: an unknown permission is refused",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
+                                    "pm.test(\"refused\", function () { pm.expect(messages, JSON.stringify(json)).to.match(/cannot be given to a server/); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"ProLife\", productId: \"Puma\", name: \"st ProLife for Puma\", scopes: [\"/Administration/Users/Edit\"] }) { id token success } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "ST: a token for the own server is refused",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
+                                    "pm.test(\"refused\", function () { pm.expect(messages, JSON.stringify(json)).to.match(/issued for another server/); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"Puma\", productId: \"Puma\", name: \"st Puma for Puma\", scopes: [\"/ProductServer/Collections/Watch\"] }) { id token success } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "ST: an ordinary user cannot issue",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const auth = pm.response.json().data.Authorization;",
+                                    "pm.test('authorized', function () { pm.expect(auth.token).to.be.a('string').and.not.empty; });",
+                                    "pm.environment.set('stUserToken', auth.token);"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{pbAdminLogin}}\", password: \"Bound_2026!\", productId: \"Puma\" }) { token } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "ST: an ordinary user is refused",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
+                                    "pm.test(\"refused\", function () { pm.expect(messages, JSON.stringify(json)).to.match(/Server tokens are managed by a superuser session/); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{stUserToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"ProLife\", productId: \"Puma\", name: \"st ProLife for Puma\", scopes: [\"/ProductServer/Collections/Watch\"] }) { id token success } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "ST: anonymous is refused",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
+                                    "pm.test(\"refused\", function () { pm.expect(messages, JSON.stringify(json)).to.match(/Server tokens are managed by a superuser session/); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"ProLife\", productId: \"Puma\", name: \"st ProLife for Puma\", scopes: [\"/ProductServer/Collections/Watch\"] }) { id token success } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "ST: su PAT seed",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const parts = pm.environment.get('su_token').split('.');",
+                                    "const claims = JSON.parse(Buffer.from(parts[1].replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString());",
+                                    "pm.environment.set('st_su_id', claims.userId);"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('created', function () { pm.expect(json.data.CreateToken.success, JSON.stringify(json)).to.eql(true); });",
+                                    "pm.environment.set('stSuPat', json.data.CreateToken.token);"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateToken { CreateToken(input: { userId: \"{{st_su_id}}\", productId: \"Puma\", name: \"st su pat\", scopes: [\"/StAny\"] }) { token success } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "ST: a personal token of su cannot issue",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
+                                    "pm.test(\"refused\", function () { pm.expect(messages, JSON.stringify(json)).to.match(/Server tokens are managed by a superuser session/); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{stSuPat}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"ProLife\", productId: \"Puma\", name: \"st ProLife for Puma\", scopes: [\"/ProductServer/Collections/Watch\"] }) { id token success } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "ST: the list shows the tokens of the product",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('both tokens listed', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  const tokens = json.data.GetServerTokenList.tokens;",
+                                    "  const ids = tokens.map(function (t) { return t.id; });",
+                                    "  pm.expect(ids).to.include(pm.environment.get('stId'));",
+                                    "  pm.expect(ids).to.include(pm.environment.get('stLisaId'));",
+                                    "  tokens.forEach(function (t) { pm.expect(t.clientProductId).to.eql('ProLife'); });",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetServerTokenList { GetServerTokenList(input: { clientProductId: \"ProLife\" }) { tokens { id clientProductId productId scopes revoked } } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "ST: the list is for su only",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
+                                    "pm.test(\"refused\", function () { pm.expect(messages, JSON.stringify(json)).to.match(/Server tokens are managed by a superuser session/); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{stUserToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetServerTokenList { GetServerTokenList(input: { clientProductId: \"ProLife\" }) { tokens { id } } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "ST: ValidateToken names both products",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('reported', function () {",
+                                    "  const p = json.data.ValidateToken;",
+                                    "  pm.expect(p.valid).to.eql(true);",
+                                    "  pm.expect(p.clientProductId).to.eql('ProLife');",
+                                    "  pm.expect(p.productId).to.eql('Puma');",
+                                    "  pm.expect(p.userId || '').to.eql('');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query ValidateToken { ValidateToken(input: { token: \"{{stToken}}\" }) { valid userId productId clientProductId scopes } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "ST: the token of a server opens no command of a user",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.request.headers.upsert({ key: 'productid', value: 'ProLife' });"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
+                                    "pm.test(\"refused\", function () { pm.expect(messages, JSON.stringify(json)).to.match(/Invalid permissions/); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{stToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query RolesList { RolesList(input: { viewParams: { offset: 0, count: 1 } }) { items { id } } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "ST: the token is refused under the header of another product",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.variables.set('expectedHttpStatus', 403);",
+                                    "pm.request.headers.upsert({ key: 'productid', value: 'Lisa' });"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('forbidden', function () { pm.expect(pm.response.code).to.eql(403); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{stToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetServerTokenList { GetServerTokenList(input: { clientProductId: \"ProLife\" }) { tokens { id } } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "ST: a token for Lisa is refused by Puma",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.variables.set('expectedHttpStatus', 403);",
+                                    "pm.request.headers.upsert({ key: 'productid', value: 'ProLife' });"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('forbidden', function () { pm.expect(pm.response.code).to.eql(403); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{stLisaToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetServerTokenList { GetServerTokenList(input: { clientProductId: \"ProLife\" }) { tokens { id } } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "ST: a server token cannot issue tokens",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.request.headers.upsert({ key: 'productid', value: 'ProLife' });"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
+                                    "pm.test(\"refused\", function () { pm.expect(messages, JSON.stringify(json)).to.match(/Server tokens are managed by a superuser session/); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{stToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"ProLife\", productId: \"Puma\", name: \"st ProLife for Puma\", scopes: [\"/ProductServer/Collections/Watch\"] }) { id token success } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "ST: a personal token is not revoked as a server token",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.environment.set('stPbTokenId', pm.variables.replaceIn('{{$guid}}'));"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
+                                    "pm.test(\"refused\", function () { pm.expect(messages, JSON.stringify(json)).to.match(/server token does not exist/); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RevokeServerToken { RevokeServerToken(input: { id: \"{{stPbTokenId}}\" }) { success } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "ST: su revokes",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('revoked', function () { pm.expect(json.data.RevokeServerToken.success, JSON.stringify(json)).to.eql(true); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RevokeServerToken { RevokeServerToken(input: { id: \"{{stLisaId}}\" }) { success } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "ST: a revoked token is reported invalid",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('invalid', function () { pm.expect(json.data.ValidateToken.valid).to.eql(false); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query ValidateToken { ValidateToken(input: { token: \"{{stLisaToken}}\" }) { valid } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
             "id": "664f4f89-6520-4a63-94d6-f3f7e022c2f6",
             "name": "99 Cleanup",
             "item": [
