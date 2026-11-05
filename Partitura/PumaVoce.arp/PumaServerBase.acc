@@ -46,6 +46,9 @@
         <Element Id="ConnectedProductCatalog" PackageId="ImtAuthVoce" ComponentId="ConnectedProductCatalog">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="PersonalAccessTokenCache" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="AuthenticationManager"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -172,6 +175,9 @@
         <Element Id="PersonalAccessTokenController" PackageId="ImtAuthVoce" ComponentId="PersonalAccessTokenController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="PersonalAccessTokenCache" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="AuthenticationManager"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
