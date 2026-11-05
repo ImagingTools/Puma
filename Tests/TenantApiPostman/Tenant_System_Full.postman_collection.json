@@ -52298,6 +52298,1700 @@
             ]
         },
         {
+            "name": "27 Product boundary",
+            "description": "A permission acts on the data of the product of its role; nobody grants what he does not hold; a token works for its product.",
+            "item": [
+                {
+                    "name": "PB seed: auth su",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.environment.set('product_id', 'Puma');",
+                                    "const n = pm.variables.replaceIn('{{$timestamp}}');",
+                                    "pm.environment.set('pbRun', n);",
+                                    "['pbAdminRole','pbHeldRole','pbBigRole','pbLisaRole','pbNewRole','pbLisaNewRole','pbChildRole','pbAdmin','pbTarget','pbLisaGroup','pbNewGroup','pbLisaProbe'].forEach(function (k) { pm.environment.set(k, pm.variables.replaceIn('{{$guid}}')); });",
+                                    "pm.environment.set('pbAdminLogin', 'pb_admin_' + n);",
+                                    "pm.environment.set('pbTargetLogin', 'pb_target_' + n);"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const auth = pm.response.json().data.Authorization;",
+                                    "pm.test('su authorized', function () { pm.expect(auth.token).to.be.a('string').and.not.empty; });",
+                                    "pm.environment.set('su_token', auth.token);"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{su_login}}\", password: \"{{su_password}}\", productId: \"{{product_id}}\" }) { token } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "PB seed: administrator role of Puma",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test(\"created\", function () { pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RoleAdd { RoleAdd(input: { id: \"{{pbAdminRole}}\", typeId: \"Role\", productId: \"Puma\", item: { id: \"{{pbAdminRole}}\", name: \"PB_ADMIN_{{pbRun}}\", roleId: \"PB_ADMIN_{{pbRun}}\", productId: \"Puma\", parentRoles: [], permissions: [{id: \"/Administration/Roles/View\", direct: true}, {id: \"/Administration/Roles/Edit/Add\", direct: true}, {id: \"/Administration/Roles/Edit/Change\", direct: true}, {id: \"/Administration/Roles/Edit/Remove\", direct: true}, {id: \"/Administration/Users/View\", direct: true}, {id: \"/Administration/Users/Edit/Add\", direct: true}, {id: \"/Administration/Users/Edit/Change\", direct: true}, {id: \"/Administration/Groups/View\", direct: true}, {id: \"/Administration/Groups/Edit/Add\", direct: true}, {id: \"/Administration/Groups/Edit/Change\", direct: true}, {id: \"/PbHeld\", direct: true}] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "PB seed: role of Puma the administrator holds",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test(\"created\", function () { pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RoleAdd { RoleAdd(input: { id: \"{{pbHeldRole}}\", typeId: \"Role\", productId: \"Puma\", item: { id: \"{{pbHeldRole}}\", name: \"PB_HELD_{{pbRun}}\", roleId: \"PB_HELD_{{pbRun}}\", productId: \"Puma\", parentRoles: [], permissions: [{id: \"/PbHeld\", direct: true}] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "PB seed: role of Puma with a permission he lacks",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test(\"created\", function () { pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RoleAdd { RoleAdd(input: { id: \"{{pbBigRole}}\", typeId: \"Role\", productId: \"Puma\", item: { id: \"{{pbBigRole}}\", name: \"PB_BIG_{{pbRun}}\", roleId: \"PB_BIG_{{pbRun}}\", productId: \"Puma\", parentRoles: [], permissions: [{id: \"/PbNotHeld\", direct: true}] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "PB seed: role of Lisa",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test(\"created\", function () { pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RoleAdd { RoleAdd(input: { id: \"{{pbLisaRole}}\", typeId: \"Role\", productId: \"Lisa\", item: { id: \"{{pbLisaRole}}\", name: \"PB_LISA_{{pbRun}}\", roleId: \"PB_LISA_{{pbRun}}\", productId: \"Lisa\", parentRoles: [], permissions: [{id: \"/PbHeld\", direct: true}] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "PB seed: group with a role of Lisa",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test(\"created\", function () { pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation GroupAdd { GroupAdd(input: { id: \"{{pbLisaGroup}}\", typeId: \"Group\", productId: \"Lisa\", item: { id: \"{{pbLisaGroup}}\", productId: \"Lisa\", name: \"PB_LISA_GROUP_{{pbRun}}\", description: \"probe\", roles: [{id: \"{{pbLisaRole}}\", direct: true}], users: [], parentGroups: [] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "PB seed: administrator",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test(\"created\", function () { pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UserAdd { UserAdd(input: { id: \"{{pbAdmin}}\", typeId: \"User\", productId: \"Puma\", item: { id: \"{{pbAdmin}}\", productId: \"Puma\", name: \"{{pbAdminLogin}}\", username: \"{{pbAdminLogin}}\", password: \"Bound_2026!\", email: \"{{pbAdminLogin}}@qa.test\", roles: [{id: \"{{pbAdminRole}}\", direct: true}], groups: [], permissions: [] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "PB seed: user with a role of Lisa",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test(\"created\", function () { pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UserAdd { UserAdd(input: { id: \"{{pbTarget}}\", typeId: \"User\", productId: \"Lisa\", item: { id: \"{{pbTarget}}\", productId: \"Lisa\", name: \"{{pbTargetLogin}}\", username: \"{{pbTargetLogin}}\", password: \"Bound_2026!\", email: \"{{pbTargetLogin}}@qa.test\", roles: [{id: \"{{pbLisaRole}}\", direct: true}], groups: [], permissions: [] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "PB seed: auth administrator",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const auth = pm.response.json().data.Authorization;",
+                                    "pm.test('authorized', function () { pm.expect(auth.token).to.be.a('string').and.not.empty; });",
+                                    "pm.environment.set('pbAdminToken', auth.token);"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{pbAdminLogin}}\", password: \"Bound_2026!\", productId: \"Puma\" }) { token } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "PB positive control: the role of the own product is readable",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('own product opens', function () { pm.expect(json.errors || []).to.have.length(0); pm.expect(json.data.RoleItem.productId).to.eql('Puma'); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{pbAdminToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query RoleItem { RoleItem(input: { id: \"{{pbHeldRole}}\", productId: \"Puma\" }) { id productId } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "PB role of another product: read naming it",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
+                                    "pm.test(\"refused by product\", function () { pm.expect(messages, JSON.stringify(json)).to.match(/Invalid permissions for the user/); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{pbAdminToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query RoleItem { RoleItem(input: { id: \"{{pbLisaRole}}\", productId: \"Lisa\" }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "PB role of another product: read naming the own product",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
+                                    "pm.test(\"reported as missing\", function () { pm.expect(messages, JSON.stringify(json)).to.match(/Object does not exist/); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{pbAdminToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query RoleItem { RoleItem(input: { id: \"{{pbLisaRole}}\", productId: \"Puma\" }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "PB role of another product: raw read",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
+                                    "pm.test(\"reported as missing\", function () { pm.expect(messages, JSON.stringify(json)).to.match(/Object does not exist/); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{pbAdminToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetObjectData { GetObjectData(input: { collectionId: \"Roles\", objectId: \"{{pbLisaRole}}\" }) { objectData } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "PB role of another product: update",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
+                                    "pm.test(\"refused by product\", function () { pm.expect(messages, JSON.stringify(json)).to.match(/Invalid permissions for the user/); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{pbAdminToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RoleUpdate { RoleUpdate(input: { id: \"{{pbLisaRole}}\", typeId: \"Role\", productId: \"Lisa\", item: { id: \"{{pbLisaRole}}\", name: \"PB_LISA_{{pbRun}}\", roleId: \"PB_LISA_{{pbRun}}\", productId: \"Lisa\", parentRoles: [], permissions: [{id: \"/PbHeld\", direct: true}] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "PB role of another product: update naming the own product at the top",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
+                                    "pm.test(\"refused by product\", function () { pm.expect(messages, JSON.stringify(json)).to.match(/Invalid permissions for the user/); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{pbAdminToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RoleUpdate { RoleUpdate(input: { id: \"{{pbLisaRole}}\", typeId: \"Role\", productId: \"Puma\", item: { id: \"{{pbLisaRole}}\", name: \"PB_LISA_{{pbRun}}\", roleId: \"PB_LISA_{{pbRun}}\", productId: \"Lisa\", parentRoles: [], permissions: [{id: \"/PbHeld\", direct: true}] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "PB role of another product: update naming the own product everywhere",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
+                                    "pm.test(\"reported as missing\", function () { pm.expect(messages, JSON.stringify(json)).to.match(/Object does not exist/); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{pbAdminToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RoleUpdate { RoleUpdate(input: { id: \"{{pbLisaRole}}\", typeId: \"Role\", productId: \"Puma\", item: { id: \"{{pbLisaRole}}\", name: \"PB_LISA_{{pbRun}}\", roleId: \"PB_LISA_{{pbRun}}\", productId: \"Puma\", parentRoles: [], permissions: [{id: \"/PbHeld\", direct: true}] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "PB role of another product: forged product header",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.request.headers.upsert({ key: 'productid', value: 'Lisa' });"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
+                                    "pm.test(\"no permissions in that product\", function () { pm.expect(messages, JSON.stringify(json)).to.match(/Invalid permissions for the user/); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{pbAdminToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RoleUpdate { RoleUpdate(input: { id: \"{{pbLisaRole}}\", typeId: \"Role\", productId: \"Lisa\", item: { id: \"{{pbLisaRole}}\", name: \"PB_LISA_{{pbRun}}\", roleId: \"PB_LISA_{{pbRun}}\", productId: \"Lisa\", parentRoles: [], permissions: [{id: \"/PbHeld\", direct: true}] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "PB role of another product: add",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
+                                    "pm.test(\"refused by product\", function () { pm.expect(messages, JSON.stringify(json)).to.match(/Invalid permissions for the user/); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{pbAdminToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RoleAdd { RoleAdd(input: { id: \"{{pbLisaNewRole}}\", typeId: \"Role\", productId: \"Lisa\", item: { id: \"{{pbLisaNewRole}}\", name: \"PB_LNEW_{{pbRun}}\", roleId: \"PB_LNEW_{{pbRun}}\", productId: \"Lisa\", parentRoles: [], permissions: [{id: \"/PbHeld\", direct: true}] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "PB role of another product: remove",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
+                                    "pm.test(\"reported as missing\", function () { pm.expect(messages, JSON.stringify(json)).to.match(/Object does not exist/); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{pbAdminToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RemoveElements { RemoveElements(input: { collectionId: \"Roles\", elementIds: [\"{{pbLisaRole}}\"] }) { success } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "PB role of another product still exists unchanged",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('su reads it, nothing was changed', function () { pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0); pm.expect(json.data.RoleItem.productId).to.eql('Lisa'); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query RoleItem { RoleItem(input: { id: \"{{pbLisaRole}}\", productId: \"Lisa\" }) { id productId } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "PB list naming another product",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
+                                    "pm.test(\"refused by product\", function () { pm.expect(messages, JSON.stringify(json)).to.match(/Invalid permissions for the user/); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{pbAdminToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query RolesList { RolesList(input: { productId: \"Lisa\", viewParams: { offset: 0, count: 100 } }) { items { id } } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "PB list naming no product shows only the own product",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('own roles only', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  const items = json.data.RolesList.items;",
+                                    "  pm.expect(items.map(function (i) { return i.id; })).to.include(pm.environment.get('pbHeldRole'));",
+                                    "  pm.expect(items.filter(function (i) { return i.productId !== 'Puma'; }), 'roles of other products').to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{pbAdminToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query RolesList { RolesList(input: { viewParams: { offset: 0, count: 1000 } }) { items { id productId } } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "PB the product of a role cannot be changed even by su",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
+                                    "pm.test(\"refused\", function () { pm.expect(messages, JSON.stringify(json)).to.match(/The product of a role cannot be changed/); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RoleUpdate { RoleUpdate(input: { id: \"{{pbHeldRole}}\", typeId: \"Role\", productId: \"Lisa\", item: { id: \"{{pbHeldRole}}\", name: \"PB_HELD_{{pbRun}}\", roleId: \"PB_HELD_{{pbRun}}\", productId: \"Lisa\", parentRoles: [], permissions: [{id: \"/PbHeld\", direct: true}] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "PB a parent role of another product",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
+                                    "pm.test(\"refused\", function () { pm.expect(messages, JSON.stringify(json)).to.match(/belongs to another product/); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RoleAdd { RoleAdd(input: { id: \"{{pbChildRole}}\", typeId: \"Role\", productId: \"Puma\", item: { id: \"{{pbChildRole}}\", name: \"PB_CHILD_{{pbRun}}\", roleId: \"PB_CHILD_{{pbRun}}\", productId: \"Puma\", parentRoles: [{id: \"{{pbLisaRole}}\", direct: true}], permissions: [] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "PB su positive control: updates a role of another product",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test(\"su is not bound\", function () { pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RoleUpdate { RoleUpdate(input: { id: \"{{pbLisaRole}}\", typeId: \"Role\", productId: \"Lisa\", item: { id: \"{{pbLisaRole}}\", name: \"PB_LISA_{{pbRun}}\", roleId: \"PB_LISA_{{pbRun}}\", productId: \"Lisa\", parentRoles: [], permissions: [{id: \"/PbHeld\", direct: true}, {id: \"/PbSuAdded\", direct: true}] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "PB raw data: su reads a role of the own product",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const rawData = pm.response.json().data.GetObjectData.objectData;",
+                                    "pm.test('role data read', function () { pm.expect(rawData).to.include('\"ProductId\":\"Puma\"'); pm.expect(rawData).to.include('\"IsGuest\":false'); });",
+                                    "pm.environment.set('pbRawRole', JSON.stringify(rawData));"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetObjectData { GetObjectData(input: { collectionId: \"Roles\", objectId: \"{{pbHeldRole}}\" }) { objectData } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "PB raw data: roles cannot be written as raw data",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
+                                    "pm.test(\"no raw writes for roles\", function () { pm.expect(messages, JSON.stringify(json)).to.match(/Object of type .Role. could not be created/); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{pbAdminToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SetObjectData { SetObjectData(input: { collectionId: \"Roles\", objectId: \"{{pbHeldRole}}\", objectData: {{pbRawRole}} }) { success } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "PB grant positive control: a role with a held permission",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test(\"held permission can be granted\", function () { pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{pbAdminToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RoleAdd { RoleAdd(input: { id: \"{{pbNewRole}}\", typeId: \"Role\", productId: \"Puma\", item: { id: \"{{pbNewRole}}\", name: \"PB_NEW_{{pbRun}}\", roleId: \"PB_NEW_{{pbRun}}\", productId: \"Puma\", parentRoles: [], permissions: [{id: \"/PbHeld\", direct: true}] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "PB grant: a new role with a permission he lacks",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
+                                    "pm.test(\"refused\", function () { pm.expect(messages, JSON.stringify(json)).to.match(/cannot be granted: you do not hold it/); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{pbAdminToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RoleAdd { RoleAdd(input: { id: \"{{pbChildRole}}\", typeId: \"Role\", productId: \"Puma\", item: { id: \"{{pbChildRole}}\", name: \"PB_CHILD_{{pbRun}}\", roleId: \"PB_CHILD_{{pbRun}}\", productId: \"Puma\", parentRoles: [], permissions: [{id: \"/PbNotHeld\", direct: true}] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "PB grant: adding a permission he lacks to a role",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
+                                    "pm.test(\"refused\", function () { pm.expect(messages, JSON.stringify(json)).to.match(/cannot be granted: you do not hold it/); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{pbAdminToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RoleUpdate { RoleUpdate(input: { id: \"{{pbNewRole}}\", typeId: \"Role\", productId: \"Puma\", item: { id: \"{{pbNewRole}}\", name: \"PB_NEW_{{pbRun}}\", roleId: \"PB_NEW_{{pbRun}}\", productId: \"Puma\", parentRoles: [], permissions: [{id: \"/PbHeld\", direct: true}, {id: \"/PbNotHeld\", direct: true}] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "PB grant: self-promotion through his own role",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
+                                    "pm.test(\"refused\", function () { pm.expect(messages, JSON.stringify(json)).to.match(/cannot be granted: you do not hold it/); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{pbAdminToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RoleUpdate { RoleUpdate(input: { id: \"{{pbAdminRole}}\", typeId: \"Role\", productId: \"Puma\", item: { id: \"{{pbAdminRole}}\", name: \"PB_ADMIN_{{pbRun}}\", roleId: \"PB_ADMIN_{{pbRun}}\", productId: \"Puma\", parentRoles: [], permissions: [{id: \"/Administration/Roles/View\", direct: true}, {id: \"/Administration/Roles/Edit/Add\", direct: true}, {id: \"/Administration/Roles/Edit/Change\", direct: true}, {id: \"/Administration/Roles/Edit/Remove\", direct: true}, {id: \"/Administration/Users/View\", direct: true}, {id: \"/Administration/Users/Edit/Add\", direct: true}, {id: \"/Administration/Users/Edit/Change\", direct: true}, {id: \"/Administration/Groups/View\", direct: true}, {id: \"/Administration/Groups/Edit/Add\", direct: true}, {id: \"/Administration/Groups/Edit/Change\", direct: true}, {id: \"/PbHeld\", direct: true}, {id: \"/PbNotHeld\", direct: true}] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "PB grant: a parent role with a permission he lacks",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
+                                    "pm.test(\"refused\", function () { pm.expect(messages, JSON.stringify(json)).to.match(/cannot be granted: you do not hold it/); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{pbAdminToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RoleUpdate { RoleUpdate(input: { id: \"{{pbNewRole}}\", typeId: \"Role\", productId: \"Puma\", item: { id: \"{{pbNewRole}}\", name: \"PB_NEW_{{pbRun}}\", roleId: \"PB_NEW_{{pbRun}}\", productId: \"Puma\", parentRoles: [{id: \"{{pbBigRole}}\", direct: true}], permissions: [{id: \"/PbHeld\", direct: true}] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "PB grant: a role keeps what he lacks when only the name changes",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test(\"only added permissions are compared\", function () { pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{pbAdminToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RoleUpdate { RoleUpdate(input: { id: \"{{pbBigRole}}\", typeId: \"Role\", productId: \"Puma\", item: { id: \"{{pbBigRole}}\", name: \"PB_BIG2_{{pbRun}}\", roleId: \"PB_BIG2_{{pbRun}}\", productId: \"Puma\", parentRoles: [], permissions: [{id: \"/PbNotHeld\", direct: true}] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "PB grant: a user gets a role with a permission he lacks",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
+                                    "pm.test(\"refused\", function () { pm.expect(messages, JSON.stringify(json)).to.match(/cannot be granted: you do not hold it/); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{pbAdminToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UserUpdate { UserUpdate(input: { id: \"{{pbTarget}}\", typeId: \"User\", productId: \"Puma\", item: { id: \"{{pbTarget}}\", productId: \"Puma\", name: \"{{pbTargetLogin}}\", username: \"{{pbTargetLogin}}\", email: \"{{pbTargetLogin}}@qa.test\", roles: [{id: \"{{pbBigRole}}\", direct: true}], groups: [], permissions: [] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "PB grant: a group gets a role with a permission he lacks",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
+                                    "pm.test(\"refused\", function () { pm.expect(messages, JSON.stringify(json)).to.match(/cannot be granted: you do not hold it/); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{pbAdminToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation GroupAdd { GroupAdd(input: { id: \"{{pbNewGroup}}\", typeId: \"Group\", productId: \"Puma\", item: { id: \"{{pbNewGroup}}\", productId: \"Puma\", name: \"PB_NEW_GROUP_{{pbRun}}\", description: \"probe\", roles: [{id: \"{{pbBigRole}}\", direct: true}], users: [], parentGroups: [] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "PB grant: su gives anything",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test(\"su is not bound\", function () { pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RoleUpdate { RoleUpdate(input: { id: \"{{pbNewRole}}\", typeId: \"Role\", productId: \"Puma\", item: { id: \"{{pbNewRole}}\", name: \"PB_NEW_{{pbRun}}\", roleId: \"PB_NEW_{{pbRun}}\", productId: \"Puma\", parentRoles: [], permissions: [{id: \"/PbHeld\", direct: true}, {id: \"/PbNotHeld\", direct: true}] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "PB user: roles of another product",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
+                                    "pm.test(\"refused by product\", function () { pm.expect(messages, JSON.stringify(json)).to.match(/Invalid permissions for the user/); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{pbAdminToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UserUpdate { UserUpdate(input: { id: \"{{pbTarget}}\", typeId: \"User\", productId: \"Lisa\", item: { id: \"{{pbTarget}}\", productId: \"Lisa\", name: \"{{pbTargetLogin}}\", username: \"{{pbTargetLogin}}\", email: \"{{pbTargetLogin}}@qa.test\", roles: [], groups: [], permissions: [] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "PB user: update in the own product",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test(\"own product can be changed\", function () { pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{pbAdminToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UserUpdate { UserUpdate(input: { id: \"{{pbTarget}}\", typeId: \"User\", productId: \"Puma\", item: { id: \"{{pbTarget}}\", productId: \"Puma\", name: \"{{pbTargetLogin}}\", username: \"{{pbTargetLogin}}\", email: \"{{pbTargetLogin}}@qa.test\", roles: [{id: \"{{pbHeldRole}}\", direct: true}], groups: [], permissions: [] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "PB user: the role in the other product survived",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('role of Lisa kept', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(JSON.stringify(json.data.UserItem.roles)).to.include(pm.environment.get('pbLisaRole'));",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query UserItem { UserItem(input: { id: \"{{pbTarget}}\", productId: \"Lisa\" }) { id roles { id } } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "PB group: roles of another product",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
+                                    "pm.test(\"refused by product\", function () { pm.expect(messages, JSON.stringify(json)).to.match(/Invalid permissions for the user/); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{pbAdminToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation GroupUpdate { GroupUpdate(input: { id: \"{{pbLisaGroup}}\", typeId: \"Group\", productId: \"Lisa\", item: { id: \"{{pbLisaGroup}}\", productId: \"Lisa\", name: \"PB_LISA_GROUP_{{pbRun}}\", description: \"probe\", roles: [], users: [], parentGroups: [] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "PB token of another product",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('created', function () { pm.expect(json.data.CreateToken.success, JSON.stringify(json)).to.eql(true); });",
+                                    "pm.environment.set('pbLisaToken', json.data.CreateToken.token);"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateToken { CreateToken(input: { userId: \"{{pbAdmin}}\", productId: \"Lisa\", name: \"pb lisa token\", scopes: [\"/PbHeld\"] }) { token success } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "PB ValidateToken names the product of the token",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('product reported', function () { pm.expect(json.data.ValidateToken.valid).to.eql(true); pm.expect(json.data.ValidateToken.productId).to.eql('Lisa'); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query ValidateToken { ValidateToken(input: { token: \"{{pbLisaToken}}\" }) { valid productId } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "PB token of another product is refused under the header of this product",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.variables.set('expectedHttpStatus', 403);"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('forbidden', function () { pm.expect(pm.response.code).to.eql(403); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{pbLisaToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetPermissions { GetPermissions(input: { accessToken: \"{{pbLisaToken}}\" }) { permissions } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
             "id": "664f4f89-6520-4a63-94d6-f3f7e022c2f6",
             "name": "99 Cleanup",
             "item": [
