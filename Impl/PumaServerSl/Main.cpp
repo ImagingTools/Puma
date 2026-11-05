@@ -56,6 +56,13 @@ int main(int argc, char* argv[])
 	ImtCoreInitNotifySqlResources();
 	Q_INIT_RESOURCE(imtresthtml);
 	Q_INIT_RESOURCE(PumaServerSl);
+#ifdef WEB_COMPILE
+	Q_INIT_RESOURCE(pumaWeb);
+#endif
+	Q_INIT_RESOURCE(pumaqml);
+	Q_INIT_RESOURCE(imtstylecontrolsqml);
+	ImtCoreInitStyleResources();
+	ImtCoreInitAuthStyleResources();
 
 	CPumaServerSl instance;
 	return imtcore::CApplicationRunner::Run(argc, argv, instance);

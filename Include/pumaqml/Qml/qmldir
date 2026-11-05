@@ -1,3 +1,5 @@
 module pumaqml
 
 PumaConnectionSubscription 1.0 PumaConnectionSubscription.qml
+PumaMain 1.0 PumaMain.qml
+PumaWeb 1.0 PumaWeb.qml
