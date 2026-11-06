@@ -602,6 +602,9 @@
                     <AttributeInfo Id="DenyAnonymousSubscriptions" Type="Boolean" ExportId="">
                         <Data IsEnabled="true" Value="true"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="TokenCheckInterval" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="5"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="GqlSubscriberControllers" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
