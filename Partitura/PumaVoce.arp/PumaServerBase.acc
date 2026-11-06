@@ -53,6 +53,7 @@
                             <Value>CheckEmailCode</Value>
                             <Value>GetUserObjectId</Value>
                             <Value>GetPasswordPolicy</Value>
+                            <Value>GetCommands</Value>
                             <Value>UserItem</Value>
                             <Value>RoleItem</Value>
                             <Value>GroupItem</Value>
@@ -176,6 +177,7 @@
                 <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                     <Data IsEnabled="true">
                         <Values>
+                            <Value>/ProductServer/Authorization</Value>
                             <Value>/ProductServer/Authorization</Value>
                             <Value>/ProductServer/Authorization</Value>
                             <Value>/ProductServer/Authorization</Value>
