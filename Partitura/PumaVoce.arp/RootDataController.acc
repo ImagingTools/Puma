@@ -211,6 +211,15 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
+                    <AttributeInfo Id="ObjectChangeCheckers" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Pages/RoleController</Value>
+                                <Value>Pages/UserController</Value>
+                                <Value>Pages/UserGroupController</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -540,6 +549,9 @@
                     <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="Demultiplexer"/>
                 </ExportedInterfaces>
                 <ExportedComponents>
+                    <Component ExportedId="RoleController" ComponentId="RolesPage/RolesDataController"/>
+                    <Component ExportedId="UserController" ComponentId="UsersPage/UserListController"/>
+                    <Component ExportedId="UserGroupController" ComponentId="UserGroupsPage/GroupsListController"/>
                     <Component ExportedId="RoleChangeGenerator" ComponentId="RolesPage/RoleChangeGenerator"/>
                     <Component ExportedId="UserChangeGenerator" ComponentId="UsersPage/UserChangeGenerator"/>
                     <Component ExportedId="UserGroupChangeGenerator" ComponentId="UserGroupsPage/UserGroupChangeGenerator"/>
