@@ -10,6 +10,11 @@
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
+        <Element Id="PermissionTree" PackageId="ImtLicensePck" ComponentId="IdentifiableProductInfo">
+            <Data IsEnabled="true" Flags="1">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
         <Element Id="ProductServerRequestPolicy" PackageId="ImtServerGqlPck" ComponentId="ProductServerRequestPolicy">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -171,59 +176,60 @@
                             <Value>SendNotification</Value>
                             <Value>WithdrawNotifications</Value>
                             <Value>PublishProductPermissions</Value>
+                            <Value>GetServerTokenFeatures</Value>
                         </Values>
                     </Data>
                 </AttributeInfo>
                 <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                     <Data IsEnabled="true">
                         <Values>
-                            <Value>/ProductServer/Authorization</Value>
-                            <Value>/ProductServer/Authorization</Value>
-                            <Value>/ProductServer/Authorization</Value>
-                            <Value>/ProductServer/Authorization</Value>
-                            <Value>/ProductServer/Authorization</Value>
-                            <Value>/ProductServer/Authorization</Value>
-                            <Value>/ProductServer/Authorization</Value>
-                            <Value>/ProductServer/Authorization</Value>
-                            <Value>/ProductServer/Authorization</Value>
-                            <Value>/ProductServer/Authorization</Value>
-                            <Value>/ProductServer/Authorization</Value>
-                            <Value>/ProductServer/Authorization</Value>
-                            <Value>/ProductServer/Authorization</Value>
-                            <Value>/ProductServer/Authorization</Value>
-                            <Value>/ProductServer/Authorization</Value>
-                            <Value>/ProductServer/Authorization</Value>
-                            <Value>/ProductServer/Authorization</Value>
-                            <Value>/ProductServer/Authorization</Value>
-                            <Value>/ProductServer/Authorization</Value>
-                            <Value>/ProductServer/Authorization</Value>
-                            <Value>/ProductServer/Authorization</Value>
-                            <Value>/ProductServer/Authorization</Value>
-                            <Value>/ProductServer/Authorization</Value>
-                            <Value>/ProductServer/Authorization</Value>
-                            <Value>/ProductServer/Authorization</Value>
-                            <Value>/ProductServer/Authorization</Value>
-                            <Value>/ProductServer/Authorization</Value>
-                            <Value>/ProductServer/Authorization</Value>
-                            <Value>/ProductServer/Authorization</Value>
-                            <Value>/ProductServer/Authorization</Value>
-                            <Value>/ProductServer/Authorization</Value>
-                            <Value>/ProductServer/Authorization</Value>
-                            <Value>/ProductServer/Authorization</Value>
-                            <Value>/ProductServer/Authorization</Value>
-                            <Value>/ProductServer/Authorization</Value>
-                            <Value>/ProductServer/Authorization</Value>
-                            <Value>/ProductServer/Authorization</Value>
-                            <Value>/ProductServer/Authorization</Value>
-                            <Value>/ProductServer/Authorization</Value>
-                            <Value>/ProductServer/Authorization</Value>
-                            <Value>/ProductServer/Authorization</Value>
-                            <Value>/ProductServer/Tokens/Validate</Value>
-                            <Value>/ProductServer/Tokens/Edit</Value>
-                            <Value>/ProductServer/Tokens/Edit</Value>
-                            <Value>/ProductServer/Tokens/Edit</Value>
-                            <Value>/ProductServer/Tokens/Edit</Value>
-                            <Value>/ProductServer/Tokens/Edit</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/PersonalTokens/Accept</Value>
+                            <Value>/ProductServer/PersonalTokens/Manage</Value>
+                            <Value>/ProductServer/PersonalTokens/Manage</Value>
+                            <Value>/ProductServer/PersonalTokens/Manage</Value>
+                            <Value>/ProductServer/PersonalTokens/Manage</Value>
+                            <Value>/ProductServer/PersonalTokens/Manage</Value>
                             <Value>/ProductServer/Users/View</Value>
                             <Value>/ProductServer/Users/View</Value>
                             <Value>/ProductServer/Users/Edit</Value>
@@ -299,18 +305,18 @@
                             <Value>/ProductServer/Organizations/Edit</Value>
                             <Value>/ProductServer/Organizations/Edit</Value>
                             <Value>/ProductServer/Organizations/Edit</Value>
-                            <Value>/ProductServer/Watch/Users</Value>
-                            <Value>/ProductServer/Watch/Users</Value>
-                            <Value>/ProductServer/Watch/Roles</Value>
-                            <Value>/ProductServer/Watch/Groups</Value>
-                            <Value>/ProductServer/Watch/Organizations</Value>
-                            <Value>/ProductServer/Watch/Organizations</Value>
-                            <Value>/ProductServer/Watch/Organizations</Value>
-                            <Value>/ProductServer/Watch/Organizations</Value>
-                            <Value>/ProductServer/Watch/Organizations</Value>
-                            <Value>/ProductServer/Watch/Organizations</Value>
-                            <Value>/ProductServer/Watch/Organizations</Value>
-                            <Value>/ProductServer/Watch/Organizations</Value>
+                            <Value>/ProductServer/Users/View</Value>
+                            <Value>/ProductServer/Users/View</Value>
+                            <Value>/ProductServer/Roles/View</Value>
+                            <Value>/ProductServer/Groups/View</Value>
+                            <Value>/ProductServer/Organizations/View</Value>
+                            <Value>/ProductServer/Organizations/View</Value>
+                            <Value>/ProductServer/Organizations/View</Value>
+                            <Value>/ProductServer/Organizations/View</Value>
+                            <Value>/ProductServer/Organizations/View</Value>
+                            <Value>/ProductServer/Organizations/View</Value>
+                            <Value>/ProductServer/Organizations/View</Value>
+                            <Value>/ProductServer/Organizations/View</Value>
                             <Value>/ProductServer/Notifications/View</Value>
                             <Value>/ProductServer/Notifications/View</Value>
                             <Value>/ProductServer/Notifications/View</Value>
@@ -324,7 +330,8 @@
                             <Value>/ProductServer/Notifications/View</Value>
                             <Value>/ProductServer/Notifications/Send</Value>
                             <Value>/ProductServer/Notifications/Send</Value>
-                            <Value>/ProductServer/Permissions/Publish</Value>
+                            <Value>/ProductServer/PublishPermissions</Value>
+                            <Value>/ProductServer/SignIn</Value>
                         </Values>
                     </Data>
                 </AttributeInfo>
@@ -379,11 +386,11 @@
                 <AttributeInfo Id="CollectionObjectReadPermissions" Type="Id[]" ExportId="">
                     <Data IsEnabled="true">
                         <Values>
-                            <Value>/ProductServer/Authorization</Value>
-                            <Value>/ProductServer/Authorization</Value>
-                            <Value>/ProductServer/Authorization</Value>
-                            <Value>/ProductServer/Authorization</Value>
-                            <Value>/ProductServer/Authorization</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
                             <Value>/ProductServer/Organizations/View</Value>
                             <Value>/ProductServer/Organizations/View</Value>
                             <Value>/ProductServer/Organizations/View</Value>
@@ -447,6 +454,9 @@
                     <AttributeInfo Id="UserCollection" Type="Reference" ExportId="UserCollection">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="PermissionTree" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PermissionTree"/>
+                    </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
@@ -485,6 +495,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PermissionTree" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PermissionTree"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -1233,6 +1246,7 @@
         </EmbeddedRegistry>
     </EmbeddedRegistriesList>
     <ExportedInterfaces>
+        <Interface InterfaceId="imtlic::IProductInfo" ComponentId="PermissionTree"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="HttpServerFramework"/>
     </ExportedInterfaces>
     <ExportedComponents>

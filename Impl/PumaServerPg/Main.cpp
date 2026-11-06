@@ -6,10 +6,12 @@
 
 // ImtCore includes
 #include <imtcore/CApplicationRunner.h>
+#include <imtlic/IProductInfo.h>
 #include <imtcore/CImtCoreAuthorizableServerInitializer.h>
 #include <imtcore/CImtCoreNotifyInitializer.h>
 
 // Puma includes
+#include <puma/PumaFeatures.h>
 #include <GeneratedFiles/PumaServerPg/CPumaServerPg.h>
 
 static QtMessageHandler s_previousMessageHandler = nullptr;
@@ -61,5 +63,11 @@ int main(int argc, char* argv[])
 	ImtCoreInitAuthStyleResources();
 
 	CPumaServerPg instance;
+
+	auto* productInfoPtr = instance.GetInterface<imtlic::IProductInfo>();
+	if (productInfoPtr != nullptr){
+		puma::FillProduct(*productInfoPtr);
+	}
+
 	return imtcore::CApplicationRunner::Run(argc, argv, instance);
 }
