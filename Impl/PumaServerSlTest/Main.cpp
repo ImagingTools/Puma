@@ -3,10 +3,12 @@
 
 // ImtCore includes
 #include <imtcore/CApplicationRunner.h>
+#include <imtlic/IProductInfo.h>
 #include <imtcore/CImtCoreAuthorizableServerInitializer.h>
 #include <imtcore/CImtCoreNotifyInitializer.h>
 
 // Puma includes
+#include <puma/PumaFeatures.h>
 #include <GeneratedFiles/PumaServerSlTest/CPumaServerSlTest.h>
 
 
@@ -25,5 +27,11 @@ int main(int argc, char* argv[])
 	ImtCoreInitAuthStyleResources();
 
 	CPumaServerSlTest instance;
+
+	auto* productInfoPtr = instance.GetInterface<imtlic::IProductInfo>();
+	if (productInfoPtr != nullptr){
+		puma::FillProduct(*productInfoPtr);
+	}
+
 	return imtcore::CApplicationRunner::Run(argc, argv, instance);
 }

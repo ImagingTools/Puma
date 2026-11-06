@@ -212,6 +212,7 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
+        <Interface InterfaceId="imtlic::IProductInfo" ComponentId="PumaServerBase"/>
         <Interface InterfaceId="ibase::IApplication" ComponentId="SingletonDocApplication"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="SingletonDocApplication"/>
     </ExportedInterfaces>
