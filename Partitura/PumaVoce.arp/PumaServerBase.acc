@@ -46,6 +46,12 @@
         <Element Id="ConnectedProductCatalog" PackageId="ImtAuthVoce" ComponentId="ConnectedProductCatalog">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="OwnProductId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Puma"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="OwnProductName" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="Puma"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="PersonalAccessTokenCache" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="AuthenticationManager"/>
                     </AttributeInfo>
