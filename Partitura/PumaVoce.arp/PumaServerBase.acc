@@ -52,9 +52,6 @@
                     <AttributeInfo Id="OwnProductName" Type="String" ExportId="">
                         <Data IsEnabled="true" Value="Puma"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="PersonalAccessTokenCache" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="AuthenticationManager"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -602,6 +599,9 @@
         <Element Id="WebSocketServerFramework" PackageId="ImtHttpServerVoce" ComponentId="WebSocketServerFramework">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="DenyUndeclaredUserSubscriptions" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="AuthenticationManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="AuthenticationManager"/>
                     </AttributeInfo>
@@ -653,6 +653,9 @@
                     <Element Id="GroupCollectionChangeNotifier" PackageId="ImtServerGqlPck" ComponentId="ObjectCollectionChangeNotifier">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
+                                <AttributeInfo Id="OpenToServers" Type="Boolean" ExportId="">
+                                    <Data IsEnabled="true" Value="true"/>
+                                </AttributeInfo>
                                 <AttributeInfo Id="ReadPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
@@ -686,6 +689,9 @@
                     <Element Id="RoleCollectionChangeNotifier" PackageId="ImtServerGqlPck" ComponentId="ObjectCollectionChangeNotifier">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
+                                <AttributeInfo Id="OpenToServers" Type="Boolean" ExportId="">
+                                    <Data IsEnabled="true" Value="true"/>
+                                </AttributeInfo>
                                 <AttributeInfo Id="ReadPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
@@ -741,6 +747,9 @@
                     <Element Id="UserCollectionChangeNotifier" PackageId="ImtServerGqlPck" ComponentId="ObjectCollectionChangeNotifier">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
+                                <AttributeInfo Id="OpenToServers" Type="Boolean" ExportId="">
+                                    <Data IsEnabled="true" Value="true"/>
+                                </AttributeInfo>
                                 <AttributeInfo Id="ReadPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
@@ -774,6 +783,9 @@
                     <Element Id="UserSessionCollectionChangeNotifier" PackageId="ImtServerGqlPck" ComponentId="ObjectCollectionChangeNotifier">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
+                                <AttributeInfo Id="OpenToServers" Type="Boolean" ExportId="">
+                                    <Data IsEnabled="true" Value="true"/>
+                                </AttributeInfo>
                                 <AttributeInfo Id="ReadPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
