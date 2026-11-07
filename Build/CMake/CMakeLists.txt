@@ -19,6 +19,10 @@ endif()
 set(ACF_MODERN_CMAKE ON)
 set(ACF_PACKAGE_NAME "Puma")
 
+if(NOT DEFINED WEB_COMPILE)
+	set(WEB_COMPILE ON CACHE BOOL "Build the web console")
+endif()
+
 include("${CMAKE_CURRENT_LIST_DIR}/../../Config/CMake/PumaEnv.cmake")
 
 set(INCLUDE_DIR		"${PUMADIR}/Include")

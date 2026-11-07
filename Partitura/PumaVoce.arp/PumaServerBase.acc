@@ -10,9 +10,399 @@
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
+        <Element Id="PermissionTree" PackageId="ImtLicensePck" ComponentId="IdentifiableProductInfo">
+            <Data IsEnabled="true" Flags="1">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="ProductServerRequestPolicy" PackageId="ImtServerGqlPck" ComponentId="ProductServerRequestPolicy">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
+                    <Data IsEnabled="true">
+                        <Values>
+                            <Value>GetApplicationInfo</Value>
+                            <Value>Authorization</Value>
+                            <Value>UserToken</Value>
+                            <Value>Logout</Value>
+                            <Value>GetPermissions</Value>
+                            <Value>HandleExternalLoginCallback</Value>
+                            <Value>GetExternalLoginProviders</Value>
+                            <Value>GetExternalIdentities</Value>
+                            <Value>BeginExternalLogin</Value>
+                            <Value>CompleteExternalLogin</Value>
+                            <Value>UnlinkExternalIdentity</Value>
+                            <Value>ValidateSession</Value>
+                            <Value>ValidateJwt</Value>
+                            <Value>RefreshToken</Value>
+                            <Value>CreateNewSession</Value>
+                            <Value>GetSession</Value>
+                            <Value>RemoveSession</Value>
+                            <Value>GetUserFromJwt</Value>
+                            <Value>GetTenantFromJwt</Value>
+                            <Value>SelectTenant</Value>
+                            <Value>GetProfile</Value>
+                            <Value>SetProfile</Value>
+                            <Value>GetUserOrganizations</Value>
+                            <Value>CheckSuperuserExists</Value>
+                            <Value>ChangePassword</Value>
+                            <Value>RegisterUser</Value>
+                            <Value>CheckEmail</Value>
+                            <Value>SendEmailCode</Value>
+                            <Value>CheckEmailCode</Value>
+                            <Value>GetUserObjectId</Value>
+                            <Value>GetPasswordPolicy</Value>
+                            <Value>GetCommands</Value>
+                            <Value>UserItem</Value>
+                            <Value>RoleItem</Value>
+                            <Value>GroupItem</Value>
+                            <Value>GetTenant</Value>
+                            <Value>GetTenantPermissions</Value>
+                            <Value>FindMembership</Value>
+                            <Value>IsMember</Value>
+                            <Value>GetOrganizationPermissions</Value>
+                            <Value>GetMembershipsByUser</Value>
+                            <Value>GetMyTenantInvitations</Value>
+                            <Value>ValidateToken</Value>
+                            <Value>CreateToken</Value>
+                            <Value>GetTokenList</Value>
+                            <Value>GetToken</Value>
+                            <Value>RevokeToken</Value>
+                            <Value>DeleteToken</Value>
+                            <Value>UsersList</Value>
+                            <Value>GetUserRepresentation</Value>
+                            <Value>UserAdd</Value>
+                            <Value>UserUpdate</Value>
+                            <Value>UpdateUserFromRepresentation</Value>
+                            <Value>UnlockUser</Value>
+                            <Value>CreateSuperuser</Value>
+                            <Value>RolesList</Value>
+                            <Value>GetRoleRepresentation</Value>
+                            <Value>RoleAdd</Value>
+                            <Value>RoleUpdate</Value>
+                            <Value>UpdateRoleFromRepresentation</Value>
+                            <Value>GroupsList</Value>
+                            <Value>GetGroupRepresentation</Value>
+                            <Value>GroupAdd</Value>
+                            <Value>GroupUpdate</Value>
+                            <Value>UpdateGroupFromRepresentation</Value>
+                            <Value>GetTenantList</Value>
+                            <Value>GetRelationshipRepresentation</Value>
+                            <Value>GetGrantRepresentation</Value>
+                            <Value>GetTenantIds</Value>
+                            <Value>GetTenantRelationships</Value>
+                            <Value>GetCrossOrgGrants</Value>
+                            <Value>GetContracts</Value>
+                            <Value>GetConnectionCode</Value>
+                            <Value>GetConnectionRequests</Value>
+                            <Value>GetConnections</Value>
+                            <Value>GetRelationshipProposals</Value>
+                            <Value>GetCrossTenantMessage</Value>
+                            <Value>GetCrossTenantMessages</Value>
+                            <Value>GetOrderRequest</Value>
+                            <Value>GetOrderRequests</Value>
+                            <Value>GetMembershipsByTenant</Value>
+                            <Value>GetMembership</Value>
+                            <Value>HasMinimumRole</Value>
+                            <Value>GetTenantInvitations</Value>
+                            <Value>CreateTenant</Value>
+                            <Value>RemoveTenant</Value>
+                            <Value>UpdateTenant</Value>
+                            <Value>SetTenantActive</Value>
+                            <Value>EnsureSystemTenant</Value>
+                            <Value>CreateCrossOrgGrant</Value>
+                            <Value>RevokeCrossOrgGrant</Value>
+                            <Value>RemoveCrossOrgGrants</Value>
+                            <Value>CreateContract</Value>
+                            <Value>UpdateContractStatus</Value>
+                            <Value>TerminateContract</Value>
+                            <Value>RegenerateConnectionCode</Value>
+                            <Value>SetAllowConnectionsByCode</Value>
+                            <Value>CreateConnectionRequest</Value>
+                            <Value>ApproveConnectionRequest</Value>
+                            <Value>RejectConnectionRequest</Value>
+                            <Value>CancelConnectionRequest</Value>
+                            <Value>RemoveConnection</Value>
+                            <Value>RemoveTenantRelationship</Value>
+                            <Value>CreateRelationshipProposal</Value>
+                            <Value>ApproveRelationshipProposal</Value>
+                            <Value>RejectRelationshipProposal</Value>
+                            <Value>CancelRelationshipProposal</Value>
+                            <Value>SendCrossTenantMessage</Value>
+                            <Value>UpdateCrossTenantMessageStatus</Value>
+                            <Value>ConfirmOrderRequest</Value>
+                            <Value>RejectOrderRequest</Value>
+                            <Value>UpdateOrderRequestStatus</Value>
+                            <Value>AddMembership</Value>
+                            <Value>CreateTenantInvitation</Value>
+                            <Value>AcceptTenantInvitation</Value>
+                            <Value>RejectTenantInvitation</Value>
+                            <Value>RevokeTenantInvitation</Value>
+                            <Value>ResendTenantInvitation</Value>
+                            <Value>RemoveMembership</Value>
+                            <Value>UpdateMembershipPermissions</Value>
+                            <Value>TransferTenantOwnership</Value>
+                            <Value>UpdateRelationshipFromRepresentation</Value>
+                            <Value>UpdateGrantFromRepresentation</Value>
+                            <Value>OnUsersCollectionChanged</Value>
+                            <Value>OnUserSessionsCollectionChanged</Value>
+                            <Value>OnRolesCollectionChanged</Value>
+                            <Value>OnGroupsCollectionChanged</Value>
+                            <Value>OnTenantsCollectionChanged</Value>
+                            <Value>OnMembershipNotification</Value>
+                            <Value>OnOrganizationMembersChanged</Value>
+                            <Value>OnConnectionCodesNotification</Value>
+                            <Value>OnTenantRelationshipsCollectionChanged</Value>
+                            <Value>OnCrossTenantMessageNotification</Value>
+                            <Value>OnCrossOrgGrantsCollectionChanged</Value>
+                            <Value>OnUsersForInvitationCollectionChanged</Value>
+                            <Value>UserNotificationsList</Value>
+                            <Value>NotificationsList</Value>
+                            <Value>NotificationsUnreadCount</Value>
+                            <Value>NotificationTypes</Value>
+                            <Value>NotificationsSync</Value>
+                            <Value>MarkNotificationsRead</Value>
+                            <Value>MarkAllNotificationsRead</Value>
+                            <Value>AcknowledgeNotificationsDelivered</Value>
+                            <Value>AcknowledgeAllNotificationsDelivered</Value>
+                            <Value>RemoveNotifications</Value>
+                            <Value>OnNotificationEvent</Value>
+                            <Value>SendNotification</Value>
+                            <Value>WithdrawNotifications</Value>
+                            <Value>PublishProductPermissions</Value>
+                            <Value>GetServerTokenFeatures</Value>
+                        </Values>
+                    </Data>
+                </AttributeInfo>
+                <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
+                    <Data IsEnabled="true">
+                        <Values>
+                            <Value></Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/PersonalTokens/Accept</Value>
+                            <Value>/ProductServer/PersonalTokens/Manage</Value>
+                            <Value>/ProductServer/PersonalTokens/Manage</Value>
+                            <Value>/ProductServer/PersonalTokens/Manage</Value>
+                            <Value>/ProductServer/PersonalTokens/Manage</Value>
+                            <Value>/ProductServer/PersonalTokens/Manage</Value>
+                            <Value>/ProductServer/Users/View</Value>
+                            <Value>/ProductServer/Users/View</Value>
+                            <Value>/ProductServer/Users/Edit</Value>
+                            <Value>/ProductServer/Users/Edit</Value>
+                            <Value>/ProductServer/Users/Edit</Value>
+                            <Value>/ProductServer/Users/Edit</Value>
+                            <Value>/ProductServer/Users/Edit</Value>
+                            <Value>/ProductServer/Roles/View</Value>
+                            <Value>/ProductServer/Roles/View</Value>
+                            <Value>/ProductServer/Roles/Edit</Value>
+                            <Value>/ProductServer/Roles/Edit</Value>
+                            <Value>/ProductServer/Roles/Edit</Value>
+                            <Value>/ProductServer/Groups/View</Value>
+                            <Value>/ProductServer/Groups/View</Value>
+                            <Value>/ProductServer/Groups/Edit</Value>
+                            <Value>/ProductServer/Groups/Edit</Value>
+                            <Value>/ProductServer/Groups/Edit</Value>
+                            <Value>/ProductServer/Organizations/View</Value>
+                            <Value>/ProductServer/Organizations/View</Value>
+                            <Value>/ProductServer/Organizations/View</Value>
+                            <Value>/ProductServer/Organizations/View</Value>
+                            <Value>/ProductServer/Organizations/View</Value>
+                            <Value>/ProductServer/Organizations/View</Value>
+                            <Value>/ProductServer/Organizations/View</Value>
+                            <Value>/ProductServer/Organizations/View</Value>
+                            <Value>/ProductServer/Organizations/View</Value>
+                            <Value>/ProductServer/Organizations/View</Value>
+                            <Value>/ProductServer/Organizations/View</Value>
+                            <Value>/ProductServer/Organizations/View</Value>
+                            <Value>/ProductServer/Organizations/View</Value>
+                            <Value>/ProductServer/Organizations/View</Value>
+                            <Value>/ProductServer/Organizations/View</Value>
+                            <Value>/ProductServer/Organizations/View</Value>
+                            <Value>/ProductServer/Organizations/View</Value>
+                            <Value>/ProductServer/Organizations/View</Value>
+                            <Value>/ProductServer/Organizations/View</Value>
+                            <Value>/ProductServer/Organizations/Edit</Value>
+                            <Value>/ProductServer/Organizations/Edit</Value>
+                            <Value>/ProductServer/Organizations/Edit</Value>
+                            <Value>/ProductServer/Organizations/Edit</Value>
+                            <Value>/ProductServer/Organizations/Edit</Value>
+                            <Value>/ProductServer/Organizations/Edit</Value>
+                            <Value>/ProductServer/Organizations/Edit</Value>
+                            <Value>/ProductServer/Organizations/Edit</Value>
+                            <Value>/ProductServer/Organizations/Edit</Value>
+                            <Value>/ProductServer/Organizations/Edit</Value>
+                            <Value>/ProductServer/Organizations/Edit</Value>
+                            <Value>/ProductServer/Organizations/Edit</Value>
+                            <Value>/ProductServer/Organizations/Edit</Value>
+                            <Value>/ProductServer/Organizations/Edit</Value>
+                            <Value>/ProductServer/Organizations/Edit</Value>
+                            <Value>/ProductServer/Organizations/Edit</Value>
+                            <Value>/ProductServer/Organizations/Edit</Value>
+                            <Value>/ProductServer/Organizations/Edit</Value>
+                            <Value>/ProductServer/Organizations/Edit</Value>
+                            <Value>/ProductServer/Organizations/Edit</Value>
+                            <Value>/ProductServer/Organizations/Edit</Value>
+                            <Value>/ProductServer/Organizations/Edit</Value>
+                            <Value>/ProductServer/Organizations/Edit</Value>
+                            <Value>/ProductServer/Organizations/Edit</Value>
+                            <Value>/ProductServer/Organizations/Edit</Value>
+                            <Value>/ProductServer/Organizations/Edit</Value>
+                            <Value>/ProductServer/Organizations/Edit</Value>
+                            <Value>/ProductServer/Organizations/Edit</Value>
+                            <Value>/ProductServer/Organizations/Edit</Value>
+                            <Value>/ProductServer/Organizations/Edit</Value>
+                            <Value>/ProductServer/Organizations/Edit</Value>
+                            <Value>/ProductServer/Organizations/Edit</Value>
+                            <Value>/ProductServer/Organizations/Edit</Value>
+                            <Value>/ProductServer/Organizations/Edit</Value>
+                            <Value>/ProductServer/Organizations/Edit</Value>
+                            <Value>/ProductServer/Organizations/Edit</Value>
+                            <Value>/ProductServer/Organizations/Edit</Value>
+                            <Value>/ProductServer/Organizations/Edit</Value>
+                            <Value>/ProductServer/Organizations/Edit</Value>
+                            <Value>/ProductServer/Users/View</Value>
+                            <Value>/ProductServer/Users/View</Value>
+                            <Value>/ProductServer/Roles/View</Value>
+                            <Value>/ProductServer/Groups/View</Value>
+                            <Value>/ProductServer/Organizations/View</Value>
+                            <Value>/ProductServer/Organizations/View</Value>
+                            <Value>/ProductServer/Organizations/View</Value>
+                            <Value>/ProductServer/Organizations/View</Value>
+                            <Value>/ProductServer/Organizations/View</Value>
+                            <Value>/ProductServer/Organizations/View</Value>
+                            <Value>/ProductServer/Organizations/View</Value>
+                            <Value>/ProductServer/Organizations/View</Value>
+                            <Value>/ProductServer/Notifications/View</Value>
+                            <Value>/ProductServer/Notifications/View</Value>
+                            <Value>/ProductServer/Notifications/View</Value>
+                            <Value>/ProductServer/Notifications/View</Value>
+                            <Value>/ProductServer/Notifications/View</Value>
+                            <Value>/ProductServer/Notifications/View</Value>
+                            <Value>/ProductServer/Notifications/View</Value>
+                            <Value>/ProductServer/Notifications/View</Value>
+                            <Value>/ProductServer/Notifications/View</Value>
+                            <Value>/ProductServer/Notifications/View</Value>
+                            <Value>/ProductServer/Notifications/View</Value>
+                            <Value>/ProductServer/Notifications/Send</Value>
+                            <Value>/ProductServer/Notifications/Send</Value>
+                            <Value>/ProductServer/PublishPermissions</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                        </Values>
+                    </Data>
+                </AttributeInfo>
+                <AttributeInfo Id="CollectionIds" Type="Id[]" ExportId="">
+                    <Data IsEnabled="true">
+                        <Values>
+                            <Value>Users</Value>
+                            <Value>UserSessions</Value>
+                            <Value>Roles</Value>
+                            <Value>Groups</Value>
+                            <Value>Tenants</Value>
+                            <Value>TenantRelationships</Value>
+                            <Value>CrossOrgGrants</Value>
+                            <Value>UsersForInvitation</Value>
+                            <Value>TenantConnections</Value>
+                            <Value>Notifications</Value>
+                        </Values>
+                    </Data>
+                </AttributeInfo>
+                <AttributeInfo Id="CollectionViewPermissions" Type="Id[]" ExportId="">
+                    <Data IsEnabled="true">
+                        <Values>
+                            <Value>/ProductServer/Users/View</Value>
+                            <Value>/ProductServer/Users/View</Value>
+                            <Value>/ProductServer/Roles/View</Value>
+                            <Value>/ProductServer/Groups/View</Value>
+                            <Value>/ProductServer/Organizations/View</Value>
+                            <Value>/ProductServer/Organizations/View</Value>
+                            <Value>/ProductServer/Organizations/View</Value>
+                            <Value>/ProductServer/Organizations/View</Value>
+                            <Value>/ProductServer/Organizations/View</Value>
+                            <Value>/ProductServer/Notifications/View</Value>
+                        </Values>
+                    </Data>
+                </AttributeInfo>
+                <AttributeInfo Id="CollectionEditPermissions" Type="Id[]" ExportId="">
+                    <Data IsEnabled="true">
+                        <Values>
+                            <Value>/ProductServer/Users/Edit</Value>
+                            <Value>/ProductServer/Users/Edit</Value>
+                            <Value>/ProductServer/Roles/Edit</Value>
+                            <Value>/ProductServer/Groups/Edit</Value>
+                            <Value>/ProductServer/Organizations/Edit</Value>
+                            <Value>/ProductServer/Organizations/Edit</Value>
+                            <Value>/ProductServer/Organizations/Edit</Value>
+                            <Value>/ProductServer/Organizations/Edit</Value>
+                            <Value>/ProductServer/Organizations/Edit</Value>
+                            <Value>/ProductServer/Notifications/View</Value>
+                        </Values>
+                    </Data>
+                </AttributeInfo>
+                <AttributeInfo Id="CollectionObjectReadPermissions" Type="Id[]" ExportId="">
+                    <Data IsEnabled="true">
+                        <Values>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/SignIn</Value>
+                            <Value>/ProductServer/Organizations/View</Value>
+                            <Value>/ProductServer/Organizations/View</Value>
+                            <Value>/ProductServer/Organizations/View</Value>
+                            <Value>/ProductServer/Organizations/View</Value>
+                            <Value>/ProductServer/Notifications/View</Value>
+                        </Values>
+                    </Data>
+                </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="AuthenticationManager" PackageId="ImtAuthVoce" ComponentId="AuthenticationManager">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="ProductServerRequestPolicy" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ProductServerRequestPolicy"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="InvitationManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="TenantController/TenantInvitationManager"/>
                     </AttributeInfo>
@@ -25,6 +415,9 @@
                     <AttributeInfo Id="PersonalAccessTokenManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PersonalAccessTokenController/PersonalAccessTokenManager"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="ServerProductId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Puma"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="SlaveJwtSessionController" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="JwtSessionController"/>
                     </AttributeInfo>
@@ -35,6 +428,60 @@
                         <Data IsEnabled="true" Value="PumaSettings/TracingConfiguration"/>
                     </AttributeInfo>
                     <AttributeInfo Id="UserCollection" Type="Reference" ExportId="UserCollection">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PermissionTree" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PermissionTree"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ConnectedProductCatalog" PackageId="ImtAuthVoce" ComponentId="ConnectedProductCatalog">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PersonalAccessTokenManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PersonalAccessTokenController/PersonalAccessTokenManager"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ProductRepository" Type="Reference" ExportId="ProductRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RequestManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="WebSocketServerFramework"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SnapshotRepository" Type="Reference" ExportId="SnapshotRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="TenantController/TenantManager"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaSettings/TracingConfiguration"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaLocalization"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PermissionTree" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PermissionTree"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="UserSettingsRepository" PackageId="ImtCoreVoce" ComponentId="DatabaseUserSettings">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="LanguageConstraints" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaLocalization"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -142,6 +589,15 @@
         <Element Id="PumaHandlers" PackageId="PumaVoce" ComponentId="PumaHandlers">
             <Data IsEnabled="true" Flags="2">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="LanguageConstraints" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaLocalization"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ServerConnectionInterface" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaSettings/ServerConnectionInterface"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserSettingsCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="UserSettingsRepository/UserSettingsRepository"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -167,6 +623,7 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>PersonalAccessTokenController</Value>
+                                <Value>ConnectedProductCatalog</Value>
                                 <Value>TenantController</Value>
                                 <Value>RoleCollectionDocumentService</Value>
                                 <Value>UserCollectionDocumentService</Value>
@@ -529,8 +986,17 @@
         <Element Id="WebSocketServerFramework" PackageId="ImtHttpServerVoce" ComponentId="WebSocketServerFramework">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="DenyUndeclaredUserSubscriptions" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="AuthenticationManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="AuthenticationManager"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DenyAnonymousSubscriptions" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TokenCheckInterval" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="5"/>
                     </AttributeInfo>
                     <AttributeInfo Id="GqlSubscriberControllers" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
@@ -540,6 +1006,7 @@
                                 <Value>UserGroupCollectionDocumentService</Value>
                                 <Value>UserCollectionDocumentService</Value>
                                 <Value>RoleCollectionDocumentService</Value>
+                                <Value>ConnectedProductCatalog</Value>
                                 <Value>NotificationCenter</Value>
                             </Values>
                         </Data>
@@ -573,6 +1040,17 @@
                     <Element Id="GroupCollectionChangeNotifier" PackageId="ImtServerGqlPck" ComponentId="ObjectCollectionChangeNotifier">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
+                                <AttributeInfo Id="OpenToServers" Type="Boolean" ExportId="">
+                                    <Data IsEnabled="true" Value="true"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ReadPermissions" Type="Id[]" ExportId="">
+                                    <Data IsEnabled="true">
+                                        <Values>
+                                            <Value>/Administration/Groups/View</Value>
+                                            <Value>/OrganizationManagement/Groups/View</Value>
+                                        </Values>
+                                    </Data>
+                                </AttributeInfo>
                                 <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
@@ -598,6 +1076,17 @@
                     <Element Id="RoleCollectionChangeNotifier" PackageId="ImtServerGqlPck" ComponentId="ObjectCollectionChangeNotifier">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
+                                <AttributeInfo Id="OpenToServers" Type="Boolean" ExportId="">
+                                    <Data IsEnabled="true" Value="true"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ReadPermissions" Type="Id[]" ExportId="">
+                                    <Data IsEnabled="true">
+                                        <Values>
+                                            <Value>/Administration/Roles/View</Value>
+                                            <Value>/OrganizationManagement/Roles/View</Value>
+                                        </Values>
+                                    </Data>
+                                </AttributeInfo>
                                 <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
@@ -645,6 +1134,17 @@
                     <Element Id="UserCollectionChangeNotifier" PackageId="ImtServerGqlPck" ComponentId="ObjectCollectionChangeNotifier">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
+                                <AttributeInfo Id="OpenToServers" Type="Boolean" ExportId="">
+                                    <Data IsEnabled="true" Value="true"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ReadPermissions" Type="Id[]" ExportId="">
+                                    <Data IsEnabled="true">
+                                        <Values>
+                                            <Value>/Administration/Users/View</Value>
+                                            <Value>/OrganizationManagement/Members/View</Value>
+                                        </Values>
+                                    </Data>
+                                </AttributeInfo>
                                 <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
@@ -670,6 +1170,16 @@
                     <Element Id="UserSessionCollectionChangeNotifier" PackageId="ImtServerGqlPck" ComponentId="ObjectCollectionChangeNotifier">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
+                                <AttributeInfo Id="OpenToServers" Type="Boolean" ExportId="">
+                                    <Data IsEnabled="true" Value="true"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ReadPermissions" Type="Id[]" ExportId="">
+                                    <Data IsEnabled="true">
+                                        <Values>
+                                            <Value>/Administration/Users/View</Value>
+                                        </Values>
+                                    </Data>
+                                </AttributeInfo>
                                 <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
@@ -703,6 +1213,7 @@
         </EmbeddedRegistry>
     </EmbeddedRegistriesList>
     <ExportedInterfaces>
+        <Interface InterfaceId="imtlic::IProductInfo" ComponentId="PermissionTree"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="HttpServerFramework"/>
     </ExportedInterfaces>
     <ExportedComponents>

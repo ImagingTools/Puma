@@ -24,7 +24,17 @@ if(WIN32 AND NOT USE_FIND_PACKAGE)
 	file(COPY ${OPENSSLDIR}/lib/x64/libssl-3-x64.dll DESTINATION ${PROJECT_SOURCE_DIR}/../../../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME})
 endif()
 
+if(WEB_COMPILE)
+	add_compile_definitions(WEB_COMPILE)
+endif()
+
 target_link_libraries(PumaServerPg PRIVATE
+	pumaqml
+	ImtCore::imtstyle
+	ImtCore::imtgui
+	ImtCore::imtguigql
+	ImtCore::imtauthgui
+	ImtCore::imtstylecontrolsqml
 	ImtCore::imtserverapp
 	ImtCore::imtauthgql
 	ImtCore::imtauthdb

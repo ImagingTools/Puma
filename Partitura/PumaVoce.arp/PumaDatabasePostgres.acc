@@ -137,6 +137,42 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="SnapshotRepository" PackageId="ImtUserAdministrationVoce" ComponentId="ProductPermissionSnapshotRepository">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="DatabaseEngine"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ProductRepository" PackageId="ImtUserAdministrationVoce" ComponentId="ConnectedProductRepository">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="DatabaseEngine"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="RoleDocumentSqlRepository" PackageId="ImtUserAdministrationVoce" ComponentId="RoleRepository">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -424,6 +460,8 @@
         <Component ExportedId="CrossOrgGrantSqlRepository" ComponentId="CrossOrgGrantSqlRepository"/>
         <Component ExportedId="CrossTenantMessageSqlRepository" ComponentId="CrossTenantMessageSqlRepository"/>
         <Component ExportedId="DatabaseEngine" ComponentId="DatabaseEngine"/>
+        <Component ExportedId="ProductRepository" ComponentId="ProductRepository"/>
+        <Component ExportedId="SnapshotRepository" ComponentId="SnapshotRepository"/>
         <Component ExportedId="RoleDocumentSqlRepository" ComponentId="RoleDocumentSqlRepository"/>
         <Component ExportedId="SessionSqlRepository" ComponentId="SessionSqlRepository"/>
         <Component ExportedId="TenantConnectionCodeSqlRepository" ComponentId="TenantConnectionCodeSqlRepository"/>
