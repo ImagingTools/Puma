@@ -54064,7 +54064,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"StNoProduct\", productId: \"Puma\", name: \"st StNoProduct for Puma\", scopes: [\"/ProductServer/Users/View\"] }) { id token success } }",
+                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"StNoProduct\", name: \"st StNoProduct for Puma\", scopes: [\"/ProductServer/Users/View\"] }) { id token success } }",
                                 "variables": ""
                             }
                         },
@@ -54393,7 +54393,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"ProLife\", productId: \"Puma\", name: \"st ProLife for Puma\", scopes: [\"/ProductServer/Users/View\"] }) { id token success } }",
+                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"ProLife\", name: \"st ProLife for Puma\", scopes: [\"/ProductServer/Users/View\"] }) { id token success } }",
                                 "variables": ""
                             }
                         },
@@ -54434,46 +54434,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"ProLife\", productId: \"Puma\", name: \"st ProLife for Puma, second\", scopes: [\"/ProductServer/Users/View\"] }) { id token success } }",
-                                "variables": ""
-                            }
-                        },
-                        "url": {
-                            "raw": "{{base_url}}",
-                            "host": [
-                                "{{base_url}}"
-                            ]
-                        }
-                    },
-                    "response": []
-                },
-                {
-                    "name": "ST: a token for another server is refused",
-                    "event": [
-                        {
-                            "listen": "test",
-                            "script": {
-                                "type": "text/javascript",
-                                "exec": [
-                                    "const json = pm.response.json();",
-                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test(\"refused\", function () { pm.expect(messages, JSON.stringify(json)).to.match(/issues tokens for itself only/); });"
-                                ]
-                            }
-                        }
-                    ],
-                    "request": {
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "x-authentication-token",
-                                "value": "{{su_token}}"
-                            }
-                        ],
-                        "body": {
-                            "mode": "graphql",
-                            "graphql": {
-                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"ProLife\", productId: \"Lisa\", name: \"st ProLife for Lisa\", scopes: [\"/ProductServer/Users/View\"] }) { id token success } }",
+                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"ProLife\", name: \"st ProLife for Puma, second\", scopes: [\"/ProductServer/Users/View\"] }) { id token success } }",
                                 "variables": ""
                             }
                         },
@@ -54512,7 +54473,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"ProLife\", productId: \"Puma\", name: \"st ProLife for Puma\", scopes: [\"/Administration/Users/Edit\"] }) { id token success } }",
+                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"ProLife\", name: \"st ProLife for Puma\", scopes: [\"/Administration/Users/Edit\"] }) { id token success } }",
                                 "variables": ""
                             }
                         },
@@ -54535,7 +54496,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test(\"refused\", function () { pm.expect(messages, JSON.stringify(json)).to.match(/issued for another server/); });"
+                                    "pm.test(\"refused\", function () { pm.expect(messages, JSON.stringify(json)).to.match(/issued to the server of another product/); });"
                                 ]
                             }
                         }
@@ -54551,7 +54512,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"Puma\", productId: \"Puma\", name: \"st Puma for Puma\", scopes: [\"/ProductServer/Users/View\"] }) { id token success } }",
+                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"Puma\", name: \"st Puma for Puma\", scopes: [\"/ProductServer/Users/View\"] }) { id token success } }",
                                 "variables": ""
                             }
                         },
@@ -54624,7 +54585,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"ProLife\", productId: \"Puma\", name: \"st ProLife for Puma\", scopes: [\"/ProductServer/Users/View\"] }) { id token success } }",
+                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"ProLife\", name: \"st ProLife for Puma\", scopes: [\"/ProductServer/Users/View\"] }) { id token success } }",
                                 "variables": ""
                             }
                         },
@@ -54736,7 +54697,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"ProLife\", productId: \"Puma\", name: \"st ProLife for Puma\", scopes: [\"/ProductServer/Users/View\"] }) { id token success } }",
+                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"ProLife\", name: \"st ProLife for Puma\", scopes: [\"/ProductServer/Users/View\"] }) { id token success } }",
                                 "variables": ""
                             }
                         },
@@ -54825,7 +54786,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"ProLife\", productId: \"Puma\", name: \"st ProLife for Puma\", scopes: [\"/ProductServer/Users/View\"] }) { id token success } }",
+                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"ProLife\", name: \"st ProLife for Puma\", scopes: [\"/ProductServer/Users/View\"] }) { id token success } }",
                                 "variables": ""
                             }
                         },
@@ -55096,7 +55057,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"ProLife\", productId: \"Puma\", name: \"st ProLife for Puma\", scopes: [\"/ProductServer/Users/View\"] }) { id token success } }",
+                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"ProLife\", name: \"st ProLife for Puma\", scopes: [\"/ProductServer/Users/View\"] }) { id token success } }",
                                 "variables": ""
                             }
                         },

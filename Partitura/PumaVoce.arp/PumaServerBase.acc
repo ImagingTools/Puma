@@ -18,16 +18,10 @@
         <Element Id="ProductServerRequestPolicy" PackageId="ImtServerGqlPck" ComponentId="ProductServerRequestPolicy">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                <AttributeInfo Id="OpenCommandIds" Type="Id[]" ExportId="">
-                    <Data IsEnabled="true">
-                        <Values>
-                            <Value>GetApplicationInfo</Value>
-                        </Values>
-                    </Data>
-                </AttributeInfo>
                 <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
                     <Data IsEnabled="true">
                         <Values>
+                            <Value>GetApplicationInfo</Value>
                             <Value>Authorization</Value>
                             <Value>UserToken</Value>
                             <Value>Logout</Value>
@@ -183,6 +177,7 @@
                 <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                     <Data IsEnabled="true">
                         <Values>
+                            <Value></Value>
                             <Value>/ProductServer/SignIn</Value>
                             <Value>/ProductServer/SignIn</Value>
                             <Value>/ProductServer/SignIn</Value>
@@ -399,25 +394,6 @@
                         </Values>
                     </Data>
                 </AttributeInfo>
-                <AttributeInfo Id="ViewCommandIds" Type="Id[]" ExportId="">
-                    <Data IsEnabled="true">
-                        <Values>
-                            <Value>OpenDocument</Value>
-                            <Value>CloseDocument</Value>
-                        </Values>
-                    </Data>
-                </AttributeInfo>
-                <AttributeInfo Id="ObjectReadCommandIds" Type="Id[]" ExportId="">
-                    <Data IsEnabled="true">
-                        <Values>
-                            <Value>GetObjectData</Value>
-                            <Value>GetElementInfo</Value>
-                            <Value>GetElementMetaInfo</Value>
-                            <Value>GetDataMetaInfo</Value>
-                            <Value>GetObjectTypeId</Value>
-                        </Values>
-                    </Data>
-                </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
@@ -463,12 +439,6 @@
         <Element Id="ConnectedProductCatalog" PackageId="ImtAuthVoce" ComponentId="ConnectedProductCatalog">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="OwnProductId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="Puma"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="OwnProductName" Type="String" ExportId="">
-                        <Data IsEnabled="true" Value="Puma"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -598,9 +568,6 @@
         <Element Id="PersonalAccessTokenController" PackageId="ImtAuthVoce" ComponentId="PersonalAccessTokenController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="PersonalAccessTokenCache" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="AuthenticationManager"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
