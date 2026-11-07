@@ -9,7 +9,6 @@ set(buildwebdir ${PUMADIR_BUILD}/AuxInclude/Web)
 list(APPEND webdirs ${PUMADIR}/Include/pumaqml/Qml)
 list(APPEND webdirs ${buildwebdir}/src)
 
-list(APPEND webdirs ${PUMADIR}/Include/pumaqml/Resources/html)
 list(APPEND webdirs ${buildwebdir}/Resources)
 
 getImtCoreQmlWebDirs(webdirs "${buildwebdir}")

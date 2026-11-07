@@ -54048,7 +54048,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test(\"refused\", function () { pm.expect(messages, JSON.stringify(json)).to.match(/is not connected/); });"
+                                    "pm.test(\"refused\", function () { pm.expect(messages, JSON.stringify(json)).to.match(/is not a client of this server/); });"
                                 ]
                             }
                         }
@@ -54064,7 +54064,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"StNoProduct\", productId: \"Puma\", name: \"st StNoProduct for Puma\", scopes: [\"/ProductServer/Collections/Watch\"] }) { id token success } }",
+                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"StNoProduct\", productId: \"Puma\", name: \"st StNoProduct for Puma\", scopes: [\"/ProductServer/Users/View\"] }) { id token success } }",
                                 "variables": ""
                             }
                         },
@@ -54085,7 +54085,7 @@
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "pm.environment.set('stCard', pm.variables.replaceIn('{{$guid}}')); pm.environment.set('stCard2', pm.variables.replaceIn('{{$guid}}')); pm.environment.set('stRun', pm.variables.replaceIn('{{$timestamp}}'));"
+                                    "pm.environment.set('stCard', pm.variables.replaceIn('{{$guid}}')); pm.environment.set('stCard2', pm.variables.replaceIn('{{$guid}}'));"
                                 ]
                             }
                         },
@@ -54393,7 +54393,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"ProLife\", productId: \"Puma\", name: \"st ProLife for Puma\", scopes: [\"/ProductServer/Collections/Watch\"] }) { id token success } }",
+                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"ProLife\", productId: \"Puma\", name: \"st ProLife for Puma\", scopes: [\"/ProductServer/Users/View\"] }) { id token success } }",
                                 "variables": ""
                             }
                         },
@@ -54407,7 +54407,7 @@
                     "response": []
                 },
                 {
-                    "name": "ST: su issues a token of ProLife for Lisa",
+                    "name": "ST: su issues a second token of ProLife",
                     "event": [
                         {
                             "listen": "test",
@@ -54417,8 +54417,8 @@
                                     "const json = pm.response.json();",
                                     "const payload = json.data && json.data.CreateServerToken;",
                                     "pm.test('created', function () { pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true); pm.expect(payload.token).to.match(/^imt_pat_/); });",
-                                    "pm.environment.set('stLisaId', payload.id);",
-                                    "pm.environment.set('stLisaToken', payload.token);"
+                                    "pm.environment.set('stSecondId', payload.id);",
+                                    "pm.environment.set('stSecondToken', payload.token);"
                                 ]
                             }
                         }
@@ -54434,7 +54434,46 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"ProLife\", productId: \"Lisa\", name: \"st ProLife for Lisa\", scopes: [\"/ProductServer/Collections/Watch\"] }) { id token success } }",
+                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"ProLife\", productId: \"Puma\", name: \"st ProLife for Puma, second\", scopes: [\"/ProductServer/Users/View\"] }) { id token success } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "ST: a token for another server is refused",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
+                                    "pm.test(\"refused\", function () { pm.expect(messages, JSON.stringify(json)).to.match(/issues tokens for itself only/); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"ProLife\", productId: \"Lisa\", name: \"st ProLife for Lisa\", scopes: [\"/ProductServer/Users/View\"] }) { id token success } }",
                                 "variables": ""
                             }
                         },
@@ -54512,7 +54551,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"Puma\", productId: \"Puma\", name: \"st Puma for Puma\", scopes: [\"/ProductServer/Collections/Watch\"] }) { id token success } }",
+                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"Puma\", productId: \"Puma\", name: \"st Puma for Puma\", scopes: [\"/ProductServer/Users/View\"] }) { id token success } }",
                                 "variables": ""
                             }
                         },
@@ -54526,7 +54565,7 @@
                     "response": []
                 },
                 {
-                    "name": "ST: an ordinary user cannot issue",
+                    "name": "ST seed: auth an ordinary user",
                     "event": [
                         {
                             "listen": "test",
@@ -54585,7 +54624,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"ProLife\", productId: \"Puma\", name: \"st ProLife for Puma\", scopes: [\"/ProductServer/Collections/Watch\"] }) { id token success } }",
+                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"ProLife\", productId: \"Puma\", name: \"st ProLife for Puma\", scopes: [\"/ProductServer/Users/View\"] }) { id token success } }",
                                 "variables": ""
                             }
                         },
@@ -54697,7 +54736,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"ProLife\", productId: \"Puma\", name: \"st ProLife for Puma\", scopes: [\"/ProductServer/Collections/Watch\"] }) { id token success } }",
+                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"ProLife\", productId: \"Puma\", name: \"st ProLife for Puma\", scopes: [\"/ProductServer/Users/View\"] }) { id token success } }",
                                 "variables": ""
                             }
                         },
@@ -54786,7 +54825,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"ProLife\", productId: \"Puma\", name: \"st ProLife for Puma\", scopes: [\"/ProductServer/Collections/Watch\"] }) { id token success } }",
+                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"ProLife\", productId: \"Puma\", name: \"st ProLife for Puma\", scopes: [\"/ProductServer/Users/View\"] }) { id token success } }",
                                 "variables": ""
                             }
                         },
@@ -54813,7 +54852,7 @@
                                     "  const tokens = json.data.GetServerTokenList.tokens;",
                                     "  const ids = tokens.map(function (t) { return t.id; });",
                                     "  pm.expect(ids).to.include(pm.environment.get('stId'));",
-                                    "  pm.expect(ids).to.include(pm.environment.get('stLisaId'));",
+                                    "  pm.expect(ids).to.include(pm.environment.get('stSecondId'));",
                                     "  tokens.forEach(function (t) { pm.expect(t.clientProductId).to.eql('ProLife'); });",
                                     "});"
                                 ]
@@ -55023,53 +55062,6 @@
                     "response": []
                 },
                 {
-                    "name": "ST: a token for Lisa is refused by Puma",
-                    "event": [
-                        {
-                            "listen": "prerequest",
-                            "script": {
-                                "type": "text/javascript",
-                                "exec": [
-                                    "pm.variables.set('expectedHttpStatus', 403);",
-                                    "pm.request.headers.upsert({ key: 'productid', value: 'ProLife' });"
-                                ]
-                            }
-                        },
-                        {
-                            "listen": "test",
-                            "script": {
-                                "type": "text/javascript",
-                                "exec": [
-                                    "pm.test('forbidden', function () { pm.expect(pm.response.code).to.eql(403); });"
-                                ]
-                            }
-                        }
-                    ],
-                    "request": {
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "x-authentication-token",
-                                "value": "{{stLisaToken}}"
-                            }
-                        ],
-                        "body": {
-                            "mode": "graphql",
-                            "graphql": {
-                                "query": "query GetServerTokenList { GetServerTokenList(input: { clientProductId: \"ProLife\" }) { tokens { id } } }",
-                                "variables": ""
-                            }
-                        },
-                        "url": {
-                            "raw": "{{base_url}}",
-                            "host": [
-                                "{{base_url}}"
-                            ]
-                        }
-                    },
-                    "response": []
-                },
-                {
                     "name": "ST: a server token cannot issue tokens",
                     "event": [
                         {
@@ -55104,7 +55096,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"ProLife\", productId: \"Puma\", name: \"st ProLife for Puma\", scopes: [\"/ProductServer/Collections/Watch\"] }) { id token success } }",
+                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"ProLife\", productId: \"Puma\", name: \"st ProLife for Puma\", scopes: [\"/ProductServer/Users/View\"] }) { id token success } }",
                                 "variables": ""
                             }
                         },
@@ -55118,7 +55110,7 @@
                     "response": []
                 },
                 {
-                    "name": "ST: a personal token is not revoked as a server token",
+                    "name": "ST: an unknown token is not revoked",
                     "event": [
                         {
                             "listen": "prerequest",
@@ -55190,7 +55182,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation RevokeServerToken { RevokeServerToken(input: { id: \"{{stLisaId}}\" }) { success } }",
+                                "query": "mutation RevokeServerToken { RevokeServerToken(input: { id: \"{{stSecondId}}\" }) { success } }",
                                 "variables": ""
                             }
                         },
@@ -55228,7 +55220,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "query ValidateToken { ValidateToken(input: { token: \"{{stLisaToken}}\" }) { valid } }",
+                                "query": "query ValidateToken { ValidateToken(input: { token: \"{{stSecondToken}}\" }) { valid } }",
                                 "variables": ""
                             }
                         },
