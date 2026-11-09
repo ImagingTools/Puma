@@ -33,8 +33,8 @@ const quietMs = 1500;
 const runTag = Date.now().toString(36);
 const password = 'WsCenter_2026!';
 
-async function act(label, query, token) {
-	const res = await gql(query, token);
+async function act(label, query, token, product, headers) {
+	const res = await gql(query, token, product, headers);
 	if (res && res.errors) {
 		throw new Error(`${label} returned GraphQL errors: ${JSON.stringify(res.errors).slice(0, 400)}`);
 	}
@@ -49,11 +49,19 @@ async function act(label, query, token) {
 }
 
 // Any signed-in user may send until a product server has an identity of its own (ImagingTools/ImtCore#1059)
-let senderToken = null;
+// Puma takes notifications from the server of a product only; its users watch and read them through that server
+const sender = { product: `WsncSender${runTag}`, token: null };
+const otherSender = { product: `WsncOther${runTag}`, token: null };
+const throughSender = () => ({ 'x-server-token': sender.token });
 
 function send(fields) {
 	return act('SendNotification',
-		`mutation SendNotification { SendNotification(input: { productId: ${gqlString(productId)}, ${fields} }) { success } }`, senderToken);
+		`mutation SendNotification { SendNotification(input: { productId: ${gqlString(sender.product)}, ${fields} }) { success } }`, sender.token, sender.product);
+}
+
+// An action of a user on the notifications of the sender
+function actThroughSender(label, query, token) {
+	return act(label, query, token, sender.product, throughSender());
 }
 
 // --- the sessions
@@ -61,7 +69,7 @@ function send(fields) {
 const sessions = [];
 
 async function openSession(role, token) {
-	const s = { role, token, session: new SubscriptionSession(role, wsUrl, token) };
+	const s = { role, token, session: new SubscriptionSession(role, wsUrl, token, Object.assign({ productId: sender.product }, throughSender())) };
 	await s.session.connect();
 	await s.session.init();
 	s.subId = s.session.beginSubscribe(COMMAND, QUERY);
@@ -110,12 +118,12 @@ async function expectEvents(expected, action) {
 }
 
 async function unreadCount(token) {
-	const res = await gql('query NotificationsUnreadCount { NotificationsUnreadCount { unreadCount } }', token);
+	const res = await gql('query NotificationsUnreadCount { NotificationsUnreadCount { unreadCount } }', token, sender.product, throughSender());
 	return res.data.NotificationsUnreadCount.unreadCount;
 }
 
 async function inboxItems(token, typeId) {
-	const res = await gql('query NotificationsList { NotificationsList(input: { pageSize: 100 }) { items { id typeId groupCount } } }', token);
+	const res = await gql('query NotificationsList { NotificationsList(input: { pageSize: 100 }) { items { id typeId groupCount } } }', token, sender.product, throughSender());
 	const items = (res && res.data && res.data.NotificationsList && res.data.NotificationsList.items) || [];
 	return items.filter(i => i.typeId === typeId);
 }
@@ -126,6 +134,16 @@ const created = (typeId) => (e) => e && e.kind === 'Created' && (e.items || []).
 
 runSuite({ name: 'Notification center WebSocket suite', className: 'NotificationCenterWs', junitFile: 'junit-report-ws-notification-center.xml' }, async () => {
 	const su = await login(suLogin, suPassword);
+
+	for (const product of [sender, otherSender]) {
+		const card = crypto.randomUUID();
+		await act('ConnectedProductAdd',
+			`mutation ConnectedProductAdd { ConnectedProductAdd(input: { id: ${gqlString(card)}, typeId: "ConnectedProduct",` +
+			` item: { id: ${gqlString(card)}, productId: ${gqlString(product.product)}, name: ${gqlString(product.product)} } }) { id } }`, su.token);
+		product.token = (await act('CreateServerToken',
+			`mutation CreateServerToken { CreateServerToken(input: { clientProductId: ${gqlString(product.product)}, name: "ws notification center",` +
+			' scopes: ["/ProductServer/Notifications/View", "/ProductServer/Notifications/Send"] }) { token } }', su.token)).token;
+	}
 
 	const createUser = async (role) => {
 		const loginName = `wsnc_${role}_${runTag}`;
@@ -147,8 +165,6 @@ runSuite({ name: 'Notification center WebSocket suite', className: 'Notification
 	const selected = await act('SelectTenant',
 		`mutation SelectTenant { SelectTenant(input: { tenantId: ${gqlString(tenantA)} }) { ok userSession { tenantId accessToken } errorMessage } }`,
 		aliceTenantLogin.token);
-
-	senderToken = su.token;
 
 	const aliceHome = await openSession('alice without an organization', (await login(alice.login, password)).token);
 	const aliceInA = await openSession('alice in organization A', selected.userSession.accessToken);
@@ -192,7 +208,7 @@ runSuite({ name: 'Notification center WebSocket suite', className: 'Notification
 		await expectEvents(new Map([
 			[aliceInA, (e, count) => e.kind === 'Read' && JSON.stringify(e.ids) === JSON.stringify([tenantItemId]) && e.unreadCount === count]
 		]), async () => {
-			await act('MarkNotificationsRead',
+			await actThroughSender('MarkNotificationsRead',
 				`mutation MarkNotificationsRead { MarkNotificationsRead(input: { ids: [${gqlString(tenantItemId)}] }) { changedIds } }`, aliceInA.token);
 			return unreadCount(aliceInA.token);
 		});
@@ -210,7 +226,7 @@ runSuite({ name: 'Notification center WebSocket suite', className: 'Notification
 			[aliceHome, personalRead],
 			[aliceSecond, personalRead],
 			[aliceInA, [tenantAllRead, personalRead]]
-		]), () => act('MarkAllNotificationsRead',
+		]), () => actThroughSender('MarkAllNotificationsRead',
 			'mutation MarkAllNotificationsRead { MarkAllNotificationsRead(input: {}) { unreadCount } }', aliceInA.token));
 	});
 
@@ -218,7 +234,7 @@ runSuite({ name: 'Notification center WebSocket suite', className: 'Notification
 		requires(tenantItemId, 'the tenant notification');
 		await expectEvents(new Map([
 			[aliceInA, (e) => e.kind === 'Removed' && JSON.stringify(e.ids) === JSON.stringify([tenantItemId])]
-		]), () => act('RemoveNotifications',
+		]), () => actThroughSender('RemoveNotifications',
 			`mutation RemoveNotifications { RemoveNotifications(input: { ids: [${gqlString(tenantItemId)}] }) { changedIds } }`, aliceInA.token));
 	});
 
@@ -234,17 +250,16 @@ runSuite({ name: 'Notification center WebSocket suite', className: 'Notification
 			[aliceSecond, removed(aliceId)],
 			[bobHome, removed(bobId)]
 		]), () => act('WithdrawNotifications',
-			`mutation WithdrawNotifications { WithdrawNotifications(input: { productId: ${gqlString(productId)}, groupKey: "wsnc-withdraw" }) { success } }`,
-			senderToken));
+			`mutation WithdrawNotifications { WithdrawNotifications(input: { productId: ${gqlString(sender.product)}, groupKey: "wsnc-withdraw" }) { success } }`,
+			sender.token, sender.product));
 	});
 
 	await test('a notification of another product reaches no session of this product', async () => {
-		const otherProduct = productId === 'ProLife' ? 'Lisa' : 'ProLife';
 		await expectEvents(new Map(), async () => {
-			const res = await gql(`mutation SendNotification { SendNotification(input: { productId: ${gqlString(otherProduct)},` +
-				` userIds: [${gqlString(alice.userId)}], typeId: "wsnc.Other" }) { success } }`, senderToken, otherProduct);
+			const res = await gql(`mutation SendNotification { SendNotification(input: { productId: ${gqlString(otherSender.product)},` +
+				` userIds: [${gqlString(alice.userId)}], typeId: "wsnc.Other" }) { success } }`, otherSender.token, otherSender.product);
 			assert(res && res.data && res.data.SendNotification && res.data.SendNotification.success === true,
-				`the notification of ${otherProduct} was not sent: ${JSON.stringify(res).slice(0, 300)}`);
+				`the notification of ${otherSender.product} was not sent: ${JSON.stringify(res).slice(0, 300)}`);
 		});
 	});
 
@@ -252,7 +267,7 @@ runSuite({ name: 'Notification center WebSocket suite', className: 'Notification
 		await send(`userIds: [${gqlString(bob.userId)}], typeId: "wsnc.Delivered"`);
 		await new Promise(r => setTimeout(r, quietMs));
 		const itemId = requires((await inboxItems(bobHome.token, 'wsnc.Delivered'))[0], 'the notification of bob').id;
-		await expectEvents(new Map(), () => act('AcknowledgeNotificationsDelivered',
+		await expectEvents(new Map(), () => actThroughSender('AcknowledgeNotificationsDelivered',
 			`mutation AcknowledgeNotificationsDelivered { AcknowledgeNotificationsDelivered(input: { ids: [${gqlString(itemId)}] }) { changedIds } }`,
 			bobHome.token));
 	});

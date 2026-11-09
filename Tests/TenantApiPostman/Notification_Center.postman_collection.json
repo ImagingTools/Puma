@@ -41,7 +41,11 @@
 								"id": "54895f06-5b33-4fa3-937a-5e7e12911c5a",
 								"type": "text/javascript",
 								"exec": [
-									"pm.environment.set('nc_run', Date.now().toString(36));"
+									"pm.environment.set('nc_run', Date.now().toString(36));",
+									"pm.environment.set('nc_product', 'NcSender' + pm.environment.get('nc_run'));",
+									"pm.environment.set('nc_other', 'NcOther' + pm.environment.get('nc_run'));",
+									"pm.environment.set('nc_product_card', pm.variables.replaceIn('{{$guid}}'));",
+									"pm.environment.set('nc_other_card', pm.variables.replaceIn('{{$guid}}'));"
 								]
 							}
 						},
@@ -178,6 +182,191 @@
 							}
 						}
 					]
+				},
+				{
+					"name": "The product that sends the notifications",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"const __json = (function () { try { return pm.response.json(); } catch (e) { return {}; } })();\nconst __data = (__json && __json.data) || {};\nconst __errors = (__json && __json.errors) || [];\nfunction payload(command) {\n  pm.test(command + ': no GraphQL errors', function () { pm.expect(__errors, JSON.stringify(__errors)).to.eql([]); });\n  pm.test(command + ': has a payload', function () { pm.expect(__data[command], JSON.stringify(__json).slice(0, 300)).to.be.an('object'); });\n  return __data[command] || {};\n}\nfunction refused(command, reason) {\n  pm.test(command + ' is refused: ' + reason, function () {\n    pm.expect(__errors.length, 'expected a refusal, got ' + JSON.stringify(__json).slice(0, 300)).to.be.above(0);\n    pm.expect(__errors[0].message).to.match(reason);\n  });\n}\nfunction env(key) { return pm.environment.get(key); }\nfunction ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }\nfunction argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }\nconst p = payload('ConnectedProductAdd');\npm.test('connected', function () { pm.expect(p.id).to.eql(env('nc_product_card')); });"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-authentication-token",
+								"value": "{{nc_su_token}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation ConnectedProductAdd { ConnectedProductAdd(input: { id: \"{{nc_product_card}}\", typeId: \"ConnectedProduct\", item: { id: \"{{nc_product_card}}\", productId: \"{{nc_product}}\", name: \"Notification sender\" } }) { id } }",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}",
+							"host": [
+								"{{base_url}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "A second product that sends notifications",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"const __json = (function () { try { return pm.response.json(); } catch (e) { return {}; } })();\nconst __data = (__json && __json.data) || {};\nconst __errors = (__json && __json.errors) || [];\nfunction payload(command) {\n  pm.test(command + ': no GraphQL errors', function () { pm.expect(__errors, JSON.stringify(__errors)).to.eql([]); });\n  pm.test(command + ': has a payload', function () { pm.expect(__data[command], JSON.stringify(__json).slice(0, 300)).to.be.an('object'); });\n  return __data[command] || {};\n}\nfunction refused(command, reason) {\n  pm.test(command + ' is refused: ' + reason, function () {\n    pm.expect(__errors.length, 'expected a refusal, got ' + JSON.stringify(__json).slice(0, 300)).to.be.above(0);\n    pm.expect(__errors[0].message).to.match(reason);\n  });\n}\nfunction env(key) { return pm.environment.get(key); }\nfunction ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }\nfunction argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }\nconst p = payload('ConnectedProductAdd');\npm.test('connected', function () { pm.expect(p.id).to.eql(env('nc_other_card')); });"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-authentication-token",
+								"value": "{{nc_su_token}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation ConnectedProductAdd { ConnectedProductAdd(input: { id: \"{{nc_other_card}}\", typeId: \"ConnectedProduct\", item: { id: \"{{nc_other_card}}\", productId: \"{{nc_other}}\", name: \"Second sender\" } }) { id } }",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}",
+							"host": [
+								"{{base_url}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "The token of the server of the sender",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"const __json = (function () { try { return pm.response.json(); } catch (e) { return {}; } })();\nconst __data = (__json && __json.data) || {};\nconst __errors = (__json && __json.errors) || [];\nfunction payload(command) {\n  pm.test(command + ': no GraphQL errors', function () { pm.expect(__errors, JSON.stringify(__errors)).to.eql([]); });\n  pm.test(command + ': has a payload', function () { pm.expect(__data[command], JSON.stringify(__json).slice(0, 300)).to.be.an('object'); });\n  return __data[command] || {};\n}\nfunction refused(command, reason) {\n  pm.test(command + ' is refused: ' + reason, function () {\n    pm.expect(__errors.length, 'expected a refusal, got ' + JSON.stringify(__json).slice(0, 300)).to.be.above(0);\n    pm.expect(__errors[0].message).to.match(reason);\n  });\n}\nfunction env(key) { return pm.environment.get(key); }\nfunction ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }\nfunction argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }\nconst p = payload('CreateServerToken');\npm.test('it may send and read notifications', function () { pm.expect(p.scopes).to.include.members(['/ProductServer/Notifications/View', '/ProductServer/Notifications/Send']); });\npm.environment.set('nc_server_token', p.token);\npm.environment.set('nc_server_token_id', p.id);"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-authentication-token",
+								"value": "{{nc_su_token}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"{{nc_product}}\", name: \"nc sender\", scopes: [\"/ProductServer/Notifications/View\", \"/ProductServer/Notifications/Send\"] }) { id token scopes } }",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}",
+							"host": [
+								"{{base_url}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "A token of the sender that may not send",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"const __json = (function () { try { return pm.response.json(); } catch (e) { return {}; } })();\nconst __data = (__json && __json.data) || {};\nconst __errors = (__json && __json.errors) || [];\nfunction payload(command) {\n  pm.test(command + ': no GraphQL errors', function () { pm.expect(__errors, JSON.stringify(__errors)).to.eql([]); });\n  pm.test(command + ': has a payload', function () { pm.expect(__data[command], JSON.stringify(__json).slice(0, 300)).to.be.an('object'); });\n  return __data[command] || {};\n}\nfunction refused(command, reason) {\n  pm.test(command + ' is refused: ' + reason, function () {\n    pm.expect(__errors.length, 'expected a refusal, got ' + JSON.stringify(__json).slice(0, 300)).to.be.above(0);\n    pm.expect(__errors[0].message).to.match(reason);\n  });\n}\nfunction env(key) { return pm.environment.get(key); }\nfunction ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }\nfunction argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }\nconst p = payload('CreateServerToken');\npm.test('it may not send', function () { pm.expect(p.scopes).to.not.include('/ProductServer/Notifications/Send'); });\npm.environment.set('nc_reader_token', p.token);"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-authentication-token",
+								"value": "{{nc_su_token}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"{{nc_product}}\", name: \"nc reader\", scopes: [\"/ProductServer/Notifications/View\"] }) { id token scopes } }",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}",
+							"host": [
+								"{{base_url}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "The token of the server of the second product",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"const __json = (function () { try { return pm.response.json(); } catch (e) { return {}; } })();\nconst __data = (__json && __json.data) || {};\nconst __errors = (__json && __json.errors) || [];\nfunction payload(command) {\n  pm.test(command + ': no GraphQL errors', function () { pm.expect(__errors, JSON.stringify(__errors)).to.eql([]); });\n  pm.test(command + ': has a payload', function () { pm.expect(__data[command], JSON.stringify(__json).slice(0, 300)).to.be.an('object'); });\n  return __data[command] || {};\n}\nfunction refused(command, reason) {\n  pm.test(command + ' is refused: ' + reason, function () {\n    pm.expect(__errors.length, 'expected a refusal, got ' + JSON.stringify(__json).slice(0, 300)).to.be.above(0);\n    pm.expect(__errors[0].message).to.match(reason);\n  });\n}\nfunction env(key) { return pm.environment.get(key); }\nfunction ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }\nfunction argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }\nconst p = payload('CreateServerToken');\npm.test('it may send', function () { pm.expect(p.scopes).to.include('/ProductServer/Notifications/Send'); });\npm.environment.set('nc_other_token', p.token);"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-authentication-token",
+								"value": "{{nc_su_token}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"{{nc_other}}\", name: \"nc second sender\", scopes: [\"/ProductServer/Notifications/View\", \"/ProductServer/Notifications/Send\"] }) { id token scopes } }",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}",
+							"host": [
+								"{{base_url}}"
+							]
+						}
+					},
+					"response": []
 				},
 				{
 					"id": "b888d7d5-3d3c-4158-b36a-4e14e65bf462",
@@ -724,69 +913,6 @@
 									"const p = payload('Authorization');",
 									"pm.test('signed in', function () { pm.expect(p.token).to.be.a('string').and.not.empty; });",
 									"pm.environment.set('nc_bob_sel', p.token);"
-								]
-							}
-						}
-					]
-				},
-				{
-					"id": "97a7a9ad-94c2-43f3-929a-f518f5dd4350",
-					"name": "Authorization alice in product ProLife",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}",
-							"host": [
-								"{{base_url}}"
-							]
-						},
-						"body": {
-							"mode": "graphql",
-							"graphql": {
-								"query": "query Authorization { Authorization(input: { login: \"nc_alice_{{nc_run}}\", password: \"Notify_2026!x\", productId: \"ProLife\" }) { userId token } }",
-								"variables": ""
-							}
-						}
-					},
-					"response": [],
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"id": "1bab9e15-a7a9-49e9-b050-78ac3f560b7d",
-								"type": "text/javascript",
-								"exec": [
-									"pm.request.headers.upsert({ key: 'productid', value: 'ProLife' });"
-								]
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"id": "0862213e-d540-4ac3-b733-5d90be3adacf",
-								"type": "text/javascript",
-								"exec": [
-									"const __json = (function () { try { return pm.response.json(); } catch (e) { return {}; } })();",
-									"const __data = (__json && __json.data) || {};",
-									"const __errors = (__json && __json.errors) || [];",
-									"function payload(command) {",
-									"  pm.test(command + ': no GraphQL errors', function () { pm.expect(__errors, JSON.stringify(__errors)).to.eql([]); });",
-									"  pm.test(command + ': has a payload', function () { pm.expect(__data[command], JSON.stringify(__json).slice(0, 300)).to.be.an('object'); });",
-									"  return __data[command] || {};",
-									"}",
-									"function refused(command, reason) {",
-									"  pm.test(command + ' is refused: ' + reason, function () {",
-									"    pm.expect(__errors.length, 'expected a refusal, got ' + JSON.stringify(__json).slice(0, 300)).to.be.above(0);",
-									"    pm.expect(__errors[0].message).to.match(reason);",
-									"  });",
-									"}",
-									"function env(key) { return pm.environment.get(key); }",
-									"function ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }",
-									"function argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }",
-									"const p = payload('Authorization');",
-									"pm.test('signed in', function () { pm.expect(p.token).to.be.a('string').and.not.empty; });",
-									"pm.environment.set('nc_alice_prolife_token', p.token);"
 								]
 							}
 						}
@@ -1404,7 +1530,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation SendNotification { SendNotification(input: { productId: \"Puma\", userIds: [\"{{nc_bob_id}}\"], typeId: \"nc.Access\" }) { success } }",
+								"query": "mutation SendNotification { SendNotification(input: { productId: \"{{nc_product}}\", userIds: [\"{{nc_bob_id}}\"], typeId: \"nc.Access\" }) { success } }",
 								"variables": ""
 							}
 						}
@@ -1417,24 +1543,7 @@
 								"id": "d8eaecc8-682c-488e-81f5-8c754636ab5e",
 								"type": "text/javascript",
 								"exec": [
-									"const __json = (function () { try { return pm.response.json(); } catch (e) { return {}; } })();",
-									"const __data = (__json && __json.data) || {};",
-									"const __errors = (__json && __json.errors) || [];",
-									"function payload(command) {",
-									"  pm.test(command + ': no GraphQL errors', function () { pm.expect(__errors, JSON.stringify(__errors)).to.eql([]); });",
-									"  pm.test(command + ': has a payload', function () { pm.expect(__data[command], JSON.stringify(__json).slice(0, 300)).to.be.an('object'); });",
-									"  return __data[command] || {};",
-									"}",
-									"function refused(command, reason) {",
-									"  pm.test(command + ' is refused: ' + reason, function () {",
-									"    pm.expect(__errors.length, 'expected a refusal, got ' + JSON.stringify(__json).slice(0, 300)).to.be.above(0);",
-									"    pm.expect(__errors[0].message).to.match(reason);",
-									"  });",
-									"}",
-									"function env(key) { return pm.environment.get(key); }",
-									"function ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }",
-									"function argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }",
-									"refused('SendNotification', /signed-in user/);"
+									"const __json = (function () { try { return pm.response.json(); } catch (e) { return {}; } })();\nconst __data = (__json && __json.data) || {};\nconst __errors = (__json && __json.errors) || [];\nfunction payload(command) {\n  pm.test(command + ': no GraphQL errors', function () { pm.expect(__errors, JSON.stringify(__errors)).to.eql([]); });\n  pm.test(command + ': has a payload', function () { pm.expect(__data[command], JSON.stringify(__json).slice(0, 300)).to.be.an('object'); });\n  return __data[command] || {};\n}\nfunction refused(command, reason) {\n  pm.test(command + ' is refused: ' + reason, function () {\n    pm.expect(__errors.length, 'expected a refusal, got ' + JSON.stringify(__json).slice(0, 300)).to.be.above(0);\n    pm.expect(__errors[0].message).to.match(reason);\n  });\n}\nfunction env(key) { return pm.environment.get(key); }\nfunction ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }\nfunction argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }\nrefused('SendNotification', /Notifications are sent only by the server of a product/);"
 								]
 							}
 						}
@@ -1442,7 +1551,7 @@
 				},
 				{
 					"id": "4a46e241-4ab9-4d50-a4bf-00fc73936d1c",
-					"name": "A signed-in user may send for the product of the request (until ImtCore#1059)",
+					"name": "A signed-in user may not send",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -1460,7 +1569,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation SendNotification { SendNotification(input: { productId: \"Puma\", userIds: [\"{{nc_su_id}}\"], typeId: \"nc.Access\" }) { success } }",
+								"query": "mutation SendNotification { SendNotification(input: { productId: \"{{nc_product}}\", userIds: [\"{{nc_bob_id}}\"], typeId: \"nc.Access\" }) { success } }",
 								"variables": ""
 							}
 						}
@@ -1473,39 +1582,155 @@
 								"id": "5ae7db81-96d9-42b7-9e40-9a174fc7e982",
 								"type": "text/javascript",
 								"exec": [
-									"const __json = (function () { try { return pm.response.json(); } catch (e) { return {}; } })();",
-									"const __data = (__json && __json.data) || {};",
-									"const __errors = (__json && __json.errors) || [];",
-									"function payload(command) {",
-									"  pm.test(command + ': no GraphQL errors', function () { pm.expect(__errors, JSON.stringify(__errors)).to.eql([]); });",
-									"  pm.test(command + ': has a payload', function () { pm.expect(__data[command], JSON.stringify(__json).slice(0, 300)).to.be.an('object'); });",
-									"  return __data[command] || {};",
-									"}",
-									"function refused(command, reason) {",
-									"  pm.test(command + ' is refused: ' + reason, function () {",
-									"    pm.expect(__errors.length, 'expected a refusal, got ' + JSON.stringify(__json).slice(0, 300)).to.be.above(0);",
-									"    pm.expect(__errors[0].message).to.match(reason);",
-									"  });",
-									"}",
-									"function env(key) { return pm.environment.get(key); }",
-									"function ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }",
-									"function argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }",
-									"const p = payload('SendNotification');",
-									"pm.test('sent', function () { pm.expect(p.success).to.eql(true); });"
+									"const __json = (function () { try { return pm.response.json(); } catch (e) { return {}; } })();\nconst __data = (__json && __json.data) || {};\nconst __errors = (__json && __json.errors) || [];\nfunction payload(command) {\n  pm.test(command + ': no GraphQL errors', function () { pm.expect(__errors, JSON.stringify(__errors)).to.eql([]); });\n  pm.test(command + ': has a payload', function () { pm.expect(__data[command], JSON.stringify(__json).slice(0, 300)).to.be.an('object'); });\n  return __data[command] || {};\n}\nfunction refused(command, reason) {\n  pm.test(command + ' is refused: ' + reason, function () {\n    pm.expect(__errors.length, 'expected a refusal, got ' + JSON.stringify(__json).slice(0, 300)).to.be.above(0);\n    pm.expect(__errors[0].message).to.match(reason);\n  });\n}\nfunction env(key) { return pm.environment.get(key); }\nfunction ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }\nfunction argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }\nrefused('SendNotification', /Notifications are sent only by the server of a product/);"
 								]
 							}
 						}
 					]
 				},
 				{
-					"id": "b6796905-f464-41f2-bbf1-f5f55aa2e92b",
-					"name": "A token sends only to the product of its request",
+					"name": "A superuser session may not send",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"const __json = (function () { try { return pm.response.json(); } catch (e) { return {}; } })();\nconst __data = (__json && __json.data) || {};\nconst __errors = (__json && __json.errors) || [];\nfunction payload(command) {\n  pm.test(command + ': no GraphQL errors', function () { pm.expect(__errors, JSON.stringify(__errors)).to.eql([]); });\n  pm.test(command + ': has a payload', function () { pm.expect(__data[command], JSON.stringify(__json).slice(0, 300)).to.be.an('object'); });\n  return __data[command] || {};\n}\nfunction refused(command, reason) {\n  pm.test(command + ' is refused: ' + reason, function () {\n    pm.expect(__errors.length, 'expected a refusal, got ' + JSON.stringify(__json).slice(0, 300)).to.be.above(0);\n    pm.expect(__errors[0].message).to.match(reason);\n  });\n}\nfunction env(key) { return pm.environment.get(key); }\nfunction ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }\nfunction argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }\nrefused('SendNotification', /Notifications are sent only by the server of a product/);"
+								]
+							}
+						}
+					],
 					"request": {
 						"method": "POST",
 						"header": [
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_su_token}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation SendNotification { SendNotification(input: { productId: \"{{nc_product}}\", userIds: [\"{{nc_bob_id}}\"], typeId: \"nc.Access\" }) { success } }",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}",
+							"host": [
+								"{{base_url}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "A request forwarded by the server of the sender does not send for the user",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"const __json = (function () { try { return pm.response.json(); } catch (e) { return {}; } })();\nconst __data = (__json && __json.data) || {};\nconst __errors = (__json && __json.errors) || [];\nfunction payload(command) {\n  pm.test(command + ': no GraphQL errors', function () { pm.expect(__errors, JSON.stringify(__errors)).to.eql([]); });\n  pm.test(command + ': has a payload', function () { pm.expect(__data[command], JSON.stringify(__json).slice(0, 300)).to.be.an('object'); });\n  return __data[command] || {};\n}\nfunction refused(command, reason) {\n  pm.test(command + ' is refused: ' + reason, function () {\n    pm.expect(__errors.length, 'expected a refusal, got ' + JSON.stringify(__json).slice(0, 300)).to.be.above(0);\n    pm.expect(__errors[0].message).to.match(reason);\n  });\n}\nfunction env(key) { return pm.environment.get(key); }\nfunction ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }\nfunction argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }\nrefused('SendNotification', /Notifications are sent only by the server of a product/);"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-authentication-token",
+								"value": "{{nc_alice_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation SendNotification { SendNotification(input: { productId: \"{{nc_product}}\", userIds: [\"{{nc_bob_id}}\"], typeId: \"nc.Access\" }) { success } }",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}",
+							"host": [
+								"{{base_url}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "A token without the permission to send is refused",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });",
+									"pm.variables.set('expectedHttpStatus', 403);"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"const __json = (function () { try { return pm.response.json(); } catch (e) { return {}; } })();\nconst __data = (__json && __json.data) || {};\nconst __errors = (__json && __json.errors) || [];\nfunction payload(command) {\n  pm.test(command + ': no GraphQL errors', function () { pm.expect(__errors, JSON.stringify(__errors)).to.eql([]); });\n  pm.test(command + ': has a payload', function () { pm.expect(__data[command], JSON.stringify(__json).slice(0, 300)).to.be.an('object'); });\n  return __data[command] || {};\n}\nfunction refused(command, reason) {\n  pm.test(command + ' is refused: ' + reason, function () {\n    pm.expect(__errors.length, 'expected a refusal, got ' + JSON.stringify(__json).slice(0, 300)).to.be.above(0);\n    pm.expect(__errors[0].message).to.match(reason);\n  });\n}\nfunction env(key) { return pm.environment.get(key); }\nfunction ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }\nfunction argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }\nrefused('SendNotification', /The server of 'NcSender[0-9a-z]+' may not send 'SendNotification': its token lacks '\\/ProductServer\\/Notifications\\/Send'/);"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-authentication-token",
+								"value": "{{nc_reader_token}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation SendNotification { SendNotification(input: { productId: \"{{nc_product}}\", userIds: [\"{{nc_bob_id}}\"], typeId: \"nc.Access\" }) { success } }",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}",
+							"host": [
+								"{{base_url}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"id": "b6796905-f464-41f2-bbf1-f5f55aa2e92b",
+					"name": "The server of a product sends only for its product",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-authentication-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -1517,7 +1742,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation SendNotification { SendNotification(input: { productId: \"ProLife\", userIds: [\"{{nc_bob_id}}\"], typeId: \"nc.Access\" }) { success } }",
+								"query": "mutation SendNotification { SendNotification(input: { productId: \"{{nc_other}}\", userIds: [\"{{nc_bob_id}}\"], typeId: \"nc.Access\" }) { success } }",
 								"variables": ""
 							}
 						}
@@ -1525,29 +1750,21 @@
 					"response": [],
 					"event": [
 						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
+						{
 							"listen": "test",
 							"script": {
 								"id": "d11d83f7-6d61-4098-b656-0051bdf96e1f",
 								"type": "text/javascript",
 								"exec": [
-									"const __json = (function () { try { return pm.response.json(); } catch (e) { return {}; } })();",
-									"const __data = (__json && __json.data) || {};",
-									"const __errors = (__json && __json.errors) || [];",
-									"function payload(command) {",
-									"  pm.test(command + ': no GraphQL errors', function () { pm.expect(__errors, JSON.stringify(__errors)).to.eql([]); });",
-									"  pm.test(command + ': has a payload', function () { pm.expect(__data[command], JSON.stringify(__json).slice(0, 300)).to.be.an('object'); });",
-									"  return __data[command] || {};",
-									"}",
-									"function refused(command, reason) {",
-									"  pm.test(command + ' is refused: ' + reason, function () {",
-									"    pm.expect(__errors.length, 'expected a refusal, got ' + JSON.stringify(__json).slice(0, 300)).to.be.above(0);",
-									"    pm.expect(__errors[0].message).to.match(reason);",
-									"  });",
-									"}",
-									"function env(key) { return pm.environment.get(key); }",
-									"function ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }",
-									"function argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }",
-									"refused('SendNotification', /only to the product of the sender/);"
+									"const __json = (function () { try { return pm.response.json(); } catch (e) { return {}; } })();\nconst __data = (__json && __json.data) || {};\nconst __errors = (__json && __json.errors) || [];\nfunction payload(command) {\n  pm.test(command + ': no GraphQL errors', function () { pm.expect(__errors, JSON.stringify(__errors)).to.eql([]); });\n  pm.test(command + ': has a payload', function () { pm.expect(__data[command], JSON.stringify(__json).slice(0, 300)).to.be.an('object'); });\n  return __data[command] || {};\n}\nfunction refused(command, reason) {\n  pm.test(command + ' is refused: ' + reason, function () {\n    pm.expect(__errors.length, 'expected a refusal, got ' + JSON.stringify(__json).slice(0, 300)).to.be.above(0);\n    pm.expect(__errors[0].message).to.match(reason);\n  });\n}\nfunction env(key) { return pm.environment.get(key); }\nfunction ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }\nfunction argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }\nrefused('SendNotification', /Notifications are sent only to the product of the sender/);"
 								]
 							}
 						}
@@ -1555,7 +1772,7 @@
 				},
 				{
 					"id": "7c514fb4-a095-47eb-857f-c500f721436e",
-					"name": "A signed-in user may withdraw for the product of the request (until ImtCore#1059)",
+					"name": "A signed-in user may not withdraw",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -1573,7 +1790,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation WithdrawNotifications { WithdrawNotifications(input: { productId: \"Puma\", groupKey: \"nc-access\" }) { success } }",
+								"query": "mutation WithdrawNotifications { WithdrawNotifications(input: { productId: \"{{nc_product}}\", groupKey: \"nc-access\" }) { success } }",
 								"variables": ""
 							}
 						}
@@ -1586,25 +1803,7 @@
 								"id": "664e6627-a2f9-483e-a0ee-8239d01edc24",
 								"type": "text/javascript",
 								"exec": [
-									"const __json = (function () { try { return pm.response.json(); } catch (e) { return {}; } })();",
-									"const __data = (__json && __json.data) || {};",
-									"const __errors = (__json && __json.errors) || [];",
-									"function payload(command) {",
-									"  pm.test(command + ': no GraphQL errors', function () { pm.expect(__errors, JSON.stringify(__errors)).to.eql([]); });",
-									"  pm.test(command + ': has a payload', function () { pm.expect(__data[command], JSON.stringify(__json).slice(0, 300)).to.be.an('object'); });",
-									"  return __data[command] || {};",
-									"}",
-									"function refused(command, reason) {",
-									"  pm.test(command + ' is refused: ' + reason, function () {",
-									"    pm.expect(__errors.length, 'expected a refusal, got ' + JSON.stringify(__json).slice(0, 300)).to.be.above(0);",
-									"    pm.expect(__errors[0].message).to.match(reason);",
-									"  });",
-									"}",
-									"function env(key) { return pm.environment.get(key); }",
-									"function ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }",
-									"function argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }",
-									"const p = payload('WithdrawNotifications');",
-									"pm.test('withdrawn', function () { pm.expect(p.success).to.eql(true); });"
+									"const __json = (function () { try { return pm.response.json(); } catch (e) { return {}; } })();\nconst __data = (__json && __json.data) || {};\nconst __errors = (__json && __json.errors) || [];\nfunction payload(command) {\n  pm.test(command + ': no GraphQL errors', function () { pm.expect(__errors, JSON.stringify(__errors)).to.eql([]); });\n  pm.test(command + ': has a payload', function () { pm.expect(__data[command], JSON.stringify(__json).slice(0, 300)).to.be.an('object'); });\n  return __data[command] || {};\n}\nfunction refused(command, reason) {\n  pm.test(command + ' is refused: ' + reason, function () {\n    pm.expect(__errors.length, 'expected a refusal, got ' + JSON.stringify(__json).slice(0, 300)).to.be.above(0);\n    pm.expect(__errors[0].message).to.match(reason);\n  });\n}\nfunction env(key) { return pm.environment.get(key); }\nfunction ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }\nfunction argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }\nrefused('WithdrawNotifications', /Notifications are sent only by the server of a product/);"
 								]
 							}
 						}
@@ -1618,7 +1817,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_su_token}}"
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -1630,7 +1829,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation SendNotification { SendNotification(input: { productId: \"Puma\", userIds: {{nc_many_users}}, typeId: \"nc.Access\" }) { success } }",
+								"query": "mutation SendNotification { SendNotification(input: { productId: \"{{nc_product}}\", userIds: {{nc_many_users}}, typeId: \"nc.Access\" }) { success } }",
 								"variables": ""
 							}
 						}
@@ -1643,6 +1842,7 @@
 								"id": "31665b2b-5feb-4fe2-b679-932c493f1c3f",
 								"type": "text/javascript",
 								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });",
 									"const ids = []; for (let i = 0; i < 101; i++) { ids.push('\"u' + i + '\"'); }",
 									"pm.variables.set('nc_many_users', '[' + ids.join(', ') + ']');"
 								]
@@ -1685,7 +1885,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_su_token}}"
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -1697,7 +1897,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation WithdrawNotifications { WithdrawNotifications(input: { productId: \"Puma\", groupKey: \"nc-many\", userIds: {{nc_many_users}} }) { success } }",
+								"query": "mutation WithdrawNotifications { WithdrawNotifications(input: { productId: \"{{nc_product}}\", groupKey: \"nc-many\", userIds: {{nc_many_users}} }) { success } }",
 								"variables": ""
 							}
 						}
@@ -1710,6 +1910,7 @@
 								"id": "974e89df-6fdc-47f8-8a3e-1bc3481a565e",
 								"type": "text/javascript",
 								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });",
 									"const ids = []; for (let i = 0; i < 101; i++) { ids.push('\"u' + i + '\"'); }",
 									"pm.variables.set('nc_many_users', '[' + ids.join(', ') + ']');"
 								]
@@ -1753,6 +1954,10 @@
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_bob_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -1771,6 +1976,15 @@
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -1816,7 +2030,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_su_token}}"
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -1828,7 +2042,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation SendNotification { SendNotification(input: { productId: \"Puma\", userIds: [\"{{nc_dave_id}}\"], typeId: \"{{nc_long}}\" }) { success } }",
+								"query": "mutation SendNotification { SendNotification(input: { productId: \"{{nc_product}}\", userIds: [\"{{nc_dave_id}}\"], typeId: \"{{nc_long}}\" }) { success } }",
 								"variables": ""
 							}
 						}
@@ -1841,6 +2055,7 @@
 								"id": "3324c425-4684-4c34-8225-be25c45850f0",
 								"type": "text/javascript",
 								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });",
 									"pm.variables.set('nc_long', 'x'.repeat(101));"
 								]
 							}
@@ -1882,7 +2097,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_su_token}}"
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -1894,7 +2109,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation SendNotification { SendNotification(input: { productId: \"Puma\", userIds: [\"{{nc_dave_id}}\"], typeId: \"nc.Bad\", groupKey: \"{{nc_long}}\" }) { success } }",
+								"query": "mutation SendNotification { SendNotification(input: { productId: \"{{nc_product}}\", userIds: [\"{{nc_dave_id}}\"], typeId: \"nc.Bad\", groupKey: \"{{nc_long}}\" }) { success } }",
 								"variables": ""
 							}
 						}
@@ -1907,6 +2122,7 @@
 								"id": "cff198a4-e2ff-4b4c-862d-ec36c6b5625a",
 								"type": "text/javascript",
 								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });",
 									"pm.variables.set('nc_long', 'x'.repeat(201));"
 								]
 							}
@@ -1948,7 +2164,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_su_token}}"
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -1960,7 +2176,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation SendNotification { SendNotification(input: { productId: \"Puma\", userIds: [\"{{nc_dave_id}}\"], typeId: \"nc.Bad\", dedupKey: \"{{nc_long}}\" }) { success } }",
+								"query": "mutation SendNotification { SendNotification(input: { productId: \"{{nc_product}}\", userIds: [\"{{nc_dave_id}}\"], typeId: \"nc.Bad\", dedupKey: \"{{nc_long}}\" }) { success } }",
 								"variables": ""
 							}
 						}
@@ -1973,6 +2189,7 @@
 								"id": "4bb8514a-26e7-4e55-8482-f72ff6431515",
 								"type": "text/javascript",
 								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });",
 									"pm.variables.set('nc_long', 'x'.repeat(201));"
 								]
 							}
@@ -2014,7 +2231,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_su_token}}"
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -2026,7 +2243,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation SendNotification { SendNotification(input: { productId: \"Puma\", userIds: [\"{{nc_dave_id}}\"], typeId: \"nc.Bad\", subject: { id: \"{{nc_long}}\", typeId: \"Tenant\", name: \"x\" } }) { success } }",
+								"query": "mutation SendNotification { SendNotification(input: { productId: \"{{nc_product}}\", userIds: [\"{{nc_dave_id}}\"], typeId: \"nc.Bad\", subject: { id: \"{{nc_long}}\", typeId: \"Tenant\", name: \"x\" } }) { success } }",
 								"variables": ""
 							}
 						}
@@ -2039,6 +2256,7 @@
 								"id": "5259d32f-e3a5-42b5-a0a6-92227d135756",
 								"type": "text/javascript",
 								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });",
 									"pm.variables.set('nc_long', 'x'.repeat(101));"
 								]
 							}
@@ -2080,7 +2298,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_su_token}}"
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -2092,7 +2310,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation SendNotification { SendNotification(input: { productId: \"Puma\", userIds: [\"{{nc_dave_id}}\"], typeId: \"nc.Bad\", actor: { id: \"{{nc_long}}\", typeId: \"User\", name: \"x\" } }) { success } }",
+								"query": "mutation SendNotification { SendNotification(input: { productId: \"{{nc_product}}\", userIds: [\"{{nc_dave_id}}\"], typeId: \"nc.Bad\", actor: { id: \"{{nc_long}}\", typeId: \"User\", name: \"x\" } }) { success } }",
 								"variables": ""
 							}
 						}
@@ -2105,6 +2323,7 @@
 								"id": "0642f27f-428a-408e-aedd-0ef8f72b4492",
 								"type": "text/javascript",
 								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });",
 									"pm.variables.set('nc_long', 'x'.repeat(101));"
 								]
 							}
@@ -2146,7 +2365,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_su_token}}"
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -2158,13 +2377,22 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation SendNotification { SendNotification(input: { productId: \"Puma\", userIds: [\"{{nc_dave_id}}\"], typeId: \"nc.Bad\", arguments: [{ id: \"bad-id\", kind: Text, value: \"x\" }] }) { success } }",
+								"query": "mutation SendNotification { SendNotification(input: { productId: \"{{nc_product}}\", userIds: [\"{{nc_dave_id}}\"], typeId: \"nc.Bad\", arguments: [{ id: \"bad-id\", kind: Text, value: \"x\" }] }) { success } }",
 								"variables": ""
 							}
 						}
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -2202,7 +2430,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_su_token}}"
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -2214,7 +2442,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation SendNotification { SendNotification(input: { productId: \"Puma\", userIds: [\"{{nc_dave_id}}\"], typeId: \"nc.Bad\", arguments: [{ id: \"{{nc_long}}\", kind: Text, value: \"x\" }] }) { success } }",
+								"query": "mutation SendNotification { SendNotification(input: { productId: \"{{nc_product}}\", userIds: [\"{{nc_dave_id}}\"], typeId: \"nc.Bad\", arguments: [{ id: \"{{nc_long}}\", kind: Text, value: \"x\" }] }) { success } }",
 								"variables": ""
 							}
 						}
@@ -2227,6 +2455,7 @@
 								"id": "79984726-1f44-4759-b9a1-6fdf65afbffa",
 								"type": "text/javascript",
 								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });",
 									"pm.variables.set('nc_long', 'x'.repeat(51));"
 								]
 							}
@@ -2268,7 +2497,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_su_token}}"
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -2280,13 +2509,22 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation SendNotification { SendNotification(input: { productId: \"Puma\", userIds: [\"{{nc_dave_id}}\"], typeId: \"nc.Bad\", arguments: [{ id: \"a\", kind: Text, value: \"x\" }, { id: \"a\", kind: Text, value: \"y\" }] }) { success } }",
+								"query": "mutation SendNotification { SendNotification(input: { productId: \"{{nc_product}}\", userIds: [\"{{nc_dave_id}}\"], typeId: \"nc.Bad\", arguments: [{ id: \"a\", kind: Text, value: \"x\" }, { id: \"a\", kind: Text, value: \"y\" }] }) { success } }",
 								"variables": ""
 							}
 						}
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -2324,7 +2562,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_su_token}}"
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -2336,13 +2574,22 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation SendNotification { SendNotification(input: { productId: \"Puma\", userIds: [\"{{nc_dave_id}}\"], typeId: \"nc.Bad\", arguments: [{ id: \"subject\", kind: Text, value: \"x\" }] }) { success } }",
+								"query": "mutation SendNotification { SendNotification(input: { productId: \"{{nc_product}}\", userIds: [\"{{nc_dave_id}}\"], typeId: \"nc.Bad\", arguments: [{ id: \"subject\", kind: Text, value: \"x\" }] }) { success } }",
 								"variables": ""
 							}
 						}
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -2380,7 +2627,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_su_token}}"
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -2392,13 +2639,22 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation SendNotification { SendNotification(input: { productId: \"Puma\", userIds: [\"{{nc_dave_id}}\"], typeId: \"nc.Bad\", arguments: [{ id: \"actor\", kind: Text, value: \"x\" }] }) { success } }",
+								"query": "mutation SendNotification { SendNotification(input: { productId: \"{{nc_product}}\", userIds: [\"{{nc_dave_id}}\"], typeId: \"nc.Bad\", arguments: [{ id: \"actor\", kind: Text, value: \"x\" }] }) { success } }",
 								"variables": ""
 							}
 						}
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -2436,7 +2692,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_su_token}}"
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -2448,13 +2704,22 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation SendNotification { SendNotification(input: { productId: \"Puma\", userIds: [\"{{nc_dave_id}}\"], typeId: \"nc.Bad\", arguments: [{ id: \"count\", kind: Number, value: \"1\" }] }) { success } }",
+								"query": "mutation SendNotification { SendNotification(input: { productId: \"{{nc_product}}\", userIds: [\"{{nc_dave_id}}\"], typeId: \"nc.Bad\", arguments: [{ id: \"count\", kind: Number, value: \"1\" }] }) { success } }",
 								"variables": ""
 							}
 						}
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -2492,7 +2757,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_su_token}}"
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -2504,13 +2769,22 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation SendNotification { SendNotification(input: { productId: \"Puma\", userIds: [\"{{nc_dave_id}}\"], typeId: \"nc.Bad\", arguments: [{ id: \"n\", kind: Number, value: \"abc\" }] }) { success } }",
+								"query": "mutation SendNotification { SendNotification(input: { productId: \"{{nc_product}}\", userIds: [\"{{nc_dave_id}}\"], typeId: \"nc.Bad\", arguments: [{ id: \"n\", kind: Number, value: \"abc\" }] }) { success } }",
 								"variables": ""
 							}
 						}
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -2548,7 +2822,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_su_token}}"
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -2560,7 +2834,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation SendNotification { SendNotification(input: { productId: \"Puma\", userIds: [\"{{nc_dave_id}}\"], typeId: \"nc.Bad\", arguments: [{ id: \"n\", kind: Number, value: \"{{nc_long_number}}\" }] }) { success } }",
+								"query": "mutation SendNotification { SendNotification(input: { productId: \"{{nc_product}}\", userIds: [\"{{nc_dave_id}}\"], typeId: \"nc.Bad\", arguments: [{ id: \"n\", kind: Number, value: \"{{nc_long_number}}\" }] }) { success } }",
 								"variables": ""
 							}
 						}
@@ -2573,6 +2847,7 @@
 								"id": "a67946ea-807f-4ace-87c1-8e2f09da0627",
 								"type": "text/javascript",
 								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });",
 									"pm.variables.set('nc_long_number', '0.' + '0'.repeat(198) + '1');"
 								]
 							}
@@ -2614,7 +2889,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_su_token}}"
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -2626,13 +2901,22 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation SendNotification { SendNotification(input: { productId: \"Puma\", userIds: [\"{{nc_dave_id}}\"], typeId: \"nc.Bad\", arguments: [{ id: \"d\", kind: DateTime, value: \"tomorrow\" }] }) { success } }",
+								"query": "mutation SendNotification { SendNotification(input: { productId: \"{{nc_product}}\", userIds: [\"{{nc_dave_id}}\"], typeId: \"nc.Bad\", arguments: [{ id: \"d\", kind: DateTime, value: \"tomorrow\" }] }) { success } }",
 								"variables": ""
 							}
 						}
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -2670,7 +2954,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_su_token}}"
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -2682,7 +2966,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation SendNotification { SendNotification(input: { productId: \"Puma\", userIds: [\"{{nc_dave_id}}\"], typeId: \"nc.Bad\", arguments: [{{nc_args}}] }) { success } }",
+								"query": "mutation SendNotification { SendNotification(input: { productId: \"{{nc_product}}\", userIds: [\"{{nc_dave_id}}\"], typeId: \"nc.Bad\", arguments: [{{nc_args}}] }) { success } }",
 								"variables": ""
 							}
 						}
@@ -2695,6 +2979,7 @@
 								"id": "a1f77cc6-9b00-4267-9b23-696c445b4b5a",
 								"type": "text/javascript",
 								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });",
 									"const a = []; for (let i = 0; i < 11; i++) { a.push('{ id: \"a' + i + '\", kind: Text, value: \"x\" }'); }",
 									"pm.variables.set('nc_args', a.join(', '));"
 								]
@@ -2738,6 +3023,10 @@
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_dave_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -2756,6 +3045,15 @@
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -2795,7 +3093,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_su_token}}"
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -2807,7 +3105,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation SendNotification { SendNotification(input: { productId: \"Puma\", userIds: [\"{{nc_dave_id}}\"], typeId: \"nc.Long\", subject: { id: \"s\", typeId: \"Tenant\", name: \"{{nc_long}}\" }, actor: { id: \"u\", typeId: \"User\", name: \"{{nc_long}}\" }, body: \"{{nc_body}}\", arguments: [{ id: \"note\", kind: Text, value: \"{{nc_long}}\" }] }) { success } }",
+								"query": "mutation SendNotification { SendNotification(input: { productId: \"{{nc_product}}\", userIds: [\"{{nc_dave_id}}\"], typeId: \"nc.Long\", subject: { id: \"s\", typeId: \"Tenant\", name: \"{{nc_long}}\" }, actor: { id: \"u\", typeId: \"User\", name: \"{{nc_long}}\" }, body: \"{{nc_body}}\", arguments: [{ id: \"note\", kind: Text, value: \"{{nc_long}}\" }] }) { success } }",
 								"variables": ""
 							}
 						}
@@ -2820,6 +3118,7 @@
 								"id": "2a9d6fe9-593c-4354-8149-26b28414c76d",
 								"type": "text/javascript",
 								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });",
 									"pm.variables.set('nc_long', 'n'.repeat(300));",
 									"pm.variables.set('nc_body', 'b'.repeat(600));"
 								]
@@ -2863,7 +3162,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_su_token}}"
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -2875,7 +3174,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation SendNotification { SendNotification(input: { productId: \"Puma\", userIds: [\"{{nc_dave_id}}\"], typeId: \"nc.Emoji\", subject: { id: \"s\", typeId: \"Tenant\", name: \"{{nc_emoji_name}}\" } }) { success } }",
+								"query": "mutation SendNotification { SendNotification(input: { productId: \"{{nc_product}}\", userIds: [\"{{nc_dave_id}}\"], typeId: \"nc.Emoji\", subject: { id: \"s\", typeId: \"Tenant\", name: \"{{nc_emoji_name}}\" } }) { success } }",
 								"variables": ""
 							}
 						}
@@ -2888,6 +3187,7 @@
 								"id": "c8a1c854-d367-4f20-aa8a-5bfd57340ad9",
 								"type": "text/javascript",
 								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });",
 									"pm.variables.set('nc_emoji_name', 'n'.repeat(199) + '\\uD83D\\uDE00' + 'x');"
 								]
 							}
@@ -2931,6 +3231,10 @@
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_dave_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -2949,6 +3253,15 @@
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -2995,7 +3308,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_su_token}}"
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -3007,13 +3320,22 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation SendNotification { SendNotification(input: { productId: \"Puma\", userIds: [\"{{nc_dave_id}}\"], typeId: \"nc.Kinds\", subject: { id: \"s\", typeId: \"Tenant\", name: \"Org\" }, arguments: [\n  { id: \"partner\", kind: Object, value: \"Acme\", objectId: \"t-acme\", objectTypeId: \"Tenant\" },\n  { id: \"amount\", kind: Number, value: \"2.5\" },\n  { id: \"due\", kind: DateTime, value: \"2026-11-05T10:00:00.000Z\" },\n  { id: \"status\", kind: Text, value: \"InProgress\" }] }) { success } }",
+								"query": "mutation SendNotification { SendNotification(input: { productId: \"{{nc_product}}\", userIds: [\"{{nc_dave_id}}\"], typeId: \"nc.Kinds\", subject: { id: \"s\", typeId: \"Tenant\", name: \"Org\" }, arguments: [\n  { id: \"partner\", kind: Object, value: \"Acme\", objectId: \"t-acme\", objectTypeId: \"Tenant\" },\n  { id: \"amount\", kind: Number, value: \"2.5\" },\n  { id: \"due\", kind: DateTime, value: \"2026-11-05T10:00:00.000Z\" },\n  { id: \"status\", kind: Text, value: \"InProgress\" }] }) { success } }",
 								"variables": ""
 							}
 						}
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -3053,6 +3375,10 @@
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_dave_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -3071,6 +3397,15 @@
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -3121,7 +3456,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_su_token}}"
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -3133,13 +3468,22 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation SendNotification { SendNotification(input: { productId: \"Puma\", userIds: [\"{{nc_alice_id}}\"], typeId: \"nc.Personal\" }) { success } }",
+								"query": "mutation SendNotification { SendNotification(input: { productId: \"{{nc_product}}\", userIds: [\"{{nc_alice_id}}\"], typeId: \"nc.Personal\" }) { success } }",
 								"variables": ""
 							}
 						}
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -3179,6 +3523,10 @@
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_alice_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -3197,6 +3545,15 @@
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -3237,6 +3594,10 @@
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_alice_a_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -3255,6 +3616,15 @@
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -3294,7 +3664,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_su_token}}"
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -3306,13 +3676,22 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation SendNotification { SendNotification(input: { productId: \"Puma\", tenantId: \"{{nc_tenant_a}}\", userIds: [\"{{nc_alice_id}}\"], typeId: \"nc.TenantA\" }) { success } }",
+								"query": "mutation SendNotification { SendNotification(input: { productId: \"{{nc_product}}\", tenantId: \"{{nc_tenant_a}}\", userIds: [\"{{nc_alice_id}}\"], typeId: \"nc.TenantA\" }) { success } }",
 								"variables": ""
 							}
 						}
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -3352,6 +3731,10 @@
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_alice_a_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -3370,6 +3753,15 @@
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -3410,6 +3802,10 @@
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_alice_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -3428,6 +3824,15 @@
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -3467,7 +3872,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_su_token}}"
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -3479,13 +3884,22 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation SendNotification { SendNotification(input: { productId: \"Puma\", tenantId: \"{{nc_tenant_a}}\", userIds: [\"{{nc_bob_id}}\"], typeId: \"nc.TenantA\" }) { success } }",
+								"query": "mutation SendNotification { SendNotification(input: { productId: \"{{nc_product}}\", tenantId: \"{{nc_tenant_a}}\", userIds: [\"{{nc_bob_id}}\"], typeId: \"nc.TenantA\" }) { success } }",
 								"variables": ""
 							}
 						}
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -3524,6 +3938,10 @@
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_bob_b_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -3542,6 +3960,15 @@
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -3575,13 +4002,13 @@
 				},
 				{
 					"id": "94230ba1-419c-4c2e-b4d1-7a0a008cd125",
-					"name": "Product ProLife notification to alice",
+					"name": "A notification of the second product to alice",
 					"request": {
 						"method": "POST",
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_su_token}}"
+								"value": "{{nc_other_token}}"
 							}
 						],
 						"url": {
@@ -3593,7 +4020,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation SendNotification { SendNotification(input: { productId: \"ProLife\", userIds: [\"{{nc_alice_id}}\"], typeId: \"nc.Product\" }) { success } }",
+								"query": "mutation SendNotification { SendNotification(input: { productId: \"{{nc_other}}\", userIds: [\"{{nc_alice_id}}\"], typeId: \"nc.Product\" }) { success } }",
 								"variables": ""
 							}
 						}
@@ -3606,7 +4033,7 @@
 								"id": "991337ab-8294-4fb4-bef2-b4f3ef81786c",
 								"type": "text/javascript",
 								"exec": [
-									"pm.request.headers.upsert({ key: 'productid', value: 'ProLife' });"
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_other}}' });"
 								]
 							}
 						},
@@ -3642,13 +4069,17 @@
 				},
 				{
 					"id": "ac9857f6-92b5-4469-9321-6a471653151e",
-					"name": "Alice in Puma does not see a ProLife one",
+					"name": "Through the first product alice does not see the second one",
 					"request": {
 						"method": "POST",
 						"header": [
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_alice_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -3667,6 +4098,15 @@
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -3700,13 +4140,17 @@
 				},
 				{
 					"id": "0b21689d-2966-4fa3-bc67-417b787e205d",
-					"name": "Alice in ProLife sees it",
+					"name": "Through the second product alice sees it",
 					"request": {
 						"method": "POST",
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_alice_prolife_token}}"
+								"value": "{{nc_alice_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_other_token}}"
 							}
 						],
 						"url": {
@@ -3731,7 +4175,7 @@
 								"id": "864dae85-b637-43ea-8ae0-43cfbe1a85d3",
 								"type": "text/javascript",
 								"exec": [
-									"pm.request.headers.upsert({ key: 'productid', value: 'ProLife' });"
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_other}}' });"
 								]
 							}
 						},
@@ -3774,7 +4218,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_su_token}}"
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -3786,13 +4230,22 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation SendNotification { SendNotification(input: { productId: \"Puma\", userIds: [\"{{nc_alice_id}}\", \"{{nc_carol_id}}\"], typeId: \"nc.Actor\", actor: { id: \"{{nc_alice_id}}\", typeId: \"User\", name: \"Alice\" } }) { success } }",
+								"query": "mutation SendNotification { SendNotification(input: { productId: \"{{nc_product}}\", userIds: [\"{{nc_alice_id}}\", \"{{nc_carol_id}}\"], typeId: \"nc.Actor\", actor: { id: \"{{nc_alice_id}}\", typeId: \"User\", name: \"Alice\" } }) { success } }",
 								"variables": ""
 							}
 						}
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -3832,6 +4285,10 @@
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_alice_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -3850,6 +4307,15 @@
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -3890,6 +4356,10 @@
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_carol_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -3908,6 +4378,15 @@
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -3949,7 +4428,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_su_token}}"
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -3961,13 +4440,22 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation SendNotification { SendNotification(input: { productId: \"Puma\", userIds: [\"{{nc_carol_id}}\", \"{{nc_carol_id}}\"], typeId: \"nc.Repeated\" }) { success } }",
+								"query": "mutation SendNotification { SendNotification(input: { productId: \"{{nc_product}}\", userIds: [\"{{nc_carol_id}}\", \"{{nc_carol_id}}\"], typeId: \"nc.Repeated\" }) { success } }",
 								"variables": ""
 							}
 						}
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -4007,6 +4495,10 @@
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_carol_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -4025,6 +4517,15 @@
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -4070,7 +4571,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_su_token}}"
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -4082,13 +4583,22 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation SendNotification { SendNotification(input: { productId: \"Puma\", userIds: [\"{{nc_carol_id}}\"], typeId: \"nc.Group\", groupKey: \"group-1\", body: \"event 1\", actor: { id: \"g-anna\", typeId: \"User\", name: \"Anna\" }, subject: { id: \"s\", typeId: \"Tenant\", name: \"Org\" }, arguments: [{ id: \"step\", kind: Number, value: \"1\" }] }) { success } }",
+								"query": "mutation SendNotification { SendNotification(input: { productId: \"{{nc_product}}\", userIds: [\"{{nc_carol_id}}\"], typeId: \"nc.Group\", groupKey: \"group-1\", body: \"event 1\", actor: { id: \"g-anna\", typeId: \"User\", name: \"Anna\" }, subject: { id: \"s\", typeId: \"Tenant\", name: \"Org\" }, arguments: [{ id: \"step\", kind: Number, value: \"1\" }] }) { success } }",
 								"variables": ""
 							}
 						}
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -4127,7 +4637,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_su_token}}"
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -4139,13 +4649,22 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation SendNotification { SendNotification(input: { productId: \"Puma\", userIds: [\"{{nc_carol_id}}\"], typeId: \"nc.Group\", groupKey: \"group-1\", body: \"event 2\", actor: { id: \"g-boris\", typeId: \"User\", name: \"Boris\" }, subject: { id: \"s\", typeId: \"Tenant\", name: \"Org\" }, arguments: [{ id: \"step\", kind: Number, value: \"2\" }] }) { success } }",
+								"query": "mutation SendNotification { SendNotification(input: { productId: \"{{nc_product}}\", userIds: [\"{{nc_carol_id}}\"], typeId: \"nc.Group\", groupKey: \"group-1\", body: \"event 2\", actor: { id: \"g-boris\", typeId: \"User\", name: \"Boris\" }, subject: { id: \"s\", typeId: \"Tenant\", name: \"Org\" }, arguments: [{ id: \"step\", kind: Number, value: \"2\" }] }) { success } }",
 								"variables": ""
 							}
 						}
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -4184,7 +4703,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_su_token}}"
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -4196,13 +4715,22 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation SendNotification { SendNotification(input: { productId: \"Puma\", userIds: [\"{{nc_carol_id}}\"], typeId: \"nc.Group\", groupKey: \"group-1\", body: \"event 3\", actor: { id: \"g-anna\", typeId: \"User\", name: \"Anna\" }, subject: { id: \"s\", typeId: \"Tenant\", name: \"Org\" }, arguments: [{ id: \"step\", kind: Number, value: \"3\" }] }) { success } }",
+								"query": "mutation SendNotification { SendNotification(input: { productId: \"{{nc_product}}\", userIds: [\"{{nc_carol_id}}\"], typeId: \"nc.Group\", groupKey: \"group-1\", body: \"event 3\", actor: { id: \"g-anna\", typeId: \"User\", name: \"Anna\" }, subject: { id: \"s\", typeId: \"Tenant\", name: \"Org\" }, arguments: [{ id: \"step\", kind: Number, value: \"3\" }] }) { success } }",
 								"variables": ""
 							}
 						}
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -4242,6 +4770,10 @@
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_carol_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -4260,6 +4792,15 @@
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -4304,7 +4845,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_su_token}}"
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -4316,13 +4857,22 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation SendNotification { SendNotification(input: { productId: \"Puma\", userIds: [\"{{nc_carol_id}}\"], typeId: \"nc.Group\", groupKey: \"group-1\", actor: { id: \"g-1\", typeId: \"User\", name: \"Actor 1\" } }) { success } }",
+								"query": "mutation SendNotification { SendNotification(input: { productId: \"{{nc_product}}\", userIds: [\"{{nc_carol_id}}\"], typeId: \"nc.Group\", groupKey: \"group-1\", actor: { id: \"g-1\", typeId: \"User\", name: \"Actor 1\" } }) { success } }",
 								"variables": ""
 							}
 						}
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -4361,7 +4911,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_su_token}}"
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -4373,13 +4923,22 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation SendNotification { SendNotification(input: { productId: \"Puma\", userIds: [\"{{nc_carol_id}}\"], typeId: \"nc.Group\", groupKey: \"group-1\", actor: { id: \"g-2\", typeId: \"User\", name: \"Actor 2\" } }) { success } }",
+								"query": "mutation SendNotification { SendNotification(input: { productId: \"{{nc_product}}\", userIds: [\"{{nc_carol_id}}\"], typeId: \"nc.Group\", groupKey: \"group-1\", actor: { id: \"g-2\", typeId: \"User\", name: \"Actor 2\" } }) { success } }",
 								"variables": ""
 							}
 						}
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -4418,7 +4977,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_su_token}}"
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -4430,13 +4989,22 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation SendNotification { SendNotification(input: { productId: \"Puma\", userIds: [\"{{nc_carol_id}}\"], typeId: \"nc.Group\", groupKey: \"group-1\", actor: { id: \"g-3\", typeId: \"User\", name: \"Actor 3\" } }) { success } }",
+								"query": "mutation SendNotification { SendNotification(input: { productId: \"{{nc_product}}\", userIds: [\"{{nc_carol_id}}\"], typeId: \"nc.Group\", groupKey: \"group-1\", actor: { id: \"g-3\", typeId: \"User\", name: \"Actor 3\" } }) { success } }",
 								"variables": ""
 							}
 						}
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -4475,7 +5043,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_su_token}}"
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -4487,13 +5055,22 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation SendNotification { SendNotification(input: { productId: \"Puma\", userIds: [\"{{nc_carol_id}}\"], typeId: \"nc.Group\", groupKey: \"group-1\", actor: { id: \"g-4\", typeId: \"User\", name: \"Actor 4\" } }) { success } }",
+								"query": "mutation SendNotification { SendNotification(input: { productId: \"{{nc_product}}\", userIds: [\"{{nc_carol_id}}\"], typeId: \"nc.Group\", groupKey: \"group-1\", actor: { id: \"g-4\", typeId: \"User\", name: \"Actor 4\" } }) { success } }",
 								"variables": ""
 							}
 						}
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -4533,6 +5110,10 @@
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_carol_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -4551,6 +5132,15 @@
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -4593,6 +5183,10 @@
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_carol_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -4611,6 +5205,15 @@
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -4649,7 +5252,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_su_token}}"
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -4661,13 +5264,22 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation SendNotification { SendNotification(input: { productId: \"Puma\", userIds: [\"{{nc_carol_id}}\"], typeId: \"nc.Group\", groupKey: \"group-1\", body: \"after read\" }) { success } }",
+								"query": "mutation SendNotification { SendNotification(input: { productId: \"{{nc_product}}\", userIds: [\"{{nc_carol_id}}\"], typeId: \"nc.Group\", groupKey: \"group-1\", body: \"after read\" }) { success } }",
 								"variables": ""
 							}
 						}
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -4707,6 +5319,10 @@
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_carol_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -4725,6 +5341,15 @@
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -4767,7 +5392,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_su_token}}"
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -4779,13 +5404,22 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation SendNotification { SendNotification(input: { productId: \"Puma\", userIds: [\"{{nc_carol_id}}\"], typeId: \"nc.Dedup\", dedupKey: \"dedup-1\" }) { success } }",
+								"query": "mutation SendNotification { SendNotification(input: { productId: \"{{nc_product}}\", userIds: [\"{{nc_carol_id}}\"], typeId: \"nc.Dedup\", dedupKey: \"dedup-1\" }) { success } }",
 								"variables": ""
 							}
 						}
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -4824,7 +5458,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_su_token}}"
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -4836,13 +5470,22 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation SendNotification { SendNotification(input: { productId: \"Puma\", userIds: [\"{{nc_carol_id}}\"], typeId: \"nc.Dedup\", dedupKey: \"dedup-1\" }) { success } }",
+								"query": "mutation SendNotification { SendNotification(input: { productId: \"{{nc_product}}\", userIds: [\"{{nc_carol_id}}\"], typeId: \"nc.Dedup\", dedupKey: \"dedup-1\" }) { success } }",
 								"variables": ""
 							}
 						}
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -4882,6 +5525,10 @@
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_carol_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -4900,6 +5547,15 @@
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -4942,6 +5598,10 @@
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_carol_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -4960,6 +5620,15 @@
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -4998,7 +5667,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_su_token}}"
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -5010,13 +5679,22 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation SendNotification { SendNotification(input: { productId: \"Puma\", userIds: [\"{{nc_carol_id}}\"], typeId: \"nc.Dedup\", dedupKey: \"dedup-1\" }) { success } }",
+								"query": "mutation SendNotification { SendNotification(input: { productId: \"{{nc_product}}\", userIds: [\"{{nc_carol_id}}\"], typeId: \"nc.Dedup\", dedupKey: \"dedup-1\" }) { success } }",
 								"variables": ""
 							}
 						}
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -5056,6 +5734,10 @@
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_carol_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -5074,6 +5756,15 @@
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -5113,7 +5804,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_su_token}}"
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -5125,13 +5816,22 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation SendNotification { SendNotification(input: { productId: \"Puma\", userIds: [\"{{nc_alice_id}}\", \"{{nc_carol_id}}\"], typeId: \"nc.Withdraw\", groupKey: \"withdraw-1\", dedupKey: \"withdraw-1\" }) { success } }",
+								"query": "mutation SendNotification { SendNotification(input: { productId: \"{{nc_product}}\", userIds: [\"{{nc_alice_id}}\", \"{{nc_carol_id}}\"], typeId: \"nc.Withdraw\", groupKey: \"withdraw-1\", dedupKey: \"withdraw-1\" }) { success } }",
 								"variables": ""
 							}
 						}
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -5171,6 +5871,10 @@
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_alice_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -5189,6 +5893,15 @@
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -5228,7 +5941,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_su_token}}"
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -5240,13 +5953,22 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation WithdrawNotifications { WithdrawNotifications(input: { productId: \"Puma\", groupKey: \"withdraw-1\", userIds: [\"{{nc_alice_id}}\"] }) { success } }",
+								"query": "mutation WithdrawNotifications { WithdrawNotifications(input: { productId: \"{{nc_product}}\", groupKey: \"withdraw-1\", userIds: [\"{{nc_alice_id}}\"] }) { success } }",
 								"variables": ""
 							}
 						}
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -5286,6 +6008,10 @@
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_alice_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -5304,6 +6030,15 @@
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -5344,6 +6079,10 @@
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_carol_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -5362,6 +6101,15 @@
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -5401,7 +6149,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_su_token}}"
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -5413,13 +6161,22 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation WithdrawNotifications { WithdrawNotifications(input: { productId: \"Puma\", groupKey: \"withdraw-1\" }) { success } }",
+								"query": "mutation WithdrawNotifications { WithdrawNotifications(input: { productId: \"{{nc_product}}\", groupKey: \"withdraw-1\" }) { success } }",
 								"variables": ""
 							}
 						}
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -5459,6 +6216,10 @@
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_alice_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -5477,6 +6238,15 @@
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -5517,6 +6287,10 @@
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_carol_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -5535,6 +6309,15 @@
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -5574,7 +6357,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_su_token}}"
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -5586,13 +6369,22 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation SendNotification { SendNotification(input: { productId: \"Puma\", userIds: [\"{{nc_carol_id}}\"], typeId: \"nc.Withdraw\", groupKey: \"withdraw-1\", dedupKey: \"withdraw-1\" }) { success } }",
+								"query": "mutation SendNotification { SendNotification(input: { productId: \"{{nc_product}}\", userIds: [\"{{nc_carol_id}}\"], typeId: \"nc.Withdraw\", groupKey: \"withdraw-1\", dedupKey: \"withdraw-1\" }) { success } }",
 								"variables": ""
 							}
 						}
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -5632,6 +6424,10 @@
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_carol_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -5650,6 +6446,15 @@
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -5689,7 +6494,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_su_token}}"
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -5701,13 +6506,22 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation WithdrawNotifications { WithdrawNotifications(input: { productId: \"Puma\", groupKey: \"\" }) { success } }",
+								"query": "mutation WithdrawNotifications { WithdrawNotifications(input: { productId: \"{{nc_product}}\", groupKey: \"\" }) { success } }",
 								"variables": ""
 							}
 						}
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -5751,7 +6565,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_su_token}}"
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -5763,13 +6577,22 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation SendNotification { SendNotification(input: { productId: \"Puma\", userIds: [\"{{nc_dave_id}}\"], typeId: \"nc.Page\", subject: { id: \"p1\", typeId: \"Tenant\", name: \"Page 1\" } }) { success } }",
+								"query": "mutation SendNotification { SendNotification(input: { productId: \"{{nc_product}}\", userIds: [\"{{nc_dave_id}}\"], typeId: \"nc.Page\", subject: { id: \"p1\", typeId: \"Tenant\", name: \"Page 1\" } }) { success } }",
 								"variables": ""
 							}
 						}
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -5808,7 +6631,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_su_token}}"
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -5820,13 +6643,22 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation SendNotification { SendNotification(input: { productId: \"Puma\", userIds: [\"{{nc_dave_id}}\"], typeId: \"nc.Page\", subject: { id: \"p2\", typeId: \"Tenant\", name: \"Page 2\" } }) { success } }",
+								"query": "mutation SendNotification { SendNotification(input: { productId: \"{{nc_product}}\", userIds: [\"{{nc_dave_id}}\"], typeId: \"nc.Page\", subject: { id: \"p2\", typeId: \"Tenant\", name: \"Page 2\" } }) { success } }",
 								"variables": ""
 							}
 						}
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -5865,7 +6697,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_su_token}}"
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -5877,13 +6709,22 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation SendNotification { SendNotification(input: { productId: \"Puma\", userIds: [\"{{nc_dave_id}}\"], typeId: \"nc.Page\", subject: { id: \"p3\", typeId: \"Tenant\", name: \"Page 3\" } }) { success } }",
+								"query": "mutation SendNotification { SendNotification(input: { productId: \"{{nc_product}}\", userIds: [\"{{nc_dave_id}}\"], typeId: \"nc.Page\", subject: { id: \"p3\", typeId: \"Tenant\", name: \"Page 3\" } }) { success } }",
 								"variables": ""
 							}
 						}
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -5922,7 +6763,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_su_token}}"
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -5934,13 +6775,22 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation SendNotification { SendNotification(input: { productId: \"Puma\", userIds: [\"{{nc_dave_id}}\"], typeId: \"nc.Page\", subject: { id: \"p4\", typeId: \"Tenant\", name: \"Page 4\" } }) { success } }",
+								"query": "mutation SendNotification { SendNotification(input: { productId: \"{{nc_product}}\", userIds: [\"{{nc_dave_id}}\"], typeId: \"nc.Page\", subject: { id: \"p4\", typeId: \"Tenant\", name: \"Page 4\" } }) { success } }",
 								"variables": ""
 							}
 						}
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -5979,7 +6829,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_su_token}}"
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -5991,13 +6841,22 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation SendNotification { SendNotification(input: { productId: \"Puma\", userIds: [\"{{nc_dave_id}}\"], typeId: \"nc.Page\", subject: { id: \"p5\", typeId: \"Tenant\", name: \"Page 5\" } }) { success } }",
+								"query": "mutation SendNotification { SendNotification(input: { productId: \"{{nc_product}}\", userIds: [\"{{nc_dave_id}}\"], typeId: \"nc.Page\", subject: { id: \"p5\", typeId: \"Tenant\", name: \"Page 5\" } }) { success } }",
 								"variables": ""
 							}
 						}
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -6037,6 +6896,10 @@
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_dave_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -6055,6 +6918,15 @@
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -6100,6 +6972,10 @@
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_dave_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -6118,6 +6994,15 @@
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -6158,6 +7043,10 @@
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_dave_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -6176,6 +7065,15 @@
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -6215,6 +7113,10 @@
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_dave_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -6233,6 +7135,15 @@
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -6273,6 +7184,10 @@
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_dave_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -6291,6 +7206,15 @@
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -6330,6 +7254,10 @@
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_bob_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -6348,6 +7276,15 @@
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -6387,6 +7324,10 @@
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_bob_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -6405,6 +7346,15 @@
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -6444,6 +7394,10 @@
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_dave_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -6462,6 +7416,15 @@
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -6503,6 +7466,10 @@
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_dave_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -6521,6 +7488,15 @@
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -6560,6 +7536,10 @@
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_dave_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -6578,6 +7558,15 @@
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -6618,6 +7607,10 @@
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_dave_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -6636,6 +7629,15 @@
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -6674,6 +7676,10 @@
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_dave_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -6692,6 +7698,15 @@
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -6733,6 +7748,10 @@
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_dave_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -6751,6 +7770,15 @@
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -6790,6 +7818,10 @@
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_dave_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -6808,6 +7840,15 @@
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -6849,7 +7890,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_su_token}}"
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -6861,13 +7902,22 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation SendNotification { SendNotification(input: { productId: \"Puma\", userIds: [\"{{nc_dave_id}}\"], typeId: \"nc.Sync\" }) { success } }",
+								"query": "mutation SendNotification { SendNotification(input: { productId: \"{{nc_product}}\", userIds: [\"{{nc_dave_id}}\"], typeId: \"nc.Sync\" }) { success } }",
 								"variables": ""
 							}
 						}
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -6906,7 +7956,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_su_token}}"
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -6918,13 +7968,22 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation SendNotification { SendNotification(input: { productId: \"Puma\", userIds: [\"{{nc_dave_id}}\"], typeId: \"nc.Sync\" }) { success } }",
+								"query": "mutation SendNotification { SendNotification(input: { productId: \"{{nc_product}}\", userIds: [\"{{nc_dave_id}}\"], typeId: \"nc.Sync\" }) { success } }",
 								"variables": ""
 							}
 						}
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -6963,7 +8022,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_su_token}}"
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -6975,13 +8034,22 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation SendNotification { SendNotification(input: { productId: \"Puma\", userIds: [\"{{nc_dave_id}}\"], typeId: \"nc.Sync\" }) { success } }",
+								"query": "mutation SendNotification { SendNotification(input: { productId: \"{{nc_product}}\", userIds: [\"{{nc_dave_id}}\"], typeId: \"nc.Sync\" }) { success } }",
 								"variables": ""
 							}
 						}
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -7021,6 +8089,10 @@
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_dave_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -7039,6 +8111,15 @@
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -7083,6 +8164,10 @@
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_dave_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -7101,6 +8186,15 @@
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -7140,6 +8234,10 @@
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_dave_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -7158,6 +8256,15 @@
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -7197,6 +8304,10 @@
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_dave_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -7215,6 +8326,15 @@
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -7253,6 +8373,10 @@
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_dave_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -7271,6 +8395,15 @@
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -7310,6 +8443,10 @@
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_dave_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -7328,6 +8465,15 @@
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -7523,7 +8669,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_su_token}}"
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -7535,13 +8681,22 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation SendNotification { SendNotification(input: { productId: \"Puma\", userIds: [\"{{nc_dave_id}}\"], typeId: \"nc.Warning\", severity: Warning, subject: { id: \"w\", typeId: \"Tenant\", name: \"Nebula {{nc_run}}\" } }) { success } }",
+								"query": "mutation SendNotification { SendNotification(input: { productId: \"{{nc_product}}\", userIds: [\"{{nc_dave_id}}\"], typeId: \"nc.Warning\", severity: Warning, subject: { id: \"w\", typeId: \"Tenant\", name: \"Nebula {{nc_run}}\" } }) { success } }",
 								"variables": ""
 							}
 						}
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -7580,7 +8735,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_su_token}}"
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -7592,13 +8747,22 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation SendNotification { SendNotification(input: { productId: \"Puma\", userIds: [\"{{nc_dave_id}}\"], typeId: \"nc.Error\", severity: Error }) { success } }",
+								"query": "mutation SendNotification { SendNotification(input: { productId: \"{{nc_product}}\", userIds: [\"{{nc_dave_id}}\"], typeId: \"nc.Error\", severity: Error }) { success } }",
 								"variables": ""
 							}
 						}
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -7638,6 +8802,10 @@
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_dave_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -7656,6 +8824,15 @@
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -7697,6 +8874,10 @@
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_dave_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -7715,6 +8896,15 @@
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -7756,6 +8946,10 @@
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_bob_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -7774,6 +8968,15 @@
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -7814,6 +9017,10 @@
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_dave_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -7832,6 +9039,15 @@
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -7871,6 +9087,10 @@
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_dave_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -7889,6 +9109,15 @@
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -7929,6 +9158,10 @@
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_dave_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -7947,6 +9180,15 @@
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -7986,6 +9228,10 @@
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_dave_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -8004,6 +9250,15 @@
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -8044,6 +9299,10 @@
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_bob_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -8062,6 +9321,15 @@
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -8100,6 +9368,10 @@
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_dave_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -8118,6 +9390,15 @@
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -8158,6 +9439,10 @@
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_dave_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -8176,6 +9461,15 @@
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -8215,6 +9509,10 @@
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_dave_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -8233,6 +9531,15 @@
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -9033,7 +10340,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_su_token}}"
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -9045,13 +10352,22 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation SendNotification { SendNotification(input: { productId: \"Puma\", tenantId: \"{{nc_tenant_a}}\", userIds: [\"{{nc_carol_id}}\"], typeId: \"nc.Member\" }) { success } }",
+								"query": "mutation SendNotification { SendNotification(input: { productId: \"{{nc_product}}\", tenantId: \"{{nc_tenant_a}}\", userIds: [\"{{nc_carol_id}}\"], typeId: \"nc.Member\" }) { success } }",
 								"variables": ""
 							}
 						}
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -9091,6 +10407,10 @@
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_carol_a_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -9109,6 +10429,15 @@
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -9550,6 +10879,10 @@
 							{
 								"key": "x-authentication-token",
 								"value": "{{nc_carol_a_token}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
 							}
 						],
 						"url": {
@@ -9568,6 +10901,15 @@
 					},
 					"response": [],
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -11117,6 +12459,43 @@
 							}
 						}
 					]
+				},
+				{
+					"name": "The tokens of the senders are revoked",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"const __json = (function () { try { return pm.response.json(); } catch (e) { return {}; } })();\nconst __data = (__json && __json.data) || {};\nconst __errors = (__json && __json.errors) || [];\nfunction payload(command) {\n  pm.test(command + ': no GraphQL errors', function () { pm.expect(__errors, JSON.stringify(__errors)).to.eql([]); });\n  pm.test(command + ': has a payload', function () { pm.expect(__data[command], JSON.stringify(__json).slice(0, 300)).to.be.an('object'); });\n  return __data[command] || {};\n}\nfunction refused(command, reason) {\n  pm.test(command + ' is refused: ' + reason, function () {\n    pm.expect(__errors.length, 'expected a refusal, got ' + JSON.stringify(__json).slice(0, 300)).to.be.above(0);\n    pm.expect(__errors[0].message).to.match(reason);\n  });\n}\nfunction env(key) { return pm.environment.get(key); }\nfunction ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }\nfunction argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }\nconst p = payload('RemoveElements');\npm.test('both senders removed with their tokens', function () { pm.expect(p.success).to.eql(true); });"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-authentication-token",
+								"value": "{{nc_su_token}}"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation RemoveElements { RemoveElements(input: { collectionId: \"ConnectedProducts\", elementIds: [\"{{nc_product_card}}\", \"{{nc_other_card}}\"] }) { success } }",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}",
+							"host": [
+								"{{base_url}}"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		}

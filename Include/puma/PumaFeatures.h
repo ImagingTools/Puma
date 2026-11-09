@@ -411,6 +411,121 @@ static void FillProduct(imtlic::IProductInfo& productInfo){
 
 	productInfo.AddFeature("ce4a7f72-5303-4044-b25c-3a02020eebd3", *administrationFeatureInfo.GetPtr());
 
+	istd::TDelPtr<imtlic::CIdentifiableFeatureInfo> organizationManagementFeatureInfo;
+	organizationManagementFeatureInfo.SetPtr(new imtlic::CIdentifiableFeatureInfo);
+	organizationManagementFeatureInfo->SetObjectUuid("f1b9f9b0-7d54-4fd1-9d17-8d2f8c5f2cf0");
+	organizationManagementFeatureInfo->SetFeatureId("OrganizationManagement");
+	organizationManagementFeatureInfo->SetFeatureName(QT_TRANSLATE_NOOP("Feature", "Organization Management"));
+	organizationManagementFeatureInfo->SetFeatureDescription(QT_TRANSLATE_NOOP("Feature", "Provides access to Organization-related operations."));
+	organizationManagementFeatureInfo->SetOptional(false);
+	organizationManagementFeatureInfo->SetIsPermission(true);
+
+	istd::TDelPtr<imtlic::CFeatureInfo> organizationManagementViewPageFeatureInfo;
+	organizationManagementViewPageFeatureInfo.SetPtr(new imtlic::CFeatureInfo);
+	organizationManagementViewPageFeatureInfo->SetFeatureId("ViewPage");
+	organizationManagementViewPageFeatureInfo->SetFeatureName(QT_TRANSLATE_NOOP("Feature", "View Organization Page"));
+	organizationManagementViewPageFeatureInfo->SetFeatureDescription(QT_TRANSLATE_NOOP("Feature", "Allows opening the organization page."));
+	organizationManagementViewPageFeatureInfo->SetOptional(false);
+	organizationManagementViewPageFeatureInfo->SetIsPermission(true);
+
+	organizationManagementFeatureInfo->InsertSubFeature(organizationManagementViewPageFeatureInfo.PopPtr());
+
+	istd::TDelPtr<imtlic::CFeatureInfo> organizationManagementViewFeatureInfo;
+	organizationManagementViewFeatureInfo.SetPtr(new imtlic::CFeatureInfo);
+	organizationManagementViewFeatureInfo->SetFeatureId("View");
+	organizationManagementViewFeatureInfo->SetFeatureName(QT_TRANSLATE_NOOP("Feature", "View Organizations"));
+	organizationManagementViewFeatureInfo->SetFeatureDescription(QT_TRANSLATE_NOOP("Feature", "Allows viewing Organizations."));
+	organizationManagementViewFeatureInfo->SetOptional(false);
+	organizationManagementViewFeatureInfo->SetIsPermission(true);
+
+	organizationManagementFeatureInfo->InsertSubFeature(organizationManagementViewFeatureInfo.PopPtr());
+
+	istd::TDelPtr<imtlic::CFeatureInfo> organizationManagementAddFeatureInfo;
+	organizationManagementAddFeatureInfo.SetPtr(new imtlic::CFeatureInfo);
+	organizationManagementAddFeatureInfo->SetFeatureId("Add");
+	organizationManagementAddFeatureInfo->SetFeatureName(QT_TRANSLATE_NOOP("Feature", "Add Organization"));
+	organizationManagementAddFeatureInfo->SetFeatureDescription(QT_TRANSLATE_NOOP("Feature", "Allows adding Organization."));
+	organizationManagementAddFeatureInfo->SetOptional(false);
+	organizationManagementAddFeatureInfo->SetIsPermission(true);
+
+	organizationManagementFeatureInfo->InsertSubFeature(organizationManagementAddFeatureInfo.PopPtr());
+
+	istd::TDelPtr<imtlic::CFeatureInfo> organizationManagementRemoveFeatureInfo;
+	organizationManagementRemoveFeatureInfo.SetPtr(new imtlic::CFeatureInfo);
+	organizationManagementRemoveFeatureInfo->SetFeatureId("Remove");
+	organizationManagementRemoveFeatureInfo->SetFeatureName(QT_TRANSLATE_NOOP("Feature", "Remove Organization"));
+	organizationManagementRemoveFeatureInfo->SetFeatureDescription(QT_TRANSLATE_NOOP("Feature", "Allows removing Organization."));
+	organizationManagementRemoveFeatureInfo->SetOptional(false);
+	organizationManagementRemoveFeatureInfo->SetIsPermission(true);
+
+	organizationManagementFeatureInfo->InsertSubFeature(organizationManagementRemoveFeatureInfo.PopPtr());
+
+	istd::TDelPtr<imtlic::CFeatureInfo> organizationManagementRevisionsFeatureInfo;
+	organizationManagementRevisionsFeatureInfo.SetPtr(new imtlic::CFeatureInfo);
+	organizationManagementRevisionsFeatureInfo->SetFeatureId("Revisions");
+	organizationManagementRevisionsFeatureInfo->SetFeatureName(QT_TRANSLATE_NOOP("Feature", "Organization Revisions"));
+	organizationManagementRevisionsFeatureInfo->SetFeatureDescription(QT_TRANSLATE_NOOP("Feature", "Provides access to the revisions of organization."));
+	organizationManagementRevisionsFeatureInfo->SetOptional(false);
+	organizationManagementRevisionsFeatureInfo->SetIsPermission(true);
+
+	istd::TDelPtr<imtlic::CFeatureInfo> organizationManagementRevisionsViewFeatureInfo;
+	organizationManagementRevisionsViewFeatureInfo.SetPtr(new imtlic::CFeatureInfo);
+	organizationManagementRevisionsViewFeatureInfo->SetFeatureId("View");
+	organizationManagementRevisionsViewFeatureInfo->SetFeatureName(QT_TRANSLATE_NOOP("Feature", "View Organization Revisions"));
+	organizationManagementRevisionsViewFeatureInfo->SetFeatureDescription(QT_TRANSLATE_NOOP("Feature", "Allows viewing the revisions of organization."));
+	organizationManagementRevisionsViewFeatureInfo->SetOptional(false);
+	organizationManagementRevisionsViewFeatureInfo->SetIsPermission(true);
+	organizationManagementRevisionsViewFeatureInfo->SetRequirements(QByteArray("/OrganizationManagement/View").split(';'));
+
+	organizationManagementRevisionsFeatureInfo->InsertSubFeature(organizationManagementRevisionsViewFeatureInfo.PopPtr());
+
+	istd::TDelPtr<imtlic::CFeatureInfo> organizationManagementRevisionsRestoreFeatureInfo;
+	organizationManagementRevisionsRestoreFeatureInfo.SetPtr(new imtlic::CFeatureInfo);
+	organizationManagementRevisionsRestoreFeatureInfo->SetFeatureId("Restore");
+	organizationManagementRevisionsRestoreFeatureInfo->SetFeatureName(QT_TRANSLATE_NOOP("Feature", "Restore Organization Revision"));
+	organizationManagementRevisionsRestoreFeatureInfo->SetFeatureDescription(QT_TRANSLATE_NOOP("Feature", "Allows restoring a revision of organization."));
+	organizationManagementRevisionsRestoreFeatureInfo->SetOptional(false);
+	organizationManagementRevisionsRestoreFeatureInfo->SetIsPermission(true);
+	organizationManagementRevisionsRestoreFeatureInfo->SetRequirements(QByteArray("/OrganizationManagement/Revisions/View").split(';'));
+
+	organizationManagementRevisionsFeatureInfo->InsertSubFeature(organizationManagementRevisionsRestoreFeatureInfo.PopPtr());
+
+	istd::TDelPtr<imtlic::CFeatureInfo> organizationManagementRevisionsDeleteFeatureInfo;
+	organizationManagementRevisionsDeleteFeatureInfo.SetPtr(new imtlic::CFeatureInfo);
+	organizationManagementRevisionsDeleteFeatureInfo->SetFeatureId("Delete");
+	organizationManagementRevisionsDeleteFeatureInfo->SetFeatureName(QT_TRANSLATE_NOOP("Feature", "Delete Organization Revision"));
+	organizationManagementRevisionsDeleteFeatureInfo->SetFeatureDescription(QT_TRANSLATE_NOOP("Feature", "Allows deleting a revision of organization."));
+	organizationManagementRevisionsDeleteFeatureInfo->SetOptional(false);
+	organizationManagementRevisionsDeleteFeatureInfo->SetIsPermission(true);
+	organizationManagementRevisionsDeleteFeatureInfo->SetRequirements(QByteArray("/OrganizationManagement/Revisions/View").split(';'));
+
+	organizationManagementRevisionsFeatureInfo->InsertSubFeature(organizationManagementRevisionsDeleteFeatureInfo.PopPtr());
+
+	organizationManagementFeatureInfo->InsertSubFeature(organizationManagementRevisionsFeatureInfo.PopPtr());
+
+	istd::TDelPtr<imtlic::CFeatureInfo> organizationManagementSharesFeatureInfo;
+	organizationManagementSharesFeatureInfo.SetPtr(new imtlic::CFeatureInfo);
+	organizationManagementSharesFeatureInfo->SetFeatureId("Shares");
+	organizationManagementSharesFeatureInfo->SetFeatureName(QT_TRANSLATE_NOOP("Feature", "Document Shares"));
+	organizationManagementSharesFeatureInfo->SetFeatureDescription(QT_TRANSLATE_NOOP("Feature", "Provides access to the documents the organization shares and receives."));
+	organizationManagementSharesFeatureInfo->SetOptional(false);
+	organizationManagementSharesFeatureInfo->SetIsPermission(true);
+
+	istd::TDelPtr<imtlic::CFeatureInfo> organizationManagementSharesEditFeatureInfo;
+	organizationManagementSharesEditFeatureInfo.SetPtr(new imtlic::CFeatureInfo);
+	organizationManagementSharesEditFeatureInfo->SetFeatureId("Edit");
+	organizationManagementSharesEditFeatureInfo->SetFeatureName(QT_TRANSLATE_NOOP("Feature", "Manage Document Shares"));
+	organizationManagementSharesEditFeatureInfo->SetFeatureDescription(QT_TRANSLATE_NOOP("Feature", "Allows restricting, accepting and removing the document shares of the organization."));
+	organizationManagementSharesEditFeatureInfo->SetOptional(false);
+	organizationManagementSharesEditFeatureInfo->SetIsPermission(true);
+	organizationManagementSharesEditFeatureInfo->SetRequirements(QByteArray("/OrganizationManagement/View").split(';'));
+
+	organizationManagementSharesFeatureInfo->InsertSubFeature(organizationManagementSharesEditFeatureInfo.PopPtr());
+
+	organizationManagementFeatureInfo->InsertSubFeature(organizationManagementSharesFeatureInfo.PopPtr());
+
+	productInfo.AddFeature("f1b9f9b0-7d54-4fd1-9d17-8d2f8c5f2cf0", *organizationManagementFeatureInfo.GetPtr());
+
 }
 
 

@@ -735,6 +735,100 @@ async function main() {
 		assertRefusalReason(refusal, { absent: 'the narrowed token watched the users again', mustMatch: notAllowed('OnUsersCollectionChanged') });
 	});
 
+	// ---------------------------------------------------------------- the organizations channel
+	// Those who belong to an organization or administer them watch it; a change reaches only those who see the organization.
+
+	const tenantsQuery = clientQuery('OnTenantsCollectionChanged');
+	const createTenant = async (name, ownerId) => {
+		const created = await mutate('CreateTenant',
+			`mutation CreateTenant { CreateTenant(input: { name: ${gqlString(name)}${ownerId ? `, ownerId: ${gqlString(ownerId)}` : ''} }) { tenantId errorMessage } }`, suNow.token);
+		assert(created.tenantId && !created.errorMessage, `CreateTenant answered ${JSON.stringify(created)}`);
+		return created.tenantId;
+	};
+	const orgPassword = 'WsOrganizations_2026!';
+	const outsiderLogin = `ws_org_outsider_${runTag}`;
+	await addUser(crypto.randomUUID(), outsiderLogin, orgPassword, suNow.token);
+	const outsider = await login(outsiderLogin, orgPassword);
+	const ownerLogin = `ws_org_owner_${runTag}`;
+	const ownerId = crypto.randomUUID();
+	await addUser(ownerId, ownerLogin, orgPassword, suNow.token);
+	const ownTenantId = await createTenant(`ws_org_own_${runTag}`, ownerId);
+	const owner = await login(ownerLogin, orgPassword);
+	const orgToken = await issueToken('ws organizations', ['/ProductServer/Organizations/View']);
+	const productHeaders = (token) => ({ 'x-server-token': token, productId: `WsProbe${runTag}` });
+
+	let ownerSession = null;
+	let ownerSubId = null;
+	let witness = null;
+	let witnessSubId = null;
+
+	await test('a user outside every organization does not watch the organizations', async () => {
+		const server = await serverSession('org outsider', outsider.token);
+		const refusal = await server.subscribeExpectingRefusal('OnTenantsCollectionChanged', tenantsQuery);
+		assertRefusalReason(refusal, { absent: 'a user outside the organizations watched them', mustMatch: notAllowed('OnTenantsCollectionChanged') });
+	});
+
+	await test('an anonymous request does not watch the organizations', async () => {
+		const server = await serverSession('org anonymous', null);
+		const refusal = await server.subscribeExpectingRefusal('OnTenantsCollectionChanged', tenantsQuery);
+		assertRefusalReason(refusal, { absent: 'an anonymous request watched the organizations', mustMatch: notAllowed('OnTenantsCollectionChanged') });
+	});
+
+	await test('the owner of an organization watches the organizations', async () => {
+		ownerSession = await serverSession('org owner', owner.token);
+		ownerSubId = await ownerSession.subscribe('OnTenantsCollectionChanged', tenantsQuery);
+		witness = await serverSession('org witness', suNow.token);
+		witnessSubId = await witness.subscribe('OnTenantsCollectionChanged', tenantsQuery);
+	});
+
+	await test('the owner is told about a change of its organization', async () => {
+		requires(ownerSubId, 'the subscription of the owner');
+		const mark = ownerSession.mark();
+		const updated = await mutate('UpdateTenant',
+			`mutation UpdateTenant { UpdateTenant(input: { tenantId: ${gqlString(ownTenantId)}, name: ${gqlString(`ws_org_own2_${runTag}`)} }) { success errorMessage } }`, suNow.token);
+		assert(updated.success === true, `UpdateTenant answered ${JSON.stringify(updated)}`);
+		await ownerSession.waitForData(ownerSubId, f => {
+			const n = notificationOf(f, 'OnTenantsCollectionChanged');
+			return !!n && n.itemId === ownTenantId && n.typeOperation === 'updated';
+		}, mark);
+	});
+
+	await test('the owner is not told about an organization it does not belong to', async () => {
+		requires(ownerSubId, 'the subscription of the owner');
+		const ownerMark = ownerSession.mark();
+		const witnessMark = witness.mark();
+		const foreignId = await createTenant(`ws_org_foreign_${runTag}`);
+		// The administrator is told, so the change was published
+		await witness.waitForData(witnessSubId, f => { const n = notificationOf(f, 'OnTenantsCollectionChanged'); return !!n && n.itemId === foreignId; }, witnessMark);
+		await delay(quietMs);
+		const leaked = ownerSession.frames.slice(ownerMark).filter(f => f.type === 'data' && f.id === ownerSubId)
+			.map(f => notificationOf(f, 'OnTenantsCollectionChanged')).filter(n => !!n && n.itemId === foreignId);
+		assert(leaked.length === 0, `the owner of another organization was told about ${foreignId}: ${JSON.stringify(leaked).slice(0, 300)}`);
+	});
+
+	await test('a member watches the organizations through the server of its product', async () => {
+		const server = await serverSession('org forwarded owner', owner.token, productHeaders(orgToken.token));
+		await server.subscribe('OnTenantsCollectionChanged', tenantsQuery);
+	});
+
+	await test('the server of a product does not lend the organizations to a user outside them', async () => {
+		const server = await serverSession('org forwarded outsider', outsider.token, productHeaders(orgToken.token));
+		const refusal = await server.subscribeExpectingRefusal('OnTenantsCollectionChanged', tenantsQuery);
+		assertRefusalReason(refusal, { absent: 'a user outside the organizations watched them through a server', mustMatch: notAllowed('OnTenantsCollectionChanged') });
+	});
+
+	await test('a token without the organizations does not forward the subscription', async () => {
+		const server = await serverSession('org forwarded without permission', owner.token, productHeaders(plain.token));
+		const refusal = await server.subscribeExpectingRefusal('OnTenantsCollectionChanged', tenantsQuery);
+		assertRefusalReason(refusal, { absent: 'the subscription was forwarded by a token without the organizations', mustMatch: notAllowed('OnTenantsCollectionChanged') });
+	});
+
+	await test('the server of a product does not watch the organizations by itself', async () => {
+		const server = await serverSession('org server itself', orgToken.token, { productId: `WsProbe${runTag}` });
+		const refusal = await server.subscribeExpectingRefusal('OnTenantsCollectionChanged', tenantsQuery);
+		assertRefusalReason(refusal, { absent: 'a server watched the organizations by itself', mustMatch: notAllowed('OnTenantsCollectionChanged') });
+	});
+
 	// Everything SubscriptionSession.audit() collected along the way: frames of an
 	// unknown type or shape, errors nobody asked for, notifications delivered to an
 	// id that holds no subscription, payloads carrying another command's data. No

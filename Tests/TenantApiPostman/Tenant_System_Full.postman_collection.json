@@ -6494,7 +6494,7 @@
                                     "pm.test('Outsider cannot remove tenant', function () {",
                                     "  pm.expect(pm.environment.get('tenantAId'), 'fixture tenantAId missing').to.be.a('string').and.not.empty;",
                                     "  pm.expect(json.errors || [], 'unexpected GraphQL error: ' + JSON.stringify(json.errors)).to.have.length(0);",
-                                    "  pm.expect(payload && payload.errorMessage ? payload.errorMessage : '', JSON.stringify(json)).to.eql('Access denied: insufficient permissions to manage tenant');",
+                                    "  pm.expect(payload && payload.errorMessage ? payload.errorMessage : '', JSON.stringify(json)).to.eql('An organization is removed only by its creator or its owner');",
                                     "  pm.expect(payload.success).to.eql(false);",
                                     "});"
                                 ]
@@ -55844,6 +55844,106 @@
                             "mode": "graphql",
                             "graphql": {
                                 "query": "query GetElementIds { GetElementIds(input: { collectionId: \"Roles\", offset: 0, count: 1 }) { elementIds } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "ST: the editor of an organization is read with the view permission of organizations",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.request.headers.remove('productid');",
+                                    "pm.variables.set('expectedHttpStatus', 403);"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
+                                    "pm.test('refused: /The server of StProbe may not send GetTenantRepresentation: its token lacks /ProductServer/Organizations/View/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/The server of 'StProbe' may not send 'GetTenantRepresentation': its token lacks '\\/ProductServer\\/Organizations\\/View'/); });",
+                                    "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-server-token",
+                                "value": "{{stToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetTenantRepresentation { GetTenantRepresentation(input: { collectionId: \"Tenants\", id: \"{{stCard2}}\" }) { id name } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "ST: the editor of an organization is saved with the edit permission of organizations",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.request.headers.remove('productid');",
+                                    "pm.variables.set('expectedHttpStatus', 403);"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
+                                    "pm.test('refused: /The server of StProbe may not send UpdateTenantFromRepresentation: its token lacks /ProductServer/Organizations/Edit/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/The server of 'StProbe' may not send 'UpdateTenantFromRepresentation': its token lacks '\\/ProductServer\\/Organizations\\/Edit'/); });",
+                                    "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-server-token",
+                                "value": "{{stToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UpdateTenantFromRepresentation { UpdateTenantFromRepresentation(input: { documentId: \"{{stCard2}}\", tenant: { name: \"st\" } }) { status } }",
                                 "variables": ""
                             }
                         },
