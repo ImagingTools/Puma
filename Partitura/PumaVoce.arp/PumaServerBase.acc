@@ -89,6 +89,7 @@
                             <Value>GetTenantList</Value>
                             <Value>GetRelationshipRepresentation</Value>
                             <Value>GetGrantRepresentation</Value>
+                            <Value>GetTenantRepresentation</Value>
                             <Value>GetTenantIds</Value>
                             <Value>GetTenantRelationships</Value>
                             <Value>GetCrossOrgGrants</Value>
@@ -144,6 +145,7 @@
                             <Value>TransferTenantOwnership</Value>
                             <Value>UpdateRelationshipFromRepresentation</Value>
                             <Value>UpdateGrantFromRepresentation</Value>
+                            <Value>UpdateTenantFromRepresentation</Value>
                             <Value>OnUsersCollectionChanged</Value>
                             <Value>OnUserSessionsCollectionChanged</Value>
                             <Value>OnRolesCollectionChanged</Value>
@@ -261,6 +263,8 @@
                             <Value>/ProductServer/Organizations/View</Value>
                             <Value>/ProductServer/Organizations/View</Value>
                             <Value>/ProductServer/Organizations/View</Value>
+                            <Value>/ProductServer/Organizations/View</Value>
+                            <Value>/ProductServer/Organizations/Edit</Value>
                             <Value>/ProductServer/Organizations/Edit</Value>
                             <Value>/ProductServer/Organizations/Edit</Value>
                             <Value>/ProductServer/Organizations/Edit</Value>

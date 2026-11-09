@@ -72,8 +72,8 @@ function gqlString(value) {
 	return JSON.stringify(String(value));
 }
 
-// productOverride: the product of this request instead of the one of the run.
-function gql(query, token, productOverride) {
+// productOverride: the product of this request instead of the one of the run; extraHeaders: e.g. the token of a product server.
+function gql(query, token, productOverride, extraHeaders) {
 	return new Promise((resolve, reject) => {
 		const u = new URL(httpUrl);
 		const body = JSON.stringify({ query });
@@ -83,6 +83,7 @@ function gql(query, token, productOverride) {
 		};
 		if (token) { headers['x-authentication-token'] = token; }
 		if (productOverride || productId) { headers['productId'] = productOverride || productId; }
+		Object.assign(headers, extraHeaders || {});
 
 		const lib = u.protocol === 'https:' ? https : http;
 		const req = lib.request({
