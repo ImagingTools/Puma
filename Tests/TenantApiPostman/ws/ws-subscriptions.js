@@ -353,7 +353,7 @@ async function main() {
 			if (refusal) {
 				assertRefusalReason(refusal, {
 					absent: `${commandId} was neither accepted nor refused`,
-					mustMatch: /^(Unauthorized|Forbidden): /,
+					mustMatch: new RegExp(`^((Unauthorized|Forbidden): |The subscription '${commandId}' is not allowed$)`),
 					mustNotMatch: [/No servlet was found/]
 				});
 				observerSubIds.delete(commandId);
@@ -644,17 +644,109 @@ async function main() {
 		await closeDocument('Tenants', documentId, suActiveToken);
 	});
 
+	// ---------------------------------------------------------------- the servers of products
+	// A product server watches Puma with its own token; the token decides the channels and ends them when it changes.
+
+	const tokenServers = [];
+	// The session token of the start may have expired by now
+	const suNow = await login(suLogin, suPassword);
+	const catalogId = crypto.randomUUID();
+	await mutate('ConnectedProductAdd',
+		`mutation ConnectedProductAdd { ConnectedProductAdd(input: { id: ${gqlString(catalogId)}, typeId: "ConnectedProduct",` +
+		` item: { id: ${gqlString(catalogId)}, productId: "WsProbe${runTag}", name: "WsProbe" } }) { id } }`, suNow.token);
+	const issueToken = async (name, scopes) => mutate('CreateServerToken',
+		`mutation CreateServerToken { CreateServerToken(input: { clientProductId: "WsProbe${runTag}", name: ${gqlString(name)},` +
+		` scopes: ${JSON.stringify(scopes)} }) { id token } }`, suNow.token);
+	const narrowed = await issueToken('ws narrowed', ['/ProductServer/Users/View']);
+	const revoked = await issueToken('ws revoked', ['/ProductServer/Users/View']);
+	const plain = await issueToken('ws plain', []);
+	const serverSession = async (label, token, extraHeaders) => {
+		const server = new SubscriptionSession(label, wsUrl, token, extraHeaders);
+		await server.connect();
+		await server.init();
+		tokenServers.push(server);
+		return server;
+	};
+	const usersQuery = clientQuery('OnUsersCollectionChanged');
+	const notAllowed = (commandId) => new RegExp(`^The subscription '${commandId}' is not allowed$`);
+
+	let narrowedServer = null;
+	let narrowedSubId = null;
+	let revokedServer = null;
+	let revokedSubId = null;
+
+	await test('the server of a product watches a collection its token allows', async () => {
+		narrowedServer = await serverSession('narrowed', narrowed.token, { productId: `WsProbe${runTag}` });
+		narrowedSubId = await narrowedServer.subscribe('OnUsersCollectionChanged', usersQuery);
+		revokedServer = await serverSession('revoked', revoked.token, { productId: `WsProbe${runTag}` });
+		revokedSubId = await revokedServer.subscribe('OnUsersCollectionChanged', usersQuery);
+	});
+
+	await test('the server of a product receives the changes of the collection', async () => {
+		requires(narrowedSubId, 'the subscription of the server');
+		const mark = narrowedServer.mark();
+		const userId = crypto.randomUUID();
+		await addUser(userId, `ws_server_push_${runTag}`, 'WsServerPush_2026!', suNow.token);
+		await narrowedServer.waitForData(narrowedSubId,
+			f => { const n = notificationOf(f, 'OnUsersCollectionChanged'); return !!n && n.itemId === userId && n.typeOperation === 'inserted'; }, mark);
+	});
+
+	await test('a collection outside the permissions of the token is refused', async () => {
+		const server = await serverSession('plain', plain.token, { productId: `WsProbe${runTag}` });
+		const refusal = await server.subscribeExpectingRefusal('OnRolesCollectionChanged', clientQuery('OnRolesCollectionChanged'));
+		assertRefusalReason(refusal, { absent: 'the roles channel was accepted for a token without Roles/View', mustMatch: notAllowed('OnRolesCollectionChanged') });
+	});
+
+	await test('a request forwarded without a user does not watch the collections', async () => {
+		const server = await serverSession('forwarded', null, { 'x-server-token': narrowed.token, productId: `WsProbe${runTag}` });
+		const refusal = await server.subscribeExpectingRefusal('OnUsersCollectionChanged', usersQuery);
+		assertRefusalReason(refusal, { absent: 'an anonymous forwarded request watched the users', mustMatch: notAllowed('OnUsersCollectionChanged') });
+	});
+
+	await test('an unknown token of a server is refused', async () => {
+		const server = await serverSession('unknown', 'imt_pat_000000000000000000000000');
+		const refusal = await server.subscribeExpectingRefusal('OnUsersCollectionChanged', usersQuery);
+		assertRefusalReason(refusal, { absent: 'an unknown token watched the users', mustMatch: /^Forbidden: Invalid personal access token\.$/ });
+	});
+
+	await test('taking the permission away ends the subscription', async () => {
+		requires(narrowedSubId, 'the subscription of the server');
+		narrowedServer.expectError(narrowedSubId);
+		const mark = narrowedServer.mark();
+		await mutate('UpdateServerTokenScopes',
+			`mutation UpdateServerTokenScopes { UpdateServerTokenScopes(input: { id: ${gqlString(narrowed.id)}, scopes: [] }) { success } }`, suNow.token);
+		const frame = await narrowedServer.waitFor(f => f.id === narrowedSubId && f.type === 'error', 15000, mark);
+		assertRefusalReason(frame, { absent: 'no end of the subscription', mustMatch: /^Forbidden: The permissions of the token have changed$/ });
+	});
+
+	await test('revoking the token ends the subscription', async () => {
+		requires(revokedSubId, 'the subscription of the server');
+		revokedServer.expectError(revokedSubId);
+		const mark = revokedServer.mark();
+		await mutate('RevokeServerToken',
+			`mutation RevokeServerToken { RevokeServerToken(input: { id: ${gqlString(revoked.id)} }) { success } }`, suNow.token);
+		const frame = await revokedServer.waitFor(f => f.id === revokedSubId && f.type === 'error', 15000, mark);
+		assertRefusalReason(frame, { absent: 'no end of the subscription', mustMatch: /^Forbidden: Invalid personal access token\.$/ });
+	});
+
+	await test('the narrowed token does not watch the collection again', async () => {
+		requires(narrowedServer, 'the session of the narrowed server');
+		const refusal = await narrowedServer.subscribeExpectingRefusal('OnUsersCollectionChanged', usersQuery);
+		assertRefusalReason(refusal, { absent: 'the narrowed token watched the users again', mustMatch: notAllowed('OnUsersCollectionChanged') });
+	});
+
 	// Everything SubscriptionSession.audit() collected along the way: frames of an
 	// unknown type or shape, errors nobody asked for, notifications delivered to an
 	// id that holds no subscription, payloads carrying another command's data. No
 	// case above looks for these, which is the point - this is what catches a
 	// mismatch no assertion was written for.
 	await test('no unaccounted frames or protocol violations on any session', async () => {
-		const violations = session.violations.concat(rogue.violations, observer ? observer.violations : []);
+		const violations = session.violations.concat(rogue.violations, observer ? observer.violations : [], ...tokenServers.map(s => s.violations));
 		assert(violations.length === 0,
 			`${violations.length} protocol violation(s):\n        - ` + violations.join('\n        - '));
 	});
 
+	tokenServers.forEach(s => s.close());
 	rogue.close();
 	if (observer) {
 		observer.close();

@@ -138,10 +138,13 @@ async function login(loginName, password) {
 const KNOWN_FRAME_TYPES = new Set(['connection_ack', 'data', 'error', 'complete', 'ka', 'pong', 'start_ack']);
 
 class SubscriptionSession {
-	constructor(label, url, token) {
+	// extraHeaders: headers of every frame on top of the token, e.g. the token of a product server
+	constructor(label, url, token, extraHeaders) {
 		this.label = label;
 		this.url = url;
 		this.token = token;
+		this.extraHeaders = extraHeaders || {};
+		this.ackedIds = new Set();
 		this.frames = [];
 		this.waiters = [];
 		this.socket = null;
@@ -223,6 +226,18 @@ class SubscriptionSession {
 			if (!this.expectErrorIds.has(frame.id)) {
 				this.violation(`unsolicited error for id "${frame.id}": ${JSON.stringify(frame.payload).slice(0, 250)}`);
 			}
+			return;
+		}
+
+		// The server confirms every subscription it accepts, once
+		if (frame.type === 'start_ack') {
+			if (!this.activeIds.has(frame.id) && !this.expectErrorIds.has(frame.id)) {
+				this.violation(`start_ack for an id the suite never started: "${frame.id}"`);
+			}
+			if (this.ackedIds.has(frame.id)) {
+				this.violation(`second start_ack for "${frame.id}"`);
+			}
+			this.ackedIds.add(frame.id);
 			return;
 		}
 
@@ -323,7 +338,7 @@ class SubscriptionSession {
 		const headers = {};
 		if (this.token) { headers['x-authentication-token'] = this.token; }
 		if (productId) { headers['productId'] = productId; }
-		return headers;
+		return Object.assign(headers, this.extraHeaders);
 	}
 
 	startFrame(id, query) {
@@ -334,10 +349,8 @@ class SubscriptionSession {
 		return { id, headers: this.headers(), type: 'stop', payload: {} };
 	}
 
-	// A successful "start" is answered with silence: nothing in ImtCore ever emits
-	// start_ack (CWebSocketRequest only parses one), and CWebSocketServletComp
-	// returns an empty response on success. So a refusal is the only registration
-	// outcome that produces a frame, and the absence of one is the acceptance.
+	// A "start" is answered with start_ack when the server accepted it and with an
+	// error frame when it refused; the grace window bounds the wait for either.
 	settle(id, waitMs) {
 		const isOutcome = (f) => f.id === id && (f.type === 'error' || f.type === 'start_ack');
 		const existing = this.frames.find(isOutcome);
@@ -377,14 +390,21 @@ class SubscriptionSession {
 	}
 
 	// Turns an id whose grace window has passed into an accepted subscription, or
-	// throws with the refusal the server gave. Acceptance is silence only: a case
-	// that relies on it has to prove delivery with a data frame of its own.
+	// throws with the refusal the server gave. Accepted means confirmed by start_ack.
 	confirmAccepted(id) {
 		const refusal = this.outcomeOf(id);
 		if (refusal) {
 			throw new Error(`Subscription refused: ${JSON.stringify(refusal.payload).slice(0, 400)}`);
 		}
+		if (!this.ackedIds.has(id)) {
+			throw new Error(`Subscription ${id} was neither confirmed by start_ack nor refused`);
+		}
 		return id;
+	}
+
+	// An accepted subscription the server is expected to end with an error frame
+	expectError(id) {
+		this.expectErrorIds.add(id);
 	}
 
 	async subscribe(commandId, query) {
