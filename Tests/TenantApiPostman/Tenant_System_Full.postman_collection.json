@@ -57380,6 +57380,7 @@
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
+                                    "pm.test('a personal token is named', function () { pm.expect(pm.environment.get('stSuPatId')).to.be.a('string').and.not.empty; });",
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
                                     "pm.test('refused: /The server token does not exist/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/The server token does not exist/); });",

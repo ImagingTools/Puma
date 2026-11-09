@@ -324,7 +324,7 @@ st.push(item('ST: the permissions of an unknown token are not changed', update('
 st.push(item('ST: the permissions of a personal token are not changed here', 'mutation UpdateServerTokenScopes { UpdateServerTokenScopes(input: { id: "{{stSuPatId}}", scopes: [] }) { success } }', {
 	auth: '{{su_token}}',
 	pre: ["pm.sendRequest({ url: pm.environment.get('base_url'), method: 'POST', header: { 'Content-Type': 'application/json', 'x-authentication-token': pm.environment.get('su_token'), 'productid': 'Puma' }, body: { mode: 'raw', raw: JSON.stringify({ query: 'query GetTokenList { GetTokenList(input: { userId: \"' + pm.environment.get('st_su_id') + '\" }) { tokens { id name } } }' }) } }, function (err, res) { const tokens = (res && res.json().data && res.json().data.GetTokenList && res.json().data.GetTokenList.tokens) || []; const pat = tokens.find(function (t) { return t.name === 'st su pat'; }); pm.environment.set('stSuPatId', pat ? pat.id : 'missing'); });"],
-	test: refused('/The server token does not exist/')
+	test: ["pm.test('a personal token is named', function () { pm.expect(pm.environment.get('stSuPatId')).to.be.a('string').and.not.empty; });", ...refused('/The server token does not exist/')]
 }));
 st.push(item('ST: an ordinary user does not change the permissions', update('{{stId}}', '[]'), { auth: '{{stUserToken}}', test: refused('/Server tokens are managed by a superuser session/') }));
 
