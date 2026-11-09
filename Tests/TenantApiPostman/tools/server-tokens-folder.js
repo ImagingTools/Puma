@@ -77,6 +77,8 @@ const update = (id, scopes) => `mutation UpdateServerTokenScopes { UpdateServerT
 const probeTree = '{ groups: [{ groupId: "/StProbe", groupName: "Probe", entries: [{ permissionId: "/StProbe/View", displayName: "View the probe" }] }] }';
 const publish = (product, version) => `mutation PublishProductPermissions { PublishProductPermissions(input: { productId: "${product}", productVersion: "${version}", tree: ${probeTree} }) { success changed } }`;
 
+const addClient = (product) => `mutation AddServerTokenClient { AddServerTokenClient(input: { clientProductId: "${product}", name: "${product} added" }) { success added } }`;
+
 function catalogEntry(product){
 	return [
 		'const json = pm.response.json();',
@@ -264,6 +266,7 @@ st.push(item('ST: a collection read follows the view permission of the collectio
 st.push(item('ST: the editor of an organization is read with the view permission of organizations', 'query GetTenantRepresentation { GetTenantRepresentation(input: { collectionId: "Tenants", id: "{{stCard2}}" }) { id name } }', { server: '{{stToken}}', status: 403, test: refused("/The server of 'StProbe' may not send 'GetTenantRepresentation': its token lacks '\\/ProductServer\\/Organizations\\/View'/") }));
 st.push(item('ST: the editor of an organization is saved with the edit permission of organizations', 'mutation UpdateTenantFromRepresentation { UpdateTenantFromRepresentation(input: { documentId: "{{stCard2}}", tenant: { name: "st" } }) { status } }', { server: '{{stToken}}', status: 403, test: refused("/The server of 'StProbe' may not send 'UpdateTenantFromRepresentation': its token lacks '\\/ProductServer\\/Organizations\\/Edit'/") }));
 st.push(item('ST: a request closed to the servers of products is refused', issue('StProbe', 'st by a server', '[]'), { server: '{{stToken}}', status: 403, test: refused("/The request 'CreateServerToken' is closed to the servers of products/") }));
+st.push(item('ST: a server does not add clients', addClient('StBySrv'), { server: '{{stToken}}', status: 403, test: refused("/The request 'AddServerTokenClient' is closed to the servers of products/") }));
 st.push(item('ST: accepting personal tokens takes its own permission', 'query ValidateToken { ValidateToken(input: { token: "{{stSuPat}}" }) { valid } }', { server: '{{stToken}}', status: 403, test: refused("/its token lacks '\\/ProductServer\\/PersonalTokens\\/Accept'/") }));
 st.push(item('ST: the token works under the header of its product', readUsers, { server: '{{stToken}}', product: 'StProbe', test: refused("/Invalid permissions for the user ''/") }));
 st.push(item('ST: the token is refused under the header of another product', appInfo, { server: '{{stToken}}', product: 'Lisa', status: 403, test: refused("/The token of the server is not the token of the product 'Lisa'/") }));
@@ -386,6 +389,39 @@ st.push(item('ST: su revokes the remaining tokens', 'mutation RevokeServerToken 
 st.push(item('ST: a product with only revoked tokens has no token', catalogList, {
 	auth: '{{su_token}}',
 	test: [...catalogEntry('StProbe'), "pm.test('no token', function () { pm.expect(entry.status).to.eql('No token'); pm.expect(entry.productVersion).to.eql('7.1.0'); });"]
+}));
+
+// A configurator (Agentino) makes a product a client before it issues the token
+st.push(item('ST: su adds a client product', addClient('StAdded'), {
+	auth: '{{su_token}}',
+	test: accepted('AddServerTokenClient', ["pm.test('added now', function () { pm.expect(payload.success).to.eql(true); pm.expect(payload.added).to.eql(true); });"])
+}));
+st.push(item('ST: adding a client again changes nothing', addClient('StAdded'), {
+	auth: '{{su_token}}',
+	test: accepted('AddServerTokenClient', ["pm.test('already a client', function () { pm.expect(payload.success).to.eql(true); pm.expect(payload.added).to.eql(false); });"])
+}));
+st.push(item('ST: the added client is in the catalog without a token', catalogList, {
+	auth: '{{su_token}}',
+	test: [...catalogEntry('StAdded'),
+		"pm.test('once and without a token', function () { pm.expect(entry.status).to.eql('No token'); pm.expect(items.filter(function (i) { return i.productId === 'StAdded'; }).length).to.eql(1); });",
+		"pm.environment.set('stAddedCard', entry ? entry.id : 'missing');"]
+}));
+st.push(item('ST: the added client gets a token', issue('StAdded', 'st added', '[]'), {
+	auth: '{{su_token}}',
+	test: accepted('CreateServerToken', ["pm.test('issued', function () { pm.expect(payload.success).to.eql(true); });"])
+}));
+st.push(item('ST: this server is not its own client', addClient('Puma'), { auth: '{{su_token}}', test: refused('/A server token is issued to the server of another product/') }));
+st.push(item('ST: a client needs an ID', addClient(''), { auth: '{{su_token}}', test: refused('/A server token is issued to the server of another product/') }));
+st.push(item('ST: an ordinary user does not add clients', addClient('StByUser'), { auth: '{{stUserToken}}', test: refused('/Server tokens are managed by a superuser session/') }));
+st.push(item('ST: anonymous does not add clients', addClient('StByAnonymous'), { test: refused('/Server tokens are managed by a superuser session/') }));
+st.push(item('ST: the refused requests added nothing', catalogList, {
+	auth: '{{su_token}}',
+	test: ['const json = pm.response.json();', 'const ids = ((json.data && json.data.ConnectedProductsList && json.data.ConnectedProductsList.items) || []).map(function (i) { return i.productId; });',
+		"pm.test('no refused product is in the catalog', function () { ['StBySrv', 'StByUser', 'StByAnonymous', ''].forEach(function (id) { pm.expect(ids).to.not.include(id); }); });"]
+}));
+st.push(item('ST cleanup: the added client is removed', 'mutation RemoveElements { RemoveElements(input: { collectionId: "ConnectedProducts", elementIds: ["{{stAddedCard}}"] }) { success } }', {
+	auth: '{{su_token}}',
+	test: accepted('RemoveElements', ["pm.test('removed', function () { pm.expect(payload.success).to.eql(true); });"])
 }));
 
 // Removing the product
