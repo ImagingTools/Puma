@@ -704,7 +704,7 @@ async function main() {
 	});
 
 	await test('an unknown token of a server is refused', async () => {
-		const server = await serverSession('unknown', 'imt_pat_000000000000000000000000');
+		const server = await serverSession('unknown', 'imt_srv_000000000000000000000000');
 		const refusal = await server.subscribeExpectingRefusal('OnUsersCollectionChanged', usersQuery);
 		assertRefusalReason(refusal, { absent: 'an unknown token watched the users', mustMatch: /^Forbidden: Invalid personal access token\.$/ });
 	});
