@@ -671,9 +671,6 @@
                                 <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="GroupRepository">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
-                                <AttributeInfo Id="OpenToServers" Type="Boolean" ExportId="">
-                                    <Data IsEnabled="true" Value="true"/>
-                                </AttributeInfo>
                                 <AttributeInfo Id="ReadPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
@@ -706,9 +703,6 @@
                                 </AttributeInfo>
                                 <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="RoleRepository">
                                     <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="OpenToServers" Type="Boolean" ExportId="">
-                                    <Data IsEnabled="true" Value="true"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="ReadPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
@@ -765,9 +759,6 @@
                                 <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="UserRepository">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
-                                <AttributeInfo Id="OpenToServers" Type="Boolean" ExportId="">
-                                    <Data IsEnabled="true" Value="true"/>
-                                </AttributeInfo>
                                 <AttributeInfo Id="ReadPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
@@ -800,9 +791,6 @@
                                 </AttributeInfo>
                                 <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="SessionCollection">
                                     <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="OpenToServers" Type="Boolean" ExportId="">
-                                    <Data IsEnabled="true" Value="true"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="ReadPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
