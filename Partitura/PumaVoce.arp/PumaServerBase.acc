@@ -2,25 +2,17 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6560" Description="ACF"/>
-            <Version Id="1" Number="2449" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6601" Description="ACF"/>
+            <Version Id="1" Number="2459" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="PermissionTree" PackageId="ImtLicensePck" ComponentId="IdentifiableProductInfo">
-            <Data IsEnabled="true" Flags="1">
-                <AttributeInfoMap/>
-            </Data>
-        </Element>
         <Element Id="AuthenticationManager" PackageId="ImtAuthVoce" ComponentId="AuthenticationManager">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="ServerTokenReceiver" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ConnectedProductCatalog"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="InvitationManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="TenantController/TenantInvitationManager"/>
                     </AttributeInfo>
@@ -30,8 +22,14 @@
                     <AttributeInfo Id="MembershipManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="TenantController/TenantMembershipManager"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="PermissionTree" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PermissionTree"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="PersonalAccessTokenManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PersonalAccessTokenController/PersonalAccessTokenManager"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ServerTokenReceiver" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ConnectedProductCatalog"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SlaveJwtSessionController" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="JwtSessionController"/>
@@ -45,28 +43,20 @@
                     <AttributeInfo Id="UserCollection" Type="Reference" ExportId="UserCollection">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="PermissionTree" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="PermissionTree"/>
-                    </AttributeInfo>
                 </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="ProductServerPolicy" PackageId="PumaVoce" ComponentId="ProductServerPolicy">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap/>
             </Data>
         </Element>
         <Element Id="ConnectedProductCatalog" PackageId="ImtAuthVoce" ComponentId="ConnectedProductCatalog">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="Policy" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ProductServerPolicy"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PermissionTree" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PermissionTree"/>
                     </AttributeInfo>
                     <AttributeInfo Id="PersonalAccessTokenManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PersonalAccessTokenController/PersonalAccessTokenManager"/>
@@ -90,24 +80,6 @@
                         <Data IsEnabled="true" Value="PumaLocalization"/>
                     </AttributeInfo>
                     <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="PermissionTree" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="PermissionTree"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="UserSettingsRepository" PackageId="ImtCoreVoce" ComponentId="DatabaseUserSettings">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="LanguageConstraints" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="PumaLocalization"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -191,6 +163,11 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="PermissionTree" PackageId="ImtLicensePck" ComponentId="IdentifiableProductInfo">
+            <Data IsEnabled="true" Flags="1">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
         <Element Id="PersonalAccessTokenController" PackageId="ImtAuthVoce" ComponentId="PersonalAccessTokenController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -215,15 +192,6 @@
         <Element Id="PumaHandlers" PackageId="PumaVoce" ComponentId="PumaHandlers">
             <Data IsEnabled="true" Flags="2">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="LanguageConstraints" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="PumaLocalization"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ServerConnectionInterface" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="PumaSettings/ServerConnectionInterface"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="UserSettingsCollection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="UserSettingsRepository/UserSettingsRepository"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -264,6 +232,9 @@
                     <AttributeInfo Id="JwtSessionController" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="AuthenticationManager"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="LanguageConstraints" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaLocalization"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="LdapEnableableParam" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaSettings/LdapEnabled"/>
                     </AttributeInfo>
@@ -287,6 +258,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="RoleRepository" Type="Reference" ExportId="RoleRepository">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ServerConnectionInterface" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaSettings/ServerConnectionInterface"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SessionCollection" Type="Reference" ExportId="SessionCollection">
                         <Data IsEnabled="false"/>
@@ -323,6 +297,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="UserRepository" Type="Reference" ExportId="UserRepository">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserSettingsCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="UserSettingsRepository/UserSettingsRepository"/>
                     </AttributeInfo>
                     <AttributeInfo Id="UserVerificationCollection" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="UserVerificationRepository"/>
@@ -466,12 +443,6 @@
         <Element Id="TenantController" PackageId="ImtUserAdministrationVoce" ComponentId="TenantController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="NotificationSender" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="NotificationCenter/NotificationSender"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="NotificationInboxController" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="NotificationCenter/NotificationInboxController"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="ContractRepository" Type="Reference" ExportId="ContractRepository">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -486,6 +457,12 @@
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="NotificationInboxController" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="NotificationCenter/NotificationInboxController"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="NotificationSender" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="NotificationCenter/NotificationSender"/>
                     </AttributeInfo>
                     <AttributeInfo Id="RequestManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="WebSocketServerFramework"/>
@@ -604,6 +581,21 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="UserSettingsRepository" PackageId="ImtCoreVoce" ComponentId="DatabaseUserSettings">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="LanguageConstraints" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaLocalization"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="UserVerificationRepository" PackageId="ImtAuthVoce" ComponentId="UserVerificationRepository">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap/>
@@ -612,17 +604,14 @@
         <Element Id="WebSocketServerFramework" PackageId="ImtHttpServerVoce" ComponentId="WebSocketServerFramework">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="DenyUndeclaredUserSubscriptions" Type="Boolean" ExportId="">
-                        <Data IsEnabled="true" Value="true"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="AuthenticationManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="AuthenticationManager"/>
                     </AttributeInfo>
                     <AttributeInfo Id="DenyAnonymousSubscriptions" Type="Boolean" ExportId="">
                         <Data IsEnabled="true" Value="true"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="TokenCheckInterval" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="5"/>
+                    <AttributeInfo Id="DenyUndeclaredUserSubscriptions" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
                     </AttributeInfo>
                     <AttributeInfo Id="GqlSubscriberControllers" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
@@ -649,6 +638,9 @@
                     <AttributeInfo Id="ThreadsLimit" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="100"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="TokenCheckInterval" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="5"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaSettings/TracingConfiguration"/>
                     </AttributeInfo>
@@ -666,17 +658,6 @@
                     <Element Id="GroupCollectionChangeNotifier" PackageId="ImtServerGqlPck" ComponentId="ObjectCollectionChangeNotifier">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
-                                <AttributeInfo Id="OpenToServers" Type="Boolean" ExportId="">
-                                    <Data IsEnabled="true" Value="true"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="ReadPermissions" Type="Id[]" ExportId="">
-                                    <Data IsEnabled="true">
-                                        <Values>
-                                            <Value>/Administration/Groups/View</Value>
-                                            <Value>/OrganizationManagement/Groups/View</Value>
-                                        </Values>
-                                    </Data>
-                                </AttributeInfo>
                                 <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
@@ -690,6 +671,17 @@
                                 <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="GroupRepository">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
+                                <AttributeInfo Id="OpenToServers" Type="Boolean" ExportId="">
+                                    <Data IsEnabled="true" Value="true"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ReadPermissions" Type="Id[]" ExportId="">
+                                    <Data IsEnabled="true">
+                                        <Values>
+                                            <Value>/Administration/Groups/View</Value>
+                                            <Value>/OrganizationManagement/Groups/View</Value>
+                                        </Values>
+                                    </Data>
+                                </AttributeInfo>
                                 <AttributeInfo Id="RequestManager" Type="Reference" ExportId="RequestManager">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
@@ -702,17 +694,6 @@
                     <Element Id="RoleCollectionChangeNotifier" PackageId="ImtServerGqlPck" ComponentId="ObjectCollectionChangeNotifier">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
-                                <AttributeInfo Id="OpenToServers" Type="Boolean" ExportId="">
-                                    <Data IsEnabled="true" Value="true"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="ReadPermissions" Type="Id[]" ExportId="">
-                                    <Data IsEnabled="true">
-                                        <Values>
-                                            <Value>/Administration/Roles/View</Value>
-                                            <Value>/OrganizationManagement/Roles/View</Value>
-                                        </Values>
-                                    </Data>
-                                </AttributeInfo>
                                 <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
@@ -725,6 +706,17 @@
                                 </AttributeInfo>
                                 <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="RoleRepository">
                                     <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="OpenToServers" Type="Boolean" ExportId="">
+                                    <Data IsEnabled="true" Value="true"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ReadPermissions" Type="Id[]" ExportId="">
+                                    <Data IsEnabled="true">
+                                        <Values>
+                                            <Value>/Administration/Roles/View</Value>
+                                            <Value>/OrganizationManagement/Roles/View</Value>
+                                        </Values>
+                                    </Data>
                                 </AttributeInfo>
                                 <AttributeInfo Id="RequestManager" Type="Reference" ExportId="RequestManager">
                                     <Data IsEnabled="false"/>
@@ -760,17 +752,6 @@
                     <Element Id="UserCollectionChangeNotifier" PackageId="ImtServerGqlPck" ComponentId="ObjectCollectionChangeNotifier">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
-                                <AttributeInfo Id="OpenToServers" Type="Boolean" ExportId="">
-                                    <Data IsEnabled="true" Value="true"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="ReadPermissions" Type="Id[]" ExportId="">
-                                    <Data IsEnabled="true">
-                                        <Values>
-                                            <Value>/Administration/Users/View</Value>
-                                            <Value>/OrganizationManagement/Members/View</Value>
-                                        </Values>
-                                    </Data>
-                                </AttributeInfo>
                                 <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
@@ -784,6 +765,17 @@
                                 <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="UserRepository">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
+                                <AttributeInfo Id="OpenToServers" Type="Boolean" ExportId="">
+                                    <Data IsEnabled="true" Value="true"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ReadPermissions" Type="Id[]" ExportId="">
+                                    <Data IsEnabled="true">
+                                        <Values>
+                                            <Value>/Administration/Users/View</Value>
+                                            <Value>/OrganizationManagement/Members/View</Value>
+                                        </Values>
+                                    </Data>
+                                </AttributeInfo>
                                 <AttributeInfo Id="RequestManager" Type="Reference" ExportId="RequestManager">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
@@ -796,16 +788,6 @@
                     <Element Id="UserSessionCollectionChangeNotifier" PackageId="ImtServerGqlPck" ComponentId="ObjectCollectionChangeNotifier">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
-                                <AttributeInfo Id="OpenToServers" Type="Boolean" ExportId="">
-                                    <Data IsEnabled="true" Value="true"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="ReadPermissions" Type="Id[]" ExportId="">
-                                    <Data IsEnabled="true">
-                                        <Values>
-                                            <Value>/Administration/Users/View</Value>
-                                        </Values>
-                                    </Data>
-                                </AttributeInfo>
                                 <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
@@ -818,6 +800,16 @@
                                 </AttributeInfo>
                                 <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="SessionCollection">
                                     <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="OpenToServers" Type="Boolean" ExportId="">
+                                    <Data IsEnabled="true" Value="true"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ReadPermissions" Type="Id[]" ExportId="">
+                                    <Data IsEnabled="true">
+                                        <Values>
+                                            <Value>/Administration/Users/View</Value>
+                                        </Values>
+                                    </Data>
                                 </AttributeInfo>
                                 <AttributeInfo Id="RequestManager" Type="Reference" ExportId="RequestManager">
                                     <Data IsEnabled="false"/>
@@ -845,11 +837,11 @@
     <ExportedComponents>
         <Component ExportedId="AutoPersistence" ComponentId="PumaSettings/AutoPersistence"/>
         <Component ExportedId="BackupSettings" ComponentId="PumaSettings/Backup"/>
-        <Component ExportedId="DatabaseAccessSettings" ComponentId="PumaSettings/DatabaseAccessSettings"/>
-        <Component ExportedId="TracingConfiguration" ComponentId="PumaSettings/TracingConfiguration"/>
-        <Component ExportedId="WebSocketServerFramework" ComponentId="WebSocketServerFramework"/>
-        <Component ExportedId="TenantNotificationPublisher" ComponentId="TenantController/TenantNotificationPublisher"/>
         <Component ExportedId="ConnectionCodesNotificationPublisher" ComponentId="TenantController/ConnectionCodesNotificationPublisher"/>
         <Component ExportedId="CrossTenantMessageNotificationPublisher" ComponentId="TenantController/CrossTenantMessageNotificationPublisher"/>
+        <Component ExportedId="DatabaseAccessSettings" ComponentId="PumaSettings/DatabaseAccessSettings"/>
+        <Component ExportedId="TenantNotificationPublisher" ComponentId="TenantController/TenantNotificationPublisher"/>
+        <Component ExportedId="TracingConfiguration" ComponentId="PumaSettings/TracingConfiguration"/>
+        <Component ExportedId="WebSocketServerFramework" ComponentId="WebSocketServerFramework"/>
     </ExportedComponents>
 </Acf>
