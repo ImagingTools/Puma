@@ -199,7 +199,7 @@ st.push(item('ST: anonymous does not read the permissions', 'query GetServerToke
 st.push(item('ST: su issues a token of StProbe for Puma', issue('StProbe', 'st StProbe for Puma', '["/ProductServer/Users/View"]'), {
 	auth: '{{su_token}}',
 	test: accepted('CreateServerToken', [
-		"pm.test('issued', function () { pm.expect(payload.success).to.eql(true); pm.expect(payload.token).to.match(/^imt_pat_/); });",
+		"pm.test('issued', function () { pm.expect(payload.success).to.eql(true); pm.expect(payload.token).to.match(/^imt_srv_/); });",
 		"pm.test('the required permissions come with the requested one', function () { pm.expect(payload.scopes).to.have.members(['/ProductServer/SignIn', '/ProductServer/PublishPermissions', '/ProductServer/Users/View']); });",
 		"pm.environment.set('stId', payload.id);",
 		"pm.environment.set('stToken', payload.token);"
@@ -272,7 +272,7 @@ st.push(item('ST: the token works under the header of its product', readUsers, {
 st.push(item('ST: the token is refused under the header of another product', appInfo, { server: '{{stToken}}', product: 'Lisa', status: 403, test: refused("/The token of the server is not the token of the product 'Lisa'/") }));
 st.push(item('ST: the token is refused under the header of Puma', appInfo, { server: '{{stToken}}', product: 'Puma', status: 403, test: refused("/The token of the server is not the token of the product 'Puma'/") }));
 st.push(item('ST: a value that is no token is refused', appInfo, { server: 'not-a-token', status: 403, test: refused('/The token of the server is not valid/') }));
-st.push(item('ST: an unknown token is refused', appInfo, { server: 'imt_pat_000000000000000000000000000000', status: 403, test: refused('/Invalid personal access token/') }));
+st.push(item('ST: an unknown token is refused', appInfo, { server: 'imt_srv_000000000000000000000000000000', status: 403, test: refused('/Invalid personal access token/') }));
 st.push(item('ST: the token of a server opens only the commands of its permissions', readRoles, { auth: '{{stToken}}', bare: true, product: 'StProbe', status: 403, test: refused("/The server of 'StProbe' may not send 'RolesList': its token lacks '\\/ProductServer\\/Roles\\/View'/") }));
 st.push(item('ST: a server token cannot issue tokens', issue('StProbe', 'st by a server', '[]'), { auth: '{{stToken}}', bare: true, product: 'StProbe', status: 403, test: refused("/The request 'CreateServerToken' is closed to the servers of products/") }));
 st.push(item('ST: a server token as the token of its own requests is refused for another product', appInfo, { auth: '{{stToken}}', bare: true, product: 'Lisa', status: 403, test: refused('/The personal access token is not valid for this product/') }));

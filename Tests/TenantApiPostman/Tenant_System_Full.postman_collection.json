@@ -54972,7 +54972,7 @@
                                     "const json = pm.response.json();",
                                     "const payload = json.data && json.data.CreateServerToken;",
                                     "pm.test('CreateServerToken answered', function () { pm.expect(json.errors, JSON.stringify(json.errors)).to.eql(undefined); pm.expect(payload, JSON.stringify(json)).to.be.an('object'); });",
-                                    "pm.test('issued', function () { pm.expect(payload.success).to.eql(true); pm.expect(payload.token).to.match(/^imt_pat_/); });",
+                                    "pm.test('issued', function () { pm.expect(payload.success).to.eql(true); pm.expect(payload.token).to.match(/^imt_srv_/); });",
                                     "pm.test('the required permissions come with the requested one', function () { pm.expect(payload.scopes).to.have.members(['/ProductServer/SignIn', '/ProductServer/PublishPermissions', '/ProductServer/Users/View']); });",
                                     "pm.environment.set('stId', payload.id);",
                                     "pm.environment.set('stToken', payload.token);"
@@ -56336,7 +56336,7 @@
                         "header": [
                             {
                                 "key": "x-server-token",
-                                "value": "imt_pat_000000000000000000000000000000"
+                                "value": "imt_srv_000000000000000000000000000000"
                             }
                         ],
                         "body": {
