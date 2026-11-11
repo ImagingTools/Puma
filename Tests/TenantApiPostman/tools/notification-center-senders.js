@@ -41,13 +41,6 @@ function setProduct(item, product){
 	pre.script.exec.unshift(line);
 }
 
-function addPre(item, line){
-	const pre = (item.event || []).find((e) => e.listen === 'prerequest');
-	if (!pre.script.exec.includes(line)){
-		pre.script.exec.push(line);
-	}
-}
-
 function setTest(item, own){
 	const test = item.event.find((e) => e.listen === 'test');
 	test.script.exec = [shared.concat(own).join('\n')];
@@ -78,7 +71,16 @@ function sentByServer(item, token = '{{nc_server_token}}', product = '{{nc_produ
 }
 
 // A user reads the notifications of the sender through the server of the sender
+function productSessionVariables(value, scope = 'sender'){
+	return value.replace(/\bnc_(alice|bob|carol|dave)((?:_[a-z]+)*?)_(token|sel)\b/g, (match, user, context, kind) =>
+		`nc_${user}${context.replace(/_(sender|other)$/, '')}_${scope}_${kind}`);
+}
+
 function readThroughServer(item, token = '{{nc_server_token}}', product = '{{nc_product}}'){
+	const auth = (item.request.header || []).find((h) => h.key === 'x-authentication-token');
+	if (auth){
+		auth.value = productSessionVariables(auth.value, product === '{{nc_other}}' ? 'other' : 'sender');
+	}
 	setHeader(item, 'x-server-token', token);
 	setProduct(item, product);
 }
@@ -97,25 +99,25 @@ const senderItems = [
 		[{ key: 'x-authentication-token', value: '{{nc_su_token}}' }],
 		["const p = payload('ConnectedProductAdd');", "pm.test('connected', function () { pm.expect(p.id).to.eql(env('nc_other_card')); });"]),
 	newItem('The token of the server of the sender',
-		'mutation CreateServerToken { CreateServerToken(input: { clientProductId: "{{nc_product}}", name: "nc sender", scopes: ["/ProductServer/Notifications/View", "/ProductServer/Notifications/Send"] }) { id token scopes } }',
+		'mutation CreateServerToken { CreateServerToken(input: { clientProductId: "{{nc_product}}", name: "nc sender", scopes: [] }) { id token scopes } }',
 		[{ key: 'x-authentication-token', value: '{{nc_su_token}}' }],
-		["const p = payload('CreateServerToken');", "pm.test('it may send and read notifications', function () { pm.expect(p.scopes).to.include.members(['/ProductServer/Notifications/View', '/ProductServer/Notifications/Send']); });",
+		["const p = payload('CreateServerToken');", "pm.test('own-product notifications need no product permissions', function () { pm.expect(p.scopes).to.eql([]); pm.expect(p.token).to.match(/^imt_srv_/); });",
 			"pm.environment.set('nc_server_token', p.token);", "pm.environment.set('nc_server_token_id', p.id);"]),
-	newItem('A token of the sender that may not send',
-		'mutation CreateServerToken { CreateServerToken(input: { clientProductId: "{{nc_product}}", name: "nc reader", scopes: ["/ProductServer/Notifications/View"] }) { id token scopes } }',
+	newItem('A token of a different sender',
+		'mutation CreateServerToken { CreateServerToken(input: { clientProductId: "{{nc_other}}", name: "nc different sender", scopes: [] }) { id token scopes } }',
 		[{ key: 'x-authentication-token', value: '{{nc_su_token}}' }],
-		["const p = payload('CreateServerToken');", "pm.test('it may not send', function () { pm.expect(p.scopes).to.not.include('/ProductServer/Notifications/Send'); });",
-			"pm.environment.set('nc_reader_token', p.token);"]),
+		["const p = payload('CreateServerToken');", "pm.test('the other sender holds no product permissions', function () { pm.expect(p.scopes).to.eql([]); pm.expect(p.token).to.match(/^imt_srv_/); });",
+			"pm.environment.set('nc_wrong_sender_token', p.token);"]),
 	newItem('The token of the server of the second product',
-		'mutation CreateServerToken { CreateServerToken(input: { clientProductId: "{{nc_other}}", name: "nc second sender", scopes: ["/ProductServer/Notifications/View", "/ProductServer/Notifications/Send"] }) { id token scopes } }',
+		'mutation CreateServerToken { CreateServerToken(input: { clientProductId: "{{nc_other}}", name: "nc second sender", scopes: [] }) { id token scopes } }',
 		[{ key: 'x-authentication-token', value: '{{nc_su_token}}' }],
-		["const p = payload('CreateServerToken');", "pm.test('it may send', function () { pm.expect(p.scopes).to.include('/ProductServer/Notifications/Send'); });",
+		["const p = payload('CreateServerToken');", "pm.test('the second sender needs no product permissions', function () { pm.expect(p.scopes).to.eql([]); pm.expect(p.token).to.match(/^imt_srv_/); });",
 			"pm.environment.set('nc_other_token', p.token);"])
 ];
-if (!bootstrap.item.some((i) => i.name === senderItems[0].name)){
-	const suIndex = bootstrap.item.findIndex((i) => i.name === 'Authorization SU');
-	bootstrap.item.splice(suIndex + 1, 0, ...senderItems);
-}
+const senderNames = new Set(senderItems.map((i) => i.name).concat('A token of the sender that may not send'));
+bootstrap.item = bootstrap.item.filter((i) => !senderNames.has(i.name));
+const suIndex = bootstrap.item.findIndex((i) => i.name === 'Authorization SU');
+bootstrap.item.splice(suIndex + 1, 0, ...senderItems);
 // The products of the run
 const runTag = bootstrap.item.find((i) => i.name === 'Run tag');
 const runPre = runTag.event.find((e) => e.listen === 'prerequest').script.exec;
@@ -138,21 +140,23 @@ if (anonymous){
 	setQuery(anonymous, sendQuery('{{nc_product}}', 'nc.Access'));
 	setTest(anonymous, ["refused('SendNotification', /Notifications are sent only by the server of a product/);"]);
 }
-const user = byName(access, 'A signed-in user may send for the product of the request (until ImtCore#1059)');
+const user = byName(access, 'A signed-in user may send for the product of the request (until ImtCore#1059)') || byName(access, 'A signed-in user may not send');
 if (user){
 	user.name = 'A signed-in user may not send';
 	setQuery(user, sendQuery('{{nc_product}}', 'nc.Access'));
 	setTest(user, ["refused('SendNotification', /Notifications are sent only by the server of a product/);"]);
-	const index = access.item.indexOf(user);
-	access.item.splice(index + 1, 0,
+	const senderChecks = [
 		newItem('A superuser session may not send', sendQuery('{{nc_product}}', 'nc.Access'), [{ key: 'x-authentication-token', value: '{{nc_su_token}}' }],
 			["refused('SendNotification', /Notifications are sent only by the server of a product/);"]),
 		newItem('A request forwarded by the server of the sender does not send for the user', sendQuery('{{nc_product}}', 'nc.Access'),
-			[{ key: 'x-authentication-token', value: '{{nc_alice_token}}' }, { key: 'x-server-token', value: '{{nc_server_token}}' }],
+			[{ key: 'x-authentication-token', value: '{{nc_alice_sender_token}}' }, { key: 'x-server-token', value: '{{nc_server_token}}' }],
 			["refused('SendNotification', /Notifications are sent only by the server of a product/);"], '{{nc_product}}'),
-		newItem('A token without the permission to send is refused', sendQuery('{{nc_product}}', 'nc.Access'), [{ key: 'x-authentication-token', value: '{{nc_reader_token}}' }],
-			["refused('SendNotification', /The server of 'NcSender[0-9a-z]+' may not send 'SendNotification': its token lacks '\\/ProductServer\\/Notifications\\/Send'/);"], '{{nc_product}}'));
-	addPre(access.item[index + 3], "pm.variables.set('expectedHttpStatus', 403);");
+		newItem('A different sender cannot impersonate the product', sendQuery('{{nc_product}}', 'nc.Access'), [{ key: 'x-authentication-token', value: '{{nc_wrong_sender_token}}' }],
+			["refused('SendNotification', /Notifications are sent only to the product of the sender/);"], '{{nc_other}}')
+	];
+	const checkNames = new Set(senderChecks.map((i) => i.name).concat('A token without the permission to send is refused'));
+	access.item = access.item.filter((i) => !checkNames.has(i.name));
+	access.item.splice(access.item.indexOf(user) + 1, 0, ...senderChecks);
 }
 const otherProduct = byName(access, 'A token sends only to the product of its request');
 if (otherProduct){
@@ -235,6 +239,42 @@ if (!organizations.item.some((i) => i.name === cleanupName)){
 		'mutation RemoveElements { RemoveElements(input: { collectionId: "ConnectedProducts", elementIds: ["{{nc_product_card}}", "{{nc_other_card}}"] }) { success } }',
 		[{ key: 'x-authentication-token', value: '{{nc_su_token}}' }],
 		["const p = payload('RemoveElements');", "pm.test('both senders removed with their tokens', function () { pm.expect(p.success).to.eql(true); });"]));
+}
+
+// Keep local Puma sessions for organization operations and open separate sessions through each sender.
+const sessionPrefix = 'Through the sender: ';
+const otherLoginName = 'Authorization alice through the second sender';
+for (const section of collection.item){
+	section.item = section.item.filter((item) => !item.name.startsWith(sessionPrefix) && item.name !== otherLoginName);
+	const items = [];
+	for (const item of section.item){
+		items.push(item);
+		const command = commandOf(item);
+		if ((command !== 'Authorization' || item.name === 'Authorization SU') && command !== 'SelectTenant'){
+			continue;
+		}
+		const forwarded = JSON.parse(JSON.stringify(item));
+		forwarded.name = sessionPrefix + item.name;
+		if (command === 'Authorization'){
+			setQuery(forwarded, forwarded.request.body.graphql.query.replace(/productId: "[^"]+"/, 'productId: "{{nc_product}}"'));
+		}
+		readThroughServer(forwarded);
+		for (const event of forwarded.event || []){
+			event.script.exec = event.script.exec.map((line) => productSessionVariables(line));
+		}
+		items.push(forwarded);
+		if (item.name === 'Authorization alice'){
+			const otherLogin = JSON.parse(JSON.stringify(forwarded));
+			otherLogin.name = otherLoginName;
+			setQuery(otherLogin, otherLogin.request.body.graphql.query.replace(/productId: "[^"]+"/, 'productId: "{{nc_other}}"'));
+			readThroughServer(otherLogin, '{{nc_other_token}}', '{{nc_other}}');
+			for (const event of otherLogin.event || []){
+				event.script.exec = event.script.exec.map((line) => productSessionVariables(line, 'other'));
+			}
+			items.push(otherLogin);
+		}
+	}
+	section.item = items;
 }
 
 // The format of the file: tabs, the line ends of the checkout and its final line end

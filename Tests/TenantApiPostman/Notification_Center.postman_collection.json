@@ -265,7 +265,7 @@
 							"script": {
 								"type": "text/javascript",
 								"exec": [
-									"const __json = (function () { try { return pm.response.json(); } catch (e) { return {}; } })();\nconst __data = (__json && __json.data) || {};\nconst __errors = (__json && __json.errors) || [];\nfunction payload(command) {\n  pm.test(command + ': no GraphQL errors', function () { pm.expect(__errors, JSON.stringify(__errors)).to.eql([]); });\n  pm.test(command + ': has a payload', function () { pm.expect(__data[command], JSON.stringify(__json).slice(0, 300)).to.be.an('object'); });\n  return __data[command] || {};\n}\nfunction refused(command, reason) {\n  pm.test(command + ' is refused: ' + reason, function () {\n    pm.expect(__errors.length, 'expected a refusal, got ' + JSON.stringify(__json).slice(0, 300)).to.be.above(0);\n    pm.expect(__errors[0].message).to.match(reason);\n  });\n}\nfunction env(key) { return pm.environment.get(key); }\nfunction ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }\nfunction argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }\nconst p = payload('CreateServerToken');\npm.test('it may send and read notifications', function () { pm.expect(p.scopes).to.include.members(['/ProductServer/Notifications/View', '/ProductServer/Notifications/Send']); });\npm.environment.set('nc_server_token', p.token);\npm.environment.set('nc_server_token_id', p.id);"
+									"const __json = (function () { try { return pm.response.json(); } catch (e) { return {}; } })();\nconst __data = (__json && __json.data) || {};\nconst __errors = (__json && __json.errors) || [];\nfunction payload(command) {\n  pm.test(command + ': no GraphQL errors', function () { pm.expect(__errors, JSON.stringify(__errors)).to.eql([]); });\n  pm.test(command + ': has a payload', function () { pm.expect(__data[command], JSON.stringify(__json).slice(0, 300)).to.be.an('object'); });\n  return __data[command] || {};\n}\nfunction refused(command, reason) {\n  pm.test(command + ' is refused: ' + reason, function () {\n    pm.expect(__errors.length, 'expected a refusal, got ' + JSON.stringify(__json).slice(0, 300)).to.be.above(0);\n    pm.expect(__errors[0].message).to.match(reason);\n  });\n}\nfunction env(key) { return pm.environment.get(key); }\nfunction ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }\nfunction argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }\nconst p = payload('CreateServerToken');\npm.test('own-product notifications need no product permissions', function () { pm.expect(p.scopes).to.eql([]); pm.expect(p.token).to.match(/^imt_srv_/); });\npm.environment.set('nc_server_token', p.token);\npm.environment.set('nc_server_token_id', p.id);"
 								]
 							}
 						}
@@ -281,7 +281,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"{{nc_product}}\", name: \"nc sender\", scopes: [\"/ProductServer/Notifications/View\", \"/ProductServer/Notifications/Send\"] }) { id token scopes } }",
+								"query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"{{nc_product}}\", name: \"nc sender\", scopes: [] }) { id token scopes } }",
 								"variables": ""
 							}
 						},
@@ -295,14 +295,14 @@
 					"response": []
 				},
 				{
-					"name": "A token of the sender that may not send",
+					"name": "A token of a different sender",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"type": "text/javascript",
 								"exec": [
-									"const __json = (function () { try { return pm.response.json(); } catch (e) { return {}; } })();\nconst __data = (__json && __json.data) || {};\nconst __errors = (__json && __json.errors) || [];\nfunction payload(command) {\n  pm.test(command + ': no GraphQL errors', function () { pm.expect(__errors, JSON.stringify(__errors)).to.eql([]); });\n  pm.test(command + ': has a payload', function () { pm.expect(__data[command], JSON.stringify(__json).slice(0, 300)).to.be.an('object'); });\n  return __data[command] || {};\n}\nfunction refused(command, reason) {\n  pm.test(command + ' is refused: ' + reason, function () {\n    pm.expect(__errors.length, 'expected a refusal, got ' + JSON.stringify(__json).slice(0, 300)).to.be.above(0);\n    pm.expect(__errors[0].message).to.match(reason);\n  });\n}\nfunction env(key) { return pm.environment.get(key); }\nfunction ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }\nfunction argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }\nconst p = payload('CreateServerToken');\npm.test('it may not send', function () { pm.expect(p.scopes).to.not.include('/ProductServer/Notifications/Send'); });\npm.environment.set('nc_reader_token', p.token);"
+									"const __json = (function () { try { return pm.response.json(); } catch (e) { return {}; } })();\nconst __data = (__json && __json.data) || {};\nconst __errors = (__json && __json.errors) || [];\nfunction payload(command) {\n  pm.test(command + ': no GraphQL errors', function () { pm.expect(__errors, JSON.stringify(__errors)).to.eql([]); });\n  pm.test(command + ': has a payload', function () { pm.expect(__data[command], JSON.stringify(__json).slice(0, 300)).to.be.an('object'); });\n  return __data[command] || {};\n}\nfunction refused(command, reason) {\n  pm.test(command + ' is refused: ' + reason, function () {\n    pm.expect(__errors.length, 'expected a refusal, got ' + JSON.stringify(__json).slice(0, 300)).to.be.above(0);\n    pm.expect(__errors[0].message).to.match(reason);\n  });\n}\nfunction env(key) { return pm.environment.get(key); }\nfunction ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }\nfunction argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }\nconst p = payload('CreateServerToken');\npm.test('the other sender holds no product permissions', function () { pm.expect(p.scopes).to.eql([]); pm.expect(p.token).to.match(/^imt_srv_/); });\npm.environment.set('nc_wrong_sender_token', p.token);"
 								]
 							}
 						}
@@ -318,7 +318,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"{{nc_product}}\", name: \"nc reader\", scopes: [\"/ProductServer/Notifications/View\"] }) { id token scopes } }",
+								"query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"{{nc_other}}\", name: \"nc different sender\", scopes: [] }) { id token scopes } }",
 								"variables": ""
 							}
 						},
@@ -339,7 +339,7 @@
 							"script": {
 								"type": "text/javascript",
 								"exec": [
-									"const __json = (function () { try { return pm.response.json(); } catch (e) { return {}; } })();\nconst __data = (__json && __json.data) || {};\nconst __errors = (__json && __json.errors) || [];\nfunction payload(command) {\n  pm.test(command + ': no GraphQL errors', function () { pm.expect(__errors, JSON.stringify(__errors)).to.eql([]); });\n  pm.test(command + ': has a payload', function () { pm.expect(__data[command], JSON.stringify(__json).slice(0, 300)).to.be.an('object'); });\n  return __data[command] || {};\n}\nfunction refused(command, reason) {\n  pm.test(command + ' is refused: ' + reason, function () {\n    pm.expect(__errors.length, 'expected a refusal, got ' + JSON.stringify(__json).slice(0, 300)).to.be.above(0);\n    pm.expect(__errors[0].message).to.match(reason);\n  });\n}\nfunction env(key) { return pm.environment.get(key); }\nfunction ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }\nfunction argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }\nconst p = payload('CreateServerToken');\npm.test('it may send', function () { pm.expect(p.scopes).to.include('/ProductServer/Notifications/Send'); });\npm.environment.set('nc_other_token', p.token);"
+									"const __json = (function () { try { return pm.response.json(); } catch (e) { return {}; } })();\nconst __data = (__json && __json.data) || {};\nconst __errors = (__json && __json.errors) || [];\nfunction payload(command) {\n  pm.test(command + ': no GraphQL errors', function () { pm.expect(__errors, JSON.stringify(__errors)).to.eql([]); });\n  pm.test(command + ': has a payload', function () { pm.expect(__data[command], JSON.stringify(__json).slice(0, 300)).to.be.an('object'); });\n  return __data[command] || {};\n}\nfunction refused(command, reason) {\n  pm.test(command + ' is refused: ' + reason, function () {\n    pm.expect(__errors.length, 'expected a refusal, got ' + JSON.stringify(__json).slice(0, 300)).to.be.above(0);\n    pm.expect(__errors[0].message).to.match(reason);\n  });\n}\nfunction env(key) { return pm.environment.get(key); }\nfunction ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }\nfunction argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }\nconst p = payload('CreateServerToken');\npm.test('the second sender needs no product permissions', function () { pm.expect(p.scopes).to.eql([]); pm.expect(p.token).to.match(/^imt_srv_/); });\npm.environment.set('nc_other_token', p.token);"
 								]
 							}
 						}
@@ -355,7 +355,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"{{nc_other}}\", name: \"nc second sender\", scopes: [\"/ProductServer/Notifications/View\", \"/ProductServer/Notifications/Send\"] }) { id token scopes } }",
+								"query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"{{nc_other}}\", name: \"nc second sender\", scopes: [] }) { id token scopes } }",
 								"variables": ""
 							}
 						},
@@ -654,6 +654,140 @@
 					]
 				},
 				{
+					"id": "6a630282-d0d3-4d29-8f04-25c596a834a0",
+					"name": "Through the sender: Authorization alice",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}",
+							"host": [
+								"{{base_url}}"
+							]
+						},
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query Authorization { Authorization(input: { login: \"nc_alice_{{nc_run}}\", password: \"Notify_2026!x\", productId: \"{{nc_product}}\" }) { userId token } }",
+								"variables": ""
+							}
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "a704fe66-2392-4cac-bdcb-ba93c962fea7",
+								"type": "text/javascript",
+								"exec": [
+									"const __json = (function () { try { return pm.response.json(); } catch (e) { return {}; } })();",
+									"const __data = (__json && __json.data) || {};",
+									"const __errors = (__json && __json.errors) || [];",
+									"function payload(command) {",
+									"  pm.test(command + ': no GraphQL errors', function () { pm.expect(__errors, JSON.stringify(__errors)).to.eql([]); });",
+									"  pm.test(command + ': has a payload', function () { pm.expect(__data[command], JSON.stringify(__json).slice(0, 300)).to.be.an('object'); });",
+									"  return __data[command] || {};",
+									"}",
+									"function refused(command, reason) {",
+									"  pm.test(command + ' is refused: ' + reason, function () {",
+									"    pm.expect(__errors.length, 'expected a refusal, got ' + JSON.stringify(__json).slice(0, 300)).to.be.above(0);",
+									"    pm.expect(__errors[0].message).to.match(reason);",
+									"  });",
+									"}",
+									"function env(key) { return pm.environment.get(key); }",
+									"function ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }",
+									"function argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }",
+									"const p = payload('Authorization');",
+									"pm.test('signed in', function () { pm.expect(p.token).to.be.a('string').and.not.empty; });",
+									"pm.environment.set('nc_alice_sender_token', p.token);"
+								]
+							}
+						}
+					]
+				},
+				{
+					"id": "6a630282-d0d3-4d29-8f04-25c596a834a0",
+					"name": "Authorization alice through the second sender",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-server-token",
+								"value": "{{nc_other_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}",
+							"host": [
+								"{{base_url}}"
+							]
+						},
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query Authorization { Authorization(input: { login: \"nc_alice_{{nc_run}}\", password: \"Notify_2026!x\", productId: \"{{nc_other}}\" }) { userId token } }",
+								"variables": ""
+							}
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_other}}' });"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "a704fe66-2392-4cac-bdcb-ba93c962fea7",
+								"type": "text/javascript",
+								"exec": [
+									"const __json = (function () { try { return pm.response.json(); } catch (e) { return {}; } })();",
+									"const __data = (__json && __json.data) || {};",
+									"const __errors = (__json && __json.errors) || [];",
+									"function payload(command) {",
+									"  pm.test(command + ': no GraphQL errors', function () { pm.expect(__errors, JSON.stringify(__errors)).to.eql([]); });",
+									"  pm.test(command + ': has a payload', function () { pm.expect(__data[command], JSON.stringify(__json).slice(0, 300)).to.be.an('object'); });",
+									"  return __data[command] || {};",
+									"}",
+									"function refused(command, reason) {",
+									"  pm.test(command + ' is refused: ' + reason, function () {",
+									"    pm.expect(__errors.length, 'expected a refusal, got ' + JSON.stringify(__json).slice(0, 300)).to.be.above(0);",
+									"    pm.expect(__errors[0].message).to.match(reason);",
+									"  });",
+									"}",
+									"function env(key) { return pm.environment.get(key); }",
+									"function ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }",
+									"function argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }",
+									"const p = payload('Authorization');",
+									"pm.test('signed in', function () { pm.expect(p.token).to.be.a('string').and.not.empty; });",
+									"pm.environment.set('nc_alice_other_token', p.token);"
+								]
+							}
+						}
+					]
+				},
+				{
 					"id": "ef87c595-0680-4454-8a12-3de27dd0f2bb",
 					"name": "Authorization bob",
 					"request": {
@@ -701,6 +835,73 @@
 									"const p = payload('Authorization');",
 									"pm.test('signed in', function () { pm.expect(p.token).to.be.a('string').and.not.empty; });",
 									"pm.environment.set('nc_bob_token', p.token);"
+								]
+							}
+						}
+					]
+				},
+				{
+					"id": "ef87c595-0680-4454-8a12-3de27dd0f2bb",
+					"name": "Through the sender: Authorization bob",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}",
+							"host": [
+								"{{base_url}}"
+							]
+						},
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query Authorization { Authorization(input: { login: \"nc_bob_{{nc_run}}\", password: \"Notify_2026!x\", productId: \"{{nc_product}}\" }) { userId token } }",
+								"variables": ""
+							}
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "a6344763-c861-49aa-934d-2b39607bda2a",
+								"type": "text/javascript",
+								"exec": [
+									"const __json = (function () { try { return pm.response.json(); } catch (e) { return {}; } })();",
+									"const __data = (__json && __json.data) || {};",
+									"const __errors = (__json && __json.errors) || [];",
+									"function payload(command) {",
+									"  pm.test(command + ': no GraphQL errors', function () { pm.expect(__errors, JSON.stringify(__errors)).to.eql([]); });",
+									"  pm.test(command + ': has a payload', function () { pm.expect(__data[command], JSON.stringify(__json).slice(0, 300)).to.be.an('object'); });",
+									"  return __data[command] || {};",
+									"}",
+									"function refused(command, reason) {",
+									"  pm.test(command + ' is refused: ' + reason, function () {",
+									"    pm.expect(__errors.length, 'expected a refusal, got ' + JSON.stringify(__json).slice(0, 300)).to.be.above(0);",
+									"    pm.expect(__errors[0].message).to.match(reason);",
+									"  });",
+									"}",
+									"function env(key) { return pm.environment.get(key); }",
+									"function ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }",
+									"function argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }",
+									"const p = payload('Authorization');",
+									"pm.test('signed in', function () { pm.expect(p.token).to.be.a('string').and.not.empty; });",
+									"pm.environment.set('nc_bob_sender_token', p.token);"
 								]
 							}
 						}
@@ -760,6 +961,73 @@
 					]
 				},
 				{
+					"id": "c2b6e039-a706-4472-96b7-0862023538c5",
+					"name": "Through the sender: Authorization carol",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}",
+							"host": [
+								"{{base_url}}"
+							]
+						},
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query Authorization { Authorization(input: { login: \"nc_carol_{{nc_run}}\", password: \"Notify_2026!x\", productId: \"{{nc_product}}\" }) { userId token } }",
+								"variables": ""
+							}
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "228a6403-5064-4160-8a4d-37d61ed394ce",
+								"type": "text/javascript",
+								"exec": [
+									"const __json = (function () { try { return pm.response.json(); } catch (e) { return {}; } })();",
+									"const __data = (__json && __json.data) || {};",
+									"const __errors = (__json && __json.errors) || [];",
+									"function payload(command) {",
+									"  pm.test(command + ': no GraphQL errors', function () { pm.expect(__errors, JSON.stringify(__errors)).to.eql([]); });",
+									"  pm.test(command + ': has a payload', function () { pm.expect(__data[command], JSON.stringify(__json).slice(0, 300)).to.be.an('object'); });",
+									"  return __data[command] || {};",
+									"}",
+									"function refused(command, reason) {",
+									"  pm.test(command + ' is refused: ' + reason, function () {",
+									"    pm.expect(__errors.length, 'expected a refusal, got ' + JSON.stringify(__json).slice(0, 300)).to.be.above(0);",
+									"    pm.expect(__errors[0].message).to.match(reason);",
+									"  });",
+									"}",
+									"function env(key) { return pm.environment.get(key); }",
+									"function ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }",
+									"function argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }",
+									"const p = payload('Authorization');",
+									"pm.test('signed in', function () { pm.expect(p.token).to.be.a('string').and.not.empty; });",
+									"pm.environment.set('nc_carol_sender_token', p.token);"
+								]
+							}
+						}
+					]
+				},
+				{
 					"id": "cafc6dc2-b31d-4ac9-8bdb-5e95027f4d6a",
 					"name": "Authorization dave",
 					"request": {
@@ -807,6 +1075,73 @@
 									"const p = payload('Authorization');",
 									"pm.test('signed in', function () { pm.expect(p.token).to.be.a('string').and.not.empty; });",
 									"pm.environment.set('nc_dave_token', p.token);"
+								]
+							}
+						}
+					]
+				},
+				{
+					"id": "cafc6dc2-b31d-4ac9-8bdb-5e95027f4d6a",
+					"name": "Through the sender: Authorization dave",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}",
+							"host": [
+								"{{base_url}}"
+							]
+						},
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query Authorization { Authorization(input: { login: \"nc_dave_{{nc_run}}\", password: \"Notify_2026!x\", productId: \"{{nc_product}}\" }) { userId token } }",
+								"variables": ""
+							}
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "982141c1-c647-4b94-893f-217b70d676c9",
+								"type": "text/javascript",
+								"exec": [
+									"const __json = (function () { try { return pm.response.json(); } catch (e) { return {}; } })();",
+									"const __data = (__json && __json.data) || {};",
+									"const __errors = (__json && __json.errors) || [];",
+									"function payload(command) {",
+									"  pm.test(command + ': no GraphQL errors', function () { pm.expect(__errors, JSON.stringify(__errors)).to.eql([]); });",
+									"  pm.test(command + ': has a payload', function () { pm.expect(__data[command], JSON.stringify(__json).slice(0, 300)).to.be.an('object'); });",
+									"  return __data[command] || {};",
+									"}",
+									"function refused(command, reason) {",
+									"  pm.test(command + ' is refused: ' + reason, function () {",
+									"    pm.expect(__errors.length, 'expected a refusal, got ' + JSON.stringify(__json).slice(0, 300)).to.be.above(0);",
+									"    pm.expect(__errors[0].message).to.match(reason);",
+									"  });",
+									"}",
+									"function env(key) { return pm.environment.get(key); }",
+									"function ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }",
+									"function argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }",
+									"const p = payload('Authorization');",
+									"pm.test('signed in', function () { pm.expect(p.token).to.be.a('string').and.not.empty; });",
+									"pm.environment.set('nc_dave_sender_token', p.token);"
 								]
 							}
 						}
@@ -866,6 +1201,73 @@
 					]
 				},
 				{
+					"id": "7ff61227-1940-4e63-b15d-1b687d871895",
+					"name": "Through the sender: Authorization alice for tenant A",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}",
+							"host": [
+								"{{base_url}}"
+							]
+						},
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query Authorization { Authorization(input: { login: \"nc_alice_{{nc_run}}\", password: \"Notify_2026!x\", productId: \"{{nc_product}}\" }) { userId token } }",
+								"variables": ""
+							}
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "01d68a2f-64fd-4c13-9634-c8e3318692ca",
+								"type": "text/javascript",
+								"exec": [
+									"const __json = (function () { try { return pm.response.json(); } catch (e) { return {}; } })();",
+									"const __data = (__json && __json.data) || {};",
+									"const __errors = (__json && __json.errors) || [];",
+									"function payload(command) {",
+									"  pm.test(command + ': no GraphQL errors', function () { pm.expect(__errors, JSON.stringify(__errors)).to.eql([]); });",
+									"  pm.test(command + ': has a payload', function () { pm.expect(__data[command], JSON.stringify(__json).slice(0, 300)).to.be.an('object'); });",
+									"  return __data[command] || {};",
+									"}",
+									"function refused(command, reason) {",
+									"  pm.test(command + ' is refused: ' + reason, function () {",
+									"    pm.expect(__errors.length, 'expected a refusal, got ' + JSON.stringify(__json).slice(0, 300)).to.be.above(0);",
+									"    pm.expect(__errors[0].message).to.match(reason);",
+									"  });",
+									"}",
+									"function env(key) { return pm.environment.get(key); }",
+									"function ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }",
+									"function argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }",
+									"const p = payload('Authorization');",
+									"pm.test('signed in', function () { pm.expect(p.token).to.be.a('string').and.not.empty; });",
+									"pm.environment.set('nc_alice_sender_sel', p.token);"
+								]
+							}
+						}
+					]
+				},
+				{
 					"id": "209a9171-cad7-49a4-a98b-b0aa3e308ff9",
 					"name": "Authorization bob for tenant B",
 					"request": {
@@ -913,6 +1315,73 @@
 									"const p = payload('Authorization');",
 									"pm.test('signed in', function () { pm.expect(p.token).to.be.a('string').and.not.empty; });",
 									"pm.environment.set('nc_bob_sel', p.token);"
+								]
+							}
+						}
+					]
+				},
+				{
+					"id": "209a9171-cad7-49a4-a98b-b0aa3e308ff9",
+					"name": "Through the sender: Authorization bob for tenant B",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}",
+							"host": [
+								"{{base_url}}"
+							]
+						},
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query Authorization { Authorization(input: { login: \"nc_bob_{{nc_run}}\", password: \"Notify_2026!x\", productId: \"{{nc_product}}\" }) { userId token } }",
+								"variables": ""
+							}
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "67981c54-8c7a-4c22-8a2a-dc9feb130550",
+								"type": "text/javascript",
+								"exec": [
+									"const __json = (function () { try { return pm.response.json(); } catch (e) { return {}; } })();",
+									"const __data = (__json && __json.data) || {};",
+									"const __errors = (__json && __json.errors) || [];",
+									"function payload(command) {",
+									"  pm.test(command + ': no GraphQL errors', function () { pm.expect(__errors, JSON.stringify(__errors)).to.eql([]); });",
+									"  pm.test(command + ': has a payload', function () { pm.expect(__data[command], JSON.stringify(__json).slice(0, 300)).to.be.an('object'); });",
+									"  return __data[command] || {};",
+									"}",
+									"function refused(command, reason) {",
+									"  pm.test(command + ' is refused: ' + reason, function () {",
+									"    pm.expect(__errors.length, 'expected a refusal, got ' + JSON.stringify(__json).slice(0, 300)).to.be.above(0);",
+									"    pm.expect(__errors[0].message).to.match(reason);",
+									"  });",
+									"}",
+									"function env(key) { return pm.environment.get(key); }",
+									"function ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }",
+									"function argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }",
+									"const p = payload('Authorization');",
+									"pm.test('signed in', function () { pm.expect(p.token).to.be.a('string').and.not.empty; });",
+									"pm.environment.set('nc_bob_sender_sel', p.token);"
 								]
 							}
 						}
@@ -1095,6 +1564,77 @@
 					]
 				},
 				{
+					"id": "5afc3694-19db-4949-84ac-abfe872b6527",
+					"name": "Through the sender: SelectTenant A",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-authentication-token",
+								"value": "{{nc_alice_sender_sel}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}",
+							"host": [
+								"{{base_url}}"
+							]
+						},
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation SelectTenant { SelectTenant(input: { tenantId: \"{{nc_tenant_a}}\" }) { ok userSession { tenantId accessToken } errorMessage } }",
+								"variables": ""
+							}
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "db625e20-1540-410c-ac12-0654aeb4cce9",
+								"type": "text/javascript",
+								"exec": [
+									"const __json = (function () { try { return pm.response.json(); } catch (e) { return {}; } })();",
+									"const __data = (__json && __json.data) || {};",
+									"const __errors = (__json && __json.errors) || [];",
+									"function payload(command) {",
+									"  pm.test(command + ': no GraphQL errors', function () { pm.expect(__errors, JSON.stringify(__errors)).to.eql([]); });",
+									"  pm.test(command + ': has a payload', function () { pm.expect(__data[command], JSON.stringify(__json).slice(0, 300)).to.be.an('object'); });",
+									"  return __data[command] || {};",
+									"}",
+									"function refused(command, reason) {",
+									"  pm.test(command + ' is refused: ' + reason, function () {",
+									"    pm.expect(__errors.length, 'expected a refusal, got ' + JSON.stringify(__json).slice(0, 300)).to.be.above(0);",
+									"    pm.expect(__errors[0].message).to.match(reason);",
+									"  });",
+									"}",
+									"function env(key) { return pm.environment.get(key); }",
+									"function ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }",
+									"function argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }",
+									"const p = payload('SelectTenant');",
+									"pm.test('selected', function () { pm.expect(p.userSession.tenantId).to.eql(env('nc_tenant_a')); });",
+									"pm.environment.set('nc_alice_a_sender_token', p.userSession.accessToken);"
+								]
+							}
+						}
+					]
+				},
+				{
 					"id": "cf5d3a77-4baf-42f3-af75-a68e896733db",
 					"name": "SelectTenant B",
 					"request": {
@@ -1147,6 +1687,77 @@
 									"const p = payload('SelectTenant');",
 									"pm.test('selected', function () { pm.expect(p.userSession.tenantId).to.eql(env('nc_tenant_b')); });",
 									"pm.environment.set('nc_bob_b_token', p.userSession.accessToken);"
+								]
+							}
+						}
+					]
+				},
+				{
+					"id": "cf5d3a77-4baf-42f3-af75-a68e896733db",
+					"name": "Through the sender: SelectTenant B",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-authentication-token",
+								"value": "{{nc_bob_sender_sel}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}",
+							"host": [
+								"{{base_url}}"
+							]
+						},
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation SelectTenant { SelectTenant(input: { tenantId: \"{{nc_tenant_b}}\" }) { ok userSession { tenantId accessToken } errorMessage } }",
+								"variables": ""
+							}
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "e8b6d480-c450-4314-9b13-04d41ab905aa",
+								"type": "text/javascript",
+								"exec": [
+									"const __json = (function () { try { return pm.response.json(); } catch (e) { return {}; } })();",
+									"const __data = (__json && __json.data) || {};",
+									"const __errors = (__json && __json.errors) || [];",
+									"function payload(command) {",
+									"  pm.test(command + ': no GraphQL errors', function () { pm.expect(__errors, JSON.stringify(__errors)).to.eql([]); });",
+									"  pm.test(command + ': has a payload', function () { pm.expect(__data[command], JSON.stringify(__json).slice(0, 300)).to.be.an('object'); });",
+									"  return __data[command] || {};",
+									"}",
+									"function refused(command, reason) {",
+									"  pm.test(command + ' is refused: ' + reason, function () {",
+									"    pm.expect(__errors.length, 'expected a refusal, got ' + JSON.stringify(__json).slice(0, 300)).to.be.above(0);",
+									"    pm.expect(__errors[0].message).to.match(reason);",
+									"  });",
+									"}",
+									"function env(key) { return pm.environment.get(key); }",
+									"function ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }",
+									"function argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }",
+									"const p = payload('SelectTenant');",
+									"pm.test('selected', function () { pm.expect(p.userSession.tenantId).to.eql(env('nc_tenant_b')); });",
+									"pm.environment.set('nc_bob_b_sender_token', p.userSession.accessToken);"
 								]
 							}
 						}
@@ -1652,7 +2263,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_alice_token}}"
+								"value": "{{nc_alice_sender_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -1676,15 +2287,14 @@
 					"response": []
 				},
 				{
-					"name": "A token without the permission to send is refused",
+					"name": "A different sender cannot impersonate the product",
 					"event": [
 						{
 							"listen": "prerequest",
 							"script": {
 								"type": "text/javascript",
 								"exec": [
-									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });",
-									"pm.variables.set('expectedHttpStatus', 403);"
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_other}}' });"
 								]
 							}
 						},
@@ -1693,7 +2303,7 @@
 							"script": {
 								"type": "text/javascript",
 								"exec": [
-									"const __json = (function () { try { return pm.response.json(); } catch (e) { return {}; } })();\nconst __data = (__json && __json.data) || {};\nconst __errors = (__json && __json.errors) || [];\nfunction payload(command) {\n  pm.test(command + ': no GraphQL errors', function () { pm.expect(__errors, JSON.stringify(__errors)).to.eql([]); });\n  pm.test(command + ': has a payload', function () { pm.expect(__data[command], JSON.stringify(__json).slice(0, 300)).to.be.an('object'); });\n  return __data[command] || {};\n}\nfunction refused(command, reason) {\n  pm.test(command + ' is refused: ' + reason, function () {\n    pm.expect(__errors.length, 'expected a refusal, got ' + JSON.stringify(__json).slice(0, 300)).to.be.above(0);\n    pm.expect(__errors[0].message).to.match(reason);\n  });\n}\nfunction env(key) { return pm.environment.get(key); }\nfunction ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }\nfunction argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }\nrefused('SendNotification', /The server of 'NcSender[0-9a-z]+' may not send 'SendNotification': its token lacks '\\/ProductServer\\/Notifications\\/Send'/);"
+									"const __json = (function () { try { return pm.response.json(); } catch (e) { return {}; } })();\nconst __data = (__json && __json.data) || {};\nconst __errors = (__json && __json.errors) || [];\nfunction payload(command) {\n  pm.test(command + ': no GraphQL errors', function () { pm.expect(__errors, JSON.stringify(__errors)).to.eql([]); });\n  pm.test(command + ': has a payload', function () { pm.expect(__data[command], JSON.stringify(__json).slice(0, 300)).to.be.an('object'); });\n  return __data[command] || {};\n}\nfunction refused(command, reason) {\n  pm.test(command + ' is refused: ' + reason, function () {\n    pm.expect(__errors.length, 'expected a refusal, got ' + JSON.stringify(__json).slice(0, 300)).to.be.above(0);\n    pm.expect(__errors[0].message).to.match(reason);\n  });\n}\nfunction env(key) { return pm.environment.get(key); }\nfunction ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }\nfunction argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }\nrefused('SendNotification', /Notifications are sent only to the product of the sender/);"
 								]
 							}
 						}
@@ -1703,7 +2313,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_reader_token}}"
+								"value": "{{nc_wrong_sender_token}}"
 							}
 						],
 						"body": {
@@ -1953,7 +2563,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_bob_token}}"
+								"value": "{{nc_bob_sender_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -3022,7 +3632,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_dave_token}}"
+								"value": "{{nc_dave_sender_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -3230,7 +3840,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_dave_token}}"
+								"value": "{{nc_dave_sender_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -3374,7 +3984,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_dave_token}}"
+								"value": "{{nc_dave_sender_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -3522,7 +4132,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_alice_token}}"
+								"value": "{{nc_alice_sender_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -3593,7 +4203,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_alice_a_token}}"
+								"value": "{{nc_alice_a_sender_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -3730,7 +4340,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_alice_a_token}}"
+								"value": "{{nc_alice_a_sender_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -3801,7 +4411,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_alice_token}}"
+								"value": "{{nc_alice_sender_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -3937,7 +4547,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_bob_b_token}}"
+								"value": "{{nc_bob_b_sender_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -4075,7 +4685,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_alice_token}}"
+								"value": "{{nc_alice_sender_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -4146,7 +4756,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_alice_token}}"
+								"value": "{{nc_alice_other_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -4284,7 +4894,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_alice_token}}"
+								"value": "{{nc_alice_sender_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -4355,7 +4965,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_carol_token}}"
+								"value": "{{nc_carol_sender_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -4494,7 +5104,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_carol_token}}"
+								"value": "{{nc_carol_sender_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -4769,7 +5379,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_carol_token}}"
+								"value": "{{nc_carol_sender_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -5109,7 +5719,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_carol_token}}"
+								"value": "{{nc_carol_sender_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -5182,7 +5792,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_carol_token}}"
+								"value": "{{nc_carol_sender_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -5318,7 +5928,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_carol_token}}"
+								"value": "{{nc_carol_sender_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -5524,7 +6134,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_carol_token}}"
+								"value": "{{nc_carol_sender_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -5597,7 +6207,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_carol_token}}"
+								"value": "{{nc_carol_sender_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -5733,7 +6343,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_carol_token}}"
+								"value": "{{nc_carol_sender_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -5870,7 +6480,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_alice_token}}"
+								"value": "{{nc_alice_sender_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -6007,7 +6617,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_alice_token}}"
+								"value": "{{nc_alice_sender_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -6078,7 +6688,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_carol_token}}"
+								"value": "{{nc_carol_sender_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -6215,7 +6825,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_alice_token}}"
+								"value": "{{nc_alice_sender_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -6286,7 +6896,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_carol_token}}"
+								"value": "{{nc_carol_sender_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -6423,7 +7033,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_carol_token}}"
+								"value": "{{nc_carol_sender_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -6895,7 +7505,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_dave_token}}"
+								"value": "{{nc_dave_sender_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -6971,7 +7581,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_dave_token}}"
+								"value": "{{nc_dave_sender_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -7042,7 +7652,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_dave_token}}"
+								"value": "{{nc_dave_sender_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -7112,7 +7722,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_dave_token}}"
+								"value": "{{nc_dave_sender_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -7183,7 +7793,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_dave_token}}"
+								"value": "{{nc_dave_sender_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -7253,7 +7863,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_bob_token}}"
+								"value": "{{nc_bob_sender_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -7323,7 +7933,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_bob_token}}"
+								"value": "{{nc_bob_sender_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -7393,7 +8003,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_dave_token}}"
+								"value": "{{nc_dave_sender_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -7465,7 +8075,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_dave_token}}"
+								"value": "{{nc_dave_sender_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -7535,7 +8145,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_dave_token}}"
+								"value": "{{nc_dave_sender_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -7606,7 +8216,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_dave_token}}"
+								"value": "{{nc_dave_sender_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -7675,7 +8285,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_dave_token}}"
+								"value": "{{nc_dave_sender_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -7747,7 +8357,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_dave_token}}"
+								"value": "{{nc_dave_sender_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -7817,7 +8427,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_dave_token}}"
+								"value": "{{nc_dave_sender_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -8088,7 +8698,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_dave_token}}"
+								"value": "{{nc_dave_sender_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -8163,7 +8773,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_dave_token}}"
+								"value": "{{nc_dave_sender_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -8233,7 +8843,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_dave_token}}"
+								"value": "{{nc_dave_sender_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -8303,7 +8913,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_dave_token}}"
+								"value": "{{nc_dave_sender_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -8372,7 +8982,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_dave_token}}"
+								"value": "{{nc_dave_sender_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -8442,7 +9052,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_dave_token}}"
+								"value": "{{nc_dave_sender_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -8801,7 +9411,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_dave_token}}"
+								"value": "{{nc_dave_sender_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -8873,7 +9483,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_dave_token}}"
+								"value": "{{nc_dave_sender_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -8945,7 +9555,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_bob_token}}"
+								"value": "{{nc_bob_sender_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -9016,7 +9626,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_dave_token}}"
+								"value": "{{nc_dave_sender_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -9086,7 +9696,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_dave_token}}"
+								"value": "{{nc_dave_sender_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -9157,7 +9767,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_dave_token}}"
+								"value": "{{nc_dave_sender_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -9227,7 +9837,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_dave_token}}"
+								"value": "{{nc_dave_sender_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -9298,7 +9908,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_bob_token}}"
+								"value": "{{nc_bob_sender_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -9367,7 +9977,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_dave_token}}"
+								"value": "{{nc_dave_sender_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -9438,7 +10048,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_dave_token}}"
+								"value": "{{nc_dave_sender_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -9508,7 +10118,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_dave_token}}"
+								"value": "{{nc_dave_sender_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -10275,6 +10885,73 @@
 					]
 				},
 				{
+					"id": "5ecb9685-a529-4ca3-b2cd-032a7615a10d",
+					"name": "Through the sender: Authorization carol for tenant A",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}",
+							"host": [
+								"{{base_url}}"
+							]
+						},
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query Authorization { Authorization(input: { login: \"nc_carol_{{nc_run}}\", password: \"Notify_2026!x\", productId: \"{{nc_product}}\" }) { userId token } }",
+								"variables": ""
+							}
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "c08e84c8-6046-44b9-843d-9edf0b33682a",
+								"type": "text/javascript",
+								"exec": [
+									"const __json = (function () { try { return pm.response.json(); } catch (e) { return {}; } })();",
+									"const __data = (__json && __json.data) || {};",
+									"const __errors = (__json && __json.errors) || [];",
+									"function payload(command) {",
+									"  pm.test(command + ': no GraphQL errors', function () { pm.expect(__errors, JSON.stringify(__errors)).to.eql([]); });",
+									"  pm.test(command + ': has a payload', function () { pm.expect(__data[command], JSON.stringify(__json).slice(0, 300)).to.be.an('object'); });",
+									"  return __data[command] || {};",
+									"}",
+									"function refused(command, reason) {",
+									"  pm.test(command + ' is refused: ' + reason, function () {",
+									"    pm.expect(__errors.length, 'expected a refusal, got ' + JSON.stringify(__json).slice(0, 300)).to.be.above(0);",
+									"    pm.expect(__errors[0].message).to.match(reason);",
+									"  });",
+									"}",
+									"function env(key) { return pm.environment.get(key); }",
+									"function ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }",
+									"function argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }",
+									"const p = payload('Authorization');",
+									"pm.test('signed in', function () { pm.expect(p.token).to.be.a('string').and.not.empty; });",
+									"pm.environment.set('nc_carol_sender_sel', p.token);"
+								]
+							}
+						}
+					]
+				},
+				{
 					"id": "1409f340-07cb-44e5-a2c8-8d784751089a",
 					"name": "SelectTenant A as carol",
 					"request": {
@@ -10327,6 +11004,77 @@
 									"const p = payload('SelectTenant');",
 									"pm.test('selected', function () { pm.expect(p.userSession.tenantId).to.eql(env('nc_tenant_a')); });",
 									"pm.environment.set('nc_carol_a_token', p.userSession.accessToken);"
+								]
+							}
+						}
+					]
+				},
+				{
+					"id": "1409f340-07cb-44e5-a2c8-8d784751089a",
+					"name": "Through the sender: SelectTenant A as carol",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-authentication-token",
+								"value": "{{nc_carol_sender_sel}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}",
+							"host": [
+								"{{base_url}}"
+							]
+						},
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation SelectTenant { SelectTenant(input: { tenantId: \"{{nc_tenant_a}}\" }) { ok userSession { tenantId accessToken } errorMessage } }",
+								"variables": ""
+							}
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "4772b8a9-8424-418f-a17d-1a7b146cd185",
+								"type": "text/javascript",
+								"exec": [
+									"const __json = (function () { try { return pm.response.json(); } catch (e) { return {}; } })();",
+									"const __data = (__json && __json.data) || {};",
+									"const __errors = (__json && __json.errors) || [];",
+									"function payload(command) {",
+									"  pm.test(command + ': no GraphQL errors', function () { pm.expect(__errors, JSON.stringify(__errors)).to.eql([]); });",
+									"  pm.test(command + ': has a payload', function () { pm.expect(__data[command], JSON.stringify(__json).slice(0, 300)).to.be.an('object'); });",
+									"  return __data[command] || {};",
+									"}",
+									"function refused(command, reason) {",
+									"  pm.test(command + ' is refused: ' + reason, function () {",
+									"    pm.expect(__errors.length, 'expected a refusal, got ' + JSON.stringify(__json).slice(0, 300)).to.be.above(0);",
+									"    pm.expect(__errors[0].message).to.match(reason);",
+									"  });",
+									"}",
+									"function env(key) { return pm.environment.get(key); }",
+									"function ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }",
+									"function argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }",
+									"const p = payload('SelectTenant');",
+									"pm.test('selected', function () { pm.expect(p.userSession.tenantId).to.eql(env('nc_tenant_a')); });",
+									"pm.environment.set('nc_carol_a_sender_token', p.userSession.accessToken);"
 								]
 							}
 						}
@@ -10406,7 +11154,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_carol_a_token}}"
+								"value": "{{nc_carol_a_sender_token}}"
 							},
 							{
 								"key": "x-server-token",
@@ -10813,6 +11561,73 @@
 					]
 				},
 				{
+					"id": "3bee6445-9d89-4741-81a5-c2c45cb89c6b",
+					"name": "Through the sender: Authorization carol for tenant A again",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}",
+							"host": [
+								"{{base_url}}"
+							]
+						},
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query Authorization { Authorization(input: { login: \"nc_carol_{{nc_run}}\", password: \"Notify_2026!x\", productId: \"{{nc_product}}\" }) { userId token } }",
+								"variables": ""
+							}
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "8f0a7541-b2e7-4074-a2d7-b063ae3e6980",
+								"type": "text/javascript",
+								"exec": [
+									"const __json = (function () { try { return pm.response.json(); } catch (e) { return {}; } })();",
+									"const __data = (__json && __json.data) || {};",
+									"const __errors = (__json && __json.errors) || [];",
+									"function payload(command) {",
+									"  pm.test(command + ': no GraphQL errors', function () { pm.expect(__errors, JSON.stringify(__errors)).to.eql([]); });",
+									"  pm.test(command + ': has a payload', function () { pm.expect(__data[command], JSON.stringify(__json).slice(0, 300)).to.be.an('object'); });",
+									"  return __data[command] || {};",
+									"}",
+									"function refused(command, reason) {",
+									"  pm.test(command + ' is refused: ' + reason, function () {",
+									"    pm.expect(__errors.length, 'expected a refusal, got ' + JSON.stringify(__json).slice(0, 300)).to.be.above(0);",
+									"    pm.expect(__errors[0].message).to.match(reason);",
+									"  });",
+									"}",
+									"function env(key) { return pm.environment.get(key); }",
+									"function ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }",
+									"function argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }",
+									"const p = payload('Authorization');",
+									"pm.test('signed in', function () { pm.expect(p.token).to.be.a('string').and.not.empty; });",
+									"pm.environment.set('nc_carol_sender_sel', p.token);"
+								]
+							}
+						}
+					]
+				},
+				{
 					"id": "0f0eb954-e5eb-42d1-8f6c-dec115d930bb",
 					"name": "SelectTenant A as carol again",
 					"request": {
@@ -10871,6 +11686,77 @@
 					]
 				},
 				{
+					"id": "0f0eb954-e5eb-42d1-8f6c-dec115d930bb",
+					"name": "Through the sender: SelectTenant A as carol again",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-authentication-token",
+								"value": "{{nc_carol_sender_sel}}"
+							},
+							{
+								"key": "x-server-token",
+								"value": "{{nc_server_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}",
+							"host": [
+								"{{base_url}}"
+							]
+						},
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation SelectTenant { SelectTenant(input: { tenantId: \"{{nc_tenant_a}}\" }) { ok userSession { tenantId accessToken } errorMessage } }",
+								"variables": ""
+							}
+						}
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.request.headers.upsert({ key: 'productid', value: '{{nc_product}}' });"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "0f376fcf-65fd-4dcc-97c7-55d6e9c53d0e",
+								"type": "text/javascript",
+								"exec": [
+									"const __json = (function () { try { return pm.response.json(); } catch (e) { return {}; } })();",
+									"const __data = (__json && __json.data) || {};",
+									"const __errors = (__json && __json.errors) || [];",
+									"function payload(command) {",
+									"  pm.test(command + ': no GraphQL errors', function () { pm.expect(__errors, JSON.stringify(__errors)).to.eql([]); });",
+									"  pm.test(command + ': has a payload', function () { pm.expect(__data[command], JSON.stringify(__json).slice(0, 300)).to.be.an('object'); });",
+									"  return __data[command] || {};",
+									"}",
+									"function refused(command, reason) {",
+									"  pm.test(command + ' is refused: ' + reason, function () {",
+									"    pm.expect(__errors.length, 'expected a refusal, got ' + JSON.stringify(__json).slice(0, 300)).to.be.above(0);",
+									"    pm.expect(__errors[0].message).to.match(reason);",
+									"  });",
+									"}",
+									"function env(key) { return pm.environment.get(key); }",
+									"function ofType(items, typeId) { return (items || []).filter(function (i) { return i.typeId === typeId; }); }",
+									"function argumentOf(item, id) { return ((item && item.arguments) || []).filter(function (a) { return a.id === id; })[0]; }",
+									"const p = payload('SelectTenant');",
+									"pm.test('selected', function () { pm.expect(p.userSession.tenantId).to.eql(env('nc_tenant_a')); });",
+									"pm.environment.set('nc_carol_a_sender_token', p.userSession.accessToken);"
+								]
+							}
+						}
+					]
+				},
+				{
 					"id": "4d03049e-1200-4277-8d00-444a936efd9c",
 					"name": "A removed member lost the notifications of the organization",
 					"request": {
@@ -10878,7 +11764,7 @@
 						"header": [
 							{
 								"key": "x-authentication-token",
-								"value": "{{nc_carol_a_token}}"
+								"value": "{{nc_carol_a_sender_token}}"
 							},
 							{
 								"key": "x-server-token",

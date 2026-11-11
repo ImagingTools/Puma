@@ -48,7 +48,10 @@ let junitPath = args.junit || '';
 let reportName = '';
 let reportClass = '';
 const frameTimeoutMs = Number(args.timeout || 15000);
-// How long a refusal has to arrive before a registration counts as accepted.
+// A change without an event is found by the control check of the server: MaxCheckInterval of the test servers (30 s) and a margin.
+// The event scenarios wait frameTimeoutMs, less than it, so a server that misses an event fails them.
+const controlCheckTimeoutMs = Number(args.controlTimeout || 45000);
+// Legacy batch grace exported for callers; acceptance itself always requires start_ack.
 const registrationGraceMs = Number(args['grace'] || 2500);
 // How long a notification already in flight may still land after its "complete".
 const drainGraceMs = 750;
@@ -350,26 +353,14 @@ class SubscriptionSession {
 		return { id, headers: this.headers(), type: 'stop', payload: {} };
 	}
 
-	// A "start" is answered with start_ack when the server accepted it and with an
-	// error frame when it refused; the grace window bounds the wait for either.
-	settle(id, waitMs) {
+	// Silence is not acceptance: wait for the registration outcome, including a fresh authorization read.
+	async settle(id, waitMs) {
 		const isOutcome = (f) => f.id === id && (f.type === 'error' || f.type === 'start_ack');
-		const existing = this.frames.find(isOutcome);
-		if (existing) { return Promise.resolve(existing.type === 'error' ? existing : null); }
-
-		return new Promise((resolve) => {
-			const waiter = { predicate: isOutcome, resolve: (frame) => resolve(frame.type === 'error' ? frame : null) };
-			waiter.timer = setTimeout(() => {
-				const index = this.waiters.indexOf(waiter);
-				if (index >= 0) { this.waiters.splice(index, 1); }
-				resolve(null);
-			}, waitMs === undefined ? registrationGraceMs : waitMs);
-			this.waiters.push(waiter);
-		});
+		const frame = await this.waitFor(isOutcome, waitMs === undefined ? frameTimeoutMs : waitMs);
+		return frame.type === 'error' ? frame : null;
 	}
 
-	// Registers without waiting, so a batch can share one grace window instead of
-	// paying it once per subscription.
+	// Registers without waiting, so a batch can await its registration outcomes together.
 	beginSubscribe(commandId, query) {
 		const id = crypto.randomUUID();
 		this.activeIds.set(id, commandId);
@@ -378,8 +369,7 @@ class SubscriptionSession {
 		return id;
 	}
 
-	// Once the grace window of a beginSubscribe() has passed: the refusal frame, or
-	// null - and from then on the id counts as accepted, so a late error is a violation.
+	// Read after settle(): a refusal, or null. A later unrequested error is a violation.
 	outcomeOf(id) {
 		const refusal = this.frames.find(f => f.id === id && f.type === 'error');
 		if (refusal) {
@@ -390,7 +380,7 @@ class SubscriptionSession {
 		return null;
 	}
 
-	// Turns an id whose grace window has passed into an accepted subscription, or
+	// Turns an id whose registration outcome arrived into an accepted subscription, or
 	// throws with the refusal the server gave. Accepted means confirmed by start_ack.
 	confirmAccepted(id) {
 		const refusal = this.outcomeOf(id);
@@ -605,7 +595,7 @@ function runSuite(options, main) {
 }
 
 module.exports = {
-	httpUrl, wsUrl, suLogin, suPassword, productId, frameTimeoutMs, registrationGraceMs, envValues,
+	httpUrl, wsUrl, suLogin, suPassword, productId, frameTimeoutMs, controlCheckTimeoutMs, registrationGraceMs, envValues,
 	gqlString, gql, mutate, login,
 	SubscriptionSession, notificationOf,
 	assert, assertRefusalReason, assertRoutingRefusal, documentNotification, jwtClaim, delay,

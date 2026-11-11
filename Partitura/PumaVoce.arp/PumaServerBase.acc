@@ -40,7 +40,13 @@
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaSettings/TracingConfiguration"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="RoleCollection" Type="Reference" ExportId="RoleRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="UserCollection" Type="Reference" ExportId="UserCollection">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserGroupCollection" Type="Reference" ExportId="UserGroupRepository">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -192,6 +198,9 @@
         <Element Id="PumaHandlers" PackageId="PumaVoce" ComponentId="PumaHandlers">
             <Data IsEnabled="true" Flags="2">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="AuthorizationSessionController" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="JwtSessionController"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -261,6 +270,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="ServerConnectionInterface" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaSettings/ServerConnectionInterface"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ServerTokenReceiver" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ConnectedProductCatalog"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SessionCollection" Type="Reference" ExportId="SessionCollection">
                         <Data IsEnabled="false"/>
@@ -638,8 +650,14 @@
                     <AttributeInfo Id="ThreadsLimit" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="100"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="TokenCheckInterval" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="5"/>
+                    <AttributeInfo Id="AccessModels" Type="Reference[]" ExportId="AccessModels">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ServerTokenReceiver" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ConnectedProductCatalog"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MaxCheckInterval" Type="Integer" ExportId="MaxCheckInterval">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaSettings/TracingConfiguration"/>
@@ -828,6 +846,7 @@
         <Component ExportedId="ConnectionCodesNotificationPublisher" ComponentId="TenantController/ConnectionCodesNotificationPublisher"/>
         <Component ExportedId="CrossTenantMessageNotificationPublisher" ComponentId="TenantController/CrossTenantMessageNotificationPublisher"/>
         <Component ExportedId="DatabaseAccessSettings" ComponentId="PumaSettings/DatabaseAccessSettings"/>
+        <Component ExportedId="PersonalAccessTokenManager" ComponentId="PersonalAccessTokenController/PersonalAccessTokenManager"/>
         <Component ExportedId="TenantNotificationPublisher" ComponentId="TenantController/TenantNotificationPublisher"/>
         <Component ExportedId="TracingConfiguration" ComponentId="PumaSettings/TracingConfiguration"/>
         <Component ExportedId="WebSocketServerFramework" ComponentId="WebSocketServerFramework"/>

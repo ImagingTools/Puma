@@ -110,6 +110,9 @@
         <Element Id="AuthorizationController" PackageId="PumaVoce" ComponentId="Authorization">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="AuthorizationSessionController" Type="Reference" ExportId="AuthorizationSessionController">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="BindingManager" Type="Reference" ExportId="BindingManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -134,6 +137,9 @@
                     <AttributeInfo Id="RoleCollection" Type="Reference" ExportId="RoleRepository">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="ServerTokenReceiver" Type="Reference" ExportId="ServerTokenReceiver">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="SessionCollection" Type="Reference" ExportId="SessionCollection">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -150,6 +156,9 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="UserConnectionCollection" Type="Reference" ExportId="UserConnectionCollection">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserGroupCollection" Type="Reference" ExportId="UserGroupRepository">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
