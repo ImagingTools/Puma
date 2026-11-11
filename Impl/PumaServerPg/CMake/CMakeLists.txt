@@ -89,6 +89,8 @@ if(UNIX AND NOT APPLE)
 				qxcb
 				# QtSql: every driver but PostgreSQL and SQLite which we actually use
 				qsqlibase qsqlmimer qsqlmysql qsqloci qsqlodbc
+				# QtImageFormats: TIFF, the official Qt binaries link it to the system libtiff.so.5, which Ubuntu 24.04 does not have
+				qtiff
 			INCLUDE_PLUGINS
 				# QtGui: the server still links QtGui (QtWidgets, through SingletonDocApplication), so it needs a platform plugin
 				qoffscreen
