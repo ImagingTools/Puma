@@ -83,6 +83,24 @@
         <Element Id="PumaServerBase" PackageId="PumaVoce" ComponentId="PumaServerBase">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="MaxCheckInterval" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="30"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="AccessModels" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>PumaDatabaseSQLite/UserRepository</Value>
+                                <Value>PumaDatabaseSQLite/RoleRepository</Value>
+                                <Value>PumaDatabaseSQLite/UserGroupRepository</Value>
+                                <Value>PumaDatabaseSQLite/TenantMembershipRepository</Value>
+                                <Value>PumaDatabaseSQLite/SQLiteTenantInvitationRepository</Value>
+                                <Value>PumaDatabaseSQLite/SQLiteTenantEntityBindingRepository</Value>
+                                <Value>PumaDatabaseSQLite/SQLiteCrossOrgGrantRepository</Value>
+                                <Value>PumaDatabaseSQLite/TenantRepository</Value>
+                                <Value>PumaServerBase/PersonalAccessTokenManager</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
                     <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="Application/ApplicationInfo"/>
                     </AttributeInfo>

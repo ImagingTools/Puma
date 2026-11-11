@@ -36,7 +36,9 @@
                                 "type": "text/javascript",
                                 "exec": [
                                     "if (!pm.environment.get('su_login')) { pm.environment.set('su_login', 'su'); }",
-                                    "if (!pm.environment.get('su_password')) { pm.environment.set('su_password', 'Su_ImtCore_2026!'); }"
+                                    "if (!pm.environment.get('su_password')) { pm.environment.set('su_password', 'Su_ImtCore_2026!'); }",
+                                    "pm.environment.set('fixture_run', pm.variables.replaceIn('{{$guid}}').replace(/-/g, ''));",
+                                    "['a_owner', 'b_owner', 'a_member', 'outsider'].forEach(function (name) { pm.environment.set(name + '_login', name + '_' + pm.environment.get('fixture_run')); });"
                                 ],
                                 "_lastExecutionId": "358cd013-3650-4344-84d6-2c7ca8d28915"
                             }
@@ -49,9 +51,10 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const payload = json.data && json.data.CreateSuperuser ? json.data.CreateSuperuser : null;",
-                                    "pm.test('Superuser is created on the empty system', function(){",
+                                    "pm.test('Superuser is created or already exists', function(){",
                                     "  pm.expect(!!(json.errors && json.errors.length), 'unexpected GraphQL error: ' + JSON.stringify(json.errors)).to.eql(false);",
-                                    "  pm.expect(payload && payload.success, 'CreateSuperuser payload: ' + JSON.stringify(payload)).to.eql(true);",
+                                    "  const ready = !!payload && (payload.success === true || (payload.success === false && payload.message === 'Superuser already exists'));",
+                                    "  pm.expect(ready, 'CreateSuperuser payload: ' + JSON.stringify(payload)).to.eql(true);",
                                     "});",
                                     "pm.environment.set('su_login', 'su');"
                                 ],
@@ -191,7 +194,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation RegisterUser { RegisterUser(input: { userData: { name: \"Owner A\", username: \"a_owner\", password: \"AOwner_2026!\", email: \"a_owner@test.local\" }, productId: \"{{product_id}}\" }) { id } }",
+                                "query": "mutation RegisterUser { RegisterUser(input: { userData: { name: \"Owner A\", username: \"{{a_owner_login}}\", password: \"AOwner_2026!\", email: \"{{a_owner_login}}@test.local\" }, productId: \"{{product_id}}\" }) { id } }",
                                 "variables": ""
                             }
                         }
@@ -250,7 +253,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation RegisterUser { RegisterUser(input: { userData: { name: \"Owner B\", username: \"b_owner\", password: \"BOwner_2026!\", email: \"b_owner@test.local\" }, productId: \"{{product_id}}\" }) { id } }",
+                                "query": "mutation RegisterUser { RegisterUser(input: { userData: { name: \"Owner B\", username: \"{{b_owner_login}}\", password: \"BOwner_2026!\", email: \"{{b_owner_login}}@test.local\" }, productId: \"{{product_id}}\" }) { id } }",
                                 "variables": ""
                             }
                         }
@@ -309,7 +312,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation RegisterUser { RegisterUser(input: { userData: { name: \"Member A\", username: \"a_member\", password: \"AMember_2026!\", email: \"a_member@test.local\" }, productId: \"{{product_id}}\" }) { id } }",
+                                "query": "mutation RegisterUser { RegisterUser(input: { userData: { name: \"Member A\", username: \"{{a_member_login}}\", password: \"AMember_2026!\", email: \"{{a_member_login}}@test.local\" }, productId: \"{{product_id}}\" }) { id } }",
                                 "variables": ""
                             }
                         }
@@ -368,7 +371,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation RegisterUser { RegisterUser(input: { userData: { name: \"Outsider\", username: \"outsider\", password: \"Outsider_2026!\", email: \"outsider@test.local\" }, productId: \"{{product_id}}\" }) { id } }",
+                                "query": "mutation RegisterUser { RegisterUser(input: { userData: { name: \"Outsider\", username: \"{{outsider_login}}\", password: \"Outsider_2026!\", email: \"{{outsider_login}}@test.local\" }, productId: \"{{product_id}}\" }) { id } }",
                                 "variables": ""
                             }
                         }
@@ -593,7 +596,7 @@
             "description": "ProLife and Lisa reach Puma through their servers. Their tokens hold every permission a server may get, so the forwarded requests of later folders are decided by the rights of the user.",
             "item": [
                 {
-                    "name": "SRV su connects ProLife",
+                    "name": "SRV su ensures ProLife is connected",
                     "event": [
                         {
                             "listen": "prerequest",
@@ -601,8 +604,7 @@
                                 "type": "text/javascript",
                                 "exec": [
                                     "pm.environment.set('product_id', 'Puma');",
-                                    "pm.environment.set('srvProLifeCard', pm.variables.replaceIn('{{$guid}}'));",
-                                    "pm.environment.set('srvLisaCard', pm.variables.replaceIn('{{$guid}}'));"
+                                    "['srvProLifeTestTokenId', 'srvLisaTestTokenId', 'srvProLifeToken', 'srvLisaToken'].forEach(function (key) { pm.environment.unset(key); });"
                                 ]
                             }
                         },
@@ -612,9 +614,9 @@
                                 "type": "text/javascript",
                                 "exec": [
                                     "const json = pm.response.json();",
-                                    "const payload = json.data && json.data.ConnectedProductAdd;",
-                                    "pm.test('ConnectedProductAdd answered', function () { pm.expect(json.errors, JSON.stringify(json.errors)).to.eql(undefined); pm.expect(payload, JSON.stringify(json)).to.be.an('object'); });",
-                                    "pm.test('the entry is added', function () { pm.expect(payload.id).to.eql(pm.environment.get('srvProLifeCard')); });"
+                                    "const payload = json.data && json.data.AddServerTokenClient;",
+                                    "pm.test('AddServerTokenClient answered', function () { pm.expect(json.errors, JSON.stringify(json.errors)).to.eql(undefined); pm.expect(payload, JSON.stringify(json)).to.be.an('object'); });",
+                                    "pm.test('the client is available without replacing it', function () { pm.expect(payload.success).to.eql(true); pm.expect(payload.added).to.be.a('boolean'); });"
                                 ]
                             }
                         }
@@ -630,7 +632,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation ConnectedProductAdd { ConnectedProductAdd(input: { id: \"{{srvProLifeCard}}\", typeId: \"ConnectedProduct\", item: { id: \"{{srvProLifeCard}}\", productId: \"ProLife\", name: \"ProLife\" } }) { id } }",
+                                "query": "mutation AddServerTokenClient { AddServerTokenClient(input: { clientProductId: \"ProLife\", name: \"ProLife added\" }) { success added } }",
                                 "variables": ""
                             }
                         },
@@ -644,7 +646,7 @@
                     "response": []
                 },
                 {
-                    "name": "SRV su connects Lisa",
+                    "name": "SRV su ensures Lisa is connected",
                     "event": [
                         {
                             "listen": "test",
@@ -652,9 +654,9 @@
                                 "type": "text/javascript",
                                 "exec": [
                                     "const json = pm.response.json();",
-                                    "const payload = json.data && json.data.ConnectedProductAdd;",
-                                    "pm.test('ConnectedProductAdd answered', function () { pm.expect(json.errors, JSON.stringify(json.errors)).to.eql(undefined); pm.expect(payload, JSON.stringify(json)).to.be.an('object'); });",
-                                    "pm.test('the entry is added', function () { pm.expect(payload.id).to.eql(pm.environment.get('srvLisaCard')); });"
+                                    "const payload = json.data && json.data.AddServerTokenClient;",
+                                    "pm.test('AddServerTokenClient answered', function () { pm.expect(json.errors, JSON.stringify(json.errors)).to.eql(undefined); pm.expect(payload, JSON.stringify(json)).to.be.an('object'); });",
+                                    "pm.test('the client is available without replacing it', function () { pm.expect(payload.success).to.eql(true); pm.expect(payload.added).to.be.a('boolean'); });"
                                 ]
                             }
                         }
@@ -670,7 +672,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation ConnectedProductAdd { ConnectedProductAdd(input: { id: \"{{srvLisaCard}}\", typeId: \"ConnectedProduct\", item: { id: \"{{srvLisaCard}}\", productId: \"Lisa\", name: \"Lisa\" } }) { id } }",
+                                "query": "mutation AddServerTokenClient { AddServerTokenClient(input: { clientProductId: \"Lisa\", name: \"Lisa added\" }) { success added } }",
                                 "variables": ""
                             }
                         },
@@ -695,7 +697,7 @@
                                     "const payload = json.data && json.data.GetServerTokenReceiver;",
                                     "pm.test('GetServerTokenReceiver answered', function () { pm.expect(json.errors, JSON.stringify(json.errors)).to.eql(undefined); pm.expect(payload, JSON.stringify(json)).to.be.an('object'); });",
                                     "const ids = []; (payload.groups || []).forEach(function (g) { (g.entries || []).forEach(function (e) { ids.push(e.permissionId); }); });",
-                                    "pm.test('the server permissions are offered', function () { pm.expect(ids).to.include('/ProductServer/Roles/Edit'); pm.expect(ids).to.include('/ProductServer/Users/Edit'); });",
+                                    "pm.test('the receiver permission leaves are offered', function () { pm.expect(ids).to.include('/Administration/Roles/Edit/Change'); pm.expect(ids).to.include('/Administration/Users/Edit/Change'); });",
                                     "pm.environment.set('srvAllScopes', JSON.stringify(ids));"
                                 ]
                             }
@@ -737,7 +739,8 @@
                                     "const payload = json.data && json.data.CreateServerToken;",
                                     "pm.test('CreateServerToken answered', function () { pm.expect(json.errors, JSON.stringify(json.errors)).to.eql(undefined); pm.expect(payload, JSON.stringify(json)).to.be.an('object'); });",
                                     "pm.test('issued with every permission', function () { pm.expect(payload.success).to.eql(true); pm.expect(payload.scopes).to.include.members(JSON.parse(pm.environment.get('srvAllScopes'))); });",
-                                    "pm.environment.set('srvProLifeToken', payload.token);"
+                                    "pm.environment.set('srvProLifeToken', payload.token);",
+                                    "pm.environment.set('srvProLifeTestTokenId', payload.id);"
                                 ]
                             }
                         }
@@ -778,7 +781,8 @@
                                     "const payload = json.data && json.data.CreateServerToken;",
                                     "pm.test('CreateServerToken answered', function () { pm.expect(json.errors, JSON.stringify(json.errors)).to.eql(undefined); pm.expect(payload, JSON.stringify(json)).to.be.an('object'); });",
                                     "pm.test('issued with every permission', function () { pm.expect(payload.success).to.eql(true); pm.expect(payload.scopes).to.include.members(JSON.parse(pm.environment.get('srvAllScopes'))); });",
-                                    "pm.environment.set('srvLisaToken', payload.token);"
+                                    "pm.environment.set('srvLisaToken', payload.token);",
+                                    "pm.environment.set('srvLisaTestTokenId', payload.id);"
                                 ]
                             }
                         }
@@ -53159,7 +53163,7 @@
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "pm.request.headers.upsert({ key: 'productid', value: 'Lisa' });",
+                                    "pm.request.headers.upsert({ key: 'productid', value: pm.variables.replaceIn('Lisa') });",
                                     "pm.variables.set('expectedHttpStatus', 403);"
                                 ]
                             }
@@ -53171,7 +53175,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The product Lisa is not connected: its server sends no valid token/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/The product 'Lisa' is not connected: its server sends no valid token/); });",
+                                    "pm.test('refused: /The product Lisa is not connected: its server sends no valid token/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The product 'Lisa' is not connected: its server sends no valid token\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -53202,6 +53206,56 @@
                     "response": []
                 },
                 {
+                    "name": "PB role of another product: authorize through its server",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.request.headers.upsert({ key: 'productid', value: pm.variables.replaceIn('Lisa') });"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.Authorization;",
+                                    "pm.test('Authorization answered', function () { pm.expect(json.errors, JSON.stringify(json.errors)).to.eql(undefined); pm.expect(payload, JSON.stringify(json)).to.be.an('object'); });",
+                                    "pm.test('the Lisa-origin session is issued', function () { pm.expect(payload.token).to.be.a('string').and.not.empty; });",
+                                    "pm.environment.set('pbLisaToken', payload.token);"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-server-token",
+                                "value": "{{srvLisaToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{pbAdminLogin}}\", password: \"Bound_2026!\", productId: \"Lisa\" }) { token } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
                     "name": "PB role of another product: through the server of that product",
                     "event": [
                         {
@@ -53209,7 +53263,7 @@
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "pm.request.headers.upsert({ key: 'productid', value: 'Lisa' });"
+                                    "pm.request.headers.upsert({ key: 'productid', value: pm.variables.replaceIn('Lisa') });"
                                 ]
                             }
                         },
@@ -53220,7 +53274,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /Invalid permissions for the user/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/Invalid permissions for the user/); });",
+                                    "pm.test('refused: /Invalid permissions for the user/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Invalid permissions for the user\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -53231,7 +53285,7 @@
                         "header": [
                             {
                                 "key": "x-authentication-token",
-                                "value": "{{pbAdminToken}}"
+                                "value": "{{pbLisaToken}}"
                             },
                             {
                                 "key": "x-server-token",
@@ -54289,8 +54343,10 @@
                                 "type": "text/javascript",
                                 "exec": [
                                     "pm.environment.set('product_id', 'Puma');",
+                                    "pm.environment.set('stRun', pm.variables.replaceIn('{{$guid}}').replace(/-/g, ''));",
                                     "pm.environment.set('stCard', pm.variables.replaceIn('{{$guid}}'));",
-                                    "pm.environment.set('stCard2', pm.variables.replaceIn('{{$guid}}'));"
+                                    "pm.environment.set('stCard2', pm.variables.replaceIn('{{$guid}}'));",
+                                    "['stId', 'stSecondId', 'stEditId', 'stAddedCard', 'stSuPatId', 'stToken', 'stSecondToken', 'stRemovedToken'].forEach(function (key) { pm.environment.unset(key); });"
                                 ]
                             }
                         },
@@ -54370,7 +54426,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The product StNoProduct is not a client of this server/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/The product 'StNoProduct' is not a client of this server/); });",
+                                    "pm.test('refused: /The product StNoProduct is not a client of this server/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The product 'StNoProduct{{stRun}}' is not a client of this server\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -54387,7 +54443,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"StNoProduct\", name: \"st StNoProduct\", scopes: [] }) { id token success scopes } }",
+                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"StNoProduct{{stRun}}\", name: \"st StNoProduct\", scopes: [] }) { id token success scopes } }",
                                 "variables": ""
                             }
                         },
@@ -54427,7 +54483,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation ConnectedProductAdd { ConnectedProductAdd(input: { id: \"{{stCard}}\", typeId: \"ConnectedProduct\", item: { id: \"{{stCard}}\", productId: \"StProbe\", name: \"StProbe\", description: \"catalog probe\" } }) { id } }",
+                                "query": "mutation ConnectedProductAdd { ConnectedProductAdd(input: { id: \"{{stCard}}\", typeId: \"ConnectedProduct\", item: { id: \"{{stCard}}\", productId: \"StProbe{{stRun}}\", name: \"StProbe{{stRun}}\", description: \"catalog probe\" } }) { id } }",
                                 "variables": ""
                             }
                         },
@@ -54450,7 +54506,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The product StProbe is already connected/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/The product 'StProbe' is already connected/); });",
+                                    "pm.test('refused: /The product StProbe is already connected/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The product 'StProbe{{stRun}}' is already connected\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -54467,7 +54523,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation ConnectedProductAdd { ConnectedProductAdd(input: { id: \"{{stCard2}}\", typeId: \"ConnectedProduct\", item: { id: \"{{stCard2}}\", productId: \"StProbe\", name: \"StProbe again\" } }) { id } }",
+                                "query": "mutation ConnectedProductAdd { ConnectedProductAdd(input: { id: \"{{stCard2}}\", typeId: \"ConnectedProduct\", item: { id: \"{{stCard2}}\", productId: \"StProbe{{stRun}}\", name: \"StProbe again\" } }) { id } }",
                                 "variables": ""
                             }
                         },
@@ -54490,7 +54546,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /Product-ID can.t be empty/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/Product-ID can.t be empty/); });",
+                                    "pm.test('refused: /Product-ID can.t be empty/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Product-ID can.t be empty\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -54530,7 +54586,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const items = (json.data && json.data.ConnectedProductsList && json.data.ConnectedProductsList.items) || [];",
-                                    "const entry = items.find(function (i) { return i.productId === 'StProbe'; });",
+                                    "const entry = items.find(function (i) { return i.productId === pm.variables.replaceIn('StProbe{{stRun}}'); });",
                                     "pm.test('the catalog has StProbe', function () { pm.expect(entry, JSON.stringify(items)).to.be.an('object'); });",
                                     "const own = items.find(function (i) { return i.productId === 'Puma'; });",
                                     "pm.test('Puma is this server', function () { pm.expect(own && own.status, JSON.stringify(items)).to.eql('This server'); });",
@@ -54550,7 +54606,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "query ConnectedProductsList { ConnectedProductsList(input: { viewParams: { offset: 0, count: 100 } }) { items { id productId status productVersion tokenCreatedAt lastUsedAt } } }",
+                                "query": "query ConnectedProductsList { ConnectedProductsList(input: { viewParams: { offset: 0, count: -1 } }) { items { id productId status productVersion tokenCreatedAt lastUsedAt } } }",
                                 "variables": ""
                             }
                         },
@@ -54589,7 +54645,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation ConnectedProductUpdate { ConnectedProductUpdate(input: { id: \"{{stCard}}\", typeId: \"ConnectedProduct\", item: { id: \"{{stCard}}\", productId: \"StProbe\", name: \"StProbe renamed\", description: \"catalog probe\" } }) { id } }",
+                                "query": "mutation ConnectedProductUpdate { ConnectedProductUpdate(input: { id: \"{{stCard}}\", typeId: \"ConnectedProduct\", item: { id: \"{{stCard}}\", productId: \"StProbe{{stRun}}\", name: \"StProbe renamed\", description: \"catalog probe\" } }) { id } }",
                                 "variables": ""
                             }
                         },
@@ -54613,7 +54669,7 @@
                                     "const json = pm.response.json();",
                                     "const payload = json.data && json.data.ConnectedProductItem;",
                                     "pm.test('ConnectedProductItem answered', function () { pm.expect(json.errors, JSON.stringify(json.errors)).to.eql(undefined); pm.expect(payload, JSON.stringify(json)).to.be.an('object'); });",
-                                    "pm.test('renamed', function () { pm.expect(payload.productId).to.eql('StProbe'); pm.expect(payload.name).to.eql('StProbe renamed'); pm.expect(payload.description).to.eql('catalog probe'); });"
+                                    "pm.test('renamed', function () { pm.expect(payload.productId).to.eql(pm.variables.replaceIn('StProbe{{stRun}}')); pm.expect(payload.name).to.eql('StProbe renamed'); pm.expect(payload.description).to.eql('catalog probe'); });"
                                 ]
                             }
                         }
@@ -54652,7 +54708,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /product ID cannot be changed/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/product ID cannot be changed/); });",
+                                    "pm.test('refused: /product ID cannot be changed/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"product ID cannot be changed\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -54669,7 +54725,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation ConnectedProductUpdate { ConnectedProductUpdate(input: { id: \"{{stCard}}\", typeId: \"ConnectedProduct\", item: { id: \"{{stCard}}\", productId: \"StOther\", name: \"x\" } }) { id } }",
+                                "query": "mutation ConnectedProductUpdate { ConnectedProductUpdate(input: { id: \"{{stCard}}\", typeId: \"ConnectedProduct\", item: { id: \"{{stCard}}\", productId: \"StOther{{stRun}}\", name: \"x\" } }) { id } }",
                                 "variables": ""
                             }
                         },
@@ -54692,7 +54748,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /Invalid permissions for the user/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/Invalid permissions for the user/); });",
+                                    "pm.test('refused: /Invalid permissions for the user/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Invalid permissions for the user\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -54732,7 +54788,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /Invalid permissions for the user/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/Invalid permissions for the user/); });",
+                                    "pm.test('refused: /Invalid permissions for the user/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Invalid permissions for the user\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -54749,7 +54805,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation ConnectedProductUpdate { ConnectedProductUpdate(input: { id: \"{{stCard}}\", typeId: \"ConnectedProduct\", item: { id: \"{{stCard}}\", productId: \"StProbe\", name: \"hacked\" } }) { id } }",
+                                "query": "mutation ConnectedProductUpdate { ConnectedProductUpdate(input: { id: \"{{stCard}}\", typeId: \"ConnectedProduct\", item: { id: \"{{stCard}}\", productId: \"StProbe{{stRun}}\", name: \"hacked\" } }) { id } }",
                                 "variables": ""
                             }
                         },
@@ -54775,9 +54831,7 @@
                                     "pm.test('GetServerTokenReceiver answered', function () { pm.expect(json.errors, JSON.stringify(json.errors)).to.eql(undefined); pm.expect(payload, JSON.stringify(json)).to.be.an('object'); });",
                                     "const ids = []; (payload.groups || []).forEach(function (g) { (g.entries || []).forEach(function (e) { ids.push(e.permissionId); }); });",
                                     "pm.test('this server receives', function () { pm.expect(payload.productId).to.eql('Puma'); });",
-                                    "pm.test('sign-in and publishing are always given', function () { pm.expect(payload.requiredPermissions).to.have.members(['/ProductServer/SignIn', '/ProductServer/PublishPermissions']); });",
-                                    "pm.test('only permissions of product servers', function () { pm.expect(ids.length).to.be.above(10); ids.forEach(function (id) { pm.expect(id).to.match(/^\\/ProductServer\\//); }); });",
-                                    "pm.test('the administration of Puma is not offered', function () { pm.expect(ids.filter(function (id) { return id.indexOf('/Administration') === 0; })).to.eql([]); });"
+                                    "pm.test('the receiver offers its administration permission leaves', function () { pm.expect(ids).to.include.members(['/Administration/Users/View', '/Administration/Roles/Edit/Change', '/OrganizationManagement/View']); });"
                                 ]
                             }
                         }
@@ -54793,7 +54847,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "query GetServerTokenReceiver { GetServerTokenReceiver(input: { clientProductId: \"StProbe\" }) { productId requiredPermissions groups { groupId entries { permissionId } } } }",
+                                "query": "query GetServerTokenReceiver { GetServerTokenReceiver(input: { clientProductId: \"StProbe{{stRun}}\" }) { productId groups { groupId entries { permissionId } } } }",
                                 "variables": ""
                             }
                         },
@@ -54816,7 +54870,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The product StNoProduct is not a client of this server/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/The product 'StNoProduct' is not a client of this server/); });",
+                                    "pm.test('refused: /The product StNoProduct is not a client of this server/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The product 'StNoProduct{{stRun}}' is not a client of this server\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -54833,7 +54887,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "query GetServerTokenReceiver { GetServerTokenReceiver(input: { clientProductId: \"StNoProduct\" }) { productId } }",
+                                "query": "query GetServerTokenReceiver { GetServerTokenReceiver(input: { clientProductId: \"StNoProduct{{stRun}}\" }) { productId } }",
                                 "variables": ""
                             }
                         },
@@ -54856,7 +54910,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /A server token is issued to the server of another product/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/A server token is issued to the server of another product/); });",
+                                    "pm.test('refused: /A server token is issued to the server of another product/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"A server token is issued to the server of another product\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -54896,7 +54950,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /Server tokens are managed by a superuser session/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/Server tokens are managed by a superuser session/); });",
+                                    "pm.test('refused: /Server tokens are managed by a superuser session/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Server tokens are managed by a superuser session\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -54913,7 +54967,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "query GetServerTokenReceiver { GetServerTokenReceiver(input: { clientProductId: \"StProbe\" }) { productId } }",
+                                "query": "query GetServerTokenReceiver { GetServerTokenReceiver(input: { clientProductId: \"StProbe{{stRun}}\" }) { productId } }",
                                 "variables": ""
                             }
                         },
@@ -54936,7 +54990,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /Server tokens are managed by a superuser session/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/Server tokens are managed by a superuser session/); });",
+                                    "pm.test('refused: /Server tokens are managed by a superuser session/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Server tokens are managed by a superuser session\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -54948,7 +55002,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "query GetServerTokenReceiver { GetServerTokenReceiver(input: { clientProductId: \"StProbe\" }) { productId } }",
+                                "query": "query GetServerTokenReceiver { GetServerTokenReceiver(input: { clientProductId: \"StProbe{{stRun}}\" }) { productId } }",
                                 "variables": ""
                             }
                         },
@@ -54973,7 +55027,7 @@
                                     "const payload = json.data && json.data.CreateServerToken;",
                                     "pm.test('CreateServerToken answered', function () { pm.expect(json.errors, JSON.stringify(json.errors)).to.eql(undefined); pm.expect(payload, JSON.stringify(json)).to.be.an('object'); });",
                                     "pm.test('issued', function () { pm.expect(payload.success).to.eql(true); pm.expect(payload.token).to.match(/^imt_srv_/); });",
-                                    "pm.test('the required permissions come with the requested one', function () { pm.expect(payload.scopes).to.have.members(['/ProductServer/SignIn', '/ProductServer/PublishPermissions', '/ProductServer/Users/View']); });",
+                                    "pm.test('only the requested permission is held', function () { pm.expect(payload.scopes).to.have.members(['/Administration/Users/View']); });",
                                     "pm.environment.set('stId', payload.id);",
                                     "pm.environment.set('stToken', payload.token);"
                                 ]
@@ -54991,7 +55045,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"StProbe\", name: \"st StProbe for Puma\", scopes: [\"/ProductServer/Users/View\"] }) { id token success scopes } }",
+                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"StProbe{{stRun}}\", name: \"st StProbe for Puma\", scopes: [\"/Administration/Users/View\"] }) { id token success scopes } }",
                                 "variables": ""
                             }
                         },
@@ -55014,7 +55068,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const items = (json.data && json.data.ConnectedProductsList && json.data.ConnectedProductsList.items) || [];",
-                                    "const entry = items.find(function (i) { return i.productId === 'StProbe'; });",
+                                    "const entry = items.find(function (i) { return i.productId === pm.variables.replaceIn('StProbe{{stRun}}'); });",
                                     "pm.test('the catalog has StProbe', function () { pm.expect(entry, JSON.stringify(items)).to.be.an('object'); });",
                                     "pm.test('never connected', function () { pm.expect(entry.status).to.eql('Never connected'); pm.expect(entry.tokenCreatedAt).to.match(/^\\d{2}\\.\\d{2}\\.\\d{4}$/); pm.expect(entry.lastUsedAt).to.eql(undefined); });"
                                 ]
@@ -55032,7 +55086,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "query ConnectedProductsList { ConnectedProductsList(input: { viewParams: { offset: 0, count: 100 } }) { items { id productId status productVersion tokenCreatedAt lastUsedAt } } }",
+                                "query": "query ConnectedProductsList { ConnectedProductsList(input: { viewParams: { offset: 0, count: -1 } }) { items { id productId status productVersion tokenCreatedAt lastUsedAt } } }",
                                 "variables": ""
                             }
                         },
@@ -55056,7 +55110,7 @@
                                     "const json = pm.response.json();",
                                     "const payload = json.data && json.data.CreateServerToken;",
                                     "pm.test('CreateServerToken answered', function () { pm.expect(json.errors, JSON.stringify(json.errors)).to.eql(undefined); pm.expect(payload, JSON.stringify(json)).to.be.an('object'); });",
-                                    "pm.test('an empty request holds the required permissions only', function () { pm.expect(payload.scopes).to.have.members(['/ProductServer/SignIn', '/ProductServer/PublishPermissions']); });",
+                                    "pm.test('empty scopes grant no product permissions', function () { pm.expect(payload.scopes).to.eql([]); });",
                                     "pm.environment.set('stSecondId', payload.id);",
                                     "pm.environment.set('stSecondToken', payload.token);"
                                 ]
@@ -55074,7 +55128,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"StProbe\", name: \"st StProbe for Puma, second\", scopes: [] }) { id token success scopes } }",
+                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"StProbe{{stRun}}\", name: \"st StProbe for Puma, second\", scopes: [] }) { id token success scopes } }",
                                 "variables": ""
                             }
                         },
@@ -55098,7 +55152,7 @@
                                     "const json = pm.response.json();",
                                     "const payload = json.data && json.data.CreateServerToken;",
                                     "pm.test('CreateServerToken answered', function () { pm.expect(json.errors, JSON.stringify(json.errors)).to.eql(undefined); pm.expect(payload, JSON.stringify(json)).to.be.an('object'); });",
-                                    "pm.test('Roles/Edit requires Roles/View', function () { pm.expect(payload.scopes).to.have.members(['/ProductServer/SignIn', '/ProductServer/PublishPermissions', '/ProductServer/Roles/View', '/ProductServer/Roles/Edit']); });",
+                                    "pm.test('Roles/Edit expands to its leaves and requires Roles/View', function () { pm.expect(payload.scopes).to.have.members(['/Administration/Roles/View', '/Administration/Roles/Edit/Add', '/Administration/Roles/Edit/Change', '/Administration/Roles/Edit/Remove']); });",
                                     "pm.environment.set('stEditId', payload.id);"
                                 ]
                             }
@@ -55115,7 +55169,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"StProbe\", name: \"st edit\", scopes: [\"/ProductServer/Roles/Edit\"] }) { id token success scopes } }",
+                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"StProbe{{stRun}}\", name: \"st edit\", scopes: [\"/Administration/Roles/Edit\"] }) { id token success scopes } }",
                                 "variables": ""
                             }
                         },
@@ -55138,7 +55192,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The name of the token is required/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/The name of the token is required/); });",
+                                    "pm.test('refused: /The name of the token is required/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The name of the token is required\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -55155,7 +55209,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"StProbe\", name: \"\", scopes: [] }) { id token success scopes } }",
+                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"StProbe{{stRun}}\", name: \"\", scopes: [] }) { id token success scopes } }",
                                 "variables": ""
                             }
                         },
@@ -55178,7 +55232,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The permission /StNoSuchPermission cannot be given to a server token/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/The permission '\\/StNoSuchPermission' cannot be given to a server token/); });",
+                                    "pm.test('refused: /The permission /StNoSuchPermission cannot be given to a server token/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The permission '\\\\/StNoSuchPermission' cannot be given to a server token\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -55195,7 +55249,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"StProbe\", name: \"st unknown\", scopes: [\"/StNoSuchPermission\"] }) { id token success scopes } }",
+                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"StProbe{{stRun}}\", name: \"st unknown\", scopes: [\"/StNoSuchPermission\"] }) { id token success scopes } }",
                                 "variables": ""
                             }
                         },
@@ -55209,7 +55263,7 @@
                     "response": []
                 },
                 {
-                    "name": "ST: a permission of the administration of Puma is refused",
+                    "name": "ST: a permission outside the receiver tree is refused",
                     "event": [
                         {
                             "listen": "test",
@@ -55218,7 +55272,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The permission /Administration/Users/Edit cannot be given to a server token/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/The permission '\\/Administration\\/Users\\/Edit' cannot be given to a server token/); });",
+                                    "pm.test('refused: /The permission /StProbe/View cannot be given to a server token/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The permission '\\\\/StProbe\\\\/View' cannot be given to a server token\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -55235,7 +55289,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"StProbe\", name: \"st administration\", scopes: [\"/Administration/Users/Edit\"] }) { id token success scopes } }",
+                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"StProbe{{stRun}}\", name: \"st foreign permission\", scopes: [\"/StProbe/View\"] }) { id token success scopes } }",
                                 "variables": ""
                             }
                         },
@@ -55258,7 +55312,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /A server token is issued to the server of another product/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/A server token is issued to the server of another product/); });",
+                                    "pm.test('refused: /A server token is issued to the server of another product/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"A server token is issued to the server of another product\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -55298,7 +55352,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /Server tokens are managed by a superuser session/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/Server tokens are managed by a superuser session/); });",
+                                    "pm.test('refused: /Server tokens are managed by a superuser session/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Server tokens are managed by a superuser session\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -55315,7 +55369,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"StProbe\", name: \"st user\", scopes: [] }) { id token success scopes } }",
+                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"StProbe{{stRun}}\", name: \"st user\", scopes: [] }) { id token success scopes } }",
                                 "variables": ""
                             }
                         },
@@ -55338,7 +55392,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /Server tokens are managed by a superuser session/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/Server tokens are managed by a superuser session/); });",
+                                    "pm.test('refused: /Server tokens are managed by a superuser session/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Server tokens are managed by a superuser session\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -55350,7 +55404,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"StProbe\", name: \"st anonymous\", scopes: [] }) { id token success scopes } }",
+                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"StProbe{{stRun}}\", name: \"st anonymous\", scopes: [] }) { id token success scopes } }",
                                 "variables": ""
                             }
                         },
@@ -55391,7 +55445,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation CreateToken { CreateToken(input: { userId: \"{{st_su_id}}\", productId: \"Puma\", name: \"st su pat\", scopes: [\"/StAny\"] }) { token success } }",
+                                "query": "mutation CreateToken { CreateToken(input: { userId: \"{{st_su_id}}\", productId: \"Puma\", name: \"st su pat {{stRun}}\", scopes: [\"/StAny\"] }) { token success } }",
                                 "variables": ""
                             }
                         },
@@ -55414,7 +55468,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /Server tokens are managed by a superuser session/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/Server tokens are managed by a superuser session/); });",
+                                    "pm.test('refused: /Server tokens are managed by a superuser session/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Server tokens are managed by a superuser session\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -55431,7 +55485,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"StProbe\", name: \"st pat\", scopes: [] }) { id token success scopes } }",
+                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"StProbe{{stRun}}\", name: \"st pat\", scopes: [] }) { id token success scopes } }",
                                 "variables": ""
                             }
                         },
@@ -55458,7 +55512,7 @@
                                     "const tokens = payload.tokens || [];",
                                     "const first = tokens.find(function (t) { return t.id === pm.environment.get('stId'); });",
                                     "pm.test('the three tokens of StProbe', function () { pm.expect(tokens.map(function (t) { return t.id; })).to.have.members([pm.environment.get('stId'), pm.environment.get('stSecondId'), pm.environment.get('stEditId')]); });",
-                                    "pm.test('a token names both products and its permissions', function () { pm.expect(first.clientProductId).to.eql('StProbe'); pm.expect(first.productId).to.eql('Puma'); pm.expect(first.revoked).to.eql(false); pm.expect(first.scopes).to.include('/ProductServer/Users/View'); pm.expect(first.lastUsedAt).to.eql(''); });"
+                                    "pm.test('a token names both products and its permissions', function () { pm.expect(first.clientProductId).to.eql(pm.variables.replaceIn('StProbe{{stRun}}')); pm.expect(first.productId).to.eql('Puma'); pm.expect(first.revoked).to.eql(false); pm.expect(first.scopes).to.include('/Administration/Users/View'); pm.expect(first.lastUsedAt).to.eql(''); });"
                                 ]
                             }
                         }
@@ -55474,7 +55528,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "query GetServerTokenList { GetServerTokenList(input: { clientProductId: \"StProbe\" }) { tokens { id name clientProductId productId scopes revoked createdAt lastUsedAt } } }",
+                                "query": "query GetServerTokenList { GetServerTokenList(input: { clientProductId: \"StProbe{{stRun}}\" }) { tokens { id name clientProductId productId scopes revoked createdAt lastUsedAt } } }",
                                 "variables": ""
                             }
                         },
@@ -55497,7 +55551,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /Server tokens are managed by a superuser session/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/Server tokens are managed by a superuser session/); });",
+                                    "pm.test('refused: /Server tokens are managed by a superuser session/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Server tokens are managed by a superuser session\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -55514,7 +55568,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "query GetServerTokenList { GetServerTokenList(input: { clientProductId: \"StProbe\" }) { tokens { id } } }",
+                                "query": "query GetServerTokenList { GetServerTokenList(input: { clientProductId: \"StProbe{{stRun}}\" }) { tokens { id } } }",
                                 "variables": ""
                             }
                         },
@@ -55538,7 +55592,7 @@
                                     "const json = pm.response.json();",
                                     "const payload = json.data && json.data.ValidateToken;",
                                     "pm.test('ValidateToken answered', function () { pm.expect(json.errors, JSON.stringify(json.errors)).to.eql(undefined); pm.expect(payload, JSON.stringify(json)).to.be.an('object'); });",
-                                    "pm.test('a token of the server of StProbe for Puma, owned by nobody', function () { pm.expect(payload.valid).to.eql(true); pm.expect(payload.productId).to.eql('Puma'); pm.expect(payload.clientProductId).to.eql('StProbe'); pm.expect(payload.userId || '').to.eql(''); });"
+                                    "pm.test('a token of the server of StProbe for Puma, owned by nobody', function () { pm.expect(payload.valid).to.eql(true); pm.expect(payload.productId).to.eql('Puma'); pm.expect(payload.clientProductId).to.eql(pm.variables.replaceIn('StProbe{{stRun}}')); pm.expect(payload.userId || '').to.eql(''); });"
                                 ]
                             }
                         }
@@ -55626,7 +55680,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const items = (json.data && json.data.ConnectedProductsList && json.data.ConnectedProductsList.items) || [];",
-                                    "const entry = items.find(function (i) { return i.productId === 'StProbe'; });",
+                                    "const entry = items.find(function (i) { return i.productId === pm.variables.replaceIn('StProbe{{stRun}}'); });",
                                     "pm.test('the catalog has StProbe', function () { pm.expect(entry, JSON.stringify(items)).to.be.an('object'); });",
                                     "pm.test('online', function () { pm.expect(entry.status).to.eql('Online'); pm.expect(entry.lastUsedAt).to.match(/^\\d{2}\\.\\d{2}\\.\\d{4} \\d{2}:\\d{2}:\\d{2}$/); });"
                                 ]
@@ -55644,7 +55698,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "query ConnectedProductsList { ConnectedProductsList(input: { viewParams: { offset: 0, count: 100 } }) { items { id productId status productVersion tokenCreatedAt lastUsedAt } } }",
+                                "query": "query ConnectedProductsList { ConnectedProductsList(input: { viewParams: { offset: 0, count: -1 } }) { items { id productId status productVersion tokenCreatedAt lastUsedAt } } }",
                                 "variables": ""
                             }
                         },
@@ -55658,14 +55712,14 @@
                     "response": []
                 },
                 {
-                    "name": "ST: a command in the permissions still needs the rights of a user",
+                    "name": "ST: a service principal reads with its own view permission",
                     "event": [
                         {
                             "listen": "prerequest",
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "pm.request.headers.remove('productid');"
+                                    "pm.request.headers.upsert({ key: 'productid', value: pm.variables.replaceIn('StProbe{{stRun}}') });"
                                 ]
                             }
                         },
@@ -55675,9 +55729,9 @@
                                 "type": "text/javascript",
                                 "exec": [
                                     "const json = pm.response.json();",
-                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /Invalid permissions for the user /', function () { pm.expect(messages, JSON.stringify(json)).to.match(/Invalid permissions for the user ''/); });",
-                                    "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
+                                    "const payload = json.data && json.data.UsersList;",
+                                    "pm.test('UsersList answered', function () { pm.expect(json.errors, JSON.stringify(json.errors)).to.eql(undefined); pm.expect(payload, JSON.stringify(json)).to.be.an('object'); });",
+                                    "pm.test('the ordinary user is read', function () { pm.expect(payload.items.map(function (i) { return i.id; })).to.eql([pm.environment.get('pbAdmin')]); });"
                                 ]
                             }
                         }
@@ -55686,14 +55740,14 @@
                         "method": "POST",
                         "header": [
                             {
-                                "key": "x-server-token",
+                                "key": "x-authentication-token",
                                 "value": "{{stToken}}"
                             }
                         ],
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "query UsersList { UsersList(input: { viewParams: { offset: 0, count: 1 } }) { items { id } } }",
+                                "query": "query UsersList { UsersList(input: { viewParams: { offset: 0, count: 1, filterModel: { textFilter: { text: \"{{pbAdminLogin}}\", fieldIds: [\"name\"] } } } }) { items { id } } }",
                                 "variables": ""
                             }
                         },
@@ -55714,8 +55768,7 @@
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "pm.request.headers.remove('productid');",
-                                    "pm.variables.set('expectedHttpStatus', 403);"
+                                    "pm.request.headers.upsert({ key: 'productid', value: pm.variables.replaceIn('StProbe{{stRun}}') });"
                                 ]
                             }
                         },
@@ -55726,7 +55779,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The server of StProbe may not send RolesList: its token lacks /ProductServer/Roles/View/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/The server of 'StProbe' may not send 'RolesList': its token lacks '\\/ProductServer\\/Roles\\/View'/); });",
+                                    "pm.test('refused: /Invalid permissions for the user StProbe/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Invalid permissions for the user 'StProbe{{stRun}}'\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -55736,7 +55789,7 @@
                         "method": "POST",
                         "header": [
                             {
-                                "key": "x-server-token",
+                                "key": "x-authentication-token",
                                 "value": "{{stToken}}"
                             }
                         ],
@@ -55764,8 +55817,7 @@
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "pm.request.headers.remove('productid');",
-                                    "pm.variables.set('expectedHttpStatus', 403);"
+                                    "pm.request.headers.upsert({ key: 'productid', value: pm.variables.replaceIn('StProbe{{stRun}}') });"
                                 ]
                             }
                         },
@@ -55776,7 +55828,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The server of StProbe may not send UserAdd: its token lacks /ProductServer/Users/Edit/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/The server of 'StProbe' may not send 'UserAdd': its token lacks '\\/ProductServer\\/Users\\/Edit'/); });",
+                                    "pm.test('refused: /Invalid permissions for the user StProbe/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Invalid permissions for the user 'StProbe{{stRun}}'\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -55786,14 +55838,14 @@
                         "method": "POST",
                         "header": [
                             {
-                                "key": "x-server-token",
+                                "key": "x-authentication-token",
                                 "value": "{{stToken}}"
                             }
                         ],
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation UserAdd { UserAdd(input: { id: \"{{stCard2}}\", typeId: \"User\", productId: \"Puma\", item: { username: \"st\" } }) { id } }",
+                                "query": "mutation UserAdd { UserAdd(input: { id: \"{{stCard2}}\", typeId: \"User\", productId: \"StProbe{{stRun}}\", item: { username: \"st\" } }) { id } }",
                                 "variables": ""
                             }
                         },
@@ -55814,8 +55866,7 @@
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "pm.request.headers.remove('productid');",
-                                    "pm.variables.set('expectedHttpStatus', 403);"
+                                    "pm.request.headers.upsert({ key: 'productid', value: pm.variables.replaceIn('StProbe{{stRun}}') });"
                                 ]
                             }
                         },
@@ -55826,7 +55877,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The server of StProbe may not send GetElementIds: its token lacks /ProductServer/Roles/View/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/The server of 'StProbe' may not send 'GetElementIds': its token lacks '\\/ProductServer\\/Roles\\/View'/); });",
+                                    "pm.test('refused: /Invalid permissions for the user StProbe/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Invalid permissions for the user 'StProbe{{stRun}}'\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -55836,7 +55887,7 @@
                         "method": "POST",
                         "header": [
                             {
-                                "key": "x-server-token",
+                                "key": "x-authentication-token",
                                 "value": "{{stToken}}"
                             }
                         ],
@@ -55857,15 +55908,14 @@
                     "response": []
                 },
                 {
-                    "name": "ST: the editor of an organization is read with the view permission of organizations",
+                    "name": "ST: empty scopes do not read protected users",
                     "event": [
                         {
                             "listen": "prerequest",
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "pm.request.headers.remove('productid');",
-                                    "pm.variables.set('expectedHttpStatus', 403);"
+                                    "pm.request.headers.upsert({ key: 'productid', value: pm.variables.replaceIn('StProbe{{stRun}}') });"
                                 ]
                             }
                         },
@@ -55876,7 +55926,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The server of StProbe may not send GetTenantRepresentation: its token lacks /ProductServer/Organizations/View/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/The server of 'StProbe' may not send 'GetTenantRepresentation': its token lacks '\\/ProductServer\\/Organizations\\/View'/); });",
+                                    "pm.test('refused: /Invalid permissions for the user StProbe/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Invalid permissions for the user 'StProbe{{stRun}}'\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -55886,14 +55936,14 @@
                         "method": "POST",
                         "header": [
                             {
-                                "key": "x-server-token",
-                                "value": "{{stToken}}"
+                                "key": "x-authentication-token",
+                                "value": "{{stSecondToken}}"
                             }
                         ],
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "query GetTenantRepresentation { GetTenantRepresentation(input: { collectionId: \"Tenants\", id: \"{{stCard2}}\" }) { id name } }",
+                                "query": "query UsersList { UsersList(input: { viewParams: { offset: 0, count: 1, filterModel: { textFilter: { text: \"{{pbAdminLogin}}\", fieldIds: [\"name\"] } } } }) { items { id } } }",
                                 "variables": ""
                             }
                         },
@@ -55907,15 +55957,14 @@
                     "response": []
                 },
                 {
-                    "name": "ST: the editor of an organization is saved with the edit permission of organizations",
+                    "name": "ST: a service without organization creation permission cannot create one",
                     "event": [
                         {
                             "listen": "prerequest",
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "pm.request.headers.remove('productid');",
-                                    "pm.variables.set('expectedHttpStatus', 403);"
+                                    "pm.request.headers.upsert({ key: 'productid', value: pm.variables.replaceIn('StProbe{{stRun}}') });"
                                 ]
                             }
                         },
@@ -55925,9 +55974,9 @@
                                 "type": "text/javascript",
                                 "exec": [
                                     "const json = pm.response.json();",
-                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The server of StProbe may not send UpdateTenantFromRepresentation: its token lacks /ProductServer/Organizations/Edit/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/The server of 'StProbe' may not send 'UpdateTenantFromRepresentation': its token lacks '\\/ProductServer\\/Organizations\\/Edit'/); });",
-                                    "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
+                                    "const payload = json.data && json.data.CreateTenant;",
+                                    "pm.test('CreateTenant answered', function () { pm.expect(json.errors, JSON.stringify(json.errors)).to.eql(undefined); pm.expect(payload, JSON.stringify(json)).to.be.an('object'); });",
+                                    "pm.test('organization creation refused', function () { pm.expect(payload.tenantId || '').to.eql(''); pm.expect(payload.errorMessage).to.eql('Permission denied: /OrganizationManagement/Add'); });"
                                 ]
                             }
                         }
@@ -55936,14 +55985,14 @@
                         "method": "POST",
                         "header": [
                             {
-                                "key": "x-server-token",
+                                "key": "x-authentication-token",
                                 "value": "{{stToken}}"
                             }
                         ],
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation UpdateTenantFromRepresentation { UpdateTenantFromRepresentation(input: { documentId: \"{{stCard2}}\", tenant: { name: \"st\" } }) { status } }",
+                                "query": "mutation CreateTenant { CreateTenant(input: { name: \"st forbidden organization\" }) { tenantId errorMessage } }",
                                 "variables": ""
                             }
                         },
@@ -55957,15 +56006,14 @@
                     "response": []
                 },
                 {
-                    "name": "ST: a request closed to the servers of products is refused",
+                    "name": "ST: an anonymous forwarded request has no service principal",
                     "event": [
                         {
                             "listen": "prerequest",
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "pm.request.headers.remove('productid');",
-                                    "pm.variables.set('expectedHttpStatus', 403);"
+                                    "pm.request.headers.remove('productid');"
                                 ]
                             }
                         },
@@ -55976,7 +56024,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The request CreateServerToken is closed to the servers of products/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/The request 'CreateServerToken' is closed to the servers of products/); });",
+                                    "pm.test('refused: /Invalid permissions for the user /', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Invalid permissions for the user ''\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -55993,7 +56041,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"StProbe\", name: \"st by a server\", scopes: [] }) { id token success scopes } }",
+                                "query": "query UsersList { UsersList(input: { viewParams: { offset: 0, count: 1, filterModel: { textFilter: { text: \"{{pbAdminLogin}}\", fieldIds: [\"name\"] } } } }) { items { id } } }",
                                 "variables": ""
                             }
                         },
@@ -56014,8 +56062,7 @@
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "pm.request.headers.remove('productid');",
-                                    "pm.variables.set('expectedHttpStatus', 403);"
+                                    "pm.request.headers.upsert({ key: 'productid', value: pm.variables.replaceIn('StProbe{{stRun}}') });"
                                 ]
                             }
                         },
@@ -56026,7 +56073,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The request AddServerTokenClient is closed to the servers of products/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/The request 'AddServerTokenClient' is closed to the servers of products/); });",
+                                    "pm.test('refused: /Server tokens are managed by a superuser session/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Server tokens are managed by a superuser session\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -56036,14 +56083,14 @@
                         "method": "POST",
                         "header": [
                             {
-                                "key": "x-server-token",
+                                "key": "x-authentication-token",
                                 "value": "{{stToken}}"
                             }
                         ],
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation AddServerTokenClient { AddServerTokenClient(input: { clientProductId: \"StBySrv\", name: \"StBySrv added\" }) { success added } }",
+                                "query": "mutation AddServerTokenClient { AddServerTokenClient(input: { clientProductId: \"StBySrv{{stRun}}\", name: \"StBySrv added\" }) { success added } }",
                                 "variables": ""
                             }
                         },
@@ -56057,15 +56104,14 @@
                     "response": []
                 },
                 {
-                    "name": "ST: accepting personal tokens takes its own permission",
+                    "name": "ST: a server validates a token without an extra scope",
                     "event": [
                         {
                             "listen": "prerequest",
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "pm.request.headers.remove('productid');",
-                                    "pm.variables.set('expectedHttpStatus', 403);"
+                                    "pm.request.headers.upsert({ key: 'productid', value: pm.variables.replaceIn('StProbe{{stRun}}') });"
                                 ]
                             }
                         },
@@ -56075,9 +56121,9 @@
                                 "type": "text/javascript",
                                 "exec": [
                                     "const json = pm.response.json();",
-                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /its token lacks /ProductServer/PersonalTokens/Accept/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/its token lacks '\\/ProductServer\\/PersonalTokens\\/Accept'/); });",
-                                    "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
+                                    "const payload = json.data && json.data.ValidateToken;",
+                                    "pm.test('ValidateToken answered', function () { pm.expect(json.errors, JSON.stringify(json.errors)).to.eql(undefined); pm.expect(payload, JSON.stringify(json)).to.be.an('object'); });",
+                                    "pm.test('the token is validated for the connected product', function () { pm.expect(payload.valid).to.eql(true); pm.expect(payload.clientProductId).to.eql(pm.variables.replaceIn('StProbe{{stRun}}')); });"
                                 ]
                             }
                         }
@@ -56086,63 +56132,14 @@
                         "method": "POST",
                         "header": [
                             {
-                                "key": "x-server-token",
-                                "value": "{{stToken}}"
+                                "key": "x-authentication-token",
+                                "value": "{{stSecondToken}}"
                             }
                         ],
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "query ValidateToken { ValidateToken(input: { token: \"{{stSuPat}}\" }) { valid } }",
-                                "variables": ""
-                            }
-                        },
-                        "url": {
-                            "raw": "{{base_url}}",
-                            "host": [
-                                "{{base_url}}"
-                            ]
-                        }
-                    },
-                    "response": []
-                },
-                {
-                    "name": "ST: the token works under the header of its product",
-                    "event": [
-                        {
-                            "listen": "prerequest",
-                            "script": {
-                                "type": "text/javascript",
-                                "exec": [
-                                    "pm.request.headers.upsert({ key: 'productid', value: 'StProbe' });"
-                                ]
-                            }
-                        },
-                        {
-                            "listen": "test",
-                            "script": {
-                                "type": "text/javascript",
-                                "exec": [
-                                    "const json = pm.response.json();",
-                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /Invalid permissions for the user /', function () { pm.expect(messages, JSON.stringify(json)).to.match(/Invalid permissions for the user ''/); });",
-                                    "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
-                                ]
-                            }
-                        }
-                    ],
-                    "request": {
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "x-server-token",
-                                "value": "{{stToken}}"
-                            }
-                        ],
-                        "body": {
-                            "mode": "graphql",
-                            "graphql": {
-                                "query": "query UsersList { UsersList(input: { viewParams: { offset: 0, count: 1 } }) { items { id } } }",
+                                "query": "query ValidateToken { ValidateToken(input: { token: \"{{stSecondToken}}\" }) { valid clientProductId } }",
                                 "variables": ""
                             }
                         },
@@ -56163,7 +56160,7 @@
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "pm.request.headers.upsert({ key: 'productid', value: 'Lisa' });",
+                                    "pm.request.headers.upsert({ key: 'productid', value: pm.variables.replaceIn('Lisa') });",
                                     "pm.variables.set('expectedHttpStatus', 403);"
                                 ]
                             }
@@ -56175,7 +56172,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The token of the server is not the token of the product Lisa/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/The token of the server is not the token of the product 'Lisa'/); });",
+                                    "pm.test('refused: /The token of the server is not the token of the product Lisa/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The token of the server is not the token of the product 'Lisa'\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -56213,7 +56210,7 @@
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "pm.request.headers.upsert({ key: 'productid', value: 'Puma' });",
+                                    "pm.request.headers.upsert({ key: 'productid', value: pm.variables.replaceIn('Puma') });",
                                     "pm.variables.set('expectedHttpStatus', 403);"
                                 ]
                             }
@@ -56225,7 +56222,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The token of the server is not the token of the product Puma/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/The token of the server is not the token of the product 'Puma'/); });",
+                                    "pm.test('refused: /The token of the server is not the token of the product Puma/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The token of the server is not the token of the product 'Puma'\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -56275,7 +56272,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The token of the server is not valid/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/The token of the server is not valid/); });",
+                                    "pm.test('refused: /The token of the server is not valid/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The token of the server is not valid\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -56325,7 +56322,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /Invalid personal access token/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/Invalid personal access token/); });",
+                                    "pm.test('refused: /Invalid personal access token/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Invalid personal access token\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -56356,56 +56353,6 @@
                     "response": []
                 },
                 {
-                    "name": "ST: the token of a server opens only the commands of its permissions",
-                    "event": [
-                        {
-                            "listen": "prerequest",
-                            "script": {
-                                "type": "text/javascript",
-                                "exec": [
-                                    "pm.request.headers.upsert({ key: 'productid', value: 'StProbe' });",
-                                    "pm.variables.set('expectedHttpStatus', 403);"
-                                ]
-                            }
-                        },
-                        {
-                            "listen": "test",
-                            "script": {
-                                "type": "text/javascript",
-                                "exec": [
-                                    "const json = pm.response.json();",
-                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The server of StProbe may not send RolesList: its token lacks /ProductServer/Roles/View/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/The server of 'StProbe' may not send 'RolesList': its token lacks '\\/ProductServer\\/Roles\\/View'/); });",
-                                    "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
-                                ]
-                            }
-                        }
-                    ],
-                    "request": {
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "x-authentication-token",
-                                "value": "{{stToken}}"
-                            }
-                        ],
-                        "body": {
-                            "mode": "graphql",
-                            "graphql": {
-                                "query": "query RolesList { RolesList(input: { viewParams: { offset: 0, count: 1 } }) { items { id } } }",
-                                "variables": ""
-                            }
-                        },
-                        "url": {
-                            "raw": "{{base_url}}",
-                            "host": [
-                                "{{base_url}}"
-                            ]
-                        }
-                    },
-                    "response": []
-                },
-                {
                     "name": "ST: a server token cannot issue tokens",
                     "event": [
                         {
@@ -56413,8 +56360,7 @@
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "pm.request.headers.upsert({ key: 'productid', value: 'StProbe' });",
-                                    "pm.variables.set('expectedHttpStatus', 403);"
+                                    "pm.request.headers.upsert({ key: 'productid', value: pm.variables.replaceIn('StProbe{{stRun}}') });"
                                 ]
                             }
                         },
@@ -56425,7 +56371,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The request CreateServerToken is closed to the servers of products/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/The request 'CreateServerToken' is closed to the servers of products/); });",
+                                    "pm.test('refused: /Server tokens are managed by a superuser session/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Server tokens are managed by a superuser session\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -56442,7 +56388,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"StProbe\", name: \"st by a server\", scopes: [] }) { id token success scopes } }",
+                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"StProbe{{stRun}}\", name: \"st by a server\", scopes: [] }) { id token success scopes } }",
                                 "variables": ""
                             }
                         },
@@ -56463,7 +56409,7 @@
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "pm.request.headers.upsert({ key: 'productid', value: 'Lisa' });",
+                                    "pm.request.headers.upsert({ key: 'productid', value: pm.variables.replaceIn('Lisa') });",
                                     "pm.variables.set('expectedHttpStatus', 403);"
                                 ]
                             }
@@ -56475,7 +56421,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The personal access token is not valid for this product/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/The personal access token is not valid for this product/); });",
+                                    "pm.test('refused: /The personal access token is not valid for this product/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The personal access token is not valid for this product\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -56533,7 +56479,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation CreateToken { CreateToken(input: { userId: \"{{st_su_id}}\", productId: \"StProbe\", name: \"st su pat for StProbe\", scopes: [\"/Administration\"] }) { token success } }",
+                                "query": "mutation CreateToken { CreateToken(input: { userId: \"{{st_su_id}}\", productId: \"StProbe{{stRun}}\", name: \"st su pat for StProbe\", scopes: [\"/Administration/Users/View\", \"/Administration/Roles/View\"] }) { token success } }",
                                 "variables": ""
                             }
                         },
@@ -56607,7 +56553,7 @@
                                     "const json = pm.response.json();",
                                     "const payload = json.data && json.data.UsersList;",
                                     "pm.test('UsersList answered', function () { pm.expect(json.errors, JSON.stringify(json.errors)).to.eql(undefined); pm.expect(payload, JSON.stringify(json)).to.be.an('object'); });",
-                                    "pm.test('the users are read with the rights of su', function () { pm.expect(payload.items.length).to.eql(1); });"
+                                    "pm.test('the ordinary user is read within both token boundaries', function () { pm.expect(payload.items.map(function (i) { return i.id; })).to.eql([pm.environment.get('pbAdmin')]); });"
                                 ]
                             }
                         }
@@ -56627,7 +56573,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "query UsersList { UsersList(input: { viewParams: { offset: 0, count: 1 } }) { items { id } } }",
+                                "query": "query UsersList { UsersList(input: { viewParams: { offset: 0, count: 1, filterModel: { textFilter: { text: \"{{pbAdminLogin}}\", fieldIds: [\"name\"] } } } }) { items { id } } }",
                                 "variables": ""
                             }
                         },
@@ -56641,15 +56587,14 @@
                     "response": []
                 },
                 {
-                    "name": "ST: the permissions of the server bound even a superuser",
+                    "name": "ST: the permissions of the server bound even a superuser PAT",
                     "event": [
                         {
                             "listen": "prerequest",
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "pm.request.headers.remove('productid');",
-                                    "pm.variables.set('expectedHttpStatus', 403);"
+                                    "pm.request.headers.remove('productid');"
                                 ]
                             }
                         },
@@ -56660,7 +56605,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /its token lacks /ProductServer/Roles/View/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/its token lacks '\\/ProductServer\\/Roles\\/View'/); });",
+                                    "pm.test('refused: /Invalid permissions for the user/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Invalid permissions for the user\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -56695,6 +56640,215 @@
                     "response": []
                 },
                 {
+                    "name": "ST seed: superuser session opened through the product server",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.request.headers.upsert({ key: 'productid', value: pm.variables.replaceIn('StProbe{{stRun}}') });"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.Authorization;",
+                                    "pm.test('Authorization answered', function () { pm.expect(json.errors, JSON.stringify(json.errors)).to.eql(undefined); pm.expect(payload, JSON.stringify(json)).to.be.an('object'); });",
+                                    "pm.test('the product session is issued', function () { pm.expect(payload.token).to.be.a('string').and.not.empty; });",
+                                    "pm.environment.set('stForwardedSuToken', payload.token);"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-server-token",
+                                "value": "{{stToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{su_login}}\", password: \"{{su_password}}\", productId: \"StProbe{{stRun}}\" }) { token } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "ST: a forwarded superuser session reads within the server boundary",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.request.headers.upsert({ key: 'productid', value: pm.variables.replaceIn('StProbe{{stRun}}') });"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.UsersList;",
+                                    "pm.test('UsersList answered', function () { pm.expect(json.errors, JSON.stringify(json.errors)).to.eql(undefined); pm.expect(payload, JSON.stringify(json)).to.be.an('object'); });",
+                                    "pm.test('the granted view permission works', function () { pm.expect(payload.items.map(function (i) { return i.id; })).to.eql([pm.environment.get('pbAdmin')]); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{stForwardedSuToken}}"
+                            },
+                            {
+                                "key": "x-server-token",
+                                "value": "{{stToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query UsersList { UsersList(input: { viewParams: { offset: 0, count: 1, filterModel: { textFilter: { text: \"{{pbAdminLogin}}\", fieldIds: [\"name\"] } } } }) { items { id } } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "ST: a forwarded superuser session is not a global administrator",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.request.headers.upsert({ key: 'productid', value: pm.variables.replaceIn('StProbe{{stRun}}') });"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
+                                    "pm.test('refused: /Invalid permissions for the user/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Invalid permissions for the user\"))); });",
+                                    "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{stForwardedSuToken}}"
+                            },
+                            {
+                                "key": "x-server-token",
+                                "value": "{{stToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query RolesList { RolesList(input: { viewParams: { offset: 0, count: 1 } }) { items { id } } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "ST: a forwarded superuser session cannot manage server tokens",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.request.headers.upsert({ key: 'productid', value: pm.variables.replaceIn('StProbe{{stRun}}') });"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
+                                    "pm.test('refused: /Server tokens are managed by a superuser session/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Server tokens are managed by a superuser session\"))); });",
+                                    "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{stForwardedSuToken}}"
+                            },
+                            {
+                                "key": "x-server-token",
+                                "value": "{{stToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"StProbe{{stRun}}\", name: \"st forwarded su\", scopes: [] }) { id token success scopes } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
                     "name": "ST: a personal token of another product does not come through this server",
                     "event": [
                         {
@@ -56714,7 +56868,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The personal access token is not for the product of the server/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/The personal access token is not for the product of the server/); });",
+                                    "pm.test('refused: /The personal access token is not for the product of the server/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The personal access token is not for the product of the server\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -56735,7 +56889,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "query UsersList { UsersList(input: { viewParams: { offset: 0, count: 1 } }) { items { id } } }",
+                                "query": "query UsersList { UsersList(input: { viewParams: { offset: 0, count: 1, filterModel: { textFilter: { text: \"{{pbAdminLogin}}\", fieldIds: [\"name\"] } } } }) { items { id } } }",
                                 "variables": ""
                             }
                         },
@@ -56768,7 +56922,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The personal access token is not for the product of the server/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/The personal access token is not for the product of the server/); });",
+                                    "pm.test('refused: /The personal access token is not for the product of the server/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The personal access token is not for the product of the server\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -56789,7 +56943,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "query UsersList { UsersList(input: { viewParams: { offset: 0, count: 1 } }) { items { id } } }",
+                                "query": "query UsersList { UsersList(input: { viewParams: { offset: 0, count: 1, filterModel: { textFilter: { text: \"{{pbAdminLogin}}\", fieldIds: [\"name\"] } } } }) { items { id } } }",
                                 "variables": ""
                             }
                         },
@@ -56822,7 +56976,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The product StProbe is not connected: its server sends no valid token/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/The product 'StProbe' is not connected: its server sends no valid token/); });",
+                                    "pm.test('refused: /The product StProbe is not connected: its server sends no valid token/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The product 'StProbe{{stRun}}' is not connected: its server sends no valid token\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -56839,7 +56993,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "query UsersList { UsersList(input: { viewParams: { offset: 0, count: 1 } }) { items { id } } }",
+                                "query": "query UsersList { UsersList(input: { viewParams: { offset: 0, count: 1, filterModel: { textFilter: { text: \"{{pbAdminLogin}}\", fieldIds: [\"name\"] } } } }) { items { id } } }",
                                 "variables": ""
                             }
                         },
@@ -56860,7 +57014,7 @@
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "pm.request.headers.upsert({ key: 'productid', value: 'StProbe' });",
+                                    "pm.request.headers.upsert({ key: 'productid', value: pm.variables.replaceIn('StProbe{{stRun}}') });",
                                     "pm.variables.set('expectedHttpStatus', 403);"
                                 ]
                             }
@@ -56872,7 +57026,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The product StProbe is not connected: its server sends no valid token/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/The product 'StProbe' is not connected: its server sends no valid token/); });",
+                                    "pm.test('refused: /The product StProbe is not connected: its server sends no valid token/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The product 'StProbe{{stRun}}' is not connected: its server sends no valid token\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -56889,7 +57043,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "query UsersList { UsersList(input: { viewParams: { offset: 0, count: 1 } }) { items { id } } }",
+                                "query": "query UsersList { UsersList(input: { viewParams: { offset: 0, count: 1, filterModel: { textFilter: { text: \"{{pbAdminLogin}}\", fieldIds: [\"name\"] } } } }) { items { id } } }",
                                 "variables": ""
                             }
                         },
@@ -56910,7 +57064,7 @@
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "pm.request.headers.upsert({ key: 'productid', value: 'StProbe' });"
+                                    "pm.request.headers.upsert({ key: 'productid', value: pm.variables.replaceIn('StProbe{{stRun}}') });"
                                 ]
                             }
                         },
@@ -56959,7 +57113,7 @@
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "pm.request.headers.upsert({ key: 'productid', value: 'StProbe' });",
+                                    "pm.request.headers.upsert({ key: 'productid', value: pm.variables.replaceIn('StProbe{{stRun}}') });",
                                     "pm.variables.set('expectedHttpStatus', 403);"
                                 ]
                             }
@@ -56971,7 +57125,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The personal access token is not valid for this product/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/The personal access token is not valid for this product/); });",
+                                    "pm.test('refused: /The personal access token is not valid for this product/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The personal access token is not valid for this product\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -57009,7 +57163,7 @@
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "pm.request.headers.upsert({ key: 'productid', value: 'StProbe' });",
+                                    "pm.request.headers.upsert({ key: 'productid', value: pm.variables.replaceIn('StProbe{{stRun}}') });",
                                     "pm.variables.set('expectedHttpStatus', 403);"
                                 ]
                             }
@@ -57021,7 +57175,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The product StProbe is not connected: its server sends no valid token/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/The product 'StProbe' is not connected: its server sends no valid token/); });",
+                                    "pm.test('refused: /The product StProbe is not connected: its server sends no valid token/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The product 'StProbe{{stRun}}' is not connected: its server sends no valid token\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -57059,7 +57213,7 @@
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "pm.request.headers.upsert({ key: 'productid', value: 'StProbe' });",
+                                    "pm.request.headers.upsert({ key: 'productid', value: pm.variables.replaceIn('StProbe{{stRun}}') });",
                                     "pm.variables.set('expectedHttpStatus', 403);"
                                 ]
                             }
@@ -57071,7 +57225,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The product StProbe is not connected: its server sends no valid token/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/The product 'StProbe' is not connected: its server sends no valid token/); });",
+                                    "pm.test('refused: /The product StProbe is not connected: its server sends no valid token/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The product 'StProbe{{stRun}}' is not connected: its server sends no valid token\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -57107,7 +57261,7 @@
                                     "const json = pm.response.json();",
                                     "const payload = json.data && json.data.UpdateServerTokenScopes;",
                                     "pm.test('UpdateServerTokenScopes answered', function () { pm.expect(json.errors, JSON.stringify(json.errors)).to.eql(undefined); pm.expect(payload, JSON.stringify(json)).to.be.an('object'); });",
-                                    "pm.test('changed', function () { pm.expect(payload.success).to.eql(true); pm.expect(payload.scopes).to.have.members(['/ProductServer/SignIn', '/ProductServer/PublishPermissions', '/ProductServer/Users/View', '/ProductServer/Roles/View']); });"
+                                    "pm.test('changed', function () { pm.expect(payload.success).to.eql(true); pm.expect(payload.scopes).to.have.members(['/Administration/Users/View', '/Administration/Roles/View']); });"
                                 ]
                             }
                         }
@@ -57123,7 +57277,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation UpdateServerTokenScopes { UpdateServerTokenScopes(input: { id: \"{{stId}}\", scopes: [\"/ProductServer/Users/View\", \"/ProductServer/Roles/View\"] }) { success scopes } }",
+                                "query": "mutation UpdateServerTokenScopes { UpdateServerTokenScopes(input: { id: \"{{stId}}\", scopes: [\"/Administration/Users/View\", \"/Administration/Roles/View\"] }) { success scopes } }",
                                 "variables": ""
                             }
                         },
@@ -57200,7 +57354,7 @@
                                     "const json = pm.response.json();",
                                     "const payload = json.data && json.data.UpdateServerTokenScopes;",
                                     "pm.test('UpdateServerTokenScopes answered', function () { pm.expect(json.errors, JSON.stringify(json.errors)).to.eql(undefined); pm.expect(payload, JSON.stringify(json)).to.be.an('object'); });",
-                                    "pm.test('changed', function () { pm.expect(payload.scopes).to.not.include('/ProductServer/Users/View'); pm.expect(payload.scopes).to.include('/ProductServer/SignIn'); });"
+                                    "pm.test('changed', function () { pm.expect(payload.scopes).to.have.members(['/Administration/Roles/View']); });"
                                 ]
                             }
                         }
@@ -57216,7 +57370,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation UpdateServerTokenScopes { UpdateServerTokenScopes(input: { id: \"{{stId}}\", scopes: [\"/ProductServer/Roles/View\"] }) { success scopes } }",
+                                "query": "mutation UpdateServerTokenScopes { UpdateServerTokenScopes(input: { id: \"{{stId}}\", scopes: [\"/Administration/Roles/View\"] }) { success scopes } }",
                                 "variables": ""
                             }
                         },
@@ -57237,8 +57391,7 @@
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "pm.request.headers.remove('productid');",
-                                    "pm.variables.set('expectedHttpStatus', 403);"
+                                    "pm.request.headers.remove('productid');"
                                 ]
                             }
                         },
@@ -57249,7 +57402,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /its token lacks /ProductServer/Users/View/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/its token lacks '\\/ProductServer\\/Users\\/View'/); });",
+                                    "pm.test('refused: /Invalid permissions for the user/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Invalid permissions for the user\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -57270,7 +57423,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "query UsersList { UsersList(input: { viewParams: { offset: 0, count: 1 } }) { items { id } } }",
+                                "query": "query UsersList { UsersList(input: { viewParams: { offset: 0, count: 1, filterModel: { textFilter: { text: \"{{pbAdminLogin}}\", fieldIds: [\"name\"] } } } }) { items { id } } }",
                                 "variables": ""
                             }
                         },
@@ -57293,7 +57446,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The permission /StNoSuchPermission cannot be given to a server token/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/The permission '\\/StNoSuchPermission' cannot be given to a server token/); });",
+                                    "pm.test('refused: /The permission /StNoSuchPermission cannot be given to a server token/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The permission '\\\\/StNoSuchPermission' cannot be given to a server token\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -57333,7 +57486,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The server token does not exist/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/The server token does not exist/); });",
+                                    "pm.test('refused: /The server token does not exist/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The server token does not exist\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -57371,7 +57524,7 @@
                             "script": {
                                 "type": "text/javascript",
                                 "exec": [
-                                    "pm.sendRequest({ url: pm.environment.get('base_url'), method: 'POST', header: { 'Content-Type': 'application/json', 'x-authentication-token': pm.environment.get('su_token'), 'productid': 'Puma' }, body: { mode: 'raw', raw: JSON.stringify({ query: 'query GetTokenList { GetTokenList(input: { userId: \"' + pm.environment.get('st_su_id') + '\" }) { tokens { id name } } }' }) } }, function (err, res) { const tokens = (res && res.json().data && res.json().data.GetTokenList && res.json().data.GetTokenList.tokens) || []; const pat = tokens.find(function (t) { return t.name === 'st su pat'; }); pm.environment.set('stSuPatId', pat ? pat.id : 'missing'); });"
+                                    "pm.sendRequest({ url: pm.environment.get('base_url'), method: 'POST', header: { 'Content-Type': 'application/json', 'x-authentication-token': pm.environment.get('su_token'), 'productid': 'Puma' }, body: { mode: 'raw', raw: JSON.stringify({ query: 'query GetTokenList { GetTokenList(input: { userId: \"' + pm.environment.get('st_su_id') + '\" }) { tokens { id name } } }' }) } }, function (err, res) { const tokens = (res && res.json().data && res.json().data.GetTokenList && res.json().data.GetTokenList.tokens) || []; const pat = tokens.find(function (t) { return t.name === pm.variables.replaceIn('st su pat {{stRun}}'); }); pm.environment.set('stSuPatId', pat ? pat.id : 'missing'); });"
                                 ]
                             }
                         },
@@ -57383,7 +57536,7 @@
                                     "pm.test('a personal token is named', function () { pm.expect(pm.environment.get('stSuPatId')).to.be.a('string').and.not.empty; });",
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The server token does not exist/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/The server token does not exist/); });",
+                                    "pm.test('refused: /The server token does not exist/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The server token does not exist\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -57423,7 +57576,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /Server tokens are managed by a superuser session/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/Server tokens are managed by a superuser session/); });",
+                                    "pm.test('refused: /Server tokens are managed by a superuser session/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Server tokens are managed by a superuser session\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -57512,7 +57665,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The permissions of this server are given to the servers of products/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/The permissions of this server are given to the servers of products/); });",
+                                    "pm.test('refused: /The permissions of this server are given to the servers of products/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The permissions of this server are given to the servers of products\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -57552,7 +57705,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The permissions of this server are given to the servers of products/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/The permissions of this server are given to the servers of products/); });",
+                                    "pm.test('refused: /The permissions of this server are given to the servers of products/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The permissions of this server are given to the servers of products\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -57578,7 +57731,7 @@
                     "response": []
                 },
                 {
-                    "name": "ST: the server of the product publishes its permissions",
+                    "name": "ST: the server of the product publishes its permissions with empty scopes",
                     "event": [
                         {
                             "listen": "prerequest",
@@ -57607,17 +57760,13 @@
                         "header": [
                             {
                                 "key": "x-authentication-token",
-                                "value": "{{stToken}}"
-                            },
-                            {
-                                "key": "x-server-token",
-                                "value": "{{stToken}}"
+                                "value": "{{stSecondToken}}"
                             }
                         ],
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation PublishProductPermissions { PublishProductPermissions(input: { productId: \"StProbe\", productVersion: \"7.1.0\", tree: { groups: [{ groupId: \"/StProbe\", groupName: \"Probe\", entries: [{ permissionId: \"/StProbe/View\", displayName: \"View the probe\" }] }] } }) { success changed } }",
+                                "query": "mutation PublishProductPermissions { PublishProductPermissions(input: { productId: \"StProbe{{stRun}}\", productVersion: \"7.1.0\", tree: { groups: [{ groupId: \"/StProbe\", groupName: \"Probe\", entries: [{ permissionId: \"/StProbe/View\", displayName: \"View the probe\" }] }] } }) { success changed } }",
                                 "variables": ""
                             }
                         },
@@ -57666,7 +57815,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation PublishProductPermissions { PublishProductPermissions(input: { productId: \"StProbe\", productVersion: \"7.1.0\", tree: { groups: [{ groupId: \"/StProbe\", groupName: \"Probe\", entries: [{ permissionId: \"/StProbe/View\", displayName: \"View the probe\" }] }] } }) { success changed } }",
+                                "query": "mutation PublishProductPermissions { PublishProductPermissions(input: { productId: \"StProbe{{stRun}}\", productVersion: \"7.1.0\", tree: { groups: [{ groupId: \"/StProbe\", groupName: \"Probe\", entries: [{ permissionId: \"/StProbe/View\", displayName: \"View the probe\" }] }] } }) { success changed } }",
                                 "variables": ""
                             }
                         },
@@ -57698,7 +57847,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The permissions of the product Lisa are published by its server only/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/The permissions of the product 'Lisa' are published by its server only/); });",
+                                    "pm.test('refused: /The permissions of the product StOther are published by its server only/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The permissions of the product 'StOther{{stRun}}' are published by its server only\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -57715,7 +57864,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation PublishProductPermissions { PublishProductPermissions(input: { productId: \"Lisa\", productVersion: \"1\", tree: { groups: [{ groupId: \"/StProbe\", groupName: \"Probe\", entries: [{ permissionId: \"/StProbe/View\", displayName: \"View the probe\" }] }] } }) { success changed } }",
+                                "query": "mutation PublishProductPermissions { PublishProductPermissions(input: { productId: \"StOther{{stRun}}\", productVersion: \"1\", tree: { groups: [{ groupId: \"/StProbe\", groupName: \"Probe\", entries: [{ permissionId: \"/StProbe/View\", displayName: \"View the probe\" }] }] } }) { success changed } }",
                                 "variables": ""
                             }
                         },
@@ -57747,7 +57896,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The permissions of the product StProbe are published by its server only/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/The permissions of the product 'StProbe' are published by its server only/); });",
+                                    "pm.test('refused: /The permissions of the product StProbe are published by its server only/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The permissions of the product 'StProbe{{stRun}}' are published by its server only\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -57764,7 +57913,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation PublishProductPermissions { PublishProductPermissions(input: { productId: \"StProbe\", productVersion: \"7.1.1\", tree: { groups: [{ groupId: \"/StProbe\", groupName: \"Probe\", entries: [{ permissionId: \"/StProbe/View\", displayName: \"View the probe\" }] }] } }) { success changed } }",
+                                "query": "mutation PublishProductPermissions { PublishProductPermissions(input: { productId: \"StProbe{{stRun}}\", productVersion: \"7.1.1\", tree: { groups: [{ groupId: \"/StProbe\", groupName: \"Probe\", entries: [{ permissionId: \"/StProbe/View\", displayName: \"View the probe\" }] }] } }) { success changed } }",
                                 "variables": ""
                             }
                         },
@@ -57787,7 +57936,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The permissions of the product StProbe are published by its server only/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/The permissions of the product 'StProbe' are published by its server only/); });",
+                                    "pm.test('refused: /The permissions of the product StProbe are published by its server only/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The permissions of the product 'StProbe{{stRun}}' are published by its server only\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -57804,7 +57953,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation PublishProductPermissions { PublishProductPermissions(input: { productId: \"StProbe\", productVersion: \"7.1.1\", tree: { groups: [{ groupId: \"/StProbe\", groupName: \"Probe\", entries: [{ permissionId: \"/StProbe/View\", displayName: \"View the probe\" }] }] } }) { success changed } }",
+                                "query": "mutation PublishProductPermissions { PublishProductPermissions(input: { productId: \"StProbe{{stRun}}\", productVersion: \"7.1.1\", tree: { groups: [{ groupId: \"/StProbe\", groupName: \"Probe\", entries: [{ permissionId: \"/StProbe/View\", displayName: \"View the probe\" }] }] } }) { success changed } }",
                                 "variables": ""
                             }
                         },
@@ -57827,7 +57976,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const items = (json.data && json.data.ConnectedProductsList && json.data.ConnectedProductsList.items) || [];",
-                                    "const entry = items.find(function (i) { return i.productId === 'StProbe'; });",
+                                    "const entry = items.find(function (i) { return i.productId === pm.variables.replaceIn('StProbe{{stRun}}'); });",
                                     "pm.test('the catalog has StProbe', function () { pm.expect(entry, JSON.stringify(items)).to.be.an('object'); });",
                                     "pm.test('version 7.1.0', function () { pm.expect(entry.productVersion).to.eql('7.1.0'); });"
                                 ]
@@ -57845,7 +57994,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "query ConnectedProductsList { ConnectedProductsList(input: { viewParams: { offset: 0, count: 100 } }) { items { id productId status productVersion tokenCreatedAt lastUsedAt } } }",
+                                "query": "query ConnectedProductsList { ConnectedProductsList(input: { viewParams: { offset: 0, count: -1 } }) { items { id productId status productVersion tokenCreatedAt lastUsedAt } } }",
                                 "variables": ""
                             }
                         },
@@ -57887,7 +58036,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "query GetProductPermissions { GetProductPermissions(input: { productId: \"StProbe\" }) { groups { groupId entries { permissionId } } } }",
+                                "query": "query GetProductPermissions { GetProductPermissions(input: { productId: \"StProbe{{stRun}}\" }) { groups { groupId entries { permissionId } } } }",
                                 "variables": ""
                             }
                         },
@@ -57910,7 +58059,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The server token does not exist/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/The server token does not exist/); });",
+                                    "pm.test('refused: /The server token does not exist/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The server token does not exist\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -57950,7 +58099,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /Server tokens are managed by a superuser session/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/Server tokens are managed by a superuser session/); });",
+                                    "pm.test('refused: /Server tokens are managed by a superuser session/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Server tokens are managed by a superuser session\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -58040,7 +58189,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /Invalid personal access token/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/Invalid personal access token/); });",
+                                    "pm.test('refused: /Invalid personal access token/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Invalid personal access token\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -58120,7 +58269,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The server token is revoked/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/The server token is revoked/); });",
+                                    "pm.test('refused: /The server token is revoked/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The server token is revoked\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -58178,7 +58327,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "query GetServerTokenList { GetServerTokenList(input: { clientProductId: \"StProbe\" }) { tokens { id revoked lastUsedAt } } }",
+                                "query": "query GetServerTokenList { GetServerTokenList(input: { clientProductId: \"StProbe{{stRun}}\" }) { tokens { id revoked lastUsedAt } } }",
                                 "variables": ""
                             }
                         },
@@ -58250,7 +58399,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const items = (json.data && json.data.ConnectedProductsList && json.data.ConnectedProductsList.items) || [];",
-                                    "const entry = items.find(function (i) { return i.productId === 'StProbe'; });",
+                                    "const entry = items.find(function (i) { return i.productId === pm.variables.replaceIn('StProbe{{stRun}}'); });",
                                     "pm.test('the catalog has StProbe', function () { pm.expect(entry, JSON.stringify(items)).to.be.an('object'); });",
                                     "pm.test('no token', function () { pm.expect(entry.status).to.eql('No token'); pm.expect(entry.productVersion).to.eql('7.1.0'); });"
                                 ]
@@ -58268,7 +58417,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "query ConnectedProductsList { ConnectedProductsList(input: { viewParams: { offset: 0, count: 100 } }) { items { id productId status productVersion tokenCreatedAt lastUsedAt } } }",
+                                "query": "query ConnectedProductsList { ConnectedProductsList(input: { viewParams: { offset: 0, count: -1 } }) { items { id productId status productVersion tokenCreatedAt lastUsedAt } } }",
                                 "variables": ""
                             }
                         },
@@ -58308,7 +58457,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation AddServerTokenClient { AddServerTokenClient(input: { clientProductId: \"StAdded\", name: \"StAdded added\" }) { success added } }",
+                                "query": "mutation AddServerTokenClient { AddServerTokenClient(input: { clientProductId: \"StAdded{{stRun}}\", name: \"StAdded added\" }) { success added } }",
                                 "variables": ""
                             }
                         },
@@ -58348,7 +58497,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation AddServerTokenClient { AddServerTokenClient(input: { clientProductId: \"StAdded\", name: \"StAdded added\" }) { success added } }",
+                                "query": "mutation AddServerTokenClient { AddServerTokenClient(input: { clientProductId: \"StAdded{{stRun}}\", name: \"StAdded added\" }) { success added } }",
                                 "variables": ""
                             }
                         },
@@ -58371,9 +58520,9 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const items = (json.data && json.data.ConnectedProductsList && json.data.ConnectedProductsList.items) || [];",
-                                    "const entry = items.find(function (i) { return i.productId === 'StAdded'; });",
+                                    "const entry = items.find(function (i) { return i.productId === pm.variables.replaceIn('StAdded{{stRun}}'); });",
                                     "pm.test('the catalog has StAdded', function () { pm.expect(entry, JSON.stringify(items)).to.be.an('object'); });",
-                                    "pm.test('once and without a token', function () { pm.expect(entry.status).to.eql('No token'); pm.expect(items.filter(function (i) { return i.productId === 'StAdded'; }).length).to.eql(1); });",
+                                    "pm.test('once and without a token', function () { pm.expect(entry.status).to.eql('No token'); pm.expect(items.filter(function (i) { return i.productId === pm.variables.replaceIn('StAdded{{stRun}}'); }).length).to.eql(1); });",
                                     "pm.environment.set('stAddedCard', entry ? entry.id : 'missing');"
                                 ]
                             }
@@ -58390,7 +58539,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "query ConnectedProductsList { ConnectedProductsList(input: { viewParams: { offset: 0, count: 100 } }) { items { id productId status productVersion tokenCreatedAt lastUsedAt } } }",
+                                "query": "query ConnectedProductsList { ConnectedProductsList(input: { viewParams: { offset: 0, count: -1 } }) { items { id productId status productVersion tokenCreatedAt lastUsedAt } } }",
                                 "variables": ""
                             }
                         },
@@ -58430,7 +58579,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"StAdded\", name: \"st added\", scopes: [] }) { id token success scopes } }",
+                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"StAdded{{stRun}}\", name: \"st added\", scopes: [] }) { id token success scopes } }",
                                 "variables": ""
                             }
                         },
@@ -58453,7 +58602,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /A server token is issued to the server of another product/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/A server token is issued to the server of another product/); });",
+                                    "pm.test('refused: /A server token is issued to the server of another product/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"A server token is issued to the server of another product\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -58493,7 +58642,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /A server token is issued to the server of another product/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/A server token is issued to the server of another product/); });",
+                                    "pm.test('refused: /A server token is issued to the server of another product/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"A server token is issued to the server of another product\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -58533,7 +58682,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /Server tokens are managed by a superuser session/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/Server tokens are managed by a superuser session/); });",
+                                    "pm.test('refused: /Server tokens are managed by a superuser session/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Server tokens are managed by a superuser session\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -58550,7 +58699,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation AddServerTokenClient { AddServerTokenClient(input: { clientProductId: \"StByUser\", name: \"StByUser added\" }) { success added } }",
+                                "query": "mutation AddServerTokenClient { AddServerTokenClient(input: { clientProductId: \"StByUser{{stRun}}\", name: \"StByUser added\" }) { success added } }",
                                 "variables": ""
                             }
                         },
@@ -58573,7 +58722,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /Server tokens are managed by a superuser session/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/Server tokens are managed by a superuser session/); });",
+                                    "pm.test('refused: /Server tokens are managed by a superuser session/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Server tokens are managed by a superuser session\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -58585,7 +58734,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation AddServerTokenClient { AddServerTokenClient(input: { clientProductId: \"StByAnonymous\", name: \"StByAnonymous added\" }) { success added } }",
+                                "query": "mutation AddServerTokenClient { AddServerTokenClient(input: { clientProductId: \"StByAnonymous{{stRun}}\", name: \"StByAnonymous added\" }) { success added } }",
                                 "variables": ""
                             }
                         },
@@ -58608,7 +58757,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const ids = ((json.data && json.data.ConnectedProductsList && json.data.ConnectedProductsList.items) || []).map(function (i) { return i.productId; });",
-                                    "pm.test('no refused product is in the catalog', function () { ['StBySrv', 'StByUser', 'StByAnonymous', ''].forEach(function (id) { pm.expect(ids).to.not.include(id); }); });"
+                                    "pm.test('no refused product is in the catalog', function () { ['StBySrv', 'StByUser', 'StByAnonymous'].forEach(function (id) { pm.expect(ids).to.not.include(id + pm.environment.get('stRun')); }); pm.expect(ids).to.not.include(''); });"
                                 ]
                             }
                         }
@@ -58624,7 +58773,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "query ConnectedProductsList { ConnectedProductsList(input: { viewParams: { offset: 0, count: 100 } }) { items { id productId status productVersion tokenCreatedAt lastUsedAt } } }",
+                                "query": "query ConnectedProductsList { ConnectedProductsList(input: { viewParams: { offset: 0, count: -1 } }) { items { id productId status productVersion tokenCreatedAt lastUsedAt } } }",
                                 "variables": ""
                             }
                         },
@@ -58704,7 +58853,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"StProbe\", name: \"st before removal\", scopes: [] }) { id token success scopes } }",
+                                "query": "mutation CreateServerToken { CreateServerToken(input: { clientProductId: \"StProbe{{stRun}}\", name: \"st before removal\", scopes: [] }) { id token success scopes } }",
                                 "variables": ""
                             }
                         },
@@ -58817,7 +58966,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /Invalid personal access token/', function () { pm.expect(messages, JSON.stringify(json)).to.match(/Invalid personal access token/); });",
+                                    "pm.test('refused: /Invalid personal access token/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Invalid personal access token\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -58835,6 +58984,86 @@
                             "mode": "graphql",
                             "graphql": {
                                 "query": "query GetApplicationInfo { GetApplicationInfo(input: {}) { applicationId } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "ST cleanup: revoke only this suite's ProLife token",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.RevokeServerToken;",
+                                    "pm.test('RevokeServerToken answered', function () { pm.expect(json.errors, JSON.stringify(json.errors)).to.eql(undefined); pm.expect(payload, JSON.stringify(json)).to.be.an('object'); });",
+                                    "pm.test('the suite token is revoked without removing its client', function () { pm.expect(payload.success).to.eql(true); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RevokeServerToken { RevokeServerToken(input: { id: \"{{srvProLifeTestTokenId}}\" }) { success } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "ST cleanup: revoke only this suite's Lisa token",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.RevokeServerToken;",
+                                    "pm.test('RevokeServerToken answered', function () { pm.expect(json.errors, JSON.stringify(json.errors)).to.eql(undefined); pm.expect(payload, JSON.stringify(json)).to.be.an('object'); });",
+                                    "pm.test('the suite token is revoked without removing its client', function () { pm.expect(payload.success).to.eql(true); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RevokeServerToken { RevokeServerToken(input: { id: \"{{srvLisaTestTokenId}}\" }) { success } }",
                                 "variables": ""
                             }
                         },

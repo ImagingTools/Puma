@@ -31,7 +31,7 @@
 
 const crypto = require('crypto');
 const {
-	wsUrl, suLogin, suPassword, productId, registrationGraceMs,
+	wsUrl, suLogin, suPassword, productId, frameTimeoutMs,
 	gqlString, gql, login,
 	SubscriptionSession, notificationOf,
 	assert, test, requires, runSuite
@@ -136,8 +136,8 @@ async function openSessions(spyInput) {
 	}
 	sessions.push(spy);
 
-	await new Promise(r => setTimeout(r, registrationGraceMs));
 	for (const p of sessions) {
+		await Promise.all(Array.from(p.subIds.values(), id => p.session.settle(id)));
 		for (const commandId of CHANNELS) {
 			p.subIds.set(commandId, p.session.confirmAccepted(p.subIds.get(commandId)));
 		}
@@ -157,6 +157,11 @@ function framesSince(p, commandId, mark) {
 // every other session gets nothing at all on that channel. The expectation may be
 // a function of what the action returned, for ids the server only now assigned.
 async function expectRouting(commandId, expectation, recipients, action) {
+	for (const p of everyone){
+		for (const id of p.subIds.values()){
+			p.session.confirmAccepted(id);
+		}
+	}
 	const marks = new Map(everyone.map(p => [p, p.session.mark()]));
 	const result = await action();
 	const expected = typeof expectation === 'function' ? expectation(result) : expectation;
@@ -180,10 +185,12 @@ async function expectRouting(commandId, expectation, recipients, action) {
 
 	for (const p of recipients) {
 		const subId = p.subIds.get(commandId);
-		await p.session.waitFor(f => f.type === 'data' && f.id === subId && matches(f),
-			15000, marks.get(p)).catch(() => {
-			throw new Error(`${p.role} did not receive ${JSON.stringify(expected)}; got ` +
-				JSON.stringify(framesSince(p, commandId, marks.get(p)).map(f => notificationOf(f, commandId))).slice(0, 400));
+		await p.session.waitFor(f => f.id === subId && f.type === 'data' && matches(f),
+			frameTimeoutMs, marks.get(p)).catch(() => {
+			const terminal = p.session.frames.slice(marks.get(p)).filter(f => f.id === subId && f.type === 'error');
+			throw new Error(`${p.role} did not receive ${JSON.stringify(expected)} on a live pre-mutation subscription; got ` +
+				JSON.stringify(framesSince(p, commandId, marks.get(p)).map(f => notificationOf(f, commandId))).slice(0, 400) +
+				`; terminal: ${JSON.stringify(terminal.map(f => f.payload)).slice(0, 400)}`);
 		});
 	}
 
@@ -203,6 +210,11 @@ async function expectRouting(commandId, expectation, recipients, action) {
 	}
 	assert(problems.length === 0, problems.join('\n        '));
 
+	for (const p of everyone){
+		for (const id of p.subIds.values()){
+			p.session.confirmAccepted(id);
+		}
+	}
 	return result;
 }
 
@@ -351,14 +363,50 @@ async function main() {
 				owner.tenantToken));
 	});
 
-	await test('an excluded member and the owner are told, nobody else', async () => {
+	await test('an excluded member and the owner receive the event on their original subscriptions, nobody else', async () => {
 		await expectRouting(MEMBERSHIP, { notificationType: 'MembershipRemoved', tenantId: tenantA, userId: member.userId, membershipId: member.membershipId }, [member, owner],
 			() => act('RemoveMembership',
 				`mutation RemoveMembership { RemoveMembership(input: { membershipId: ${gqlString(member.membershipId)} }) { success errorMessage } }`,
 				owner.tenantToken));
 	});
 
-	await test('a member leaving is told to that member and the owner, nobody else', async () => {
+	await test('an excluded member recovers the personal notification after reconnecting without membership', async () => {
+		await new Promise((resolve, reject) => {
+			const timeout = setTimeout(() => reject(new Error('The previous connection did not close')), frameTimeoutMs);
+			member.session.socket.once('close', () => {
+				clearTimeout(timeout);
+				resolve();
+			});
+			member.session.close();
+		});
+		assert(member.session.violations.length === 0, member.session.violations.join('\n'));
+		const auth = await login(member.login, password);
+		assert(auth.userId === member.userId, 'The returning user must be the same recipient');
+		member.token = auth.token;
+		member.session = new SubscriptionSession(member.role, wsUrl, member.token);
+		await member.session.connect();
+		await member.session.init();
+		for (const commandId of CHANNELS){
+			member.subIds.set(commandId, await member.session.subscribe(commandId, subscriptionQuery(commandId)));
+		}
+
+		const membership = await gql(
+			`query FindMembership { FindMembership(input: { userId: ${gqlString(member.userId)}, tenantId: ${gqlString(tenantA)} }) { membership { id } errorMessage } }`,
+			member.token);
+		const current = membership.data && membership.data.FindMembership;
+		assert(!membership.errors && current && current.errorMessage === 'Membership not found' && !current.membership,
+			'The returning recipient must no longer belong to the organization');
+
+		const list = await act('NotificationsList',
+			'query NotificationsList { NotificationsList(input: { pageSize: 100 }) { items { id typeId subject { id } } } }', member.token);
+		const ended = list.items.filter(item => item.typeId === 'imtauth.MembershipEnded' && item.subject && item.subject.id === tenantA);
+		assert(ended.length === 1 && ended[0].id, 'The personal membership-ended notification must survive reconnection');
+		const unrelated = await act('NotificationsList',
+			'query NotificationsList { NotificationsList(input: { pageSize: 100 }) { items { id typeId subject { id } } } }', outsider.token);
+		assert(!unrelated.items.some(item => item.id === ended[0].id), 'Another recipient must not read the saved notification');
+	});
+
+	await test('a leaving member and the owner receive the event on their original subscriptions, nobody else', async () => {
 		const found = await act('FindMembership',
 			`query FindMembership { FindMembership(input: { userId: ${gqlString(invitee.userId)}, tenantId: ${gqlString(tenantA)} }) { membership { id } errorMessage } }`,
 			invitee.token);

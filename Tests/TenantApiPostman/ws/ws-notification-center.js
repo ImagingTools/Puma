@@ -18,7 +18,7 @@
 
 const crypto = require('crypto');
 const {
-	wsUrl, suLogin, suPassword, productId, registrationGraceMs,
+	wsUrl, suLogin, suPassword, productId,
 	gqlString, gql, login,
 	SubscriptionSession, notificationOf,
 	assert, test, requires, runSuite
@@ -48,7 +48,6 @@ async function act(label, query, token, product, headers) {
 	return payload;
 }
 
-// Any signed-in user may send until a product server has an identity of its own (ImagingTools/ImtCore#1059)
 // Puma takes notifications from the server of a product only; its users watch and read them through that server
 const sender = { product: `WsncSender${runTag}`, token: null };
 const otherSender = { product: `WsncOther${runTag}`, token: null };
@@ -62,6 +61,14 @@ function send(fields) {
 // An action of a user on the notifications of the sender
 function actThroughSender(label, query, token) {
 	return act(label, query, token, sender.product, throughSender());
+}
+
+async function loginThroughSender(username) {
+	const auth = await actThroughSender('Authorization',
+		`query Authorization { Authorization(input: { login: ${gqlString(username)}, password: ${gqlString(password)},` +
+		` productId: ${gqlString(sender.product)} }) { userId token } }`);
+	assert(auth.userId && auth.token, 'The sender did not issue a user session');
+	return auth;
 }
 
 // --- the sessions
@@ -142,15 +149,16 @@ runSuite({ name: 'Notification center WebSocket suite', className: 'Notification
 			` item: { id: ${gqlString(card)}, productId: ${gqlString(product.product)}, name: ${gqlString(product.product)} } }) { id } }`, su.token);
 		product.token = (await act('CreateServerToken',
 			`mutation CreateServerToken { CreateServerToken(input: { clientProductId: ${gqlString(product.product)}, name: "ws notification center",` +
-			' scopes: ["/ProductServer/Notifications/View", "/ProductServer/Notifications/Send"] }) { token } }', su.token)).token;
+			' scopes: [] }) { token } }', su.token)).token;
 	}
 
 	const createUser = async (role) => {
 		const loginName = `wsnc_${role}_${runTag}`;
-		await act('RegisterUser',
+		const registered = await act('RegisterUser',
 			`mutation RegisterUser { RegisterUser(input: { userData: { name: ${gqlString('WS NC ' + role)}, username: ${gqlString(loginName)},` +
 			` password: ${gqlString(password)}, email: ${gqlString(loginName + '@ws.test')} }, productId: ${gqlString(productId)} }) { id } }`, su.token);
-		return { role, login: loginName, userId: (await login(loginName, password)).userId };
+		assert(registered.id, 'The notification fixture user was not created');
+		return { role, login: loginName, userId: registered.id };
 	};
 
 	const alice = await createUser('alice');
@@ -161,17 +169,17 @@ runSuite({ name: 'Notification center WebSocket suite', className: 'Notification
 		` ownerId: ${gqlString(alice.userId)} }) { tenantId errorMessage } }`, su.token)).tenantId;
 
 	// SelectTenant ends the session of the token it is called with: the tenant session signs in on its own
-	const aliceTenantLogin = await login(alice.login, password);
-	const selected = await act('SelectTenant',
+	const aliceTenantLogin = await loginThroughSender(alice.login);
+	const selected = await actThroughSender('SelectTenant',
 		`mutation SelectTenant { SelectTenant(input: { tenantId: ${gqlString(tenantA)} }) { ok userSession { tenantId accessToken } errorMessage } }`,
 		aliceTenantLogin.token);
 
-	const aliceHome = await openSession('alice without an organization', (await login(alice.login, password)).token);
+	const aliceHome = await openSession('alice without an organization', (await loginThroughSender(alice.login)).token);
 	const aliceInA = await openSession('alice in organization A', selected.userSession.accessToken);
-	const aliceSecond = await openSession('a second session of alice', (await login(alice.login, password)).token);
-	const bobHome = await openSession('bob', (await login(bob.login, password)).token);
+	const aliceSecond = await openSession('a second session of alice', (await loginThroughSender(alice.login)).token);
+	const bobHome = await openSession('bob', (await loginThroughSender(bob.login)).token);
 
-	await new Promise(r => setTimeout(r, registrationGraceMs));
+	await Promise.all(sessions.map(s => s.session.settle(s.subId)));
 	for (const s of sessions) {
 		s.subId = s.session.confirmAccepted(s.subId);
 	}
