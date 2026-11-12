@@ -58341,6 +58341,257 @@
                     "response": []
                 },
                 {
+                    "name": "ST: a token in use is not deleted",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
+                                    "pm.test('refused: /Revoke the server token before deleting it/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Revoke the server token before deleting it\"))); });",
+                                    "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation DeleteServerToken { DeleteServerToken(input: { id: \"{{stId}}\" }) { success } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "ST: an ordinary user does not delete",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
+                                    "pm.test('refused: /Server tokens are managed by a superuser session/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Server tokens are managed by a superuser session\"))); });",
+                                    "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{stUserToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation DeleteServerToken { DeleteServerToken(input: { id: \"{{stSecondId}}\" }) { success } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "ST: su deletes a revoked token",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.DeleteServerToken;",
+                                    "pm.test('DeleteServerToken answered', function () { pm.expect(json.errors, JSON.stringify(json.errors)).to.eql(undefined); pm.expect(payload, JSON.stringify(json)).to.be.an('object'); });",
+                                    "pm.test('deleted', function () { pm.expect(payload.success).to.eql(true); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation DeleteServerToken { DeleteServerToken(input: { id: \"{{stSecondId}}\" }) { success } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "ST: the list has no deleted token",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data && json.data.GetServerTokenList;",
+                                    "pm.test('GetServerTokenList answered', function () { pm.expect(json.errors, JSON.stringify(json.errors)).to.eql(undefined); pm.expect(payload, JSON.stringify(json)).to.be.an('object'); });",
+                                    "const ids = (payload.tokens || []).map(function (t) { return t.id; });",
+                                    "pm.test('gone, the others stay', function () { pm.expect(ids).to.not.include(pm.environment.get('stSecondId')); pm.expect(ids).to.include(pm.environment.get('stId')); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetServerTokenList { GetServerTokenList(input: { clientProductId: \"StProbe{{stRun}}\" }) { tokens { id } } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "ST: a deleted token is refused",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.request.headers.remove('productid');",
+                                    "pm.variables.set('expectedHttpStatus', 403);"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
+                                    "pm.test('refused: /Invalid personal access token/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Invalid personal access token\"))); });",
+                                    "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-server-token",
+                                "value": "{{stSecondToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetApplicationInfo { GetApplicationInfo(input: {}) { applicationId } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "ST: a deleted token is not deleted again",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
+                                    "pm.test('refused: /The server token does not exist/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The server token does not exist\"))); });",
+                                    "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation DeleteServerToken { DeleteServerToken(input: { id: \"{{stSecondId}}\" }) { success } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
                     "name": "ST: su revokes the remaining tokens",
                     "event": [
                         {

@@ -405,6 +405,24 @@ st.push(item('ST: the list marks the revoked token', 'query GetServerTokenList {
 		"pm.test('revoked and in use', function () { pm.expect(byId[pm.environment.get('stSecondId')].revoked).to.eql(true); pm.expect(byId[pm.environment.get('stId')].revoked).to.eql(false); pm.expect(byId[pm.environment.get('stId')].lastUsedAt).to.not.eql(''); });"
 	])
 }));
+
+// Deleting: a revoked token only
+const deleteToken = (id) => `mutation DeleteServerToken { DeleteServerToken(input: { id: "${id}" }) { success } }`;
+st.push(item('ST: a token in use is not deleted', deleteToken('{{stId}}'), { auth: '{{su_token}}', test: refused('/Revoke the server token before deleting it/') }));
+st.push(item('ST: an ordinary user does not delete', deleteToken('{{stSecondId}}'), { auth: '{{stUserToken}}', test: refused('/Server tokens are managed by a superuser session/') }));
+st.push(item('ST: su deletes a revoked token', deleteToken('{{stSecondId}}'), {
+	auth: '{{su_token}}',
+	test: accepted('DeleteServerToken', ["pm.test('deleted', function () { pm.expect(payload.success).to.eql(true); });"])
+}));
+st.push(item('ST: the list has no deleted token', 'query GetServerTokenList { GetServerTokenList(input: { clientProductId: "StProbe" }) { tokens { id } } }', {
+	auth: '{{su_token}}',
+	test: accepted('GetServerTokenList', [
+		'const ids = (payload.tokens || []).map(function (t) { return t.id; });',
+		"pm.test('gone, the others stay', function () { pm.expect(ids).to.not.include(pm.environment.get('stSecondId')); pm.expect(ids).to.include(pm.environment.get('stId')); });"
+	])
+}));
+st.push(item('ST: a deleted token is refused', appInfo, { server: '{{stSecondToken}}', status: 403, test: refused('/Invalid personal access token/') }));
+st.push(item('ST: a deleted token is not deleted again', deleteToken('{{stSecondId}}'), { auth: '{{su_token}}', test: refused('/The server token does not exist/') }));
 st.push(item('ST: su revokes the remaining tokens', 'mutation RevokeServerToken { RevokeServerToken(input: { id: "{{stEditId}}" }) { success } }', {
 	auth: '{{su_token}}',
 	pre: ["pm.sendRequest({ url: pm.environment.get('base_url'), method: 'POST', header: { 'Content-Type': 'application/json', 'x-authentication-token': pm.environment.get('su_token'), 'productid': 'Puma' }, body: { mode: 'raw', raw: JSON.stringify({ query: 'mutation RevokeServerToken { RevokeServerToken(input: { id: \"' + pm.environment.get('stId') + '\" }) { success } }' }) } }, function (err, res) { pm.environment.set('stFirstRevoked', String(!err && res.json().data && res.json().data.RevokeServerToken && res.json().data.RevokeServerToken.success)); });"],
