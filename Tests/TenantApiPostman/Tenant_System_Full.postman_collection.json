@@ -53175,7 +53175,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The product Lisa is not connected: its server sends no valid token/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The product 'Lisa' is not connected: its server sends no valid token\"))); });",
+                                    "pm.test('refused: /Lisa is not connected to Puma: its server has no valid server token/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Lisa is not connected to Puma: its server has no valid server token\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -56976,7 +56976,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The product StProbe is not connected: its server sends no valid token/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The product 'StProbe{{stRun}}' is not connected: its server sends no valid token\"))); });",
+                                    "pm.test('refused: /StProbe is not connected to Puma: its server has no valid server token/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"StProbe is not connected to Puma: its server has no valid server token\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -57026,7 +57026,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The product StProbe is not connected: its server sends no valid token/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The product 'StProbe{{stRun}}' is not connected: its server sends no valid token\"))); });",
+                                    "pm.test('refused: /StProbe is not connected to Puma: its server has no valid server token/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"StProbe is not connected to Puma: its server has no valid server token\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -57175,7 +57175,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The product StProbe is not connected: its server sends no valid token/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The product 'StProbe{{stRun}}' is not connected: its server sends no valid token\"))); });",
+                                    "pm.test('refused: /StProbe is not connected to Puma: its server has no valid server token/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"StProbe is not connected to Puma: its server has no valid server token\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -57225,7 +57225,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The product StProbe is not connected: its server sends no valid token/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The product 'StProbe{{stRun}}' is not connected: its server sends no valid token\"))); });",
+                                    "pm.test('refused: /StProbe is not connected to Puma: its server has no valid server token/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"StProbe is not connected to Puma: its server has no valid server token\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -57665,7 +57665,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The permissions of this server are given to the servers of products/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The permissions of this server are given to the servers of products\"))); });",
+                                    "pm.test('refused: /The permissions of Puma are given only to a product server with a valid server token/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The permissions of Puma are given only to a product server with a valid server token\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -57705,7 +57705,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The permissions of this server are given to the servers of products/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The permissions of this server are given to the servers of products\"))); });",
+                                    "pm.test('refused: /The permissions of Puma are given only to a product server with a valid server token/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The permissions of Puma are given only to a product server with a valid server token\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
