@@ -10,6 +10,7 @@
 
 // ImtCore includes
 #include <imtauth/CUserInfo.h>
+#include <imtauthgql/CAssignmentCollector.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Users.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Roles.h>
 
@@ -206,13 +207,13 @@ sdl::V1_0::imtauth::CUserData* CTestBase::CreateUserDataFromUserInfo(
 	QByteArrayList groupList = userInfo.GetGroups();
 	groupList.removeAll("");
 
-	userDataPtr->groups.Emplace().FromList(groupList);
+	userDataPtr->groups = imtauthgql::CAssignmentCollector::CreateDirectAssignments(groupList);
 
 	if (!productId.isEmpty()){
 		QByteArrayList roleList = userInfo.GetRoles(productId);
 		roleList.removeAll("");
 
-		userDataPtr->roles.Emplace().FromList(roleList);
+		userDataPtr->roles = imtauthgql::CAssignmentCollector::CreateDirectAssignments(roleList);
 	}
 
 	return userDataPtr.PopPtr();
@@ -250,10 +251,10 @@ sdl::V1_0::imtauth::CRoleData* CTestBase::CreateRoleDataFromUserInfo(const imtau
 
 	QByteArrayList parentRoles = roleInfo.GetIncludedRoles();
 	parentRoles.removeAll("");
-	roleDataPtr->parentRoles.Emplace().FromList(parentRoles);
+	roleDataPtr->parentRoles = imtauthgql::CAssignmentCollector::CreateDirectAssignments(parentRoles);
 
 	QByteArrayList features = roleInfo.GetPermissions();
-	roleDataPtr->permissions = features.join(';');
+	roleDataPtr->permissions = imtauthgql::CAssignmentCollector::CreateDirectAssignments(features);
 
 	roleDataPtr->isDefault = false;
 	roleDataPtr->isGuest = false;
