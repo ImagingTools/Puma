@@ -171,10 +171,10 @@ public:
 		qDebug() << "HTTP server started on port" << serverConfig.httpPort;
 
 		if (!serverControllerPtr->StartServer(imtcom::IServerConnectionInterface::PT_WEBSOCKET)){
-			qWarning() << "Failed to start WebSocket server on port" << serverConfig.wsPort;
+			qWarning() << "Failed to start WebSocket server on port" << serverConfig.httpPort;
 			return false;
 		}
-		qDebug() << "WebSocket server started on port" << serverConfig.wsPort;
+		qDebug() << "WebSocket server started on port" << serverConfig.httpPort;
 
 		qDebug() << "Server started successfully";
 
@@ -229,7 +229,11 @@ public:
 
 	bool SetConnectionParam(const ServerConfig& serverConfig)
 	{
-		return SetConnectionParamInternal(serverConfig, "ServerConnectionInterfaceParam");
+		// The server serves WebSocket on its HTTP port (AuthServerSdk.acc), so clients are sent there
+		ServerConfig ownConfig = serverConfig;
+		ownConfig.wsPort = serverConfig.httpPort;
+
+		return SetConnectionParamInternal(ownConfig, "ServerConnectionInterfaceParam");
 	}
 
 

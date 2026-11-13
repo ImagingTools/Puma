@@ -17,10 +17,11 @@ void CPersonalAccessTokenTest::initTestCase()
 	qDebug() << "=== [Init] PersonalAccessToken tests start ===";
 
 	// Ports match PumaServerSlTest.acc (isolated, disposable-DB test server),
-	// not the plain PumaServerSl.exe (17789/18789 vs. 7788/8788) - this suite
+	// not the plain PumaServerSl.exe (17789 vs. 7788) - this suite
 	// must never touch a developer's persistent local Puma database.
 	AuthServerSdk::ServerConfig pumaConfig;
-	pumaConfig.wsPort = 18789;
+	// Puma serves WebSocket on its HTTP port
+	pumaConfig.wsPort = 17789;
 	pumaConfig.httpPort = 17789;
 
 	m_authorizableServer.SetPumaConnectionParam(pumaConfig);

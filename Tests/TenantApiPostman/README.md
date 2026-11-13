@@ -670,7 +670,7 @@ extra build step is needed. Standalone:
 
 ```
 npm install
-node ws/ws-subscriptions.js --http http://localhost:17788/Puma/graphql --ws ws://localhost:18788
+node ws/ws-subscriptions.js --http http://localhost:17788/Puma/graphql
 ```
 
 Options: `--http`, `--ws`, `--env`, `--junit`, `--timeout`, `--grace`, `--su-login`,
@@ -678,8 +678,8 @@ Options: `--http`, `--ws`, `--env`, `--junit`, `--timeout`, `--grace`, `--su-log
 before it counts as accepted (default 2500 ms) - a successful registration is answered
 with silence, so the absence of a refusal is the only acceptance signal on the wire.
 
-The WS port defaults to the HTTP port + 1000 (17788 → 18788, matching
-`PumaServerPgTest.acc`); override with `--ws` where that convention does not hold.
+WebSocket is served on the HTTP port (`PumaServerPgTest.acc`), so the WS URL is derived from
+`--http`; override with `--ws` where it differs.
 
 ### Covered subscriptions
 

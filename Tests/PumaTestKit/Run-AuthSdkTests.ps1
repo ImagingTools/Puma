@@ -11,7 +11,7 @@
     network through an embedded AuthServerSdk instance, which in turn delegates
     user/role/group/PAT/login operations to a real Puma server reachable via
     AuthServerSdk::SetPumaConnectionParam() - hardcoded in those test files to
-    PumaServerSlTest.acc's ports (17789 HTTP / 18789 WebSocket), i.e. the isolated,
+    PumaServerSlTest.acc's port (17789, HTTP and WebSocket), i.e. the isolated,
     disposable-DB test server variant, matching how Run-CiTests-Sqlite.ps1
     (Tests/TenantApiPostman) drives the same executable. This is deliberately NOT
     PumaServerSl.exe's ports (7788/8788) - this suite must never touch a
@@ -45,7 +45,7 @@
     CPersonalAccessTokenTest.cpp - do not change without updating those files too).
 
 .PARAMETER WsPort
-    WebSocket counterpart of -HttpPort (18789, see above).
+    WebSocket port of the server: Puma serves WebSocket on its HTTP port (17789).
 
 .PARAMETER ResetDatabase
     Delete PumaServerSlTest's puma_test.sqlite (+ -wal/-shm sidecars) before
@@ -100,7 +100,7 @@ param(
     [string]$ServerExePath = "",
     [string]$TestExePath = "",
     [int]$HttpPort = 17789,
-    [int]$WsPort = 18789,
+    [int]$WsPort = 17789,
     [switch]$ResetDatabase,
     [string]$SqliteDbPath = (Join-Path $env:PUBLIC "ImagingTools\Puma\Puma Server\puma_test.sqlite"),
     [string[]]$TestArgs = @(),

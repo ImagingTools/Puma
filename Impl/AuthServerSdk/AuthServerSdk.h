@@ -326,6 +326,9 @@ struct ServerConfig
 	* @note If SSL is configured, this becomes a WSS (secure WebSocket) port.
 	*       WebSocket connections are used for real-time notifications and
 	*       bidirectional communication between server and clients.
+	* @note The SDK server serves WebSocket on httpPort, the value is ignored for it.
+	*       For the connection to Puma (SetPumaConnectionParam) it is the WebSocket
+	*       port of Puma: Puma serves WebSocket on its HTTP port, so it equals httpPort.
 	*/
 	int wsPort = 90;
 

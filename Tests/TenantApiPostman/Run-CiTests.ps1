@@ -103,7 +103,7 @@ param(
     [string]$WsNotificationCenterJUnitReportPath = (Join-Path $ScriptDir "junit-report-ws-notification-center.xml"),
     [string]$ServerStdOutPath = (Join-Path $ScriptDir "server-stdout.log"),
     [string]$ServerStdErrPath = (Join-Path $ScriptDir "server-stderr.log"),
-    [int]$WebSocketPort = 18788,
+    [int]$WebSocketPort = 0,
     [int]$StartupTimeoutSeconds = 60
 )
 
@@ -270,7 +270,9 @@ function Invoke-WsSuite([string]$ScriptName, [string]$Title, [string]$ReportPath
     Write-Step "Running $Title"
 
     $httpUrl = "http://localhost:$HttpPort/Puma/graphql"
-    $wsUrl = "ws://localhost:$WebSocketPort"
+    # Puma serves WebSocket on its HTTP port unless -WebSocketPort says otherwise
+    $wsPort = if ($WebSocketPort -gt 0) { $WebSocketPort } else { $HttpPort }
+    $wsUrl = "ws://localhost:$wsPort"
 
     & node $wsScript --http $httpUrl --ws $wsUrl --env $EnvironmentPath --junit $ReportPath | Out-Host
     return $LASTEXITCODE
