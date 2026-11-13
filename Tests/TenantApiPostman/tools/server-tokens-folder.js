@@ -317,8 +317,8 @@ st.push(item('ST: a forwarded superuser session is not a global administrator', 
 st.push(item('ST: a forwarded superuser session cannot manage server tokens', issue('StProbe', 'st forwarded su', '[]'), { auth: '{{stForwardedSuToken}}', server: '{{stToken}}', product: 'StProbe', test: refused('/Server tokens are managed by a superuser session/') }));
 st.push(item('ST: a personal token of another product does not come through this server', readUsers, { auth: '{{stLisaPat}}', bare: true, server: '{{stToken}}', status: 403, test: refused('/The personal access token is not for the product of the server/') }));
 st.push(item('ST: a personal token of Puma does not come through the server of another product', readUsers, { auth: '{{stSuPat}}', server: '{{stToken}}', status: 403, test: refused('/The personal access token is not for the product of the server/') }));
-st.push(item('ST: a personal token of another product is refused without the token of its server', readUsers, { auth: '{{stProbePat}}', bare: true, status: 403, test: refused("/The product 'StProbe' is not connected: its server sends no valid token/") }));
-st.push(item('ST: the same with the header of its product', readUsers, { auth: '{{stProbePat}}', bare: true, product: 'StProbe', status: 403, test: refused("/The product 'StProbe' is not connected: its server sends no valid token/") }));
+st.push(item('ST: a personal token of another product is refused without the token of its server', readUsers, { auth: '{{stProbePat}}', bare: true, status: 403, test: refused("/StProbe is not connected to Puma: its server has no valid server token/") }));
+st.push(item('ST: the same with the header of its product', readUsers, { auth: '{{stProbePat}}', bare: true, product: 'StProbe', status: 403, test: refused("/StProbe is not connected to Puma: its server has no valid server token/") }));
 
 // Another product without the token of its server
 st.push(item('ST: a superuser session works for another product', 'query RolesList { RolesList(input: { viewParams: { offset: 0, count: 1 } }) { items { id } } }', {
@@ -326,8 +326,8 @@ st.push(item('ST: a superuser session works for another product', 'query RolesLi
 	test: accepted('RolesList', ["pm.test('the console of Puma administers the product', function () { pm.expect(payload.items).to.be.an('array'); });"])
 }));
 st.push(item('ST: a personal token of su does not work for another product', readRoles, { auth: '{{stSuPat}}', product: 'StProbe', status: 403, test: refused('/The personal access token is not valid for this product/') }));
-st.push(item('ST: an ordinary user does not work for another product', readRoles, { auth: '{{stUserToken}}', product: 'StProbe', status: 403, test: refused("/The product 'StProbe' is not connected: its server sends no valid token/") }));
-st.push(item('ST: anonymous does not work for another product', appInfo, { product: 'StProbe', status: 403, test: refused("/The product 'StProbe' is not connected: its server sends no valid token/") }));
+st.push(item('ST: an ordinary user does not work for another product', readRoles, { auth: '{{stUserToken}}', product: 'StProbe', status: 403, test: refused("/StProbe is not connected to Puma: its server has no valid server token/") }));
+st.push(item('ST: anonymous does not work for another product', appInfo, { product: 'StProbe', status: 403, test: refused("/StProbe is not connected to Puma: its server has no valid server token/") }));
 
 // The permissions change while the token is in use
 st.push(item('ST: su gives the token the view of roles', update('{{stId}}', '["/Administration/Users/View", "/Administration/Roles/View"]'), {
@@ -357,8 +357,8 @@ st.push(item('ST: the server of a product reads the permissions of Puma for its 
 	auth: '{{stToken}}', bare: true,
 	test: accepted('GetServerTokenFeatures', ["pm.test('the administration of Puma', function () { const ids = payload.features.map(function (f) { return f.featureId; }); pm.expect(ids).to.include('Administration'); });"])
 }));
-st.push(item('ST: a superuser session does not read them', 'query GetServerTokenFeatures { GetServerTokenFeatures { features { featureId } } }', { auth: '{{su_token}}', test: refused('/The permissions of this server are given to the servers of products/') }));
-st.push(item('ST: anonymous does not read them', 'query GetServerTokenFeatures { GetServerTokenFeatures { features { featureId } } }', { test: refused('/The permissions of this server are given to the servers of products/') }));
+st.push(item('ST: a superuser session does not read them', 'query GetServerTokenFeatures { GetServerTokenFeatures { features { featureId } } }', { auth: '{{su_token}}', test: refused('/The permissions of Puma are given only to a product server with a valid server token/') }));
+st.push(item('ST: anonymous does not read them', 'query GetServerTokenFeatures { GetServerTokenFeatures { features { featureId } } }', { test: refused('/The permissions of Puma are given only to a product server with a valid server token/') }));
 
 // Publishing the permissions of a product
 st.push(item('ST: the server of the product publishes its permissions with empty scopes', publish('StProbe', '7.1.0'), {
@@ -533,7 +533,7 @@ const forged = boundary.item[forgedIndex];
 const forgedQuery = forged.request.body.graphql.query;
 boundary.item[forgedIndex] = item('PB role of another product: forged product header', forgedQuery, {
 	auth: '{{pbAdminToken}}', product: 'Lisa', status: 403,
-	test: refused("/The product 'Lisa' is not connected: its server sends no valid token/")
+	test: refused("/Lisa is not connected to Puma: its server has no valid server token/")
 });
 const lisaSession = item('PB role of another product: authorize through its server',
 	'query Authorization { Authorization(input: { login: "{{pbAdminLogin}}", password: "Bound_2026!", productId: "Lisa" }) { token } }', {

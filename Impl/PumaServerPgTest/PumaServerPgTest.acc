@@ -167,6 +167,9 @@
                     <AttributeInfo Id="SessionCollection" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaDatabasePostgres/SessionSqlRepository"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="ServerTokensEnabled" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="SettingsFilePath" Type="String" ExportId="">
                         <Data IsEnabled="true" Value="Puma/Puma Server/PumaServerPgTestSettings.xml"/>
                     </AttributeInfo>
