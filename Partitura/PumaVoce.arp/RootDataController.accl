@@ -8,6 +8,7 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
+        <Element ComponentName="ApplicationInfoController" X="250" Y="600" Note=""/>
         <Element ComponentName="AuthorizationController" X="600" Y="600" Note=""/>
         <Element ComponentName="Demultiplexer" X="600" Y="375" Note=""/>
         <Element ComponentName="DocumentRevisionController" X="950" Y="600" Note=""/>

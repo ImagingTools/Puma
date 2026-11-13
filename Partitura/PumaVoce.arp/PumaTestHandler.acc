@@ -43,9 +43,6 @@
         <Element Id="PumaHandlers" PackageId="PumaVoce" ComponentId="PumaHandlers">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="DatabaseAccessSettings" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="DatabaseAccessSettings"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="DatabaseEngine"/>
                     </AttributeInfo>

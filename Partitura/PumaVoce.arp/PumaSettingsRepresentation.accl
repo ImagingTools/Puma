@@ -8,18 +8,14 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="BackupFolder" X="1000" Y="600" Note=""/>
-        <Element ComponentName="BackupSettingsRepresentation" X="1025" Y="275" Note=""/>
-        <Element ComponentName="DatabaseAccessSettingsRepresentation" X="575" Y="450" Note=""/>
-        <Element ComponentName="DatabaseSettingsRepresentation" X="575" Y="275" Note=""/>
-        <Element ComponentName="EnableableParamRepresentationController" X="575" Y="750" Note=""/>
-        <Element ComponentName="LdapRepresentation" X="550" Y="600" Note=""/>
-        <Element ComponentName="SchedulerParams" X="1000" Y="450" Note=""/>
-        <Element ComponentName="ServerConnectionParamRepresentationController" X="200" Y="450" Note=""/>
-        <Element ComponentName="ServerSettingsRepresentation" X="175" Y="275" Note=""/>
+        <Element ComponentName="DatabaseAccessSettingsRepresentation" X="450" Y="275" Note=""/>
+        <Element ComponentName="EnableableParamRepresentation" X="975" Y="275" Note=""/>
+        <Element ComponentName="FileNameParamRepresentation" X="800" Y="275" Note=""/>
+        <Element ComponentName="SchedulerParamsRepresentation" X="625" Y="275" Note=""/>
+        <Element ComponentName="SelectionParamRepresentation" X="1150" Y="275" Note=""/>
+        <Element ComponentName="ServerConnectionParamRepresentation" X="225" Y="275" Note=""/>
         <Element ComponentName="SettingsRepresentation" X="600" Y="75" Note=""/>
-        <Element ComponentName="SmtpParamsRepresentation" X="200" Y="75" Note=""/>
-        <Element ComponentName="SslConfigurationRepresentation" X="1000" Y="50" Note=""/>
+        <Element ComponentName="TextParamRepresentation" X="1325" Y="275" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

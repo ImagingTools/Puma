@@ -10,9 +10,27 @@
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
+        <Element Id="ApplicationInfoController" PackageId="ImtGraphQlVoce" ComponentId="ApplicationInfoController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="AuthorizationController" PackageId="PumaVoce" ComponentId="Authorization">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="BindingManager" Type="Reference" ExportId="BindingManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="DelegatedAccess" Type="Reference" ExportId="DelegatedAccess">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -64,6 +82,7 @@
                     <AttributeInfo Id="GqlRequestHandlers" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
+                                <Value>ApplicationInfoController</Value>
                                 <Value>AuthorizationController</Value>
                                 <Value>Pages</Value>
                                 <Value>DocumentRevisionController</Value>
@@ -88,6 +107,15 @@
                                 <Value>Roles</Value>
                                 <Value>Users</Value>
                                 <Value>Groups</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RevisionPermissionPaths" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>/Administration/Roles/Revisions</Value>
+                                <Value>/Administration/Users/Revisions</Value>
+                                <Value>/Administration/Groups/Revisions</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

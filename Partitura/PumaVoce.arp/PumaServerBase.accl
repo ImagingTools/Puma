@@ -23,6 +23,7 @@
         <Element ComponentName="UserGroupCollectionDocumentService" X="575" Y="750" Note=""/>
         <Element ComponentName="UserVerificationRepository" X="625" Y="600" Note=""/>
         <Element ComponentName="WebSocketServerFramework" X="600" Y="100" Note=""/>
+        <Element ComponentName="NotificationCenter" X="100" Y="900" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
         <EmbededRegistry Id="Subscriptions">

@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<testsuites><testsuite name="TenantRowLevelSecurity" tests="11" failures="0">
+<testcase classname="TenantRowLevelSecurity" name="role imt_app: superuser=f, bypassrls=f"/>
+<testcase classname="TenantRowLevelSecurity" name="TenantConnections: owner=imt_app, rls=t, force=t, policies=1"/>
+<testcase classname="TenantRowLevelSecurity" name="TenantConnections without context: visible 0 of 0 rows"/>
+<testcase classname="TenantRowLevelSecurity" name="TenantConnectionRequests: owner=imt_app, rls=t, force=t, policies=1"/>
+<testcase classname="TenantRowLevelSecurity" name="TenantConnectionRequests without context: visible 0 of 0 rows"/>
+<testcase classname="TenantRowLevelSecurity" name="TenantRelationships: owner=imt_app, rls=t, force=t, policies=1"/>
+<testcase classname="TenantRowLevelSecurity" name="TenantRelationships without context: visible 0 of 0 rows"/>
+<testcase classname="TenantRowLevelSecurity" name="TenantRelationshipProposals: owner=imt_app, rls=t, force=t, policies=1"/>
+<testcase classname="TenantRowLevelSecurity" name="TenantRelationshipProposals without context: visible 0 of 0 rows"/>
+<testcase classname="TenantRowLevelSecurity" name="CrossOrgGrants: owner=imt_app, rls=t, force=t, policies=1"/>
+<testcase classname="TenantRowLevelSecurity" name="CrossOrgGrants without context: visible 0 of 0 rows"/>
+</testsuite></testsuites>
+

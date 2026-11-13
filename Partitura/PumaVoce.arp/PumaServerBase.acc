@@ -13,8 +13,14 @@
         <Element Id="AuthenticationManager" PackageId="ImtAuthVoce" ComponentId="AuthenticationManager">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="InvitationManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="TenantController/TenantInvitationManager"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MembershipManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="TenantController/TenantMembershipManager"/>
                     </AttributeInfo>
                     <AttributeInfo Id="PersonalAccessTokenManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PersonalAccessTokenController/PersonalAccessTokenManager"/>
@@ -88,6 +94,33 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="NotificationCenter" PackageId="ImtCoreVoce" ComponentId="NotificationCenter">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RequestManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="WebSocketServerFramework"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantMembershipManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="TenantController/TenantMembershipManager"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaSettings/TracingConfiguration"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaLocalization"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserCollection" Type="Reference" ExportId="UserRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="PersonalAccessTokenController" PackageId="ImtAuthVoce" ComponentId="PersonalAccessTokenController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -118,17 +151,11 @@
                     <AttributeInfo Id="AuthenticationManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="AuthenticationManager"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="BackupSettings" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="PumaSettings/Backup"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="BindingManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="TenantController/TenantEntityBindingManager"/>
                     </AttributeInfo>
                     <AttributeInfo Id="CrossOrgGrantManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="TenantController/CrossOrgGrantManager"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="DatabaseAccessSettings" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="PumaSettings/DatabaseAccessSettings"/>
                     </AttributeInfo>
                     <AttributeInfo Id="DatabaseConnectionChecker" Type="Reference" ExportId="DatabaseConnectionChecker">
                         <Data IsEnabled="false"/>
@@ -147,6 +174,7 @@
                                 <Value>RoleCollectionDocumentService</Value>
                                 <Value>UserCollectionDocumentService</Value>
                                 <Value>UserGroupCollectionDocumentService</Value>
+                                <Value>NotificationCenter</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -154,7 +182,7 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="JwtSessionController" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="JwtSessionController"/>
+                        <Data IsEnabled="true" Value="AuthenticationManager"/>
                     </AttributeInfo>
                     <AttributeInfo Id="LdapEnableableParam" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaSettings/LdapEnabled"/>
@@ -355,6 +383,12 @@
         <Element Id="TenantController" PackageId="ImtUserAdministrationVoce" ComponentId="TenantController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="NotificationSender" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="NotificationCenter/NotificationSender"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="NotificationInboxController" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="NotificationCenter/NotificationInboxController"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ContractRepository" Type="Reference" ExportId="ContractRepository">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -506,6 +540,7 @@
                                 <Value>UserGroupCollectionDocumentService</Value>
                                 <Value>UserCollectionDocumentService</Value>
                                 <Value>RoleCollectionDocumentService</Value>
+                                <Value>NotificationCenter</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -679,5 +714,8 @@
         <Component ExportedId="DatabaseAccessSettings" ComponentId="PumaSettings/DatabaseAccessSettings"/>
         <Component ExportedId="TracingConfiguration" ComponentId="PumaSettings/TracingConfiguration"/>
         <Component ExportedId="WebSocketServerFramework" ComponentId="WebSocketServerFramework"/>
+        <Component ExportedId="TenantNotificationPublisher" ComponentId="TenantController/TenantNotificationPublisher"/>
+        <Component ExportedId="ConnectionCodesNotificationPublisher" ComponentId="TenantController/ConnectionCodesNotificationPublisher"/>
+        <Component ExportedId="CrossTenantMessageNotificationPublisher" ComponentId="TenantController/CrossTenantMessageNotificationPublisher"/>
     </ExportedComponents>
 </Acf>

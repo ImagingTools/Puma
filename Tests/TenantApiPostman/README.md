@@ -38,11 +38,13 @@ Minimal run:
 newman run Tenant_System_Full.postman_collection.json -e Tenant_System_Full.postman_environment.json
 ```
 
+`Run-CiTests.ps1` (Postgres) and `Run-CiTests-Sqlite.ps1` also fail the run if the server log (`server-stdout.log`/`server-stderr.log`, `server-sqlite-*.log` for SQLite) has a database error - see `ServerLogCheck.ps1`. A server can answer every request correctly while it loses data behind them; the log is the only place that shows it.
+
 ## Scenario Coverage Summary
 
-Total request-level scenarios: 405
+Total request-level scenarios: 406
 
-- 00 System bootstrap: 1 requests
+- 00 System bootstrap: 2 requests
 - 00A Auth SU: 1 requests
 - 00B Register users: 4 requests
 - 00C Auth all users: 4 requests
@@ -66,6 +68,8 @@ Total request-level scenarios: 405
 - 14 Advanced Edge - Lifecycle and delegation depth: 88 requests  [GetProfile for dual grants and revoke]
 - 14A Role permissions validation in-tenant: 12 requests
 - 14B Scope isolation - Roles/Users/Groups: 18 requests
+- 20 Organization permissions by path: 24 requests  [organization permissions are checked by imtauth::HasPermission: a leaf granted as the full path the GUI stores opens what it names, a sibling leaf or a group of the tree - by path or bare id - does not; the reads of the organization (members, connections, connection code, permissions of another member) need their own leaf]
+- 21 QA Regression - Organizations GUI audit: 66 requests  [server defects found by the browser audit of the ProLife Organizations page (2026-10-22): an open organization document follows TransferTenantOwnership and saving it does not revert the ownership; GetTenantList sorts by tenantRelationScope; the Status filter as the GUI sends it (Bool, typed by __typename); user history: every revision has an author and a description, a rename is not recorded as a change of the login, joining a group is recorded as such; role and group documents saved as the editor does keep the element id as the representation id, so their history is found; the grant list reports a revoked grant as inactive]
 - 99 Cleanup: 5 requests
 
 ### Assertion policy
@@ -84,9 +88,10 @@ document handle carried across folders expires on any run slower than ~30s.
 
 ## Full Scenario Catalog (All Request-Level Scenarios)
 
-### 00 System bootstrap (1)
+### 00 System bootstrap (2)
 
 1. Ensure superuser exists (su)
+2. GetApplicationInfo reports the version and build time of Puma
 
 ### 00A Auth SU (1)
 
@@ -126,19 +131,20 @@ document handle carried across folders expires on any run slower than ~30s.
 7. Save Tenant document (final)
 8. GetTenant by id (verify document-service tenant)
 
-### 02 Memberships and invitations (11)
+### 02 Memberships and invitations (12)
 
 1. Create invitation A -> member
 2. Get my invitations (A member)
-3. Accept invitation (A member)
-4. Find membership after accept
-5. Refresh auth A member after accept
-6. SelectTenant A member context after accept
-7. GetTenantList A member after accept
-8. Create invitation A -> outsider
-9. Get my invitations (outsider pending)
-10. Reject invitation (outsider)
-11. Get my invitations (outsider pending after reject)
+3. Invitation notification reached the member (A member) - the first notification of a fresh database
+4. Accept invitation (A member)
+5. Find membership after accept
+6. Refresh auth A member after accept
+7. SelectTenant A member context after accept
+8. GetTenantList A member after accept
+9. Create invitation A -> outsider
+10. Get my invitations (outsider pending)
+11. Reject invitation (outsider)
+12. Get my invitations (outsider pending after reject)
 
 ### 03 Connections, relationships, grants (9)
 
@@ -338,7 +344,7 @@ carried an `expectGetTenantAllowed` value, so it could only ever skip, and folde
 1. GetMembershipsByTenant coverage
 2. GetMembershipsByUser coverage
 3. GetMembership coverage
-4. GetOrganizationPermissions (new org perms tree) — verifies 6-group org permission tree (EditOrganization, MemberManagement, RoleManagement, GroupManagement, PermissionManagement, ConnectionManagement); asserts stale groups absent (OrganizationManagement, ContractManagement, MessageManagement)
+4. GetOrganizationPermissions (organization tree) — verifies 6-group org permission tree (EditOrganization, MemberManagement, RoleManagement, GroupManagement, PermissionManagement, ConnectionManagement); asserts stale groups absent (OrganizationManagement, ContractManagement, MessageManagement)
 5. UpdateMembershipPermissions + verify (new org perms)
 6. Verify organizationPermissions in GetMembership (new)
 7. IsMember coverage
@@ -491,6 +497,102 @@ feature is actually wired up.
 4. RolePerm: RoleUpdate with forbidden permission (negative)
 5. RolePerm: RoleUpdate with allowed permission (positive)
 
+### 20 Organization permissions by path (24)
+
+1. OPP: Authorization A member
+2. OPP: SelectTenant A for the member
+3. OPP: Owner grants Members/Edit/Invite as its full path
+4. OPP: A leaf granted as its full path lets the member invite
+5. OPP: Owner revokes that invitation
+6. OPP: Owner grants only Members/View
+7. OPP: A sibling leaf does not let the member invite
+8. OPP: Owner grants the group Members/Edit
+9. OPP: A group of the tree is no permission of its own
+10. OPP: Owner grants the group Edit of the members by its bare id
+11. OPP: A group named by its bare id is no permission either
+12. OPP: Owner grants only Members/View for the reads
+13. OPP: Members/View opens the list of members
+14. OPP: Members/View does not open the connections
+15. OPP: Members/View does not open the permissions of another member
+16. OPP: Owner grants only Connections/View
+17. OPP: Connections/View opens the connections
+18. OPP: Connections/View does not open the connection code
+19. OPP: Connections/View does not open the list of members
+20. OPP: Owner grants only Connections/ViewCode
+21. OPP: Connections/ViewCode opens the connection code
+22. OPP: Owner grants only Permissions/View
+23. OPP: Permissions/View opens the permissions of another member
+24. OPP: Owner grants nothing again
+
+### 21 QA Regression - Organizations GUI audit (66)
+
+1. AUD: Authorize the A owner outside of any organization
+2. AUD: Authorize the A member outside of any organization
+3. AUD: Create the ownership transfer organization
+4. AUD: Switch into the ownership transfer organization
+5. AUD: Invite the A member into the ownership transfer organization
+6. AUD: The A member accepts the invitation
+7. AUD: Open the organization before the transfer
+8. AUD: Wait for the organization document load
+9. AUD: Transfer the ownership to the A member
+10. AUD: GetTenant names the new owner
+11. AUD: The organization representation names the new owner
+12. AUD: The previous owner edits the open organization document
+13. AUD: Saving the open document keeps the new owner
+14. AUD: Close the ownership transfer organization document
+15. AUD: The organization list of the A owner
+16. AUD: The organization list sorts by the Role column
+17. AUD: Create the organization to deactivate
+18. AUD: Switch into the organization to deactivate
+19. AUD: Deactivate the organization
+20. AUD: The Inactive status filter lists only inactive organizations
+21. AUD: The Active status filter lists only active organizations
+22. AUD: Switch into A for the user history probe
+23. AUD: Create a user document in A
+24. AUD: Fill the new user
+25. AUD: Save the new user
+26. AUD: Every revision of the new user names its author and its change
+27. AUD: Rename the user
+28. AUD: Save the renamed user
+29. AUD: The rename is not recorded as a change of the login
+30. AUD: Close the user document
+31. AUD: Add the user to a new group
+32. AUD: The group membership revision of the user names the group
+33. AUD: Create a role document as the editor does
+34. AUD: Fill the new role
+35. AUD: Save the new role
+36. AUD: Rename the role
+37. AUD: Save the renamed role
+38. AUD: Close the new role document
+39. AUD: Open the stored role
+40. AUD: Wait for the role document load
+41. AUD: The role representation carries the stored role id
+42. AUD: The role history is found by the id of its representation
+43. AUD: Close the stored role document
+44. AUD: Create a group document as the editor does
+45. AUD: Fill the new group
+46. AUD: Save the new group
+47. AUD: Rename the group
+48. AUD: Save the renamed group
+49. AUD: Close the new group document
+50. AUD: Open the stored group
+51. AUD: Wait for the group document load
+52. AUD: The group representation carries the stored group id
+53. AUD: The group history is found by the id of its representation
+54. AUD: Close the stored group document
+55. AUD: Authorize the A member for the grant probe
+56. AUD: Switch the A member into the ownership transfer organization
+57. AUD: The ownership transfer organization accepts connections by code
+58. AUD: Connection code of the ownership transfer organization
+59. AUD: A requests a connection to the ownership transfer organization
+60. AUD: The ownership transfer organization approves the connection
+61. AUD: A grants access to the ownership transfer organization
+62. AUD: A revokes the grant
+63. AUD: The grant list reports the revoked grant as inactive
+64. AUD: Remove the audit connection
+65. AUD: Remove the deactivated organization
+66. AUD: Remove the ownership transfer organization
+
 ### 99 Cleanup (5)
 
 1. Remove relationship
@@ -498,6 +600,51 @@ feature is actually wired up.
 3. Remove tenant A
 4. Remove tenant B
 5. Remove tenant created via document service
+
+## Notification center (`Notification_Center.postman_collection.json`, `ws/ws-notification-center.js`)
+
+The user notification center of Puma (`ImtCore/Docs/Notifications/NotificationCenter.md`), in two suites that create
+their own users and organizations, so they run on any system, after the tenant suite or alone:
+
+```powershell
+newman run Notification_Center.postman_collection.json -e Tenant_System_Full.postman_environment.json --env-var base_url=http://localhost:17788/Puma/graphql
+node ws/ws-notification-center.js --http http://localhost:17788/Puma/graphql --env Tenant_System_Full.postman_environment.json
+```
+
+(add `--env-var su_password=...` / `--su-password ...` when su has another password, e.g. `1` after a restore from a
+ProLife backup). `Run-CiTests.ps1` runs both after the tenant suites, `Run-CiTests-Sqlite.ps1` runs the collection on
+SQLite.
+
+The collection (183 requests):
+
+- `00 Bootstrap` - four users, organizations A (alice) and B (bob), tenant sessions.
+- `01 Access` - every inbox command and sending refuse an anonymous caller; any signed-in user may send and withdraw,
+  only for the product of the request and to at most 100 users. This is a known hole kept until a product server has
+  an identity of its own (ImagingTools/ImtCore#1059); the senders of the other folders use the session of su.
+- `02 Validation` - the length limits of type, keys, subject and actor; arguments: id characters and length, repeated
+  ids, more than 10, the standard values, a `Number` that is no number, a `DateTime` that is no time - a refused
+  notification stores nothing; long names, values and body are cut; every kind of argument comes back as sent.
+- `03 Inboxes` - a personal notification is seen in every tenant of the user, a tenant one only in that tenant, a
+  product one only in that product; a non-member gets no tenant notification; nobody sees another user's; the actor is
+  not notified; a repeated recipient gets one.
+- `04 Groups, dedup and withdrawal` - a group counts its events, keeps the three latest actors newest first and the
+  content of its latest event; a read group is closed; a dedup key is stored once and outlives a removal; a withdrawn
+  group leaves every inbox and may be told again.
+- `05 Inbox operations` - pages newest first, the counts, read and remove only in the own inbox, mark all read up to a
+  time (no ids answered), the sync at login (newest undelivered, their count, the server time) and the acknowledgements.
+- `06 Catalog` - the types, icons and messages of the organization types in English and Russian.
+- `07 Notifications page` - the collection `Notifications`: the inbox of the caller only, filters, search, sorting,
+  removal.
+- `08 Organization notifications` - invitations (from whom, withdrawn when revoked or answered, the answer to the
+  inviter), removed member (personal to the member, `member` to the owner, the organization notifications of the
+  member removed), connection requests and relationship proposals (`partner`, withdrawn when answered), the ownership
+  transfer.
+
+The WebSocket suite (`OnNotificationEvent`): every event reaches exactly the sessions that see its inbox and nothing
+else - a personal one every session of the user (unread count -1), a tenant one the sessions in that tenant, an update
+of a group, read, all read (a tenant inbox with `createdUntil` and no ids to its sessions, the notifications of the
+personal inbox by their ids to every session of the user), removed, withdrawn from two users; a notification
+of another product and an acknowledged delivery reach no session.
 
 ## WebSocket subscriptions (`ws/ws-subscriptions.js`)
 
@@ -543,7 +690,6 @@ The WS port defaults to the HTTP port + 1000 (17788 → 18788, matching
 | `OnUndoRedoChanged` | `imtbase/CollectionDocumentService.sdl` |
 | `OnMembershipNotification` | `imtauth/TenantMemberships.sdl` |
 | `OnConnectionCodesNotification` | `imtauth/Tenants.sdl` |
-| `OnCrossTenantMessageNotification` | `imtauth/Tenants.sdl` |
 
 Beyond "does it deliver", the suite pins down the protocol behaviour that has
 actually broken in the field: an error frame must carry the id of the subscription
