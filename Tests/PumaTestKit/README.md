@@ -36,9 +36,9 @@ them:
 
 Of these, only **CAuthClientSdkTest** and **CPersonalAccessTokenTest** need a
 real Puma backend reachable at `AuthServerSdk::SetPumaConnectionParam()`'s
-target - hardcoded in those two files to host/port `17789`/`18789`, i.e.
+target - hardcoded in those two files to host/port `17789` (HTTP and WebSocket), i.e.
 `PumaServerSlTest.acc`'s ports (the isolated, disposable-DB test server
-variant - **not** `PumaServerSl.exe`'s `7788`/`8788`, which is a developer's
+variant - **not** `PumaServerSl.exe`'s `7788`, which is a developer's
 persistent local Puma database and must never be touched by this suite). They
 connect to it through their own embedded `AuthServerSdk` instance, which
 delegates user/role/group/PAT/login handling to that backend via
