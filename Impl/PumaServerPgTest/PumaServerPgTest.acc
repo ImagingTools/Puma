@@ -86,6 +86,24 @@
         <Element Id="PumaServerBase" PackageId="PumaVoce" ComponentId="PumaServerBase">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="MaxCheckInterval" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="30"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="AccessModels" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>PumaDatabasePostgres/UserSqlRepository</Value>
+                                <Value>PumaDatabasePostgres/RoleDocumentSqlRepository</Value>
+                                <Value>PumaDatabasePostgres/UserGroupSqlRepository</Value>
+                                <Value>PumaDatabasePostgres/TenantMembershipSqlRepository</Value>
+                                <Value>PumaDatabasePostgres/TenantInvitationRepository</Value>
+                                <Value>PumaDatabasePostgres/TenantEntityBindingSqlRepository</Value>
+                                <Value>PumaDatabasePostgres/CrossOrgGrantSqlRepository</Value>
+                                <Value>PumaDatabasePostgres/TenantRepository</Value>
+                                <Value>PumaServerBase/PersonalAccessTokenManager</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
                     <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="Application/ApplicationInfo"/>
                     </AttributeInfo>
@@ -131,6 +149,12 @@
                     <AttributeInfo Id="LogPath" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="Application/LogFilePath"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="ProductRepository" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaDatabasePostgres/ProductRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SnapshotRepository" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaDatabasePostgres/SnapshotRepository"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="RoleInfoProvider" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaDatabasePostgres/RoleDocumentSqlRepository"/>
                     </AttributeInfo>
@@ -142,6 +166,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="SessionCollection" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaDatabasePostgres/SessionSqlRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ServerTokensEnabled" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SettingsFilePath" Type="String" ExportId="">
                         <Data IsEnabled="true" Value="Puma/Puma Server/PumaServerPgTestSettings.xml"/>
@@ -209,6 +236,7 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
+        <Interface InterfaceId="imtlic::IProductInfo" ComponentId="PumaServerBase"/>
         <Interface InterfaceId="ibase::IApplication" ComponentId="Application"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="Application"/>
     </ExportedInterfaces>

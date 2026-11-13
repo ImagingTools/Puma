@@ -48,7 +48,10 @@ let junitPath = args.junit || '';
 let reportName = '';
 let reportClass = '';
 const frameTimeoutMs = Number(args.timeout || 15000);
-// How long a refusal has to arrive before a registration counts as accepted.
+// A change without an event is found by the control check of the server: MaxCheckInterval of the test servers (30 s) and a margin.
+// The event scenarios wait frameTimeoutMs, less than it, so a server that misses an event fails them.
+const controlCheckTimeoutMs = Number(args.controlTimeout || 45000);
+// Legacy batch grace exported for callers; acceptance itself always requires start_ack.
 const registrationGraceMs = Number(args['grace'] || 2500);
 // How long a notification already in flight may still land after its "complete".
 const drainGraceMs = 750;
@@ -72,8 +75,8 @@ function gqlString(value) {
 	return JSON.stringify(String(value));
 }
 
-// productOverride: the product of this request instead of the one of the run.
-function gql(query, token, productOverride) {
+// productOverride: the product of this request instead of the one of the run; extraHeaders: e.g. the token of a product server.
+function gql(query, token, productOverride, extraHeaders) {
 	return new Promise((resolve, reject) => {
 		const u = new URL(httpUrl);
 		const body = JSON.stringify({ query });
@@ -83,6 +86,7 @@ function gql(query, token, productOverride) {
 		};
 		if (token) { headers['x-authentication-token'] = token; }
 		if (productOverride || productId) { headers['productId'] = productOverride || productId; }
+		Object.assign(headers, extraHeaders || {});
 
 		const lib = u.protocol === 'https:' ? https : http;
 		const req = lib.request({
@@ -138,10 +142,13 @@ async function login(loginName, password) {
 const KNOWN_FRAME_TYPES = new Set(['connection_ack', 'data', 'error', 'complete', 'ka', 'pong', 'start_ack']);
 
 class SubscriptionSession {
-	constructor(label, url, token) {
+	// extraHeaders: headers of every frame on top of the token, e.g. the token of a product server
+	constructor(label, url, token, extraHeaders) {
 		this.label = label;
 		this.url = url;
 		this.token = token;
+		this.extraHeaders = extraHeaders || {};
+		this.ackedIds = new Set();
 		this.frames = [];
 		this.waiters = [];
 		this.socket = null;
@@ -223,6 +230,18 @@ class SubscriptionSession {
 			if (!this.expectErrorIds.has(frame.id)) {
 				this.violation(`unsolicited error for id "${frame.id}": ${JSON.stringify(frame.payload).slice(0, 250)}`);
 			}
+			return;
+		}
+
+		// The server confirms every subscription it accepts, once
+		if (frame.type === 'start_ack') {
+			if (!this.activeIds.has(frame.id) && !this.expectErrorIds.has(frame.id)) {
+				this.violation(`start_ack for an id the suite never started: "${frame.id}"`);
+			}
+			if (this.ackedIds.has(frame.id)) {
+				this.violation(`second start_ack for "${frame.id}"`);
+			}
+			this.ackedIds.add(frame.id);
 			return;
 		}
 
@@ -323,7 +342,7 @@ class SubscriptionSession {
 		const headers = {};
 		if (this.token) { headers['x-authentication-token'] = this.token; }
 		if (productId) { headers['productId'] = productId; }
-		return headers;
+		return Object.assign(headers, this.extraHeaders);
 	}
 
 	startFrame(id, query) {
@@ -334,28 +353,14 @@ class SubscriptionSession {
 		return { id, headers: this.headers(), type: 'stop', payload: {} };
 	}
 
-	// A successful "start" is answered with silence: nothing in ImtCore ever emits
-	// start_ack (CWebSocketRequest only parses one), and CWebSocketServletComp
-	// returns an empty response on success. So a refusal is the only registration
-	// outcome that produces a frame, and the absence of one is the acceptance.
-	settle(id, waitMs) {
+	// Silence is not acceptance: wait for the registration outcome, including a fresh authorization read.
+	async settle(id, waitMs) {
 		const isOutcome = (f) => f.id === id && (f.type === 'error' || f.type === 'start_ack');
-		const existing = this.frames.find(isOutcome);
-		if (existing) { return Promise.resolve(existing.type === 'error' ? existing : null); }
-
-		return new Promise((resolve) => {
-			const waiter = { predicate: isOutcome, resolve: (frame) => resolve(frame.type === 'error' ? frame : null) };
-			waiter.timer = setTimeout(() => {
-				const index = this.waiters.indexOf(waiter);
-				if (index >= 0) { this.waiters.splice(index, 1); }
-				resolve(null);
-			}, waitMs === undefined ? registrationGraceMs : waitMs);
-			this.waiters.push(waiter);
-		});
+		const frame = await this.waitFor(isOutcome, waitMs === undefined ? frameTimeoutMs : waitMs);
+		return frame.type === 'error' ? frame : null;
 	}
 
-	// Registers without waiting, so a batch can share one grace window instead of
-	// paying it once per subscription.
+	// Registers without waiting, so a batch can await its registration outcomes together.
 	beginSubscribe(commandId, query) {
 		const id = crypto.randomUUID();
 		this.activeIds.set(id, commandId);
@@ -364,8 +369,7 @@ class SubscriptionSession {
 		return id;
 	}
 
-	// Once the grace window of a beginSubscribe() has passed: the refusal frame, or
-	// null - and from then on the id counts as accepted, so a late error is a violation.
+	// Read after settle(): a refusal, or null. A later unrequested error is a violation.
 	outcomeOf(id) {
 		const refusal = this.frames.find(f => f.id === id && f.type === 'error');
 		if (refusal) {
@@ -376,15 +380,22 @@ class SubscriptionSession {
 		return null;
 	}
 
-	// Turns an id whose grace window has passed into an accepted subscription, or
-	// throws with the refusal the server gave. Acceptance is silence only: a case
-	// that relies on it has to prove delivery with a data frame of its own.
+	// Turns an id whose registration outcome arrived into an accepted subscription, or
+	// throws with the refusal the server gave. Accepted means confirmed by start_ack.
 	confirmAccepted(id) {
 		const refusal = this.outcomeOf(id);
 		if (refusal) {
 			throw new Error(`Subscription refused: ${JSON.stringify(refusal.payload).slice(0, 400)}`);
 		}
+		if (!this.ackedIds.has(id)) {
+			throw new Error(`Subscription ${id} was neither confirmed by start_ack nor refused`);
+		}
 		return id;
+	}
+
+	// An accepted subscription the server is expected to end with an error frame
+	expectError(id) {
+		this.expectErrorIds.add(id);
 	}
 
 	async subscribe(commandId, query) {
@@ -584,7 +595,7 @@ function runSuite(options, main) {
 }
 
 module.exports = {
-	httpUrl, wsUrl, suLogin, suPassword, productId, frameTimeoutMs, registrationGraceMs, envValues,
+	httpUrl, wsUrl, suLogin, suPassword, productId, frameTimeoutMs, controlCheckTimeoutMs, registrationGraceMs, envValues,
 	gqlString, gql, mutate, login,
 	SubscriptionSession, notificationOf,
 	assert, assertRefusalReason, assertRoutingRefusal, documentNotification, jwtClaim, delay,
