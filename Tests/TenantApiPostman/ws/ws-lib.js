@@ -53,12 +53,12 @@ const registrationGraceMs = Number(args['grace'] || 2500);
 // How long a notification already in flight may still land after its "complete".
 const drainGraceMs = 750;
 
-// The WS listener is a separate port from HTTP (PumaServerPgTest.acc: HttpPort 17788,
-// WebSocketPort 18788). Derive it by convention, override with --ws when it differs.
+// Puma serves WebSocket on its HTTP port (PumaServerPgTest.acc: HttpPort 17788).
+// Override with --ws or WS_TEST_WS_PORT when it differs.
 function deriveWsUrl(httpEndpoint) {
 	const u = new URL(httpEndpoint);
 	const httpPort = Number(u.port || (u.protocol === 'https:' ? 443 : 80));
-	const wsPort = process.env.WS_TEST_WS_PORT || (httpPort + 1000);
+	const wsPort = process.env.WS_TEST_WS_PORT || httpPort;
 	const scheme = u.protocol === 'https:' ? 'wss:' : 'ws:';
 	return `${scheme}//${u.hostname}:${wsPort}`;
 }
