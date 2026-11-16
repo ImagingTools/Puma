@@ -46,9 +46,10 @@ unset(DEPLOY_QT_QML_DIRS)
 # Flat layout: libraries next to the executable, Qt plugins in bin/plugins, qt.conf pointing there.
 # Linux has no Qt deploy tool, so Qt's CMake deployment API collects the dependencies.
 # Windows and macOS keep their current deployment.
+# Needs Qt 6.10 for the plugin selection options of qt_deploy_runtime_dependencies.
 # TODO: other headless servers need the same install-time deployment (plugin options, RUNPATH fix):
 # move it to a common helper, e.g. next to deploy_qt() in Acf/Config/CMake/DeployQt.cmake.
-if(UNIX AND NOT APPLE)
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND "${Qt6Core_VERSION}" VERSION_GREATER_EQUAL 6.10)
 	# The Qt PostgreSQL plugin is dlopen-ed and would otherwise find the system libpq, whose dependencies
 	# (libldap, krb5) need the system OpenSSL, while the process already has the conan OpenSSL loaded:
 	# "libldap.so.2: undefined symbol: EVP_md2". Link the conan libpq to the executable, so the loader
