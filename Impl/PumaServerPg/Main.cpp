@@ -12,8 +12,9 @@
 // Puma includes
 #include <GeneratedFiles/PumaServerPg/CPumaServerPg.h>
 
-#if defined(__linux__)
-// The Qt PostgreSQL plugin is dlopen-ed and must find the bundled libpq already loaded (see CMake/CMakeLists.txt).
+#ifdef PUMA_KEEP_LIBPQ_LINKED
+// Set where CMake links libpq to the executable: the Qt PostgreSQL plugin is dlopen-ed and must find
+// the bundled libpq already loaded (see CMake/CMakeLists.txt).
 // Nothing calls libpq directly, so --as-needed would drop it from DT_NEEDED: this reference keeps it.
 // TODO: remove once libpq is linked with $<LINK_LIBRARY:NO_AS_NEEDED,...> (--push-state,--no-as-needed)
 extern "C" int PQlibVersion();

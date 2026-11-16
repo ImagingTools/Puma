@@ -56,7 +56,9 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND "${Qt6Core_VERSION}" VERSION_GREATER_E
 	# preloads it through the executable's RUNPATH and the install collects it with its dependencies.
 	find_package(PostgreSQL REQUIRED)
 	target_link_libraries(${PROJECT_NAME} PRIVATE PostgreSQL::PostgreSQL)
-	# No code calls libpq, so --as-needed would drop it from DT_NEEDED: Main.cpp references PQlibVersion to keep it.
+	# No code calls libpq, so --as-needed would drop it from DT_NEEDED:
+	# with this define Main.cpp references PQlibVersion to keep it.
+	target_compile_definitions(${PROJECT_NAME} PRIVATE PUMA_KEEP_LIBPQ_LINKED)
 
 	set_target_properties(${PROJECT_NAME} PROPERTIES INSTALL_RPATH "$ORIGIN")
 	install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin COMPONENT ${PROJECT_NAME})
