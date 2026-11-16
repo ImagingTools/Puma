@@ -146,6 +146,9 @@
                     <AttributeInfo Id="SettingsFilePath" Type="String" ExportId="">
                         <Data IsEnabled="true" Value="Puma/Puma Server/PumaServerPgTestSettings.xml"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="SmtpClient" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SimSmtpClient"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="TenantConnectionCodeRepository" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaDatabasePostgres/TenantConnectionCodeSqlRepository"/>
                     </AttributeInfo>
@@ -193,6 +196,30 @@
                     </AttributeInfo>
                     <AttributeInfo Id="WebSocketPort" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="18788"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SimSmtpClient" PackageId="ImtMailPck" ComponentId="SmtpClient">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Host" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="127.0.0.1"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Application/Log"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MaxAttempts" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="2"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Password" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="sim"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Port" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="17796"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="User" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="puma@puma.test"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
