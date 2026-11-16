@@ -23265,6 +23265,287 @@
                     ]
                 },
                 {
+                    "name": "QA UserAdd with a password violating the policy is refused",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const suffix = pm.variables.replaceIn('{{$guid}}').replace(/-/g, '').slice(0, 12);",
+                                    "pm.environment.set('qaWeakUserId', pm.variables.replaceIn('{{$guid}}'));",
+                                    "pm.environment.set('qaWeakUserLogin', 'qa_weak_' + suffix);"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.UserAdd : null;",
+                                    "pm.test('A password set by an administrator is checked against the policy', function () {",
+                                    "  pm.expect(payload && payload.id ? payload.id : '', 'the user must not be created: ' + JSON.stringify(json)).to.eql('');",
+                                    "  pm.expect(JSON.stringify(json.errors || []), JSON.stringify(json)).to.include('UppercaseRequired');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UserAdd { UserAdd(input: { id: \"{{qaWeakUserId}}\", typeId: \"User\", productId: \"{{product_id}}\", item: { id: \"{{qaWeakUserId}}\", productId: \"{{product_id}}\", name: \"QA Weak Password\", username: \"{{qaWeakUserLogin}}\", password: \"alllowercase1\", email: \"{{qaWeakUserLogin}}@qa.test\", groups: [], roles: [], permissions: [], systemInfos: [] } }) { id } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "QA Open a new user document for the editor password check",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const suffix = pm.variables.replaceIn('{{$guid}}').replace(/-/g, '').slice(0, 12);",
+                                    "pm.environment.set('qaEditorUserId', pm.variables.replaceIn('{{$guid}}'));",
+                                    "pm.environment.set('qaEditorUserLogin', 'qa_editor_' + suffix);"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.CreateNewDocument : null;",
+                                    "pm.test('User document opened', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.documentId ? payload.documentId : '', JSON.stringify(json)).to.not.eql('');",
+                                    "});",
+                                    "if (payload && payload.documentId) pm.environment.set('qaEditorDocId', payload.documentId);"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateNewDocument { CreateNewDocument(input: { collectionId: \"Users\", typeId: \"User\" }) { documentId } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "QA The user editor refuses a password violating the policy",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.UpdateUserFromRepresentation : null;",
+                                    "pm.test('A password typed in the user editor is checked against the policy', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.status, JSON.stringify(json)).to.eql('Failed');",
+                                    "  pm.expect(payload && payload.message ? payload.message : '', JSON.stringify(json)).to.include('UppercaseRequired');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UpdateUserFromRepresentation { UpdateUserFromRepresentation(input: { documentId: \"{{qaEditorDocId}}\", user: { id: \"{{qaEditorUserId}}\", productId: \"{{product_id}}\", name: \"QA Editor Password\", username: \"{{qaEditorUserLogin}}\", password: \"alllowercase1\", email: \"{{qaEditorUserLogin}}@qa.test\", groups: [], roles: [], permissions: [] } }) { status message } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "QA The user editor accepts a password meeting the policy",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.UpdateUserFromRepresentation : null;",
+                                    "pm.test('A valid password is accepted by the user editor', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.status, JSON.stringify(json)).to.eql('Success');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UpdateUserFromRepresentation { UpdateUserFromRepresentation(input: { documentId: \"{{qaEditorDocId}}\", user: { id: \"{{qaEditorUserId}}\", productId: \"{{product_id}}\", name: \"QA Editor Password\", username: \"{{qaEditorUserLogin}}\", password: \"QaEditor_2026x\", email: \"{{qaEditorUserLogin}}@qa.test\", groups: [], roles: [], permissions: [] } }) { status message } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "QA The user editor accepts the same password sent again",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "// The editor sends the whole representation on every change: the same password must not count as reused",
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.UpdateUserFromRepresentation : null;",
+                                    "pm.test('The same password sent again by the editor is accepted', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.status, JSON.stringify(json)).to.eql('Success');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UpdateUserFromRepresentation { UpdateUserFromRepresentation(input: { documentId: \"{{qaEditorDocId}}\", user: { id: \"{{qaEditorUserId}}\", productId: \"{{product_id}}\", name: \"QA Editor Password renamed\", username: \"{{qaEditorUserLogin}}\", password: \"QaEditor_2026x\", email: \"{{qaEditorUserLogin}}@qa.test\", groups: [], roles: [], permissions: [] } }) { status message } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "QA Close the user document of the editor password check",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test('User document closed', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CloseDocument { CloseDocument(input: { collectionId: \"Users\", id: \"{{qaEditorDocId}}\" }) { status message } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": []
+                },
+                {
                     "id": "1d13b54a-7e94-4bbc-9a6b-a13bf84f963a",
                     "name": "D-26 UserItem reports the group permission with its source, not the group role as a direct role",
                     "request": {
@@ -25023,6 +25304,50 @@
                             }
                         }
                     ]
+                },
+                {
+                    "name": "D-38 UserItem does not return the password hash",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const payload = json.data ? json.data.UserItem : null;",
+                                    "pm.test('The password hash is not sent to a client', function () {",
+                                    "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.username, JSON.stringify(json)).to.eql(pm.environment.get('qaRegNamedUserLogin'));",
+                                    "  pm.expect(payload && payload.password ? payload.password : '', JSON.stringify(json)).to.eql('');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query UserItem { UserItem(input: { id: \"{{qaRegNamedUserId}}\", productId: \"{{product_id}}\" }) { username password } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": []
                 },
                 {
                     "id": "f69be563-1746-4f84-b965-8567dfe8f056",
@@ -51476,7 +51801,7 @@
                     }
                 },
                 {
-                    "name": "UI V changes the own password with the old one",
+                    "name": "UI V cannot change the own password before the minimum password age",
                     "event": [
                         {
                             "listen": "test",
@@ -51486,9 +51811,10 @@
                                     "const json = pm.response.json();",
                                     "const errors = json.errors || [];",
                                     "const payload = json.data ? json.data.ChangePassword : null;",
-                                    "pm.test('UI V changes the own password with the old one', function(){",
+                                    "pm.test('UI V cannot change the own password right after the registration', function(){",
                                     "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
-                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true);",
+                                    "  pm.expect(payload && payload.success === true, JSON.stringify(json)).to.eql(false);",
+                                    "  pm.expect(payload && payload.violatedRules ? payload.violatedRules : [], JSON.stringify(json)).to.eql(['MinPasswordAge']);",
                                     "});",
                                     "})();"
                                 ],
@@ -51508,6 +51834,51 @@
                             "mode": "graphql",
                             "graphql": {
                                 "query": "mutation ChangePassword { ChangePassword(input: { login: \"{{uiVLogin}}\", oldPassword: \"{{uiVPassword}}\", newPassword: \"{{uiVNewPassword}}\" }) { success message violatedRules } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        }
+                    }
+                },
+                {
+                    "name": "UI su sets the new password of V",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.ChangePassword : null;",
+                                    "pm.test('UI su sets the new password of V regardless of the minimum password age', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true);",
+                                    "});",
+                                    "})();"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation ChangePassword { ChangePassword(input: { login: \"{{uiVLogin}}\", oldPassword: \"\", newPassword: \"{{uiVNewPassword}}\" }) { success message violatedRules } }",
                                 "variables": ""
                             }
                         },

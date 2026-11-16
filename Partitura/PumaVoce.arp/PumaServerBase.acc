@@ -464,6 +464,9 @@
                     <AttributeInfo Id="MembershipManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="TenantController/TenantMembershipManager"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="PasswordPolicy" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaHandlers/PasswordPolicy"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="RequestManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="WebSocketServerFramework"/>
                     </AttributeInfo>
