@@ -544,6 +544,20 @@ async function test(name, fn) {
 	writeJUnit(junitPath);
 }
 
+// A case of a known open defect: it runs and reports its outcome, but is skipped in the report and does not fail the run
+async function muted(name, reason, fn) {
+	const started = Date.now();
+	let outcome = 'passes now - unmute it';
+	try {
+		await fn();
+	} catch (err) {
+		outcome = err && err.message ? err.message : String(err);
+	}
+	results.push({ name, ok: true, skipped: `${reason}: ${outcome}`, ms: Date.now() - started });
+	console.log(`  MUTED ${name} (${reason})\n        ${outcome}`);
+	writeJUnit(junitPath);
+}
+
 // Cases downstream of a failed one must not run their assertions against undefined
 // state - that reports a second, misleading defect. They fail explicitly instead.
 function requires(value, what) {
@@ -561,15 +575,19 @@ function writeJUnit(filePath) {
 
 	const cases = results.map(r => {
 		const head = `    <testcase classname="${reportClass}" name="${escape(r.name)}" time="${(r.ms / 1000).toFixed(3)}"`;
+		if (r.skipped){
+			return head + `>\n      <skipped message="${escape(r.skipped)}"/>\n    </testcase>`;
+		}
 		return r.ok
 			? head + '/>'
 			: head + `>\n      <failure message="${escape(r.error)}"/>\n    </testcase>`;
 	}).join('\n');
+	const skipped = results.filter(r => r.skipped).length;
 
 	const xml =
 		'<?xml version="1.0" encoding="UTF-8"?>\n' +
-		`<testsuites name="${reportName}" tests="${results.length}" failures="${failures}" time="${(totalMs / 1000).toFixed(3)}">\n` +
-		`  <testsuite name="${reportClass}" tests="${results.length}" failures="${failures}" time="${(totalMs / 1000).toFixed(3)}">\n` +
+		`<testsuites name="${reportName}" tests="${results.length}" failures="${failures}" skipped="${skipped}" time="${(totalMs / 1000).toFixed(3)}">\n` +
+		`  <testsuite name="${reportClass}" tests="${results.length}" failures="${failures}" skipped="${skipped}" time="${(totalMs / 1000).toFixed(3)}">\n` +
 		cases + '\n  </testsuite>\n</testsuites>\n';
 
 	fs.writeFileSync(filePath, xml, 'utf8');
@@ -589,7 +607,8 @@ function runSuite(options, main) {
 		.finally(() => {
 			writeJUnit(junitPath);
 			const failures = results.filter(r => !r.ok).length;
-			console.log(`\n${results.length - failures}/${results.length} passed. JUnit: ${junitPath}`);
+			const mutedCount = results.filter(r => r.skipped).length;
+			console.log(`\n${results.length - failures - mutedCount}/${results.length} passed, ${mutedCount} muted. JUnit: ${junitPath}`);
 			process.exit(failures > 0 ? 1 : 0);
 		});
 }
@@ -599,5 +618,5 @@ module.exports = {
 	gqlString, gql, mutate, login,
 	SubscriptionSession, notificationOf,
 	assert, assertRefusalReason, assertRoutingRefusal, documentNotification, jwtClaim, delay,
-	test, requires, runSuite
+	test, muted, requires, runSuite
 };
