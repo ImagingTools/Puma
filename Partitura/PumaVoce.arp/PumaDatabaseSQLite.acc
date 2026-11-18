@@ -31,6 +31,42 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="SnapshotRepository" PackageId="ImtUserAdministrationVoce" ComponentId="SQLiteProductPermissionSnapshotRepository">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="DatabaseEngine"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ProductRepository" PackageId="ImtUserAdministrationVoce" ComponentId="SQLiteConnectedProductRepository">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="DatabaseEngine"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="UserLocalRepositories" PackageId="ImtAuthVoce" ComponentId="UserLocalRepositories">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -57,6 +93,8 @@
     </ExportedInterfaces>
     <ExportedComponents>
         <Component ExportedId="DatabaseEngine" ComponentId="DatabaseEngine"/>
+        <Component ExportedId="ProductRepository" ComponentId="ProductRepository"/>
+        <Component ExportedId="SnapshotRepository" ComponentId="SnapshotRepository"/>
         <Component ExportedId="RoleRepository" ComponentId="UserLocalRepositories/RoleRepository"/>
         <Component ExportedId="SQLiteContractRepository" ComponentId="UserLocalRepositories/SQLiteContractRepository"/>
         <Component ExportedId="SQLiteCrossOrgGrantRepository" ComponentId="UserLocalRepositories/SQLiteCrossOrgGrantRepository"/>

@@ -9,7 +9,7 @@
 //
 // Protocol (see ImtCore CWebSocketServletComp / Qml/imtguigql/SubscriptionManager.qml):
 //   -> {"type":"connection_init"}                                   <- {"type":"connection_ack"}
-//   -> {"id":..,"type":"start","headers":{..},"payload":{"data":Q}} <- (silence on success)
+//   -> {"id":..,"type":"start","headers":{..},"payload":{"data":Q}} <- {"type":"start_ack","id":..}
 //                                                                   <- {"type":"data","id":..,"payload":{..}}
 //   -> {"id":..,"type":"stop"}                                      <- {"type":"complete","id":..}
 //   errors arrive as {"id":..,"type":"error","payload":[{message,extensions:{type}}]}
@@ -25,7 +25,7 @@
 
 const crypto = require('crypto');
 const {
-	httpUrl, wsUrl, suLogin, suPassword, productId, frameTimeoutMs, registrationGraceMs,
+	httpUrl, wsUrl, suLogin, suPassword, productId, frameTimeoutMs, controlCheckTimeoutMs,
 	gqlString, gql, mutate, login,
 	SubscriptionSession, notificationOf,
 	assert, assertRefusalReason, assertRoutingRefusal, documentNotification, jwtClaim, delay,
@@ -95,6 +95,12 @@ async function main() {
 
 	const su = await login(suLogin, suPassword);
 	console.log(`Authenticated as '${suLogin}' (userId=${su.userId})\n`);
+
+	// Acquiring the first organization changes the global permission fingerprint. Establish it before subscribing.
+	const bootstrapTenant = await mutate('CreateTenant',
+		`mutation CreateTenant { CreateTenant(input: { name: ${gqlString('WS_Bootstrap_' + runTag)},` +
+		` ownerId: ${gqlString(su.userId)} }) { tenantId errorMessage } }`, su.token);
+	assert(bootstrapTenant.tenantId && !bootstrapTenant.errorMessage, 'Unable to establish the administrator organization fixture');
 
 	const session = new SubscriptionSession('main', wsUrl, su.token);
 	await session.connect();
@@ -305,7 +311,7 @@ async function main() {
 	// (SubscriptionClient.qml): empty input, "notification { id }" selection. The
 	// notifier pushes {typeOperation, itemId, operationContext} whatever the
 	// selection. Each case causes one insertion and requires the frame naming it:
-	// a "start" is answered with silence, so registration alone proves nothing.
+	// a start_ack proves registration, but only a push proves delivery.
 	//
 	// The tenant notification channels (OnMembershipNotification,
 	// OnConnectionCodesNotification) are proven per recipient in ws-notifications.js. Not here either: PumaWsConnection is the
@@ -344,7 +350,7 @@ async function main() {
 		}
 		observerSubIds.set('OnDocumentManagerChanged',
 			watcher.beginSubscribe('OnDocumentManagerChanged', collectionQuery('OnDocumentManagerChanged', 'Tenants')));
-		await delay(registrationGraceMs);
+		await Promise.all(Array.from(observerSubIds.values(), id => watcher.settle(id)));
 		observerMark = session.mark();
 
 		// Refusing him for want of rights is as good as delivering nothing; any other refusal is a fault.
@@ -353,7 +359,7 @@ async function main() {
 			if (refusal) {
 				assertRefusalReason(refusal, {
 					absent: `${commandId} was neither accepted nor refused`,
-					mustMatch: /^(Unauthorized|Forbidden): /,
+					mustMatch: new RegExp(`^((Unauthorized|Forbidden): |The subscription '${commandId}' is not allowed$)`),
 					mustNotMatch: [/No servlet was found/]
 				});
 				observerSubIds.delete(commandId);
@@ -365,7 +371,7 @@ async function main() {
 	for (const commandId of collectionSubscriptions) {
 		collectionSubIds.set(commandId, session.beginSubscribe(commandId, clientQuery(commandId)));
 	}
-	await delay(registrationGraceMs);
+	await Promise.all(Array.from(collectionSubIds.values(), id => session.settle(id)));
 
 	// Runs the action and requires the "inserted" frame for the item it created.
 	const expectInsertion = async (commandId, action, itemIdOf) => {
@@ -516,7 +522,11 @@ async function main() {
 		// receiving. Left registered, it keeps a destroyed view's request alive.
 		const stoppedAt = session.dataFrames(docSubId).length;
 
-		// A stored organization is edited only from inside it.
+		// SelectTenant closes the old session; every subscription registered with it must end, not silently migrate.
+		// A closed session is no event of the access: the control check of the server ends them
+		const oldSubscriptions = Array.from(session.activeIds);
+		const selectionMark = session.mark();
+		oldSubscriptions.forEach(([id]) => session.expectError(id));
 		const selected = await mutate('SelectTenant',
 			`mutation SelectTenant { SelectTenant(input: { tenantId: ${gqlString(seedId)} }) { ok userSession { accessToken } errorMessage } }`,
 			su.token);
@@ -524,6 +534,15 @@ async function main() {
 		assert(tenantToken, `SelectTenant gave no token: ${JSON.stringify(selected).slice(0, 300)}`);
 		suActiveToken = tenantToken;
 		session.token = tenantToken;
+		for (const [id, commandId] of oldSubscriptions){
+			const closed = await session.waitFor(f => f.id === id && f.type === 'error', controlCheckTimeoutMs, selectionMark);
+			assertRefusalReason(closed, { absent: 'the old session subscription survived SelectTenant', mustMatch: /^Forbidden: The session of the token is closed\.$/ });
+			session.activeIds.delete(id);
+			session.retiredIds.set(id, { commandId, at: Date.now() });
+			session.expectErrorIds.delete(id);
+		}
+		managerSubId = await session.subscribe('OnDocumentManagerChanged',
+			collectionQuery('OnDocumentManagerChanged', 'Tenants'));
 
 		const managerMark = session.mark();
 
@@ -574,15 +593,13 @@ async function main() {
 		assert(second.type === 'complete',
 			`a repeated stop answered ${JSON.stringify(second).slice(0, 250)} instead of an idempotent "complete"`);
 
-		// The session must still serve new subscriptions afterwards - proven by delivery,
-		// since an accepted "start" and a "complete" both look the same on a dead session.
-		const probeId = await session.subscribe('OnDocumentManagerChanged',
-			collectionQuery('OnDocumentManagerChanged', 'Tenants'));
-		const probeMark = session.mark();
-
+		// The session must still serve new subscriptions afterwards, proven by delivery as well as start_ack.
 		// A new organization is created only outside of any organization, so su signs in again.
 		suActiveToken = (await login(suLogin, suPassword)).token;
 		session.token = suActiveToken;
+		const probeId = await session.subscribe('OnDocumentManagerChanged',
+			collectionQuery('OnDocumentManagerChanged', 'Tenants'));
+		const probeMark = session.mark();
 
 		const probe = await createTenantDocument(crypto.randomUUID(), suActiveToken);
 		await session.waitForData(probeId,
@@ -644,17 +661,238 @@ async function main() {
 		await closeDocument('Tenants', documentId, suActiveToken);
 	});
 
+	// ---------------------------------------------------------------- the servers of products
+	// A product server watches Puma with its own token; the token decides the channels and ends them when it changes.
+
+	const tokenServers = [];
+	// The session token of the start may have expired by now
+	const suNow = await login(suLogin, suPassword);
+	const catalogId = crypto.randomUUID();
+	await mutate('ConnectedProductAdd',
+		`mutation ConnectedProductAdd { ConnectedProductAdd(input: { id: ${gqlString(catalogId)}, typeId: "ConnectedProduct",` +
+		` item: { id: ${gqlString(catalogId)}, productId: "WsProbe${runTag}", name: "WsProbe" } }) { id } }`, suNow.token);
+	const issueToken = async (name, scopes) => mutate('CreateServerToken',
+		`mutation CreateServerToken { CreateServerToken(input: { clientProductId: "WsProbe${runTag}", name: ${gqlString(name)},` +
+		` scopes: ${JSON.stringify(scopes)} }) { id token } }`, suNow.token);
+	const narrowed = await issueToken('ws narrowed', ['/Administration/Users/View']);
+	const revoked = await issueToken('ws revoked', ['/Administration/Users/View']);
+	const plain = await issueToken('ws plain', []);
+	const serverSession = async (label, token, extraHeaders) => {
+		const server = new SubscriptionSession(label, wsUrl, token, extraHeaders);
+		await server.connect();
+		await server.init();
+		tokenServers.push(server);
+		return server;
+	};
+	const usersQuery = clientQuery('OnUsersCollectionChanged');
+	const notAllowed = (commandId) => new RegExp(`^The subscription '${commandId}' is not allowed$`);
+
+	let narrowedServer = null;
+	let narrowedSubId = null;
+	let revokedServer = null;
+	let revokedSubId = null;
+
+	await test('the server of a product watches a collection its token allows', async () => {
+		narrowedServer = await serverSession('narrowed', narrowed.token, { productId: `WsProbe${runTag}` });
+		narrowedSubId = await narrowedServer.subscribe('OnUsersCollectionChanged', usersQuery);
+		revokedServer = await serverSession('revoked', revoked.token, { productId: `WsProbe${runTag}` });
+		revokedSubId = await revokedServer.subscribe('OnUsersCollectionChanged', usersQuery);
+	});
+
+	await test('the server of a product receives the changes of the collection', async () => {
+		requires(narrowedSubId, 'the subscription of the server');
+		const mark = narrowedServer.mark();
+		const revokedMark = revokedServer.mark();
+		const userId = crypto.randomUUID();
+		await addUser(userId, `ws_server_push_${runTag}`, 'WsServerPush_2026!', suNow.token);
+		await narrowedServer.waitForData(narrowedSubId,
+			f => { const n = notificationOf(f, 'OnUsersCollectionChanged'); return !!n && n.itemId === userId && n.typeOperation === 'inserted'; }, mark);
+		await revokedServer.waitForData(revokedSubId,
+			f => { const n = notificationOf(f, 'OnUsersCollectionChanged'); return !!n && n.itemId === userId && n.typeOperation === 'inserted'; }, revokedMark);
+	});
+
+	await test('a collection outside the permissions of the token is refused', async () => {
+		const server = await serverSession('plain', plain.token, { productId: `WsProbe${runTag}` });
+		const refusal = await server.subscribeExpectingRefusal('OnRolesCollectionChanged', clientQuery('OnRolesCollectionChanged'));
+		assertRefusalReason(refusal, { absent: 'the roles channel was accepted for a token without Roles/View', mustMatch: notAllowed('OnRolesCollectionChanged') });
+	});
+
+	await test('a request forwarded without a user does not watch the collections', async () => {
+		const server = await serverSession('forwarded', null, { 'x-server-token': narrowed.token, productId: `WsProbe${runTag}` });
+		const refusal = await server.subscribeExpectingRefusal('OnUsersCollectionChanged', usersQuery);
+		assertRefusalReason(refusal, { absent: 'an anonymous forwarded request watched the users', mustMatch: notAllowed('OnUsersCollectionChanged') });
+	});
+
+	await test('an unknown token of a server is refused', async () => {
+		const server = await serverSession('unknown', 'imt_srv_000000000000000000000000');
+		const refusal = await server.subscribeExpectingRefusal('OnUsersCollectionChanged', usersQuery);
+		assertRefusalReason(refusal, { absent: 'an unknown token watched the users', mustMatch: /^Forbidden: The token is revoked, expired or unknown\.$/ });
+	});
+
+	await test('taking the permission away ends the subscription', async () => {
+		requires(narrowedSubId, 'the subscription of the server');
+		narrowedServer.expectError(narrowedSubId);
+		const mark = narrowedServer.mark();
+		await mutate('UpdateServerTokenScopes',
+			`mutation UpdateServerTokenScopes { UpdateServerTokenScopes(input: { id: ${gqlString(narrowed.id)}, scopes: [] }) { success } }`, suNow.token);
+		const frame = await narrowedServer.waitFor(f => f.id === narrowedSubId && f.type === 'error', 15000, mark);
+		assertRefusalReason(frame, { absent: 'no end of the subscription', mustMatch: /^Forbidden: The permissions have changed$/ });
+	});
+
+	await test('revoking the token ends the subscription', async () => {
+		requires(revokedSubId, 'the subscription of the server');
+		revokedServer.expectError(revokedSubId);
+		const mark = revokedServer.mark();
+		await mutate('RevokeServerToken',
+			`mutation RevokeServerToken { RevokeServerToken(input: { id: ${gqlString(revoked.id)} }) { success } }`, suNow.token);
+		const frame = await revokedServer.waitFor(f => f.id === revokedSubId && f.type === 'error', 15000, mark);
+		assertRefusalReason(frame, { absent: 'no end of the subscription', mustMatch: /^Forbidden: The token is revoked, expired or unknown\.$/ });
+	});
+
+	await test('the narrowed token does not watch the collection again', async () => {
+		requires(narrowedServer, 'the session of the narrowed server');
+		const refusal = await narrowedServer.subscribeExpectingRefusal('OnUsersCollectionChanged', usersQuery);
+		assertRefusalReason(refusal, { absent: 'the narrowed token watched the users again', mustMatch: notAllowed('OnUsersCollectionChanged') });
+	});
+
+	await test('the revoked token does not watch the collection again', async () => {
+		requires(revokedServer, 'the session of the revoked server');
+		const refusal = await revokedServer.subscribeExpectingRefusal('OnUsersCollectionChanged', usersQuery);
+		assertRefusalReason(refusal, { absent: 'the revoked token watched the users again', mustMatch: /^Forbidden: The token is revoked, expired or unknown\.$/ });
+	});
+
+	// ---------------------------------------------------------------- the organizations channel
+	// Those who belong to an organization or administer them watch it; a change reaches only those who see the organization.
+
+	const tenantsQuery = clientQuery('OnTenantsCollectionChanged');
+	const createTenant = async (name, ownerId) => {
+		const created = await mutate('CreateTenant',
+			`mutation CreateTenant { CreateTenant(input: { name: ${gqlString(name)}${ownerId ? `, ownerId: ${gqlString(ownerId)}` : ''} }) { tenantId errorMessage } }`, suNow.token);
+		assert(created.tenantId && !created.errorMessage, `CreateTenant answered ${JSON.stringify(created)}`);
+		return created.tenantId;
+	};
+	const orgPassword = 'WsOrganizations_2026!';
+	const outsiderLogin = `ws_org_outsider_${runTag}`;
+	await addUser(crypto.randomUUID(), outsiderLogin, orgPassword, suNow.token);
+	const outsider = await login(outsiderLogin, orgPassword);
+	const ownerLogin = `ws_org_owner_${runTag}`;
+	const ownerId = crypto.randomUUID();
+	await addUser(ownerId, ownerLogin, orgPassword, suNow.token);
+	const ownTenantId = await createTenant(`ws_org_own_${runTag}`, ownerId);
+	const owner = await login(ownerLogin, orgPassword);
+	const orgToken = await issueToken('ws organizations', ['/OrganizationManagement/View']);
+	const productHeaders = (token) => ({ 'x-server-token': token, productId: `WsProbe${runTag}` });
+	const loginThroughServer = async (username, password) => {
+		const response = await gql(
+			`query Authorization { Authorization(input: { login: ${gqlString(username)}, password: ${gqlString(password)},` +
+			` productId: "WsProbe${runTag}" }) { token } }`, null, `WsProbe${runTag}`, { 'x-server-token': orgToken.token });
+		const auth = response.data && response.data.Authorization;
+		assert(!response.errors && auth && auth.token, 'Authorization through the test product server failed');
+		return auth.token;
+	};
+
+	let ownerSession = null;
+	let ownerSubId = null;
+	let witness = null;
+	let witnessSubId = null;
+
+	await test('a user outside every organization does not watch the organizations', async () => {
+		const server = await serverSession('org outsider', outsider.token);
+		const refusal = await server.subscribeExpectingRefusal('OnTenantsCollectionChanged', tenantsQuery);
+		assertRefusalReason(refusal, { absent: 'a user outside the organizations watched them', mustMatch: notAllowed('OnTenantsCollectionChanged') });
+	});
+
+	await test('an anonymous request does not watch the organizations', async () => {
+		const server = await serverSession('org anonymous', null);
+		const refusal = await server.subscribeExpectingRefusal('OnTenantsCollectionChanged', tenantsQuery);
+		assertRefusalReason(refusal, { absent: 'an anonymous request watched the organizations', mustMatch: notAllowed('OnTenantsCollectionChanged') });
+	});
+
+	await test('the owner of an organization watches the organizations', async () => {
+		ownerSession = await serverSession('org owner', owner.token);
+		ownerSubId = await ownerSession.subscribe('OnTenantsCollectionChanged', tenantsQuery);
+		witness = await serverSession('org witness', suNow.token);
+		witnessSubId = await witness.subscribe('OnTenantsCollectionChanged', tenantsQuery);
+	});
+
+	await test('the owner is told about a change of its organization', async () => {
+		requires(ownerSubId, 'the subscription of the owner');
+		const mark = ownerSession.mark();
+		const updated = await mutate('UpdateTenant',
+			`mutation UpdateTenant { UpdateTenant(input: { tenantId: ${gqlString(ownTenantId)}, name: ${gqlString(`ws_org_own2_${runTag}`)} }) { success errorMessage } }`, suNow.token);
+		assert(updated.success === true, `UpdateTenant answered ${JSON.stringify(updated)}`);
+		await ownerSession.waitForData(ownerSubId, f => {
+			const n = notificationOf(f, 'OnTenantsCollectionChanged');
+			return !!n && n.itemId === ownTenantId && n.typeOperation === 'updated';
+		}, mark);
+	});
+
+	// Known regression https://github.com/ImagingTools/ImtCore/issues/1091; keep recipient isolation strict.
+	await test('the owner is not told about an organization it does not belong to', async () => {
+		requires(ownerSubId, 'the subscription of the owner');
+		const ownerMark = ownerSession.mark();
+		const witnessMark = witness.mark();
+		const foreignId = await createTenant(`ws_org_foreign_${runTag}`);
+		// The administrator is told, so the change was published
+		await witness.waitForData(witnessSubId, f => { const n = notificationOf(f, 'OnTenantsCollectionChanged'); return !!n && n.itemId === foreignId; }, witnessMark);
+		await delay(quietMs);
+		const leaked = ownerSession.frames.slice(ownerMark).filter(f => f.type === 'data' && f.id === ownerSubId)
+			.map(f => notificationOf(f, 'OnTenantsCollectionChanged')).filter(n => !!n && n.itemId === foreignId);
+		assert(leaked.length === 0, `the owner of another organization was told about ${foreignId}: ${JSON.stringify(leaked).slice(0, 300)}`);
+	});
+
+	await test('a member watches the organizations through the server of its product', async () => {
+		const token = await loginThroughServer(ownerLogin, orgPassword);
+		const server = await serverSession('org forwarded owner', token, productHeaders(orgToken.token));
+		await server.subscribe('OnTenantsCollectionChanged', tenantsQuery);
+	});
+
+	await test('a session opened directly at Puma cannot be forwarded by a product server', async () => {
+		const server = await serverSession('org local session forwarded', owner.token, productHeaders(orgToken.token));
+		const refusal = await server.subscribeExpectingRefusal('OnTenantsCollectionChanged', tenantsQuery);
+		assertRefusalReason(refusal, {
+			absent: 'a directly opened session was forwarded without product-origin proof',
+			mustMatch: new RegExp(`^Forbidden: The session was opened at this server and works only here, not through the server of 'WsProbe${runTag}'\\.$`)
+		});
+	});
+
+	await test('the server of a product does not lend the organizations to a user outside them', async () => {
+		const token = await loginThroughServer(outsiderLogin, orgPassword);
+		const server = await serverSession('org forwarded outsider', token, productHeaders(orgToken.token));
+		const refusal = await server.subscribeExpectingRefusal('OnTenantsCollectionChanged', tenantsQuery);
+		assertRefusalReason(refusal, { absent: 'a user outside the organizations watched them through a server', mustMatch: notAllowed('OnTenantsCollectionChanged') });
+	});
+
+	await test('an empty-scope token does not give a forwarded superuser organization access', async () => {
+		const token = await loginThroughServer(suLogin, suPassword);
+		const server = await serverSession('org forwarded without permission', token, productHeaders(plain.token));
+		const refusal = await server.subscribeExpectingRefusal('OnTenantsCollectionChanged', tenantsQuery);
+		assertRefusalReason(refusal, { absent: 'the forwarded superuser escaped the empty token boundary', mustMatch: notAllowed('OnTenantsCollectionChanged') });
+	});
+
+	await test('the server of a product watches organizations with its own view permission', async () => {
+		const server = await serverSession('org server itself', orgToken.token, { productId: `WsProbe${runTag}` });
+		const subId = await server.subscribe('OnTenantsCollectionChanged', tenantsQuery);
+		const mark = server.mark();
+		const tenantId = await createTenant(`ws_org_service_${runTag}`);
+		await server.waitForData(subId, f => {
+			const n = notificationOf(f, 'OnTenantsCollectionChanged');
+			return !!n && n.itemId === tenantId && n.typeOperation === 'inserted';
+		}, mark);
+	});
+
 	// Everything SubscriptionSession.audit() collected along the way: frames of an
 	// unknown type or shape, errors nobody asked for, notifications delivered to an
 	// id that holds no subscription, payloads carrying another command's data. No
 	// case above looks for these, which is the point - this is what catches a
 	// mismatch no assertion was written for.
 	await test('no unaccounted frames or protocol violations on any session', async () => {
-		const violations = session.violations.concat(rogue.violations, observer ? observer.violations : []);
+		const violations = session.violations.concat(rogue.violations, observer ? observer.violations : [], ...tokenServers.map(s => s.violations));
 		assert(violations.length === 0,
 			`${violations.length} protocol violation(s):\n        - ` + violations.join('\n        - '));
 	});
 
+	tokenServers.forEach(s => s.close());
 	rogue.close();
 	if (observer) {
 		observer.close();

@@ -1,0 +1,13 @@
+{
+    "appName": "Puma",
+    "rootPath": "/Puma/Views/",
+    "entry": "PumaWeb.qml",
+    "base": "${PUMADIR}/Include/pumaqml/Qml",
+    "includes": [
+        "${IMTCOREDIR}/Qml/web/imtcore.json"
+    ],
+    "dirs": [
+
+    ],
+    "output": "${PUMADIR}/Bin/web/Resources/jqml.puma.js"
+}
