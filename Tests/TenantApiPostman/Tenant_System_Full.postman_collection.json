@@ -28134,8 +28134,8 @@
                                     "pm.test('A group role of another organization is not listed in the profile', function () {",
                                     "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
                                     "  pm.expect(profile.currentTenantId).to.eql(pm.environment.get('tenantAId'));",
-                                    "  pm.expect(ids, 'ihChildRoleName').to.include(pm.environment.get('ihChildRoleName'));",
-                                    "  pm.expect(ids, 'ihForeignRoleName').to.not.include(pm.environment.get('ihForeignRoleName'));",
+                                    "  pm.expect(ids, 'ihChildRole').to.include(pm.environment.get('ihChildRole'));",
+                                    "  pm.expect(ids, 'ihForeignRole').to.not.include(pm.environment.get('ihForeignRole'));",
                                     "});"
                                 ]
                             }
@@ -57183,7 +57183,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test(\"refused: /StProbe is not connected to Puma: its server has no valid server token/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"StProbe is not connected to Puma: its server has no valid server token\"))); });",
+                                    "pm.test(\"refused: /StProbe{{stRun}} is not connected to Puma: its server has no valid server token/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"StProbe{{stRun}} is not connected to Puma: its server has no valid server token\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -57233,7 +57233,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test(\"refused: /StProbe is not connected to Puma: its server has no valid server token/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"StProbe is not connected to Puma: its server has no valid server token\"))); });",
+                                    "pm.test(\"refused: /StProbe{{stRun}} is not connected to Puma: its server has no valid server token/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"StProbe{{stRun}} is not connected to Puma: its server has no valid server token\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -57382,7 +57382,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test(\"refused: /StProbe is not connected to Puma: its server has no valid server token/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"StProbe is not connected to Puma: its server has no valid server token\"))); });",
+                                    "pm.test(\"refused: /StProbe{{stRun}} is not connected to Puma: its server has no valid server token/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"StProbe{{stRun}} is not connected to Puma: its server has no valid server token\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -57432,7 +57432,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test(\"refused: /StProbe is not connected to Puma: its server has no valid server token/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"StProbe is not connected to Puma: its server has no valid server token\"))); });",
+                                    "pm.test(\"refused: /StProbe{{stRun}} is not connected to Puma: its server has no valid server token/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"StProbe{{stRun}} is not connected to Puma: its server has no valid server token\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }

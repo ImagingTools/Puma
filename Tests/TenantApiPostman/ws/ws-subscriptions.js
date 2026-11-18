@@ -170,6 +170,9 @@ async function main() {
 	});
 
 	let docSubId = null;
+	// The server closes a document 30 s after its last OnDocumentChanged subscriber is gone
+	let keeper = null;
+	let keeperSubId = null;
 
 	await test('OnDocumentChanged accepts a subscription for the new document', async () => {
 		requires(documentId, 'a created document id');
@@ -514,6 +517,15 @@ async function main() {
 		requires(documentId, 'a created document id');
 		requires(managerSubId, 'a live OnDocumentManagerChanged subscription');
 
+		// The wait for the control check below lasts as long as the close timeout: another session keeps the document open
+		keeper = new SubscriptionSession('keeper', wsUrl, (await login(suLogin, suPassword)).token);
+		await keeper.connect();
+		await keeper.init();
+		keeperSubId = await keeper.subscribe('OnDocumentChanged',
+			'subscription OnDocumentChanged { OnDocumentChanged(input: { __typename: "DocumentId",' +
+			` collectionId: "Tenants", id: ${gqlString(documentId)} })` +
+			' { documentOperation documentId documentName objectId isDirty isLoading } }');
+
 		const frame = await session.stop(docSubId);
 		assert(frame.type === 'complete', `expected "complete", got ${JSON.stringify(frame).slice(0, 300)}`);
 		assert(frame.id === docSubId, `complete carries id "${frame.id}" instead of "${docSubId}"`);
@@ -658,6 +670,9 @@ async function main() {
 
 	await test('CloseDocument closes the tenant document', async () => {
 		requires(documentId, 'a created document id');
+		if (keeperSubId){
+			await keeper.stop(keeperSubId);
+		}
 		await closeDocument('Tenants', documentId, suActiveToken);
 	});
 
@@ -887,7 +902,7 @@ async function main() {
 	// case above looks for these, which is the point - this is what catches a
 	// mismatch no assertion was written for.
 	await test('no unaccounted frames or protocol violations on any session', async () => {
-		const violations = session.violations.concat(rogue.violations, observer ? observer.violations : [], ...tokenServers.map(s => s.violations));
+		const violations = session.violations.concat(rogue.violations, observer ? observer.violations : [], keeper ? keeper.violations : [], ...tokenServers.map(s => s.violations));
 		assert(violations.length === 0,
 			`${violations.length} protocol violation(s):\n        - ` + violations.join('\n        - '));
 	});
@@ -896,6 +911,9 @@ async function main() {
 	rogue.close();
 	if (observer) {
 		observer.close();
+	}
+	if (keeper) {
+		keeper.close();
 	}
 	session.close();
 }
