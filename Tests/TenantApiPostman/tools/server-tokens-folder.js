@@ -53,13 +53,17 @@ function item(name, query, options = {}){
 	};
 }
 
+// A JS string literal safe to embed in generated code
+const unsafeChars = new RegExp('[<>/' + String.fromCharCode(0x2028, 0x2029) + ']', 'g');
+const jsString = (value) => JSON.stringify(value).replace(unsafeChars, (c) => String.fromCharCode(92) + 'u' + c.charCodeAt(0).toString(16).padStart(4, '0'));
+
 // A refusal: the GraphQL errors carry the reason
 function refused(pattern){
 	const source = pattern.slice(1, -1).replace(/'(StProbe|StAdded|StNoProduct|StOther|StBySrv|StByUser|StByAnonymous)'/g, (_, id) => `'${clientProductId(id)}'`);
 	return [
 		'const json = pm.response.json();',
 		"const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-		`pm.test(${JSON.stringify('refused: ' + pattern.replace(/\\/g, '').replace(/'/g, ''))}, function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(${JSON.stringify(source)}))); });`,
+		`pm.test(${jsString('refused: ' + pattern.replace(/\\/g, '').replace(/'/g, ''))}, function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(${jsString(source)}))); });`,
 		"pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
 	];
 }
