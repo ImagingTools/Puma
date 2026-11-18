@@ -53175,7 +53175,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /Lisa is not connected to Puma: its server has no valid server token/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Lisa is not connected to Puma: its server has no valid server token\"))); });",
+                                    "pm.test(\"refused: /Lisa is not connected to Puma: its server has no valid server token/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Lisa is not connected to Puma: its server has no valid server token\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -53274,7 +53274,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /Invalid permissions for the user/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Invalid permissions for the user\"))); });",
+                                    "pm.test(\"refused: /Invalid permissions for the user/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Invalid permissions for the user\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -54426,7 +54426,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The product StNoProduct is not a client of this server/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The product 'StNoProduct{{stRun}}' is not a client of this server\"))); });",
+                                    "pm.test(\"refused: /The product StNoProduct is not a client of this server/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The product 'StNoProduct{{stRun}}' is not a client of this server\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -54506,7 +54506,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The product StProbe is already connected/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The product 'StProbe{{stRun}}' is already connected\"))); });",
+                                    "pm.test(\"refused: /The product StProbe is already connected/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The product 'StProbe{{stRun}}' is already connected\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -54546,7 +54546,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /Product-ID can.t be empty/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Product-ID can.t be empty\"))); });",
+                                    "pm.test(\"refused: /Product-ID can.t be empty/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Product-ID can.t be empty\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -54708,7 +54708,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /product ID cannot be changed/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"product ID cannot be changed\"))); });",
+                                    "pm.test(\"refused: /product ID cannot be changed/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"product ID cannot be changed\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -54748,7 +54748,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /Invalid permissions for the user/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Invalid permissions for the user\"))); });",
+                                    "pm.test(\"refused: /Invalid permissions for the user/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Invalid permissions for the user\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -54788,7 +54788,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /Invalid permissions for the user/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Invalid permissions for the user\"))); });",
+                                    "pm.test(\"refused: /Invalid permissions for the user/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Invalid permissions for the user\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -54870,7 +54870,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The product StNoProduct is not a client of this server/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The product 'StNoProduct{{stRun}}' is not a client of this server\"))); });",
+                                    "pm.test(\"refused: /The product StNoProduct is not a client of this server/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The product 'StNoProduct{{stRun}}' is not a client of this server\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -54910,7 +54910,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /A server token is issued to the server of another product/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"A server token is issued to the server of another product\"))); });",
+                                    "pm.test(\"refused: /A server token is issued to the server of another product/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"A server token is issued to the server of another product\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -54950,7 +54950,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /Server tokens are managed by a superuser session/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Server tokens are managed by a superuser session\"))); });",
+                                    "pm.test(\"refused: /Server tokens are managed by a superuser session/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Server tokens are managed by a superuser session\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -54990,7 +54990,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /Server tokens are managed by a superuser session/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Server tokens are managed by a superuser session\"))); });",
+                                    "pm.test(\"refused: /Server tokens are managed by a superuser session/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Server tokens are managed by a superuser session\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -55192,7 +55192,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The name of the token is required/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The name of the token is required\"))); });",
+                                    "pm.test(\"refused: /The name of the token is required/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The name of the token is required\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -55232,7 +55232,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The permission /StNoSuchPermission cannot be given to a server token/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The permission '\\\\/StNoSuchPermission' cannot be given to a server token\"))); });",
+                                    "pm.test(\"refused: /The permission /StNoSuchPermission cannot be given to a server token/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The permission '\\\\/StNoSuchPermission' cannot be given to a server token\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -55272,7 +55272,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The permission /StProbe/View cannot be given to a server token/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The permission '\\\\/StProbe\\\\/View' cannot be given to a server token\"))); });",
+                                    "pm.test(\"refused: /The permission /StProbe/View cannot be given to a server token/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The permission '\\\\/StProbe\\\\/View' cannot be given to a server token\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -55312,7 +55312,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /A server token is issued to the server of another product/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"A server token is issued to the server of another product\"))); });",
+                                    "pm.test(\"refused: /A server token is issued to the server of another product/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"A server token is issued to the server of another product\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -55352,7 +55352,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /Server tokens are managed by a superuser session/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Server tokens are managed by a superuser session\"))); });",
+                                    "pm.test(\"refused: /Server tokens are managed by a superuser session/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Server tokens are managed by a superuser session\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -55392,7 +55392,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /Server tokens are managed by a superuser session/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Server tokens are managed by a superuser session\"))); });",
+                                    "pm.test(\"refused: /Server tokens are managed by a superuser session/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Server tokens are managed by a superuser session\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -55468,7 +55468,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /Server tokens are managed by a superuser session/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Server tokens are managed by a superuser session\"))); });",
+                                    "pm.test(\"refused: /Server tokens are managed by a superuser session/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Server tokens are managed by a superuser session\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -55551,7 +55551,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /Server tokens are managed by a superuser session/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Server tokens are managed by a superuser session\"))); });",
+                                    "pm.test(\"refused: /Server tokens are managed by a superuser session/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Server tokens are managed by a superuser session\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -55779,7 +55779,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /Invalid permissions for the user StProbe/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Invalid permissions for the user 'StProbe{{stRun}}'\"))); });",
+                                    "pm.test(\"refused: /Invalid permissions for the user StProbe/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Invalid permissions for the user 'StProbe{{stRun}}'\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -55828,7 +55828,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /Invalid permissions for the user StProbe/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Invalid permissions for the user 'StProbe{{stRun}}'\"))); });",
+                                    "pm.test(\"refused: /Invalid permissions for the user StProbe/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Invalid permissions for the user 'StProbe{{stRun}}'\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -55877,7 +55877,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /Invalid permissions for the user StProbe/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Invalid permissions for the user 'StProbe{{stRun}}'\"))); });",
+                                    "pm.test(\"refused: /Invalid permissions for the user StProbe/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Invalid permissions for the user 'StProbe{{stRun}}'\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -55926,7 +55926,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /Invalid permissions for the user StProbe/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Invalid permissions for the user 'StProbe{{stRun}}'\"))); });",
+                                    "pm.test(\"refused: /Invalid permissions for the user StProbe/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Invalid permissions for the user 'StProbe{{stRun}}'\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -56024,7 +56024,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /Invalid permissions for the user /', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Invalid permissions for the user ''\"))); });",
+                                    "pm.test(\"refused: /Invalid permissions for the user /\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Invalid permissions for the user ''\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -56073,7 +56073,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /Server tokens are managed by a superuser session/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Server tokens are managed by a superuser session\"))); });",
+                                    "pm.test(\"refused: /Server tokens are managed by a superuser session/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Server tokens are managed by a superuser session\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -56172,7 +56172,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The token of the server is not the token of the product Lisa/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The token of the server is not the token of the product 'Lisa'\"))); });",
+                                    "pm.test(\"refused: /The token of the server is not the token of the product Lisa/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The token of the server is not the token of the product 'Lisa'\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -56222,7 +56222,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The token of the server is not the token of the product Puma/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The token of the server is not the token of the product 'Puma'\"))); });",
+                                    "pm.test(\"refused: /The token of the server is not the token of the product Puma/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The token of the server is not the token of the product 'Puma'\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -56272,7 +56272,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The token of the server is not valid/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The token of the server is not valid\"))); });",
+                                    "pm.test(\"refused: /The token of the server is not valid/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The token of the server is not valid\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -56322,7 +56322,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /Invalid personal access token/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Invalid personal access token\"))); });",
+                                    "pm.test(\"refused: /Invalid personal access token/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Invalid personal access token\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -56371,7 +56371,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /Server tokens are managed by a superuser session/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Server tokens are managed by a superuser session\"))); });",
+                                    "pm.test(\"refused: /Server tokens are managed by a superuser session/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Server tokens are managed by a superuser session\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -56421,7 +56421,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The personal access token is not valid for this product/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The personal access token is not valid for this product\"))); });",
+                                    "pm.test(\"refused: /The personal access token is not valid for this product/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The personal access token is not valid for this product\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -56605,7 +56605,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /Invalid permissions for the user/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Invalid permissions for the user\"))); });",
+                                    "pm.test(\"refused: /Invalid permissions for the user/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Invalid permissions for the user\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -56761,7 +56761,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /Invalid permissions for the user/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Invalid permissions for the user\"))); });",
+                                    "pm.test(\"refused: /Invalid permissions for the user/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Invalid permissions for the user\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -56814,7 +56814,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /Server tokens are managed by a superuser session/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Server tokens are managed by a superuser session\"))); });",
+                                    "pm.test(\"refused: /Server tokens are managed by a superuser session/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Server tokens are managed by a superuser session\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -56868,7 +56868,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The personal access token is not for the product of the server/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The personal access token is not for the product of the server\"))); });",
+                                    "pm.test(\"refused: /The personal access token is not for the product of the server/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The personal access token is not for the product of the server\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -56922,7 +56922,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The personal access token is not for the product of the server/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The personal access token is not for the product of the server\"))); });",
+                                    "pm.test(\"refused: /The personal access token is not for the product of the server/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The personal access token is not for the product of the server\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -56976,7 +56976,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /StProbe is not connected to Puma: its server has no valid server token/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"StProbe is not connected to Puma: its server has no valid server token\"))); });",
+                                    "pm.test(\"refused: /StProbe is not connected to Puma: its server has no valid server token/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"StProbe is not connected to Puma: its server has no valid server token\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -57026,7 +57026,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /StProbe is not connected to Puma: its server has no valid server token/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"StProbe is not connected to Puma: its server has no valid server token\"))); });",
+                                    "pm.test(\"refused: /StProbe is not connected to Puma: its server has no valid server token/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"StProbe is not connected to Puma: its server has no valid server token\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -57125,7 +57125,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The personal access token is not valid for this product/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The personal access token is not valid for this product\"))); });",
+                                    "pm.test(\"refused: /The personal access token is not valid for this product/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The personal access token is not valid for this product\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -57175,7 +57175,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /StProbe is not connected to Puma: its server has no valid server token/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"StProbe is not connected to Puma: its server has no valid server token\"))); });",
+                                    "pm.test(\"refused: /StProbe is not connected to Puma: its server has no valid server token/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"StProbe is not connected to Puma: its server has no valid server token\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -57225,7 +57225,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /StProbe is not connected to Puma: its server has no valid server token/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"StProbe is not connected to Puma: its server has no valid server token\"))); });",
+                                    "pm.test(\"refused: /StProbe is not connected to Puma: its server has no valid server token/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"StProbe is not connected to Puma: its server has no valid server token\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -57402,7 +57402,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /Invalid permissions for the user/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Invalid permissions for the user\"))); });",
+                                    "pm.test(\"refused: /Invalid permissions for the user/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Invalid permissions for the user\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -57446,7 +57446,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The permission /StNoSuchPermission cannot be given to a server token/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The permission '\\\\/StNoSuchPermission' cannot be given to a server token\"))); });",
+                                    "pm.test(\"refused: /The permission /StNoSuchPermission cannot be given to a server token/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The permission '\\\\/StNoSuchPermission' cannot be given to a server token\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -57486,7 +57486,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The server token does not exist/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The server token does not exist\"))); });",
+                                    "pm.test(\"refused: /The server token does not exist/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The server token does not exist\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -57536,7 +57536,7 @@
                                     "pm.test('a personal token is named', function () { pm.expect(pm.environment.get('stSuPatId')).to.be.a('string').and.not.empty; });",
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The server token does not exist/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The server token does not exist\"))); });",
+                                    "pm.test(\"refused: /The server token does not exist/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The server token does not exist\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -57576,7 +57576,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /Server tokens are managed by a superuser session/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Server tokens are managed by a superuser session\"))); });",
+                                    "pm.test(\"refused: /Server tokens are managed by a superuser session/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Server tokens are managed by a superuser session\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -57665,7 +57665,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The permissions of Puma are given only to a product server with a valid server token/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The permissions of Puma are given only to a product server with a valid server token\"))); });",
+                                    "pm.test(\"refused: /The permissions of Puma are given only to a product server with a valid server token/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The permissions of Puma are given only to a product server with a valid server token\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -57705,7 +57705,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The permissions of Puma are given only to a product server with a valid server token/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The permissions of Puma are given only to a product server with a valid server token\"))); });",
+                                    "pm.test(\"refused: /The permissions of Puma are given only to a product server with a valid server token/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The permissions of Puma are given only to a product server with a valid server token\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -57847,7 +57847,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The permissions of the product StOther are published by its server only/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The permissions of the product 'StOther{{stRun}}' are published by its server only\"))); });",
+                                    "pm.test(\"refused: /The permissions of the product StOther are published by its server only/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The permissions of the product 'StOther{{stRun}}' are published by its server only\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -57896,7 +57896,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The permissions of the product StProbe are published by its server only/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The permissions of the product 'StProbe{{stRun}}' are published by its server only\"))); });",
+                                    "pm.test(\"refused: /The permissions of the product StProbe are published by its server only/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The permissions of the product 'StProbe{{stRun}}' are published by its server only\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -57936,7 +57936,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The permissions of the product StProbe are published by its server only/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The permissions of the product 'StProbe{{stRun}}' are published by its server only\"))); });",
+                                    "pm.test(\"refused: /The permissions of the product StProbe are published by its server only/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The permissions of the product 'StProbe{{stRun}}' are published by its server only\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -58059,7 +58059,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The server token does not exist/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The server token does not exist\"))); });",
+                                    "pm.test(\"refused: /The server token does not exist/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The server token does not exist\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -58099,7 +58099,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /Server tokens are managed by a superuser session/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Server tokens are managed by a superuser session\"))); });",
+                                    "pm.test(\"refused: /Server tokens are managed by a superuser session/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Server tokens are managed by a superuser session\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -58189,7 +58189,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /Invalid personal access token/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Invalid personal access token\"))); });",
+                                    "pm.test(\"refused: /Invalid personal access token/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Invalid personal access token\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -58269,7 +58269,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The server token is revoked/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The server token is revoked\"))); });",
+                                    "pm.test(\"refused: /The server token is revoked/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The server token is revoked\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -58350,7 +58350,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /Revoke the server token before deleting it/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Revoke the server token before deleting it\"))); });",
+                                    "pm.test(\"refused: /Revoke the server token before deleting it/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Revoke the server token before deleting it\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -58390,7 +58390,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /Server tokens are managed by a superuser session/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Server tokens are managed by a superuser session\"))); });",
+                                    "pm.test(\"refused: /Server tokens are managed by a superuser session/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Server tokens are managed by a superuser session\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -58521,7 +58521,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /Invalid personal access token/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Invalid personal access token\"))); });",
+                                    "pm.test(\"refused: /Invalid personal access token/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Invalid personal access token\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -58561,7 +58561,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /The server token does not exist/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The server token does not exist\"))); });",
+                                    "pm.test(\"refused: /The server token does not exist/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"The server token does not exist\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -58853,7 +58853,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /A server token is issued to the server of another product/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"A server token is issued to the server of another product\"))); });",
+                                    "pm.test(\"refused: /A server token is issued to the server of another product/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"A server token is issued to the server of another product\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -58893,7 +58893,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /A server token is issued to the server of another product/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"A server token is issued to the server of another product\"))); });",
+                                    "pm.test(\"refused: /A server token is issued to the server of another product/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"A server token is issued to the server of another product\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -58933,7 +58933,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /Server tokens are managed by a superuser session/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Server tokens are managed by a superuser session\"))); });",
+                                    "pm.test(\"refused: /Server tokens are managed by a superuser session/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Server tokens are managed by a superuser session\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -58973,7 +58973,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /Server tokens are managed by a superuser session/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Server tokens are managed by a superuser session\"))); });",
+                                    "pm.test(\"refused: /Server tokens are managed by a superuser session/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Server tokens are managed by a superuser session\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }
@@ -59217,7 +59217,7 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-                                    "pm.test('refused: /Invalid personal access token/', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Invalid personal access token\"))); });",
+                                    "pm.test(\"refused: /Invalid personal access token/\", function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(\"Invalid personal access token\"))); });",
                                     "pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
                                 ]
                             }

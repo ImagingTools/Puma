@@ -59,7 +59,7 @@ function refused(pattern){
 	return [
 		'const json = pm.response.json();',
 		"const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
-		`pm.test('refused: ${pattern.replace(/\\/g, '').replace(/'/g, '')}', function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(${JSON.stringify(source)}))); });`,
+		`pm.test(${JSON.stringify('refused: ' + pattern.replace(/\\/g, '').replace(/'/g, ''))}, function () { pm.expect(messages, JSON.stringify(json)).to.match(new RegExp(pm.variables.replaceIn(${JSON.stringify(source)}))); });`,
 		"pm.test('no data', function () { const data = json.data || {}; Object.keys(data).forEach(function (k) { pm.expect(data[k], k).to.eql(null); }); });"
 	];
 }
