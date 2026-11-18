@@ -83,12 +83,19 @@ param(
     [string]$EnvironmentPath = (Join-Path $ScriptDir "Tenant_System_Full.postman_environment.json"),
     [string]$JUnitReportPath = (Join-Path $ScriptDir "junit-report-sqlite.xml"),
     [string]$JsonReportPath = (Join-Path $ScriptDir "run-report-sqlite.json"),
+    [string]$NotificationCenterCollectionPath = (Join-Path $ScriptDir "Notification_Center.postman_collection.json"),
+    [string]$NotificationCenterJUnitReportPath = (Join-Path $ScriptDir "junit-report-notification-center-sqlite.xml"),
+    [string]$NotificationCenterJsonReportPath = (Join-Path $ScriptDir "run-report-notification-center-sqlite.json"),
+    [string]$ServerStdOutPath = (Join-Path $ScriptDir "server-sqlite-stdout.log"),
+    [string]$ServerStdErrPath = (Join-Path $ScriptDir "server-sqlite-stderr.log"),
     [int]$StartupTimeoutSeconds = 60
 )
 
 $ErrorActionPreference = "Stop"
 $serverProcess = $null
 $exitCode = 1
+
+. (Join-Path $ScriptDir "ServerLogCheck.ps1")
 
 if ([string]::IsNullOrWhiteSpace($ServerExePath)) {
     $ServerExePath = Join-Path $RepoRoot "Bin\$BuildConfig\PumaServerSlTest.exe"
@@ -130,8 +137,14 @@ function Start-TestServer {
         throw "Server executable not found: $ServerExePath"
     }
     $workDir = Split-Path -Parent $ServerExePath
-    $script:serverProcess = Start-Process -FilePath $ServerExePath -WorkingDirectory $workDir -PassThru -WindowStyle Hidden
+    # Redirected to files for the same reasons as in Run-CiTests.ps1: a hidden Debug
+    # console stalls the server under load, and the log is checked after the run
+    $script:serverProcess = Start-Process -FilePath $ServerExePath -WorkingDirectory $workDir -PassThru `
+        -WindowStyle Hidden `
+        -RedirectStandardOutput $ServerStdOutPath `
+        -RedirectStandardError $ServerStdErrPath
     Write-Host "Started PID $($script:serverProcess.Id)"
+    Write-Host "Server stdout: $ServerStdOutPath"
 
     $deadline = (Get-Date).AddSeconds($StartupTimeoutSeconds)
     $ready = $false
@@ -174,18 +187,22 @@ function Install-NewmanIfNeeded {
     return $newmanCmd
 }
 
-function Invoke-NewmanSuite {
+function Invoke-NewmanSuite(
+        [string]$Collection = $CollectionPath,
+        [string]$JUnitReport = $JUnitReportPath,
+        [string]$JsonReport = $JsonReportPath,
+        [string]$Title = "newman suite") {
     $newmanCmd = Install-NewmanIfNeeded
 
-    Write-Step "Running newman suite"
+    Write-Step "Running $Title"
     $baseUrl = "http://localhost:$HttpPort/Puma/graphql"
     $newmanArgs = @(
-        "run", $CollectionPath,
+        "run", $Collection,
         "-e", $EnvironmentPath,
         "--env-var", "base_url=$baseUrl",
         "--reporters", "cli,junit,json",
-        "--reporter-junit-export", $JUnitReportPath,
-        "--reporter-json-export", $JsonReportPath
+        "--reporter-junit-export", $JUnitReport,
+        "--reporter-json-export", $JsonReport
     )
     & $newmanCmd @newmanArgs | Out-Host
     return $LASTEXITCODE
@@ -209,6 +226,10 @@ try {
     Reset-TestDatabase
     Start-TestServer
     $exitCode = Invoke-NewmanSuite
+
+    # The notification center on SQLite: the same collection, its own users and organizations
+    $centerExitCode = Invoke-NewmanSuite $NotificationCenterCollectionPath $NotificationCenterJUnitReportPath $NotificationCenterJsonReportPath "notification center suite"
+    if ($exitCode -eq 0) { $exitCode = $centerExitCode }
 }
 finally {
     if ($serverProcess -and -not $serverProcess.HasExited) {
@@ -216,6 +237,8 @@ finally {
         Stop-Process -Id $serverProcess.Id -Force -ErrorAction SilentlyContinue
     }
 }
+
+if (-not (Test-ServerLogs @($ServerStdOutPath, $ServerStdErrPath)) -and $exitCode -eq 0) { $exitCode = 1 }
 
 if ($exitCode -eq 0) {
     Write-Host "`nAll tests passed." -ForegroundColor Green

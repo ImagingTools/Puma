@@ -11,6 +11,7 @@
         <Element ComponentName="Application" X="625" Y="175" Note=""/>
         <Element ComponentName="PumaDatabasePostgres" X="675" Y="400" Note=""/>
         <Element ComponentName="PumaServerBase" X="225" Y="400" Note=""/>
+        <Element ComponentName="SimSmtpClient" X="225" Y="550" Note=""/>
         <Element ComponentName="VersionInfo" X="1000" Y="400" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
