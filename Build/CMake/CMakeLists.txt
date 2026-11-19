@@ -29,6 +29,11 @@ set(INCLUDE_DIR		"${PUMADIR}/Include")
 set(IMPL_DIR		"${PUMADIR}/Impl")
 set(AUX_INCLUDE_DIR "${PUMADIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles")
 
+if(USE_FIND_PACKAGE)
+	find_program(NODE_EXE NAMES node)
+	message("NODE_EXE found: ${NODE_EXE}")
+endif()
+
 # Include
 add_subdirectory("${INCLUDE_DIR}/pumaqml/CMake" "${AUX_INCLUDE_DIR}/pumaqml")
 
