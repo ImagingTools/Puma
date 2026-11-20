@@ -38,6 +38,17 @@ Minimal run:
 newman run Tenant_System_Full.postman_collection.json -e Tenant_System_Full.postman_environment.json
 ```
 
+### Access changes (`ws/ws-access-change.js`)
+
+Run with the usual lifetimes, before the short sessions. A user holding a role gets a right added to the role, loses it, then loses the role: each change applies to the very next request of the same token (no waiting, no polling), and the subscription `OnAccessChanged` of the session is told of it. A role the user does not hold tells nothing. With `--product-http`, `--product-ws`, `--product`, `--product-right`, `--product-check` and `--product-check-command` the same runs at the server of a product (ProLife runs it so).
+
+### Short sessions (`ws/ws-token-expiry.js`, `ws/ws-session-security.js`)
+
+The last step of `Run-CiTests.ps1` starts the server again with short sessions: `ServerSettings.ps1` puts the group `Sessions` (`AccessTokenLifetime` 20 s, `SessionLifetime` 75 s; `-JwtLifetime`, `-SessionLifetime`) into the settings file of the test server and restores the file afterwards. A server reads these settings at its start; by default a token lives 3600 s and a session 86400 s.
+
+- `ws-token-expiry.js`: an expired token is refused with 401 and a new subscription with code `Unauthorized`, while an established subscription lives on until its session ends; refresh keeps the session and rotates the refresh token once, also under concurrency; stop and start move the delivery to the new token; a sign-out ends the subscriptions; a refresh moves the end of the session, and at that end the subscription ends as `Unauthorized`. It takes about three minutes of real time.
+- `ws-session-security.js`: `Logout` naming the token of another user, an anonymous `Logout` or `RemoveSession`, `RemoveSession` and `GetSession` of the session of another user, and a forged token end or read nothing; each refusal has a positive control.
+
 `Run-CiTests.ps1` (Postgres) and `Run-CiTests-Sqlite.ps1` also fail the run if the server log (`server-stdout.log`/`server-stderr.log`, `server-sqlite-*.log` for SQLite) has a database error - see `ServerLogCheck.ps1`. A server can answer every request correctly while it loses data behind them; the log is the only place that shows it.
 
 ## Scenario Coverage Summary

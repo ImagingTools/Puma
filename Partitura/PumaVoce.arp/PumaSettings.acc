@@ -10,6 +10,15 @@
     <Description>Settings of the Puma-server</Description>
     <Keywords>Puma.Server</Keywords>
     <ElementsList>
+        <Element Id="AccessTokenLifetime" PackageId="BasePck" ComponentId="TextParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DefaultText" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="3600"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="Backup" PackageId="BasePck" ComponentId="ComposedParamsSet">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -285,12 +294,14 @@
                                 <Value>SmtpServerParams</Value>
                                 <Value>FileBasedSslConfiguration</Value>
                                 <Value>ServerTokens</Value>
+                                <Value>Sessions</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="ParametersDescription" Type="Text[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
+                                <Value></Value>
                                 <Value></Value>
                                 <Value></Value>
                                 <Value></Value>
@@ -313,6 +324,7 @@
                                 <Value>SmtpServer</Value>
                                 <Value>SslConfiguration</Value>
                                 <Value>ServerTokens</Value>
+                                <Value>Sessions</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -327,6 +339,7 @@
                                 <Value>SMTP</Value>
                                 <Value>SSL Configuration</Value>
                                 <Value>Server Tokens</Value>
+                                <Value>Sessions</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -421,6 +434,56 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="SessionLifetime" PackageId="BasePck" ComponentId="TextParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DefaultText" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="86400"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="Sessions" PackageId="BasePck" ComponentId="ComposedParamsSet">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Parameters" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>AccessTokenLifetime</Value>
+                                <Value>SessionLifetime</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ParametersDescription" Type="Text[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Seconds an access token is valid; the client refreshes it with its session</Value>
+                                <Value>Seconds a session lives after its last refresh; then the user signs in again</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ParametersId" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>AccessTokenLifetime</Value>
+                                <Value>SessionLifetime</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ParametersName" Type="Text[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Access token lifetime (s)</Value>
+                                <Value>Session lifetime (s)</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Default"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="SmtpServerParams" PackageId="ImtHttpServerVoce" ComponentId="SmtpServerParams">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap/>
@@ -438,6 +501,7 @@
         <Interface InterfaceId="istd::TIHierarchical&lt;istd::IPolymorphic&gt;" ComponentId="Preferences"/>
     </ExportedInterfaces>
     <ExportedComponents>
+        <Component ExportedId="AccessTokenLifetime" ComponentId="AccessTokenLifetime"/>
         <Component ExportedId="AutoPersistence" ComponentId="FileAutoPersistence/AutoPersistence"/>
         <Component ExportedId="Backup" ComponentId="Backup"/>
         <Component ExportedId="DatabaseAccessSettings" ComponentId="DatabaseAccessSettings"/>
@@ -446,6 +510,7 @@
         <Component ExportedId="ServerConnectionInterface" ComponentId="Server/ServerConnectionInterface"/>
         <Component ExportedId="ServerPort" ComponentId="Server/ServerPort"/>
         <Component ExportedId="ServerTokensEnabled" ComponentId="ServerTokensEnabled"/>
+        <Component ExportedId="SessionLifetime" ComponentId="SessionLifetime"/>
         <Component ExportedId="SmtpPasswordParam" ComponentId="SmtpServerParams/SmtpPasswordParam"/>
         <Component ExportedId="SmtpPortParam" ComponentId="SmtpServerParams/SmtpPortParam"/>
         <Component ExportedId="SmtpServerAddressParam" ComponentId="SmtpServerParams/SmtpServerAddressParam"/>
