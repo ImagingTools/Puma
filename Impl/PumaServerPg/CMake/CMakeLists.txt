@@ -118,9 +118,13 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND "${Qt6Core_VERSION}" VERSION_GREATER_E
 	# with $ORIGIN they find each other in bin.
 	# Must run after every copy into bin, as each copy restores the original file.
 	# Only the libraries directly in bin, plugins have their RUNPATH from Qt already.
-	find_program(PATCHELF_EXECUTABLE patchelf REQUIRED)
+	# Needed by the install only: a build without patchelf configures and builds, its install of this component fails.
+	find_program(PATCHELF_EXECUTABLE patchelf)
 	install(CODE "set(patchelf \"${PATCHELF_EXECUTABLE}\")" COMPONENT ${PROJECT_NAME})
 	install(CODE [=[
+		if(NOT patchelf)
+			message(FATAL_ERROR "patchelf is required to install PumaServerPg: install it (apt install patchelf) and configure again")
+		endif()
 		file(GLOB files LIST_DIRECTORIES false "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/*.so*")
 		foreach(file IN LISTS files)
 			if(IS_SYMLINK "${file}")
