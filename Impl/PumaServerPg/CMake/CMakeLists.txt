@@ -64,11 +64,14 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND "${Qt6Core_VERSION}" VERSION_GREATER_E
 	# (libldap, krb5) need the system OpenSSL, while the process already has the conan OpenSSL loaded:
 	# "libldap.so.2: undefined symbol: EVP_md2". Link the conan libpq to the executable, so the loader
 	# preloads it through the executable's RUNPATH and the install collects it with its dependencies.
-	find_package(PostgreSQL REQUIRED)
-	target_link_libraries(${PROJECT_NAME} PRIVATE PostgreSQL::PostgreSQL)
-	# No code calls libpq, so --as-needed would drop it from DT_NEEDED:
-	# with this define Main.cpp references PQlibVersion to keep it.
-	target_compile_definitions(${PROJECT_NAME} PRIVATE PUMA_KEEP_LIBPQ_LINKED)
+	# A build without a libpq development package (no conan, no libpq-dev) links none and loads the system one.
+	find_package(PostgreSQL)
+	if(PostgreSQL_FOUND)
+		target_link_libraries(${PROJECT_NAME} PRIVATE PostgreSQL::PostgreSQL)
+		# No code calls libpq, so --as-needed would drop it from DT_NEEDED:
+		# with this define Main.cpp references PQlibVersion to keep it.
+		target_compile_definitions(${PROJECT_NAME} PRIVATE PUMA_KEEP_LIBPQ_LINKED)
+	endif()
 
 	set_target_properties(${PROJECT_NAME} PROPERTIES INSTALL_RPATH "$ORIGIN")
 	install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin COMPONENT ${PROJECT_NAME})
