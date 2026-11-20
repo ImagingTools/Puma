@@ -10,9 +10,31 @@
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
+        <Element Id="AccessChangePublisher" PackageId="ImtServerGqlPck" ComponentId="AccessChangePublisher">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>OnAccessChanged</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RequestManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="WebSocketServerFramework"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="AuthenticationManager" PackageId="ImtAuthVoce" ComponentId="AuthenticationManager">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="AccessModels" Type="Reference[]" ExportId="AccessModels">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SessionCollection" Type="Reference" ExportId="SessionCollection">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="InvitationManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="TenantController/TenantInvitationManager"/>
                     </AttributeInfo>
@@ -130,8 +152,14 @@
                     <AttributeInfo Id="DefaultPath" Type="String" ExportId="">
                         <Data IsEnabled="true" Value="Puma/Puma Server/key.xml"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="JwtLifetimeParam" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaSettings/AccessTokenLifetime"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RefreshTokenLifetimeParam" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaSettings/SessionLifetime"/>
                     </AttributeInfo>
                     <AttributeInfo Id="RuntimeStatus" Type="Reference" ExportId="RuntimeStatus">
                         <Data IsEnabled="false"/>
@@ -637,6 +665,7 @@
                     <AttributeInfo Id="GqlSubscriberControllers" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
+                                <Value>AccessChangePublisher</Value>
                                 <Value>Subscriptions</Value>
                                 <Value>TenantController</Value>
                                 <Value>UserGroupCollectionDocumentService</Value>

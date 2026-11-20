@@ -40,6 +40,11 @@
     Where newman writes the JUnit XML report. Point TeamCity's "XML Report
     Processing" (JUnit) build feature at this same path.
 
+.PARAMETER SettingsPath / JwtLifetime / SessionLifetime
+    The token expiry suites run last, on the server started again with short
+    sessions: their lifetimes (in seconds) go into the "Sessions" group of the
+    settings file of the test server, which is restored afterwards.
+
 .EXAMPLE
     powershell -ExecutionPolicy Bypass -File Run-CiTests.ps1
 
@@ -104,14 +109,25 @@ param(
     [string]$ServerStdOutPath = (Join-Path $ScriptDir "server-stdout.log"),
     [string]$ServerStdErrPath = (Join-Path $ScriptDir "server-stderr.log"),
     [int]$WebSocketPort = 18788,
-    [int]$StartupTimeoutSeconds = 60
+    [int]$StartupTimeoutSeconds = 60,
+    [string]$SettingsPath = (Join-Path $env:PUBLIC "ImagingTools\Puma\Puma Server\PumaServerPgTestSettings.xml"),
+    [int]$JwtLifetime = 20,
+    [int]$SessionLifetime = 75,
+    [string]$WsTokenExpiryJUnitReportPath = (Join-Path $ScriptDir "junit-report-ws-token-expiry.xml"),
+    [string]$WsSessionSecurityJUnitReportPath = (Join-Path $ScriptDir "junit-report-ws-session-security.xml"),
+    [string]$WsAccessChangeJUnitReportPath = (Join-Path $ScriptDir "junit-report-ws-access-change.xml"),
+    [string]$ShortSessionServerStdOutPath = (Join-Path $ScriptDir "server-short-sessions-stdout.log"),
+    [string]$ShortSessionServerStdErrPath = (Join-Path $ScriptDir "server-short-sessions-stderr.log")
 )
 
 $ErrorActionPreference = "Stop"
 $serverProcess = $null
 $exitCode = 1
+$settingsBackup = $null
+$isSettingsChanged = $false
 
 . (Join-Path $ScriptDir "ServerLogCheck.ps1")
+. (Join-Path $ScriptDir "ServerSettings.ps1")
 
 if ([string]::IsNullOrWhiteSpace($ServerExePath)) {
     $ServerExePath = Join-Path $RepoRoot "Bin\$BuildConfig\PumaServerPgTest.exe"
@@ -175,7 +191,7 @@ function Reset-TestDatabase {
     }
 }
 
-function Start-TestServer {
+function Start-TestServer([string]$StdOutPath = $ServerStdOutPath, [string]$StdErrPath = $ServerStdErrPath) {
     Write-Step "Starting PumaServerPgTest.exe"
     if (-not (Test-Path $ServerExePath)) {
         throw "Server executable not found: $ServerExePath"
@@ -190,10 +206,10 @@ function Start-TestServer {
     # get when a request fails.
     $script:serverProcess = Start-Process -FilePath $ServerExePath -WorkingDirectory $workDir -PassThru `
         -WindowStyle Hidden `
-        -RedirectStandardOutput $ServerStdOutPath `
-        -RedirectStandardError $ServerStdErrPath
+        -RedirectStandardOutput $StdOutPath `
+        -RedirectStandardError $StdErrPath
     Write-Host "Started PID $($script:serverProcess.Id)"
-    Write-Host "Server stdout: $ServerStdOutPath"
+    Write-Host "Server stdout: $StdOutPath"
 
     $deadline = (Get-Date).AddSeconds($StartupTimeoutSeconds)
     $ready = $false
@@ -257,7 +273,7 @@ function Invoke-NewmanSuite(
     return $LASTEXITCODE
 }
 
-function Invoke-WsSuite([string]$ScriptName, [string]$Title, [string]$ReportPath) {
+function Invoke-WsSuite([string]$ScriptName, [string]$Title, [string]$ReportPath, [string[]]$ExtraArguments = @()) {
     # Newman does not execute Postman WebSocket requests, so subscription
     # coverage lives in node runners speaking the same protocol, each writing
     # its own JUnit report (see ws\ws-lib.js).
@@ -272,7 +288,7 @@ function Invoke-WsSuite([string]$ScriptName, [string]$Title, [string]$ReportPath
     $httpUrl = "http://localhost:$HttpPort/Puma/graphql"
     $wsUrl = "ws://localhost:$WebSocketPort"
 
-    & node $wsScript --http $httpUrl --ws $wsUrl --env $EnvironmentPath --junit $ReportPath | Out-Host
+    & node $wsScript --http $httpUrl --ws $wsUrl --env $EnvironmentPath --junit $ReportPath @ExtraArguments | Out-Host
     return $LASTEXITCODE
 }
 
@@ -305,15 +321,36 @@ try {
     if ($exitCode -eq 0) { $exitCode = $centerExitCode }
     $wsExitCode = Invoke-WsSuite "ws-notification-center.js" "WebSocket notification center suite" $WsNotificationCenterJUnitReportPath
     if ($exitCode -eq 0) { $exitCode = $wsExitCode }
+
+    # Changed permissions apply at once, told to the session too; with the usual lifetimes, a token expiring mid-case would hide it
+    $wsExitCode = Invoke-WsSuite "ws-access-change.js" "Access change suite" $WsAccessChangeJUnitReportPath
+    if ($exitCode -eq 0) { $exitCode = $wsExitCode }
+
+    # Short sessions, read by the server at its start: the token of a subscriber expires within the suite
+    Stop-TestServer
+    $settingsBackup = Set-ServerSettings $SettingsPath (Get-ShortSessionSettings $JwtLifetime $SessionLifetime)
+    $isSettingsChanged = $true
+    Start-TestServer $ShortSessionServerStdOutPath $ShortSessionServerStdErrPath
+    $lifetimeArguments = @("--jwt-lifetime", "$JwtLifetime", "--session-lifetime", "$SessionLifetime")
+    $wsExitCode = Invoke-WsSuite "ws-token-expiry.js" "WebSocket token expiry suite" $WsTokenExpiryJUnitReportPath $lifetimeArguments
+    if ($exitCode -eq 0) { $exitCode = $wsExitCode }
+    $wsExitCode = Invoke-WsSuite "ws-session-security.js" "Session security suite" $WsSessionSecurityJUnitReportPath
+    if ($exitCode -eq 0) { $exitCode = $wsExitCode }
 }
 finally {
     if ($serverProcess -and -not $serverProcess.HasExited) {
         Write-Step "Stopping PumaServerPgTest.exe (PID $($serverProcess.Id))"
         Stop-Process -Id $serverProcess.Id -Force -ErrorAction SilentlyContinue
     }
+    if ($isSettingsChanged) {
+        Start-Sleep -Seconds 1
+        Restore-ServerSettings $SettingsPath $settingsBackup
+    }
 }
 
-if (-not (Test-ServerLogs @($ServerStdOutPath, $ServerStdErrPath)) -and $exitCode -eq 0) { $exitCode = 1 }
+$serverLogs = @($ServerStdOutPath, $ServerStdErrPath)
+if ($isSettingsChanged) { $serverLogs += @($ShortSessionServerStdOutPath, $ShortSessionServerStdErrPath) }
+if (-not (Test-ServerLogs $serverLogs) -and $exitCode -eq 0) { $exitCode = 1 }
 
 if ($exitCode -eq 0) {
     Write-Host "`nAll tests passed." -ForegroundColor Green
