@@ -14909,7 +14909,7 @@
                 },
                 {
                     "id": "2711a2a8-bcb8-4c92-a7a9-afd9685d52ed",
-                    "name": "NoOrg sees NoOrg role and not Tenant-A role",
+                    "name": "NoOrg viewer sees neither the personal role of su nor the Tenant-A role",
                     "request": {
                         "url": {
                             "host": [
@@ -14958,14 +14958,76 @@
                                     "pm.test(\"Tenant-A role fixture exists\", function(){",
                                     "  pm.expect(!!tenantARoleId).to.eql(true);",
                                     "});",
-                                    "pm.test(\"NoOrg role is visible in NoOrg context\", function(){",
-                                    "  pm.expect(items.some(r => r.id === noOrgRoleId), \"RolesList payload: \" + JSON.stringify(json)).to.eql(true);",
+                                    "pm.test(\"The personal role of su is hidden from another user\", function(){",
+                                    "  pm.expect(items.some(r => r.id === noOrgRoleId), \"RolesList payload: \" + JSON.stringify(json)).to.eql(false);",
                                     "});",
                                     "pm.test(\"Tenant-A role is hidden in NoOrg context\", function(){",
                                     "  pm.expect(items.some(r => r.id === tenantARoleId)).to.eql(false);",
                                     "});"
                                 ],
                                 "_lastExecutionId": "adf7d2fd-6473-442e-af0d-0a766b47e45c"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "c1c763bc-4034-4c91-afdb-26ea8086ec8b",
+                    "name": "NoOrg su sees its own role and not Tenant-A role",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query RolesList { RolesList(input: { productId: \"{{product_id}}\", viewParams: { offset: 0, count: 200 } }) { items { id roleId roleName } } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "09637f6c-5729-4e6b-83ca-0106e0ee8021",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const warnings = (json.errors || []).filter(e => e && e.extensions && e.extensions.type === \"Warning\");",
+                                    "const denied = warnings.some(e => /Invalid permissions/i.test(e.message || \"\"));",
+                                    "const items = json.data && json.data.RolesList ? (json.data.RolesList.items || []) : [];",
+                                    "const noOrgRoleId = pm.environment.get(\"noOrgRoleId\");",
+                                    "const tenantARoleId = pm.environment.get(\"roleViewId\");",
+                                    "pm.test(\"RolesList is authorized in NoOrg context\", function(){",
+                                    "  const allowed = !!(json.data && json.data.RolesList && Array.isArray(json.data.RolesList.items));",
+                                    "  pm.expect(denied, \"RolesList payload: \" + JSON.stringify(json)).to.eql(false);",
+                                    "  pm.expect(allowed, \"RolesList payload: \" + JSON.stringify(json)).to.eql(true);",
+                                    "});",
+                                    "pm.test(\"NoOrg role fixture exists\", function(){",
+                                    "  pm.expect(!!noOrgRoleId).to.eql(true);",
+                                    "});",
+                                    "pm.test(\"Tenant-A role fixture exists\", function(){",
+                                    "  pm.expect(!!tenantARoleId).to.eql(true);",
+                                    "});",
+                                    "pm.test(\"The own role of su is visible to it\", function(){",
+                                    "  pm.expect(items.some(r => r.id === noOrgRoleId), \"RolesList payload: \" + JSON.stringify(json)).to.eql(true);",
+                                    "});",
+                                    "pm.test(\"Tenant-A role is hidden in NoOrg context\", function(){",
+                                    "  pm.expect(items.some(r => r.id === tenantARoleId)).to.eql(false);",
+                                    "});"
+                                ]
                             }
                         }
                     ]
@@ -15131,7 +15193,7 @@
                 },
                 {
                     "id": "ed6f535f-8934-4a93-9117-2f397ad73c22",
-                    "name": "NoOrg sees NoOrg group",
+                    "name": "NoOrg viewer sees neither the personal group of su nor the Tenant-A group",
                     "request": {
                         "url": {
                             "host": [
@@ -15180,14 +15242,76 @@
                                     "pm.test(\"Tenant-A group fixture exists\", function(){",
                                     "  pm.expect(!!tenantAGroupId).to.eql(true);",
                                     "});",
-                                    "pm.test(\"NoOrg group is visible in NoOrg context\", function(){",
-                                    "  pm.expect(items.some(g => g.id === noOrgGroupId), \"GroupsList payload: \" + JSON.stringify(json)).to.eql(true);",
+                                    "pm.test(\"The personal group of su is hidden from another user\", function(){",
+                                    "  pm.expect(items.some(g => g.id === noOrgGroupId), \"GroupsList payload: \" + JSON.stringify(json)).to.eql(false);",
                                     "});",
                                     "pm.test(\"Tenant-A group is hidden in NoOrg context\", function(){",
                                     "  pm.expect(items.some(g => g.id === tenantAGroupId)).to.eql(false);",
                                     "});"
                                 ],
                                 "_lastExecutionId": "894da729-79e0-4cbe-bc89-45cda0b0ad6e"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "3e55cf79-ae8c-4463-9a22-4757e2c3ed48",
+                    "name": "NoOrg su sees its own group and not Tenant-A group",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GroupsList { GroupsList(input: { productId: \"{{product_id}}\", viewParams: { offset: 0, count: 200 } }) { items { id name description } } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "730e7a3b-151e-4c0f-9dcb-1a17245a79c1",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const warnings = (json.errors || []).filter(e => e && e.extensions && e.extensions.type === \"Warning\");",
+                                    "const denied = warnings.some(e => /Invalid permissions/i.test(e.message || \"\"));",
+                                    "const items = json.data && json.data.GroupsList ? (json.data.GroupsList.items || []) : [];",
+                                    "const noOrgGroupId = pm.environment.get(\"noOrgGroupId\");",
+                                    "const tenantAGroupId = pm.environment.get(\"groupSupportId\");",
+                                    "pm.test(\"GroupsList is authorized in NoOrg context\", function(){",
+                                    "  const allowed = !!(json.data && json.data.GroupsList && Array.isArray(json.data.GroupsList.items));",
+                                    "  pm.expect(denied, \"GroupsList payload: \" + JSON.stringify(json)).to.eql(false);",
+                                    "  pm.expect(allowed, \"GroupsList payload: \" + JSON.stringify(json)).to.eql(true);",
+                                    "});",
+                                    "pm.test(\"NoOrg group fixture exists\", function(){",
+                                    "  pm.expect(!!noOrgGroupId).to.eql(true);",
+                                    "});",
+                                    "pm.test(\"Tenant-A group fixture exists\", function(){",
+                                    "  pm.expect(!!tenantAGroupId).to.eql(true);",
+                                    "});",
+                                    "pm.test(\"The own group of su is visible to it\", function(){",
+                                    "  pm.expect(items.some(g => g.id === noOrgGroupId), \"GroupsList payload: \" + JSON.stringify(json)).to.eql(true);",
+                                    "});",
+                                    "pm.test(\"Tenant-A group is hidden in NoOrg context\", function(){",
+                                    "  pm.expect(items.some(g => g.id === tenantAGroupId)).to.eql(false);",
+                                    "});"
+                                ]
                             }
                         }
                     ]
@@ -52753,7 +52877,7 @@
                                     "pm.environment.set('product_id', 'Puma');",
                                     "const n = pm.variables.replaceIn('{{$timestamp}}');",
                                     "pm.environment.set('pbRun', n);",
-                                    "['pbAdminRole','pbHeldRole','pbBigRole','pbLisaRole','pbNewRole','pbLisaNewRole','pbChildRole','pbAdmin','pbTarget','pbLisaGroup','pbNewGroup','pbLisaProbe'].forEach(function (k) { pm.environment.set(k, pm.variables.replaceIn('{{$guid}}')); });",
+                                    "['pbAdminRole','pbHeldRole','pbOwnRole','pbOwnBigRole','pbBigRole','pbLisaRole','pbNewRole','pbLisaNewRole','pbChildRole','pbAdmin','pbTarget','pbLisaGroup','pbNewGroup','pbLisaProbe'].forEach(function (k) { pm.environment.set(k, pm.variables.replaceIn('{{$guid}}')); });",
                                     "pm.environment.set('pbAdminLogin', 'pb_admin_' + n);",
                                     "pm.environment.set('pbTargetLogin', 'pb_target_' + n);"
                                 ]
@@ -53091,6 +53215,194 @@
                     "response": []
                 },
                 {
+                    "name": "PB seed: the administrator creates his own role of Puma",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test(\"created\", function () { pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{pbAdminToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RoleAdd { RoleAdd(input: { id: \"{{pbOwnRole}}\", typeId: \"Role\", productId: \"Puma\", item: { id: \"{{pbOwnRole}}\", name: \"PB_OWN_{{pbRun}}\", roleId: \"PB_OWN_{{pbRun}}\", productId: \"Puma\", parentRoles: [], permissions: [{id: \"/PbHeld\", direct: true}] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "PB seed: the administrator creates a second role of Puma",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test(\"created\", function () { pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{pbAdminToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RoleAdd { RoleAdd(input: { id: \"{{pbOwnBigRole}}\", typeId: \"Role\", productId: \"Puma\", item: { id: \"{{pbOwnBigRole}}\", name: \"PB_OWNBIG_{{pbRun}}\", roleId: \"PB_OWNBIG_{{pbRun}}\", productId: \"Puma\", parentRoles: [], permissions: [{id: \"/PbHeld\", direct: true}] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "PB seed: su gives that role a permission the administrator lacks",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test(\"updated\", function () { pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RoleUpdate { RoleUpdate(input: { id: \"{{pbOwnBigRole}}\", typeId: \"Role\", productId: \"Puma\", item: { id: \"{{pbOwnBigRole}}\", name: \"PB_OWNBIG_{{pbRun}}\", roleId: \"PB_OWNBIG_{{pbRun}}\", productId: \"Puma\", parentRoles: [], permissions: [{id: \"/PbNotHeld\", direct: true}] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "PB seed: su gives the administrator his own role",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test(\"updated\", function () { pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UserUpdate { UserUpdate(input: { id: \"{{pbAdmin}}\", typeId: \"User\", productId: \"Puma\", item: { id: \"{{pbAdmin}}\", productId: \"Puma\", name: \"{{pbAdminLogin}}\", username: \"{{pbAdminLogin}}\", email: \"{{pbAdminLogin}}@qa.test\", roles: [{id: \"{{pbAdminRole}}\", direct: true}, {id: \"{{pbOwnRole}}\", direct: true}], groups: [], permissions: [] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "PB seed: auth administrator holding his own role",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const auth = pm.response.json().data.Authorization;",
+                                    "pm.test('authorized', function () { pm.expect(auth.token).to.be.a('string').and.not.empty; });",
+                                    "pm.environment.set('pbAdminToken', auth.token);"
+                                ],
+                                "id": "254dfd8d-bb9c-4492-adac-4c16031cea3f"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{pbAdminLogin}}\", password: \"Bound_2026!\", productId: \"Puma\" }) { token } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": [],
+                    "id": "645c74b0-28f4-451f-9733-1abefdaa3c42"
+                },
+                {
                     "name": "PB positive control: the role of the own product is readable",
                     "event": [
                         {
@@ -53100,6 +53412,45 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "pm.test('own product opens', function () { pm.expect(json.errors || []).to.have.length(0); pm.expect(json.data.RoleItem.productId).to.eql('Puma'); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{pbAdminToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query RoleItem { RoleItem(input: { id: \"{{pbOwnRole}}\", productId: \"Puma\" }) { id productId } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "PB a role su created is not readable by the administrator",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
+                                    "pm.test(\"reported as missing\", function () { pm.expect(messages, JSON.stringify(json)).to.match(/Object does not exist/); });"
                                 ]
                             }
                         }
@@ -53682,7 +54033,8 @@
                                     "pm.test('own roles only', function () {",
                                     "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
                                     "  const items = json.data.RolesList.items;",
-                                    "  pm.expect(items.map(function (i) { return i.id; })).to.include(pm.environment.get('pbHeldRole'));",
+                                    "  pm.expect(items.map(function (i) { return i.id; })).to.include(pm.environment.get('pbOwnRole'));",
+                                    "  pm.expect(items.map(function (i) { return i.id; }), 'the roles of su are personal').to.not.include(pm.environment.get('pbHeldRole'));",
                                     "  pm.expect(items.filter(function (i) { return i.productId !== 'Puma'; }), 'roles of other products').to.have.length(0);",
                                     "});"
                                 ]
@@ -53894,7 +54246,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation SetObjectData { SetObjectData(input: { collectionId: \"Roles\", objectId: \"{{pbHeldRole}}\", objectData: {{pbRawRole}} }) { success } }",
+                                "query": "mutation SetObjectData { SetObjectData(input: { collectionId: \"Roles\", objectId: \"{{pbOwnRole}}\", objectData: {{pbRawRole}} }) { success } }",
                                 "variables": ""
                             }
                         },
@@ -54049,7 +54401,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation RoleUpdate { RoleUpdate(input: { id: \"{{pbAdminRole}}\", typeId: \"Role\", productId: \"Puma\", item: { id: \"{{pbAdminRole}}\", name: \"PB_ADMIN_{{pbRun}}\", roleId: \"PB_ADMIN_{{pbRun}}\", productId: \"Puma\", parentRoles: [], permissions: [{id: \"/Administration/Roles/View\", direct: true}, {id: \"/Administration/Roles/Edit/Add\", direct: true}, {id: \"/Administration/Roles/Edit/Change\", direct: true}, {id: \"/Administration/Roles/Edit/Remove\", direct: true}, {id: \"/Administration/Users/View\", direct: true}, {id: \"/Administration/Users/Edit/Add\", direct: true}, {id: \"/Administration/Users/Edit/Change\", direct: true}, {id: \"/Administration/Groups/View\", direct: true}, {id: \"/Administration/Groups/Edit/Add\", direct: true}, {id: \"/Administration/Groups/Edit/Change\", direct: true}, {id: \"/PbHeld\", direct: true}, {id: \"/PbNotHeld\", direct: true}] } }) { id } }",
+                                "query": "mutation RoleUpdate { RoleUpdate(input: { id: \"{{pbOwnRole}}\", typeId: \"Role\", productId: \"Puma\", item: { id: \"{{pbOwnRole}}\", name: \"PB_OWN_{{pbRun}}\", roleId: \"PB_OWN_{{pbRun}}\", productId: \"Puma\", parentRoles: [], permissions: [{id: \"/PbHeld\", direct: true}, {id: \"/PbNotHeld\", direct: true}] } }) { id } }",
                                 "variables": ""
                             }
                         },
@@ -54111,6 +54463,45 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "pm.test(\"only added permissions are compared\", function () { pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{pbAdminToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RoleUpdate { RoleUpdate(input: { id: \"{{pbOwnBigRole}}\", typeId: \"Role\", productId: \"Puma\", item: { id: \"{{pbOwnBigRole}}\", name: \"PB_OWNBIG2_{{pbRun}}\", roleId: \"PB_OWNBIG2_{{pbRun}}\", productId: \"Puma\", parentRoles: [], permissions: [{id: \"/PbNotHeld\", direct: true}] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "PB grant: a role su created is out of reach of the administrator",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
+                                    "pm.test(\"reported as missing\", function () { pm.expect(messages, JSON.stringify(json)).to.match(/Object does not exist or the organization may not change it/); });"
                                 ]
                             }
                         }
