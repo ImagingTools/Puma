@@ -14909,7 +14909,7 @@
                 },
                 {
                     "id": "2711a2a8-bcb8-4c92-a7a9-afd9685d52ed",
-                    "name": "NoOrg sees NoOrg role and not Tenant-A role",
+                    "name": "NoOrg viewer sees neither the personal role of su nor the Tenant-A role",
                     "request": {
                         "url": {
                             "host": [
@@ -14958,14 +14958,76 @@
                                     "pm.test(\"Tenant-A role fixture exists\", function(){",
                                     "  pm.expect(!!tenantARoleId).to.eql(true);",
                                     "});",
-                                    "pm.test(\"NoOrg role is visible in NoOrg context\", function(){",
-                                    "  pm.expect(items.some(r => r.id === noOrgRoleId), \"RolesList payload: \" + JSON.stringify(json)).to.eql(true);",
+                                    "pm.test(\"The personal role of su is hidden from another user\", function(){",
+                                    "  pm.expect(items.some(r => r.id === noOrgRoleId), \"RolesList payload: \" + JSON.stringify(json)).to.eql(false);",
                                     "});",
                                     "pm.test(\"Tenant-A role is hidden in NoOrg context\", function(){",
                                     "  pm.expect(items.some(r => r.id === tenantARoleId)).to.eql(false);",
                                     "});"
                                 ],
                                 "_lastExecutionId": "adf7d2fd-6473-442e-af0d-0a766b47e45c"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "c1c763bc-4034-4c91-afdb-26ea8086ec8b",
+                    "name": "NoOrg su sees its own role and not Tenant-A role",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query RolesList { RolesList(input: { productId: \"{{product_id}}\", viewParams: { offset: 0, count: 200 } }) { items { id roleId roleName } } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "09637f6c-5729-4e6b-83ca-0106e0ee8021",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const warnings = (json.errors || []).filter(e => e && e.extensions && e.extensions.type === \"Warning\");",
+                                    "const denied = warnings.some(e => /Invalid permissions/i.test(e.message || \"\"));",
+                                    "const items = json.data && json.data.RolesList ? (json.data.RolesList.items || []) : [];",
+                                    "const noOrgRoleId = pm.environment.get(\"noOrgRoleId\");",
+                                    "const tenantARoleId = pm.environment.get(\"roleViewId\");",
+                                    "pm.test(\"RolesList is authorized in NoOrg context\", function(){",
+                                    "  const allowed = !!(json.data && json.data.RolesList && Array.isArray(json.data.RolesList.items));",
+                                    "  pm.expect(denied, \"RolesList payload: \" + JSON.stringify(json)).to.eql(false);",
+                                    "  pm.expect(allowed, \"RolesList payload: \" + JSON.stringify(json)).to.eql(true);",
+                                    "});",
+                                    "pm.test(\"NoOrg role fixture exists\", function(){",
+                                    "  pm.expect(!!noOrgRoleId).to.eql(true);",
+                                    "});",
+                                    "pm.test(\"Tenant-A role fixture exists\", function(){",
+                                    "  pm.expect(!!tenantARoleId).to.eql(true);",
+                                    "});",
+                                    "pm.test(\"The own role of su is visible to it\", function(){",
+                                    "  pm.expect(items.some(r => r.id === noOrgRoleId), \"RolesList payload: \" + JSON.stringify(json)).to.eql(true);",
+                                    "});",
+                                    "pm.test(\"Tenant-A role is hidden in NoOrg context\", function(){",
+                                    "  pm.expect(items.some(r => r.id === tenantARoleId)).to.eql(false);",
+                                    "});"
+                                ]
                             }
                         }
                     ]
@@ -15131,7 +15193,7 @@
                 },
                 {
                     "id": "ed6f535f-8934-4a93-9117-2f397ad73c22",
-                    "name": "NoOrg sees NoOrg group",
+                    "name": "NoOrg viewer sees neither the personal group of su nor the Tenant-A group",
                     "request": {
                         "url": {
                             "host": [
@@ -15180,14 +15242,76 @@
                                     "pm.test(\"Tenant-A group fixture exists\", function(){",
                                     "  pm.expect(!!tenantAGroupId).to.eql(true);",
                                     "});",
-                                    "pm.test(\"NoOrg group is visible in NoOrg context\", function(){",
-                                    "  pm.expect(items.some(g => g.id === noOrgGroupId), \"GroupsList payload: \" + JSON.stringify(json)).to.eql(true);",
+                                    "pm.test(\"The personal group of su is hidden from another user\", function(){",
+                                    "  pm.expect(items.some(g => g.id === noOrgGroupId), \"GroupsList payload: \" + JSON.stringify(json)).to.eql(false);",
                                     "});",
                                     "pm.test(\"Tenant-A group is hidden in NoOrg context\", function(){",
                                     "  pm.expect(items.some(g => g.id === tenantAGroupId)).to.eql(false);",
                                     "});"
                                 ],
                                 "_lastExecutionId": "894da729-79e0-4cbe-bc89-45cda0b0ad6e"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "3e55cf79-ae8c-4463-9a22-4757e2c3ed48",
+                    "name": "NoOrg su sees its own group and not Tenant-A group",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": []
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GroupsList { GroupsList(input: { productId: \"{{product_id}}\", viewParams: { offset: 0, count: 200 } }) { items { id name description } } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "730e7a3b-151e-4c0f-9dcb-1a17245a79c1",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const warnings = (json.errors || []).filter(e => e && e.extensions && e.extensions.type === \"Warning\");",
+                                    "const denied = warnings.some(e => /Invalid permissions/i.test(e.message || \"\"));",
+                                    "const items = json.data && json.data.GroupsList ? (json.data.GroupsList.items || []) : [];",
+                                    "const noOrgGroupId = pm.environment.get(\"noOrgGroupId\");",
+                                    "const tenantAGroupId = pm.environment.get(\"groupSupportId\");",
+                                    "pm.test(\"GroupsList is authorized in NoOrg context\", function(){",
+                                    "  const allowed = !!(json.data && json.data.GroupsList && Array.isArray(json.data.GroupsList.items));",
+                                    "  pm.expect(denied, \"GroupsList payload: \" + JSON.stringify(json)).to.eql(false);",
+                                    "  pm.expect(allowed, \"GroupsList payload: \" + JSON.stringify(json)).to.eql(true);",
+                                    "});",
+                                    "pm.test(\"NoOrg group fixture exists\", function(){",
+                                    "  pm.expect(!!noOrgGroupId).to.eql(true);",
+                                    "});",
+                                    "pm.test(\"Tenant-A group fixture exists\", function(){",
+                                    "  pm.expect(!!tenantAGroupId).to.eql(true);",
+                                    "});",
+                                    "pm.test(\"The own group of su is visible to it\", function(){",
+                                    "  pm.expect(items.some(g => g.id === noOrgGroupId), \"GroupsList payload: \" + JSON.stringify(json)).to.eql(true);",
+                                    "});",
+                                    "pm.test(\"Tenant-A group is hidden in NoOrg context\", function(){",
+                                    "  pm.expect(items.some(g => g.id === tenantAGroupId)).to.eql(false);",
+                                    "});"
+                                ]
                             }
                         }
                     ]
@@ -52753,7 +52877,7 @@
                                     "pm.environment.set('product_id', 'Puma');",
                                     "const n = pm.variables.replaceIn('{{$timestamp}}');",
                                     "pm.environment.set('pbRun', n);",
-                                    "['pbAdminRole','pbHeldRole','pbBigRole','pbLisaRole','pbNewRole','pbLisaNewRole','pbChildRole','pbAdmin','pbTarget','pbLisaGroup','pbNewGroup','pbLisaProbe'].forEach(function (k) { pm.environment.set(k, pm.variables.replaceIn('{{$guid}}')); });",
+                                    "['pbAdminRole','pbHeldRole','pbOwnRole','pbOwnBigRole','pbBigRole','pbLisaRole','pbNewRole','pbLisaNewRole','pbChildRole','pbAdmin','pbTarget','pbLisaGroup','pbNewGroup','pbLisaProbe'].forEach(function (k) { pm.environment.set(k, pm.variables.replaceIn('{{$guid}}')); });",
                                     "pm.environment.set('pbAdminLogin', 'pb_admin_' + n);",
                                     "pm.environment.set('pbTargetLogin', 'pb_target_' + n);"
                                 ]
@@ -53091,6 +53215,194 @@
                     "response": []
                 },
                 {
+                    "name": "PB seed: the administrator creates his own role of Puma",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test(\"created\", function () { pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{pbAdminToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RoleAdd { RoleAdd(input: { id: \"{{pbOwnRole}}\", typeId: \"Role\", productId: \"Puma\", item: { id: \"{{pbOwnRole}}\", name: \"PB_OWN_{{pbRun}}\", roleId: \"PB_OWN_{{pbRun}}\", productId: \"Puma\", parentRoles: [], permissions: [{id: \"/PbHeld\", direct: true}] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "PB seed: the administrator creates a second role of Puma",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test(\"created\", function () { pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{pbAdminToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RoleAdd { RoleAdd(input: { id: \"{{pbOwnBigRole}}\", typeId: \"Role\", productId: \"Puma\", item: { id: \"{{pbOwnBigRole}}\", name: \"PB_OWNBIG_{{pbRun}}\", roleId: \"PB_OWNBIG_{{pbRun}}\", productId: \"Puma\", parentRoles: [], permissions: [{id: \"/PbHeld\", direct: true}] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "PB seed: su gives that role a permission the administrator lacks",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test(\"updated\", function () { pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RoleUpdate { RoleUpdate(input: { id: \"{{pbOwnBigRole}}\", typeId: \"Role\", productId: \"Puma\", item: { id: \"{{pbOwnBigRole}}\", name: \"PB_OWNBIG_{{pbRun}}\", roleId: \"PB_OWNBIG_{{pbRun}}\", productId: \"Puma\", parentRoles: [], permissions: [{id: \"/PbNotHeld\", direct: true}] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "PB seed: su gives the administrator his own role",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "pm.test(\"updated\", function () { pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UserUpdate { UserUpdate(input: { id: \"{{pbAdmin}}\", typeId: \"User\", productId: \"Puma\", item: { id: \"{{pbAdmin}}\", productId: \"Puma\", name: \"{{pbAdminLogin}}\", username: \"{{pbAdminLogin}}\", email: \"{{pbAdminLogin}}@qa.test\", roles: [{id: \"{{pbAdminRole}}\", direct: true}, {id: \"{{pbOwnRole}}\", direct: true}], groups: [], permissions: [] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "PB seed: auth administrator holding his own role",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const auth = pm.response.json().data.Authorization;",
+                                    "pm.test('authorized', function () { pm.expect(auth.token).to.be.a('string').and.not.empty; });",
+                                    "pm.environment.set('pbAdminToken', auth.token);"
+                                ],
+                                "id": "254dfd8d-bb9c-4492-adac-4c16031cea3f"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{pbAdminLogin}}\", password: \"Bound_2026!\", productId: \"Puma\" }) { token } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": [],
+                    "id": "645c74b0-28f4-451f-9733-1abefdaa3c42"
+                },
+                {
                     "name": "PB positive control: the role of the own product is readable",
                     "event": [
                         {
@@ -53100,6 +53412,45 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "pm.test('own product opens', function () { pm.expect(json.errors || []).to.have.length(0); pm.expect(json.data.RoleItem.productId).to.eql('Puma'); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{pbAdminToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query RoleItem { RoleItem(input: { id: \"{{pbOwnRole}}\", productId: \"Puma\" }) { id productId } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "PB a role su created is not readable by the administrator",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
+                                    "pm.test(\"reported as missing\", function () { pm.expect(messages, JSON.stringify(json)).to.match(/Object does not exist/); });"
                                 ]
                             }
                         }
@@ -53682,7 +54033,8 @@
                                     "pm.test('own roles only', function () {",
                                     "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
                                     "  const items = json.data.RolesList.items;",
-                                    "  pm.expect(items.map(function (i) { return i.id; })).to.include(pm.environment.get('pbHeldRole'));",
+                                    "  pm.expect(items.map(function (i) { return i.id; })).to.include(pm.environment.get('pbOwnRole'));",
+                                    "  pm.expect(items.map(function (i) { return i.id; }), 'the roles of su are personal').to.not.include(pm.environment.get('pbHeldRole'));",
                                     "  pm.expect(items.filter(function (i) { return i.productId !== 'Puma'; }), 'roles of other products').to.have.length(0);",
                                     "});"
                                 ]
@@ -53894,7 +54246,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation SetObjectData { SetObjectData(input: { collectionId: \"Roles\", objectId: \"{{pbHeldRole}}\", objectData: {{pbRawRole}} }) { success } }",
+                                "query": "mutation SetObjectData { SetObjectData(input: { collectionId: \"Roles\", objectId: \"{{pbOwnRole}}\", objectData: {{pbRawRole}} }) { success } }",
                                 "variables": ""
                             }
                         },
@@ -54049,7 +54401,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation RoleUpdate { RoleUpdate(input: { id: \"{{pbAdminRole}}\", typeId: \"Role\", productId: \"Puma\", item: { id: \"{{pbAdminRole}}\", name: \"PB_ADMIN_{{pbRun}}\", roleId: \"PB_ADMIN_{{pbRun}}\", productId: \"Puma\", parentRoles: [], permissions: [{id: \"/Administration/Roles/View\", direct: true}, {id: \"/Administration/Roles/Edit/Add\", direct: true}, {id: \"/Administration/Roles/Edit/Change\", direct: true}, {id: \"/Administration/Roles/Edit/Remove\", direct: true}, {id: \"/Administration/Users/View\", direct: true}, {id: \"/Administration/Users/Edit/Add\", direct: true}, {id: \"/Administration/Users/Edit/Change\", direct: true}, {id: \"/Administration/Groups/View\", direct: true}, {id: \"/Administration/Groups/Edit/Add\", direct: true}, {id: \"/Administration/Groups/Edit/Change\", direct: true}, {id: \"/PbHeld\", direct: true}, {id: \"/PbNotHeld\", direct: true}] } }) { id } }",
+                                "query": "mutation RoleUpdate { RoleUpdate(input: { id: \"{{pbOwnRole}}\", typeId: \"Role\", productId: \"Puma\", item: { id: \"{{pbOwnRole}}\", name: \"PB_OWN_{{pbRun}}\", roleId: \"PB_OWN_{{pbRun}}\", productId: \"Puma\", parentRoles: [], permissions: [{id: \"/PbHeld\", direct: true}, {id: \"/PbNotHeld\", direct: true}] } }) { id } }",
                                 "variables": ""
                             }
                         },
@@ -54111,6 +54463,45 @@
                                 "exec": [
                                     "const json = pm.response.json();",
                                     "pm.test(\"only added permissions are compared\", function () { pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{pbAdminToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RoleUpdate { RoleUpdate(input: { id: \"{{pbOwnBigRole}}\", typeId: \"Role\", productId: \"Puma\", item: { id: \"{{pbOwnBigRole}}\", name: \"PB_OWNBIG2_{{pbRun}}\", roleId: \"PB_OWNBIG2_{{pbRun}}\", productId: \"Puma\", parentRoles: [], permissions: [{id: \"/PbNotHeld\", direct: true}] } }) { id } }",
+                                "variables": ""
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}",
+                            "host": [
+                                "{{base_url}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "PB grant: a role su created is out of reach of the administrator",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "const messages = (json.errors || []).map(function (e) { return e.message || ''; }).join(' | ');",
+                                    "pm.test(\"reported as missing\", function () { pm.expect(messages, JSON.stringify(json)).to.match(/Object does not exist or the organization may not change it/); });"
                                 ]
                             }
                         }
@@ -62033,6 +62424,2945 @@
                                     "  pm.expect(json.errors || [], JSON.stringify(json.errors)).to.have.length(0);",
                                     "  pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true);",
                                     "});"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "9502f717-ef87-4f27-9a34-d423d902a687",
+            "name": "30 Partnership in one approval",
+            "item": [
+                {
+                    "id": "0158cea5-d93a-46be-b69b-ff7e2cf41626",
+                    "name": "PO Sign in SU",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": [],
+                            "raw": "{{base_url}}"
+                        },
+                        "header": [],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{su_login}}\", password: \"{{su_password}}\", productId: \"{{product_id}}\" }) { userId token } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "2250e5b6-43b7-45bc-b6e8-26ab802b46e6",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.Authorization : null;",
+                                    "pm.test('PO Sign in SU', function(){ pm.expect(!!payload && !!payload.token, JSON.stringify(json)).to.eql(true); });",
+                                    "if (payload && payload.token) pm.environment.set('su_token', payload.token);",
+                                    "})();"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "14aa8551-042e-4317-93a2-bbebf2f5923c",
+                    "name": "PO Sign in A owner without organization",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": [],
+                            "raw": "{{base_url}}"
+                        },
+                        "header": [],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{a_owner_login}}\", password: \"{{a_owner_password}}\", productId: \"{{product_id}}\" }) { userId token } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "6836a812-4a47-4ada-933f-14ff39f91f66",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.Authorization : null;",
+                                    "pm.test('PO Sign in A owner without organization', function(){ pm.expect(!!payload && !!payload.token, JSON.stringify(json)).to.eql(true); });",
+                                    "if (payload && payload.token) pm.environment.set('poAOwnerToken', payload.token);",
+                                    "})();"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "edfd9c29-e155-4971-81b2-9eaf75854ab2",
+                    "name": "PO Sign in B owner without organization",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": [],
+                            "raw": "{{base_url}}"
+                        },
+                        "header": [],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{b_owner_login}}\", password: \"{{b_owner_password}}\", productId: \"{{product_id}}\" }) { userId token } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "921bde08-6d8c-4368-9bab-4bca6b7d74c0",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.Authorization : null;",
+                                    "pm.test('PO Sign in B owner without organization', function(){ pm.expect(!!payload && !!payload.token, JSON.stringify(json)).to.eql(true); });",
+                                    "if (payload && payload.token) pm.environment.set('poBOwnerToken', payload.token);",
+                                    "})();"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "b448dd7c-042a-440b-87ea-f2a8eb6f8257",
+                    "name": "PO SU creates the requesting organization X owned by the A owner",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": [],
+                            "raw": "{{base_url}}"
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateTenant { CreateTenant(input: { name: \"{{poXName}}\", description: \"Partnership in one approval\", ownerId: \"{{a_owner_user_id}}\" }) { tenantId errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "id": "b7312c3c-ba07-4182-9bf8-184f44e35130",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const run = pm.variables.replaceIn('{{$timestamp}}');",
+                                    "pm.environment.set('poXName', 'PO X ' + run);",
+                                    "pm.environment.set('poYName', 'PO Y ' + run);",
+                                    "pm.environment.set('poZName', 'PO Z ' + run);",
+                                    "pm.environment.set('poWName', 'PO W ' + run);"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "a2fd8ca0-4fcb-4a33-b1fb-5ee46f594a0c",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.CreateTenant : null;",
+                                    "pm.test('PO SU creates the requesting organization X owned by the A owner', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.tenantId, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('poXId', payload && payload.tenantId ? payload.tenantId : '');",
+                                    "})();"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "e999f6d9-1542-4f72-aee7-1e5ef05be674",
+                    "name": "PO SU creates the partner Y owned by the B owner",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": [],
+                            "raw": "{{base_url}}"
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateTenant { CreateTenant(input: { name: \"{{poYName}}\", description: \"Partnership in one approval\", ownerId: \"{{b_owner_user_id}}\" }) { tenantId errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "f700a16f-884e-4660-8ab1-116f7be9b8c3",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.CreateTenant : null;",
+                                    "pm.test('PO SU creates the partner Y owned by the B owner', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.tenantId, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('poYId', payload && payload.tenantId ? payload.tenantId : '');",
+                                    "})();"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "63cbc9fb-60bf-47ea-b502-4f3b2410a733",
+                    "name": "PO SU creates the partner Z owned by the B owner",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": [],
+                            "raw": "{{base_url}}"
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateTenant { CreateTenant(input: { name: \"{{poZName}}\", description: \"Partnership in one approval\", ownerId: \"{{b_owner_user_id}}\" }) { tenantId errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "d0b25fa0-aa5f-4fbd-b205-bc964bf8f185",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.CreateTenant : null;",
+                                    "pm.test('PO SU creates the partner Z owned by the B owner', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.tenantId, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('poZId', payload && payload.tenantId ? payload.tenantId : '');",
+                                    "})();"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "bd97eff2-83ba-4750-af1c-b99822261631",
+                    "name": "PO SU creates the partner W owned by the B owner",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": [],
+                            "raw": "{{base_url}}"
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateTenant { CreateTenant(input: { name: \"{{poWName}}\", description: \"Partnership in one approval\", ownerId: \"{{b_owner_user_id}}\" }) { tenantId errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "54e08291-5182-4ce2-8e7d-5409b2c17ab9",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.CreateTenant : null;",
+                                    "pm.test('PO SU creates the partner W owned by the B owner', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.tenantId, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('poWId', payload && payload.tenantId ? payload.tenantId : '');",
+                                    "})();"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "72de14c2-c6c5-4626-8edf-479639e9894f",
+                    "name": "PO The A owner works in X",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": [],
+                            "raw": "{{base_url}}"
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{poAOwnerToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SelectTenant { SelectTenant(input: { tenantId: \"{{poXId}}\" }) { ok userSession { tenantId accessToken } errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "48b8c22d-41b7-4112-a4cf-930db83bbbe2",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.SelectTenant : null;",
+                                    "const session = payload ? payload.userSession : null;",
+                                    "pm.test('PO The A owner works in X', function(){",
+                                    "  pm.expect(session && session.tenantId, JSON.stringify(json)).to.eql(pm.environment.get('poXId'));",
+                                    "});",
+                                    "if (session && session.accessToken) pm.environment.set('poXToken', session.accessToken);",
+                                    "})();"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "ff40991e-b6e5-48f9-9793-4456a01eaa9f",
+                    "name": "PO The B owner works in Y",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": [],
+                            "raw": "{{base_url}}"
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{poBOwnerToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SelectTenant { SelectTenant(input: { tenantId: \"{{poYId}}\" }) { ok userSession { tenantId accessToken } errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "852f4d83-98c8-4595-95d5-fce5e4ae7b15",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.SelectTenant : null;",
+                                    "const session = payload ? payload.userSession : null;",
+                                    "pm.test('PO The B owner works in Y', function(){",
+                                    "  pm.expect(session && session.tenantId, JSON.stringify(json)).to.eql(pm.environment.get('poYId'));",
+                                    "});",
+                                    "if (session && session.accessToken) pm.environment.set('poYToken', session.accessToken);",
+                                    "})();"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "eea01d4d-985c-49ce-ae1d-3021375459fd",
+                    "name": "PO Y gives its connection code",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": [],
+                            "raw": "{{base_url}}"
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{poYToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetConnectionCode { GetConnectionCode(input: { tenantId: \"{{poYId}}\" }) { connectionCode { connectionCode } errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "7a5edc56-6b6e-4274-94fc-f8837a7b5e35",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.GetConnectionCode : null;",
+                                    "const code = payload && payload.connectionCode ? payload.connectionCode.connectionCode : '';",
+                                    "pm.test('PO Y gives its connection code', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(code, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('poYCode', code || '');",
+                                    "})();"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "b8b6bc59-0e92-4dce-8dde-05081d4d20ee",
+                    "name": "PO A request naming one role only is refused",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": [],
+                            "raw": "{{base_url}}"
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{poXToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateConnectionRequest { CreateConnectionRequest(input: { sourceTenantId: \"{{poXId}}\", connectionCode: \"{{poYCode}}\", message: \"one role\", proposedSourceRole: Customer }) { requestId errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "73735beb-abb3-40bb-8108-49faa47c5ab0",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.CreateConnectionRequest : null;",
+                                    "pm.test('refused for the missing role', function(){",
+                                    "  pm.expect(payload && payload.errorMessage, JSON.stringify(json)).to.eql('A proposed relationship needs the roles of both organizations');",
+                                    "  pm.expect(payload && payload.requestId ? payload.requestId : '').to.eql('');",
+                                    "});",
+                                    "})();"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "a5c2ef7f-e8e5-4926-a117-2973d05679f0",
+                    "name": "PO X asks Y for a connection with the terms of the relationship",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": [],
+                            "raw": "{{base_url}}"
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{poXToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateConnectionRequest { CreateConnectionRequest(input: { sourceTenantId: \"{{poXId}}\", connectionCode: \"{{poYCode}}\", message: \"Service of your devices\", proposedSourceRole: Customer, proposedTargetRole: Supplier, proposedScope: \"Devices\" }) { requestId errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "fb213379-fa32-4f98-9c79-d52117900620",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.CreateConnectionRequest : null;",
+                                    "pm.test('the request is created', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.errorMessage ? payload.errorMessage : '').to.eql('');",
+                                    "  pm.expect(payload && payload.requestId, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('poXYRequestId', payload && payload.requestId ? payload.requestId : '');",
+                                    "})();"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "508a1927-704e-4c09-bf39-44162ddcf13e",
+                    "name": "PO Y sees the proposed terms in the request",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": [],
+                            "raw": "{{base_url}}"
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{poYToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetConnectionRequests { GetConnectionRequests(input: { tenantId: \"{{poYId}}\" }) { requests { id sourceTenantId status proposedSourceRole proposedTargetRole proposedScope } errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "5028bf7e-7ece-4c8b-9336-e5925181f9e5",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.GetConnectionRequests : null;",
+                                    "const request = ((payload && payload.requests) || []).find(function(r){ return r.id === pm.environment.get('poXYRequestId'); });",
+                                    "pm.test('the request carries the terms', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(request, JSON.stringify(json)).to.be.an('object');",
+                                    "  pm.expect(request.status).to.eql('Pending');",
+                                    "  pm.expect(request.proposedSourceRole).to.eql('Customer');",
+                                    "  pm.expect(request.proposedTargetRole).to.eql('Supplier');",
+                                    "  pm.expect(request.proposedScope).to.eql('Devices');",
+                                    "});",
+                                    "})();"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "eb1789cb-344c-4602-8415-fc583dd0b2bf",
+                    "name": "PO Y approves once",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": [],
+                            "raw": "{{base_url}}"
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{poYToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation ApproveConnectionRequest { ApproveConnectionRequest(input: { requestId: \"{{poXYRequestId}}\", tenantId: \"{{poYId}}\" }) { connectionId relationshipId errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "5b764d81-550b-4c22-abe4-50c6aa9abad2",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.ApproveConnectionRequest : null;",
+                                    "pm.test('the connection and the relationship come into force', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.errorMessage ? payload.errorMessage : '').to.eql('');",
+                                    "  pm.expect(payload && payload.connectionId, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "  pm.expect(payload && payload.relationshipId, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('poXYConnectionId', payload && payload.connectionId ? payload.connectionId : '');",
+                                    "pm.environment.set('poXYRelationshipId', payload && payload.relationshipId ? payload.relationshipId : '');",
+                                    "})();"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "b4d7fd07-45e1-4bb8-954e-7f38186edbca",
+                    "name": "PO X has the relationship with the proposed terms",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": [],
+                            "raw": "{{base_url}}"
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{poXToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetTenantRelationships { GetTenantRelationships(input: { tenantId: \"{{poXId}}\" }) { relationships { id connectionId sourceTenantId targetTenantId sourceRole targetRole scope status } errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "abb6880b-97d4-48f4-8167-2e04d2d03556",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.GetTenantRelationships : null;",
+                                    "const relationship = ((payload && payload.relationships) || []).find(function(r){ return r.id === pm.environment.get('poXYRelationshipId'); });",
+                                    "pm.test('the relationship of X and Y is active with the terms', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(relationship, JSON.stringify(json)).to.be.an('object');",
+                                    "  pm.expect(relationship.connectionId).to.eql(pm.environment.get('poXYConnectionId'));",
+                                    "  pm.expect(relationship.sourceTenantId).to.eql(pm.environment.get('poXId'));",
+                                    "  pm.expect(relationship.targetTenantId).to.eql(pm.environment.get('poYId'));",
+                                    "  pm.expect(relationship.sourceRole).to.eql('Customer');",
+                                    "  pm.expect(relationship.targetRole).to.eql('Supplier');",
+                                    "  pm.expect(relationship.scope).to.eql('Devices');",
+                                    "  pm.expect(relationship.status).to.eql('Active');",
+                                    "});",
+                                    "})();"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "40f8b1e8-bb9d-44de-b27d-6393c70d7975",
+                    "name": "PO Y has the same relationship",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": [],
+                            "raw": "{{base_url}}"
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{poYToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetTenantRelationships { GetTenantRelationships(input: { tenantId: \"{{poYId}}\" }) { relationships { id connectionId sourceTenantId targetTenantId sourceRole targetRole scope status } errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "59c6dfe8-8e41-42f5-88bb-bdfc052dbc74",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.GetTenantRelationships : null;",
+                                    "const ids = ((payload && payload.relationships) || []).map(function(r){ return r.id; });",
+                                    "pm.test('Y lists the relationship', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(ids, JSON.stringify(json)).to.include(pm.environment.get('poXYRelationshipId'));",
+                                    "});",
+                                    "})();"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "67c3c883-dd61-4447-93e0-f3bddc5e4b92",
+                    "name": "PO The request is approved",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": [],
+                            "raw": "{{base_url}}"
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{poYToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetConnectionRequests { GetConnectionRequests(input: { tenantId: \"{{poYId}}\" }) { requests { id status } errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "0249fe14-203b-4bf6-8b2a-ae9d52b438b6",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.GetConnectionRequests : null;",
+                                    "const request = ((payload && payload.requests) || []).find(function(r){ return r.id === pm.environment.get('poXYRequestId'); });",
+                                    "pm.test('approved', function(){ pm.expect(request && request.status, JSON.stringify(json)).to.eql('Approved'); });",
+                                    "})();"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "824cff2c-4463-49ff-9eec-5ee20ea9a0e7",
+                    "name": "PO Sign in B owner for Z",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": [],
+                            "raw": "{{base_url}}"
+                        },
+                        "header": [],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{b_owner_login}}\", password: \"{{b_owner_password}}\", productId: \"{{product_id}}\" }) { userId token } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "3fff052c-9cdc-4f2d-92a1-31418c9794fa",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.Authorization : null;",
+                                    "pm.test('PO Sign in B owner for Z', function(){ pm.expect(!!payload && !!payload.token, JSON.stringify(json)).to.eql(true); });",
+                                    "if (payload && payload.token) pm.environment.set('poBOwnerToken', payload.token);",
+                                    "})();"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "e9e86974-0a4e-487f-adf7-df8c82f46b13",
+                    "name": "PO The B owner works in Z",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": [],
+                            "raw": "{{base_url}}"
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{poBOwnerToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SelectTenant { SelectTenant(input: { tenantId: \"{{poZId}}\" }) { ok userSession { tenantId accessToken } errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "3905ef6e-5e75-42cb-b176-522cec1cabbb",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.SelectTenant : null;",
+                                    "const session = payload ? payload.userSession : null;",
+                                    "pm.test('PO The B owner works in Z', function(){",
+                                    "  pm.expect(session && session.tenantId, JSON.stringify(json)).to.eql(pm.environment.get('poZId'));",
+                                    "});",
+                                    "if (session && session.accessToken) pm.environment.set('poZToken', session.accessToken);",
+                                    "})();"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "11446b0b-1846-4826-9697-a1e9da6d76e6",
+                    "name": "PO Z gives its connection code",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": [],
+                            "raw": "{{base_url}}"
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{poZToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetConnectionCode { GetConnectionCode(input: { tenantId: \"{{poZId}}\" }) { connectionCode { connectionCode } errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "04198a34-58ee-4692-8bf5-8de504cc2bc1",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.GetConnectionCode : null;",
+                                    "const code = payload && payload.connectionCode ? payload.connectionCode.connectionCode : '';",
+                                    "pm.test('PO Z gives its connection code', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(code, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('poZCode', code || '');",
+                                    "})();"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "787fc291-c919-4492-9f3b-f7c94346c6e2",
+                    "name": "PO X asks Z for a plain connection",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": [],
+                            "raw": "{{base_url}}"
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{poXToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateConnectionRequest { CreateConnectionRequest(input: { sourceTenantId: \"{{poXId}}\", connectionCode: \"{{poZCode}}\", message: \"plain\" }) { requestId errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "3268d3d5-4af0-4725-912b-960139651820",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.CreateConnectionRequest : null;",
+                                    "pm.test('the request is created', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.requestId, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('poXZRequestId', payload && payload.requestId ? payload.requestId : '');",
+                                    "})();"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "0d15535a-f2af-4858-9a44-5a6b32c11ab0",
+                    "name": "PO Z approves the plain request: a connection without a relationship",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": [],
+                            "raw": "{{base_url}}"
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{poZToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation ApproveConnectionRequest { ApproveConnectionRequest(input: { requestId: \"{{poXZRequestId}}\", tenantId: \"{{poZId}}\" }) { connectionId relationshipId errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "ce7ee8fe-8bf5-408a-87f2-b148970561b9",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.ApproveConnectionRequest : null;",
+                                    "pm.test('connected, no relationship', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.connectionId, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "  pm.expect(payload.relationshipId === null || payload.relationshipId === undefined, JSON.stringify(json)).to.eql(true);",
+                                    "});",
+                                    "})();"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "cd05adc1-5144-4bd8-9ae3-6017e6e71b36",
+                    "name": "PO Z has no relationship",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": [],
+                            "raw": "{{base_url}}"
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{poZToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetTenantRelationships { GetTenantRelationships(input: { tenantId: \"{{poZId}}\" }) { relationships { id connectionId sourceTenantId targetTenantId sourceRole targetRole scope status } errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "60299a88-3364-4756-b0db-530cbb5c3f4b",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.GetTenantRelationships : null;",
+                                    "pm.test('Z lists no relationship', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect((payload && payload.relationships) || [], JSON.stringify(json)).to.have.length(0);",
+                                    "});",
+                                    "})();"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "915d3285-d09f-4052-8354-945a702dc799",
+                    "name": "PO Sign in B owner for W",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": [],
+                            "raw": "{{base_url}}"
+                        },
+                        "header": [],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{b_owner_login}}\", password: \"{{b_owner_password}}\", productId: \"{{product_id}}\" }) { userId token } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "8c1cca00-535f-40b3-8f9d-e8de1fc66b29",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.Authorization : null;",
+                                    "pm.test('PO Sign in B owner for W', function(){ pm.expect(!!payload && !!payload.token, JSON.stringify(json)).to.eql(true); });",
+                                    "if (payload && payload.token) pm.environment.set('poBOwnerToken', payload.token);",
+                                    "})();"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "6545eabf-e718-49cd-ae3e-1ecf0c5bf5f6",
+                    "name": "PO The B owner works in W",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": [],
+                            "raw": "{{base_url}}"
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{poBOwnerToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SelectTenant { SelectTenant(input: { tenantId: \"{{poWId}}\" }) { ok userSession { tenantId accessToken } errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "ca0d56a3-10af-477a-ae94-ddac033234b4",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.SelectTenant : null;",
+                                    "const session = payload ? payload.userSession : null;",
+                                    "pm.test('PO The B owner works in W', function(){",
+                                    "  pm.expect(session && session.tenantId, JSON.stringify(json)).to.eql(pm.environment.get('poWId'));",
+                                    "});",
+                                    "if (session && session.accessToken) pm.environment.set('poWToken', session.accessToken);",
+                                    "})();"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "07375692-9f28-413d-bf12-78ac72f878f2",
+                    "name": "PO W gives its connection code",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": [],
+                            "raw": "{{base_url}}"
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{poWToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetConnectionCode { GetConnectionCode(input: { tenantId: \"{{poWId}}\" }) { connectionCode { connectionCode } errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "a8da261a-b966-4070-be43-720a0e49e7b8",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.GetConnectionCode : null;",
+                                    "const code = payload && payload.connectionCode ? payload.connectionCode.connectionCode : '';",
+                                    "pm.test('PO W gives its connection code', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(code, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('poWCode', code || '');",
+                                    "})();"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "f512e31c-34de-4de5-8cba-10f2654fc2d5",
+                    "name": "PO X asks W with terms",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": [],
+                            "raw": "{{base_url}}"
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{poXToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateConnectionRequest { CreateConnectionRequest(input: { sourceTenantId: \"{{poXId}}\", connectionCode: \"{{poWCode}}\", proposedSourceRole: Partner, proposedTargetRole: Partner }) { requestId errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "aea34d67-2818-45e0-ae0b-1250deb311ac",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.CreateConnectionRequest : null;",
+                                    "pm.test('the request is created', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.requestId, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('poXWRequestId', payload && payload.requestId ? payload.requestId : '');",
+                                    "})();"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "4d427092-cd06-49f9-8369-f8b1fb6f76e9",
+                    "name": "PO W rejects",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": [],
+                            "raw": "{{base_url}}"
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{poWToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RejectConnectionRequest { RejectConnectionRequest(input: { requestId: \"{{poXWRequestId}}\", tenantId: \"{{poWId}}\" }) { success errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "e3390d74-1987-45ed-9bc0-18461f98c25e",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.RejectConnectionRequest : null;",
+                                    "pm.test('rejected', function(){ pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true); });",
+                                    "})();"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "f830b898-3254-4a2a-8eec-560ebb2119b6",
+                    "name": "PO W has no relationship after the rejection",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": [],
+                            "raw": "{{base_url}}"
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{poWToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetTenantRelationships { GetTenantRelationships(input: { tenantId: \"{{poWId}}\" }) { relationships { id connectionId sourceTenantId targetTenantId sourceRole targetRole scope status } errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "f8d39635-d25e-4121-af6d-67534ecb221e",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.GetTenantRelationships : null;",
+                                    "pm.test('W lists no relationship', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect((payload && payload.relationships) || [], JSON.stringify(json)).to.have.length(0);",
+                                    "});",
+                                    "})();"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "286b48c1-b2d8-4554-8c84-331d893043aa",
+                    "name": "PO W has no connection after the rejection",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": [],
+                            "raw": "{{base_url}}"
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{poWToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetConnections { GetConnections(input: { tenantId: \"{{poWId}}\" }) { connections { id status } errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "4d0a3f27-e87c-4c0a-8609-304946b27606",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.GetConnections : null;",
+                                    "pm.test('W lists no connection', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect((payload && payload.connections) || [], JSON.stringify(json)).to.have.length(0);",
+                                    "});",
+                                    "})();"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "5b65227c-33e4-4782-b852-d59cf64f958d",
+                    "name": "PO SU removes the organizations of this folder",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": [],
+                            "raw": "{{base_url}}"
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RemoveElements { RemoveElements(input: { collectionId: \"Tenants\", elementIds: [\"{{poXId}}\", \"{{poYId}}\", \"{{poZId}}\", \"{{poWId}}\"] }) { success } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "f333803e-19bd-4bc8-b46b-a91a8491863b",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.RemoveElements : null;",
+                                    "pm.test('removed', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true);",
+                                    "});",
+                                    "})();"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "befc7c01-3d0d-4ce9-b8e2-1335b389a9b4",
+            "name": "31 Organization management levels",
+            "item": [
+                {
+                    "id": "93664aac-3715-4a93-92e5-a309f67fe333",
+                    "name": "OL Sign in SU",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": [],
+                            "raw": "{{base_url}}"
+                        },
+                        "header": [],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{su_login}}\", password: \"{{su_password}}\", productId: \"{{product_id}}\" }) { userId token } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "0cb3028a-1490-4f29-ba85-300f33aea1d2",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.Authorization : null;",
+                                    "pm.test('OL Sign in SU', function(){ pm.expect(!!payload && !!payload.token, JSON.stringify(json)).to.eql(true); });",
+                                    "if (payload && payload.token) pm.environment.set('su_token', payload.token);",
+                                    "})();"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "042cbf5b-1c6a-42d3-9805-d7404948a170",
+                    "name": "OL SU creates the organization L owned by the A owner",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": [],
+                            "raw": "{{base_url}}"
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateTenant { CreateTenant(input: { name: \"{{olLName}}\", description: \"Organization management levels\", ownerId: \"{{a_owner_user_id}}\" }) { tenantId errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "id": "0bf39494-8964-4eaf-b76b-16485a276b5a",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.environment.set('olLName', 'OL_L_' + Date.now());",
+                                    "pm.environment.set('olM2User', pm.variables.replaceIn('{{$guid}}'));",
+                                    "pm.environment.set('olM2Login', 'ol_member_' + Date.now());",
+                                    "pm.environment.set('olM1User', pm.environment.get('a_member_user_id'));"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "9cb452bd-3cdb-436e-b5ad-90b10f15d303",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.CreateTenant : null;",
+                                    "pm.test('OL SU creates the organization L owned by the A owner', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.tenantId, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('olLId', payload && payload.tenantId ? payload.tenantId : '');",
+                                    "})();"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "da154f61-8bf4-4c70-ba07-8393a27b81d7",
+                    "name": "OL Sign in the A owner",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": [],
+                            "raw": "{{base_url}}"
+                        },
+                        "header": [],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{a_owner_login}}\", password: \"{{a_owner_password}}\", productId: \"{{product_id}}\" }) { userId token } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "56cfb235-5717-47bf-82d3-a47b15ab82d2",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.Authorization : null;",
+                                    "pm.test('OL Sign in the A owner', function(){ pm.expect(!!payload && !!payload.token, JSON.stringify(json)).to.eql(true); });",
+                                    "if (payload && payload.token) pm.environment.set('olOwnerToken', payload.token);",
+                                    "})();"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "f70c7202-1adf-4b67-9da6-c30571e64360",
+                    "name": "OL The A owner works in L",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": [],
+                            "raw": "{{base_url}}"
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{olOwnerToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SelectTenant { SelectTenant(input: { tenantId: \"{{olLId}}\" }) { ok userSession { tenantId accessToken } errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "db17b686-8916-4397-a492-a79ca943ed4d",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.SelectTenant : null;",
+                                    "const session = payload ? payload.userSession : null;",
+                                    "pm.test('OL The A owner works in L', function(){",
+                                    "  pm.expect(session && session.tenantId, JSON.stringify(json)).to.eql(pm.environment.get('olLId'));",
+                                    "});",
+                                    "if (session && session.accessToken) pm.environment.set('olOwnerLToken', session.accessToken);",
+                                    "})();"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "45ed1aee-9e12-4ae2-9c2e-d3d473a85d0f",
+                    "name": "OL The owner invites the A member to L",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": [],
+                            "raw": "{{base_url}}"
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{olOwnerLToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation CreateTenantInvitation { CreateTenantInvitation(input: { userId: \"{{a_member_user_id}}\", tenantId: \"{{olLId}}\" }) { invitationId errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "78606061-7ec9-420c-8cd0-251e04c66602",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.CreateTenantInvitation : null;",
+                                    "pm.test('OL The owner invites the A member to L', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.invitationId, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('olInvitationId', payload && payload.invitationId ? payload.invitationId : '');",
+                                    "})();"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "4f8c8834-b6e7-4ebb-9087-edb5f41d4543",
+                    "name": "OL Sign in the A member",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": [],
+                            "raw": "{{base_url}}"
+                        },
+                        "header": [],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{a_member_login}}\", password: \"{{a_member_password}}\", productId: \"{{product_id}}\" }) { userId token } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "eef63ca5-2fca-4d65-bda3-613c6d2ea042",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.Authorization : null;",
+                                    "pm.test('OL Sign in the A member', function(){ pm.expect(!!payload && !!payload.token, JSON.stringify(json)).to.eql(true); });",
+                                    "if (payload && payload.token) pm.environment.set('olM1Token', payload.token);",
+                                    "})();"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "db8b65db-e3d4-428f-b6b1-e43aae06947b",
+                    "name": "OL The A member accepts the invitation to L",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": [],
+                            "raw": "{{base_url}}"
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{olM1Token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation AcceptTenantInvitation { AcceptTenantInvitation(input: { invitationId: \"{{olInvitationId}}\" }) { membershipId success errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "3d1bbe61-395c-49a1-9c90-2c095703ba94",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.AcceptTenantInvitation : null;",
+                                    "pm.test('OL The A member accepts the invitation to L', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true);",
+                                    "});",
+                                    "pm.environment.set('olM1', payload && payload.membershipId ? payload.membershipId : '');",
+                                    "})();"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "98adc33c-aba6-4a4d-8295-1e354cf8c5d2",
+                    "name": "OL Sign in the A member again",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": [],
+                            "raw": "{{base_url}}"
+                        },
+                        "header": [],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query Authorization { Authorization(input: { login: \"{{a_member_login}}\", password: \"{{a_member_password}}\", productId: \"{{product_id}}\" }) { userId token } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "8ae76f98-2a52-4d53-b59d-026579c520f0",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.Authorization : null;",
+                                    "pm.test('OL Sign in the A member again', function(){ pm.expect(!!payload && !!payload.token, JSON.stringify(json)).to.eql(true); });",
+                                    "if (payload && payload.token) pm.environment.set('olM1Token', payload.token);",
+                                    "})();"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "bc664bf0-0d4e-4df3-b44f-c4e22c180d5e",
+                    "name": "OL The A member works in L",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": [],
+                            "raw": "{{base_url}}"
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{olM1Token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation SelectTenant { SelectTenant(input: { tenantId: \"{{olLId}}\" }) { ok userSession { tenantId accessToken } errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "15863389-3577-4606-a363-ca3e77becdfe",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.SelectTenant : null;",
+                                    "const session = payload ? payload.userSession : null;",
+                                    "pm.test('OL The A member works in L', function(){",
+                                    "  pm.expect(session && session.tenantId, JSON.stringify(json)).to.eql(pm.environment.get('olLId'));",
+                                    "});",
+                                    "if (session && session.accessToken) pm.environment.set('olM1LToken', session.accessToken);",
+                                    "})();"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "70f1ce5c-b15a-47e1-acdd-4df584aa5166",
+                    "name": "OL The owner creates the member M2 of L",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": [],
+                            "raw": "{{base_url}}"
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{olOwnerLToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UserAdd { UserAdd(input: { id: \"{{olM2User}}\", typeId: \"User\", productId: \"{{product_id}}\", item: { id: \"{{olM2User}}\", productId: \"{{product_id}}\", name: \"Levels Member\", username: \"{{olM2Login}}\", password: \"OrgMember_2026!\", email: \"{{olM2Login}}@ol.test\", groups: [], roles: [], permissions: [], systemInfos: [] } }) { id } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "8d961417-07b1-44be-af23-c8ca4edab4e7",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.UserAdd : null;",
+                                    "pm.test('OL The owner creates the member M2 of L', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.id, JSON.stringify(json)).to.eql(pm.environment.get('olM2User'));",
+                                    "});",
+                                    "})();"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "caa0b5d7-043c-435c-a237-d5a94d226e34",
+                    "name": "OL The owner finds the membership of M2",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": [],
+                            "raw": "{{base_url}}"
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{olOwnerLToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query FindMembership { FindMembership(input: { userId: \"{{olM2User}}\", tenantId: \"{{olLId}}\" }) { membership { id isActive } errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "1da626e7-834a-4dc3-ac1d-5baaae0014dc",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.FindMembership : null;",
+                                    "pm.test('OL The owner finds the membership of M2', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.membership && payload.membership.id, JSON.stringify(json)).to.be.a('string').and.not.empty;",
+                                    "});",
+                                    "pm.environment.set('olM2', payload && payload.membership ? payload.membership.id : '');",
+                                    "})();"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "4f441a5e-1119-4018-8fac-916e7ccdd83c",
+                    "name": "OL The tree gives the level Administrator",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": [],
+                            "raw": "{{base_url}}"
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{olOwnerLToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query GetOrganizationPermissions { GetOrganizationPermissions(input: { tenantId: \"{{olLId}}\" }) { groups { id } administratorPermissions errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "0156cb84-7a31-4310-8d11-6e397d061fc9",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.GetOrganizationPermissions : null;",
+                                    "const administrator = payload ? (payload.administratorPermissions || []) : [];",
+                                    "pm.test('The administrator holds every leaf but the change of the permissions', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(administrator, JSON.stringify(json)).to.include.members(['/OrganizationManagement/Edit/ChangeName', '/OrganizationManagement/Edit/ChangeDescription', '/OrganizationManagement/Members/Edit/Invite', '/OrganizationManagement/Members/Edit/Exclude', '/OrganizationManagement/Roles/Edit/Add', '/OrganizationManagement/Groups/Edit/Remove', '/OrganizationManagement/Permissions/View', '/OrganizationManagement/Connections/Edit/Connect']);",
+                                    "  pm.expect(administrator).to.not.include('/OrganizationManagement/Permissions/Change');",
+                                    "  pm.expect(administrator, 'groups are no leaves').to.not.include('/OrganizationManagement/Members/Edit');",
+                                    "  pm.expect(administrator).to.have.length(21);",
+                                    "});",
+                                    "pm.environment.set('olAdministrator', JSON.stringify(administrator));",
+                                    "})();"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "b72a33dc-49f0-4f39-9692-42c5fcc97885",
+                    "name": "OL The owner lets M1 invite only",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": [],
+                            "raw": "{{base_url}}"
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{olOwnerLToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UpdateMembershipPermissions { UpdateMembershipPermissions(input: { membershipId: \"{{olM1}}\", permissions: {{olGiven}} }) { success errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "id": "58df81b9-3ec9-46b4-9857-92908d220a84",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.environment.set('olGiven', JSON.stringify([\"/OrganizationManagement/Members/Edit/Invite\"]));"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "74d59946-7664-4b1f-adba-db08143386a7",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.UpdateMembershipPermissions : null;",
+                                    "pm.test('The owner gives any permission', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.errorMessage ? payload.errorMessage : '', JSON.stringify(json)).to.eql('');",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true);",
+                                    "});",
+                                    "})();"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "1fbada7f-2a12-4a3f-af6e-6926c23e51c4",
+                    "name": "OL M1 that may invite cannot give permissions to M2",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": [],
+                            "raw": "{{base_url}}"
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{olM1LToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UpdateMembershipPermissions { UpdateMembershipPermissions(input: { membershipId: \"{{olM2}}\", permissions: {{olGiven}} }) { success errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "3af16ee7-a19a-4edf-a103-0e31c59c4202",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.UpdateMembershipPermissions : null;",
+                                    "pm.test('An inviting member is no administrator of the permissions', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.not.eql(true);",
+                                    "  pm.expect(payload && payload.errorMessage, JSON.stringify(json)).to.eql('Insufficient organization permissions to update member organization permissions');",
+                                    "});",
+                                    "})();"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "4c339f7a-7d2e-4146-b659-9ba0a89a52c9",
+                    "name": "OL M1 that may invite cannot give itself everything",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": [],
+                            "raw": "{{base_url}}"
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{olM1LToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UpdateMembershipPermissions { UpdateMembershipPermissions(input: { membershipId: \"{{olM1}}\", permissions: {{olAdministrator}} }) { success errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "22dd6409-4980-44f8-be22-a90d7660acb6",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.UpdateMembershipPermissions : null;",
+                                    "pm.test('Nor to itself', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.not.eql(true);",
+                                    "  pm.expect(payload && payload.errorMessage, JSON.stringify(json)).to.eql('Insufficient organization permissions to update member organization permissions');",
+                                    "});",
+                                    "})();"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "71389b2a-83b9-4a1a-98da-7da15a92251c",
+                    "name": "OL M2 got nothing from M1",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": [],
+                            "raw": "{{base_url}}"
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{olOwnerLToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query FindMembership { FindMembership(input: { userId: \"{{olM2User}}\", tenantId: \"{{olLId}}\" }) { membership { id organizationPermissions } errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "60fda82f-e0c4-4a23-b914-df57973fd898",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.FindMembership : null;",
+                                    "const held = payload && payload.membership ? (payload.membership.organizationPermissions || []) : null;",
+                                    "pm.test('OL M2 got nothing from M1', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(held, JSON.stringify(json)).to.be.an(\"array\");",
+                                    "  pm.expect(held.slice().sort()).to.eql(([]).slice().sort());",
+                                    "});",
+                                    "})();"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "6949a8b1-ed49-4012-93d8-176121b67264",
+                    "name": "OL The owner lets M1 change the permissions",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": [],
+                            "raw": "{{base_url}}"
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{olOwnerLToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UpdateMembershipPermissions { UpdateMembershipPermissions(input: { membershipId: \"{{olM1}}\", permissions: {{olGiven}} }) { success errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "id": "f532eafc-96d3-4a03-8781-2c56966a3fa6",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.environment.set('olGiven', JSON.stringify([\"/OrganizationManagement/Permissions/Change\",\"/OrganizationManagement/Members/View\"]));"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "500bdf33-81c8-404d-86e8-d54007365870",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.UpdateMembershipPermissions : null;",
+                                    "pm.test('The owner gives the change of the permissions', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.errorMessage ? payload.errorMessage : '', JSON.stringify(json)).to.eql('');",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true);",
+                                    "});",
+                                    "})();"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "26a71df2-3c97-4728-a2d7-d34acd15c20c",
+                    "name": "OL M1 cannot give M2 a permission it does not hold",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": [],
+                            "raw": "{{base_url}}"
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{olM1LToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UpdateMembershipPermissions { UpdateMembershipPermissions(input: { membershipId: \"{{olM2}}\", permissions: {{olGiven}} }) { success errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "id": "65dacef1-0161-40cc-8e5f-687f87cc5917",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.environment.set('olGiven', JSON.stringify([\"/OrganizationManagement/Members/View\",\"/OrganizationManagement/Members/Edit/Invite\"]));"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "aeaa1910-0aa3-495c-982d-673ba602aa50",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.UpdateMembershipPermissions : null;",
+                                    "pm.test('Inviting is beyond M1', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.not.eql(true);",
+                                    "  pm.expect(payload && payload.errorMessage, JSON.stringify(json)).to.eql(\"The organization permission '/OrganizationManagement/Members/Edit/Invite' cannot be given without holding it\");",
+                                    "});",
+                                    "})();"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "883b2a8c-b712-4b10-8323-eb3dba2aea6a",
+                    "name": "OL M2 still has nothing",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": [],
+                            "raw": "{{base_url}}"
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{olOwnerLToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query FindMembership { FindMembership(input: { userId: \"{{olM2User}}\", tenantId: \"{{olLId}}\" }) { membership { id organizationPermissions } errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "17a819cf-a4b1-48a3-be84-1819d875fe44",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.FindMembership : null;",
+                                    "const held = payload && payload.membership ? (payload.membership.organizationPermissions || []) : null;",
+                                    "pm.test('OL M2 still has nothing', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(held, JSON.stringify(json)).to.be.an(\"array\");",
+                                    "  pm.expect(held.slice().sort()).to.eql(([]).slice().sort());",
+                                    "});",
+                                    "})();"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "f72e9216-1855-46f7-8117-1a8953a6ea4e",
+                    "name": "OL M1 gives M2 a permission it holds",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": [],
+                            "raw": "{{base_url}}"
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{olM1LToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UpdateMembershipPermissions { UpdateMembershipPermissions(input: { membershipId: \"{{olM2}}\", permissions: {{olGiven}} }) { success errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "id": "7cfd2fd9-82d2-47ff-a6dd-15ddd09ddd41",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.environment.set('olGiven', JSON.stringify([\"/OrganizationManagement/Members/View\"]));"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "76820c19-1fea-45df-8df2-2e6644166ee4",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.UpdateMembershipPermissions : null;",
+                                    "pm.test('Viewing the members is within M1', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.errorMessage ? payload.errorMessage : '', JSON.stringify(json)).to.eql('');",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true);",
+                                    "});",
+                                    "})();"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "474e4f40-2a52-4163-805f-34a25e0968fe",
+                    "name": "OL M2 can view the members",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": [],
+                            "raw": "{{base_url}}"
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{olOwnerLToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query FindMembership { FindMembership(input: { userId: \"{{olM2User}}\", tenantId: \"{{olLId}}\" }) { membership { id organizationPermissions } errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "db2d765e-cce1-48c4-b07f-15a42ed7294e",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.FindMembership : null;",
+                                    "const held = payload && payload.membership ? (payload.membership.organizationPermissions || []) : null;",
+                                    "pm.test('OL M2 can view the members', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(held, JSON.stringify(json)).to.be.an(\"array\");",
+                                    "  pm.expect(held.slice().sort()).to.eql(([\"/OrganizationManagement/Members/View\"]).slice().sort());",
+                                    "});",
+                                    "})();"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "f1e85868-85ca-41a4-854f-26dbae3153f0",
+                    "name": "OL The owner makes M2 an administrator",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": [],
+                            "raw": "{{base_url}}"
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{olOwnerLToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UpdateMembershipPermissions { UpdateMembershipPermissions(input: { membershipId: \"{{olM2}}\", permissions: {{olAdministrator}} }) { success errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "09ceb8aa-d59a-4429-b93d-b705346ccbe3",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.UpdateMembershipPermissions : null;",
+                                    "pm.test('The owner gives the level Administrator', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.errorMessage ? payload.errorMessage : '', JSON.stringify(json)).to.eql('');",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true);",
+                                    "});",
+                                    "})();"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "d8dda358-2bba-42ee-a6e1-b7f9fa29d196",
+                    "name": "OL M2 holds the level Administrator",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": [],
+                            "raw": "{{base_url}}"
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{olOwnerLToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "query FindMembership { FindMembership(input: { userId: \"{{olM2User}}\", tenantId: \"{{olLId}}\" }) { membership { id organizationPermissions } errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "89d09085-76f6-4039-9f81-8049440f5fbb",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.FindMembership : null;",
+                                    "const held = payload && payload.membership ? (payload.membership.organizationPermissions || []) : null;",
+                                    "pm.test('OL M2 holds the level Administrator', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(held, JSON.stringify(json)).to.be.an(\"array\");",
+                                    "  pm.expect(held.slice().sort()).to.eql((JSON.parse(pm.environment.get('olAdministrator'))).slice().sort());",
+                                    "});",
+                                    "})();"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "20bb8d5d-e674-43e4-a03b-b1e20717ea4c",
+                    "name": "OL M1 keeps the permissions M2 already holds",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": [],
+                            "raw": "{{base_url}}"
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{olM1LToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UpdateMembershipPermissions { UpdateMembershipPermissions(input: { membershipId: \"{{olM2}}\", permissions: {{olAdministrator}} }) { success errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "97c8f36a-5712-4e43-8a9a-d393cabec1d6",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.UpdateMembershipPermissions : null;",
+                                    "pm.test('What M2 holds stays although M1 lacks it', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.errorMessage ? payload.errorMessage : '', JSON.stringify(json)).to.eql('');",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true);",
+                                    "});",
+                                    "})();"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "2b1b6615-e994-40b9-8af2-24fc7d50ad54",
+                    "name": "OL M1 takes a permission away from M2",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": [],
+                            "raw": "{{base_url}}"
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{olM1LToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UpdateMembershipPermissions { UpdateMembershipPermissions(input: { membershipId: \"{{olM2}}\", permissions: {{olGiven}} }) { success errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "id": "6d97419b-5ba2-407c-9f49-6bdebaec16bb",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.environment.set('olGiven', JSON.stringify(JSON.parse(pm.environment.get('olAdministrator')).filter(function(p){ return p !== '/OrganizationManagement/Members/Edit/Invite'; })));"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "6a62fab3-2dce-4715-88a2-dd46f742af65",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.UpdateMembershipPermissions : null;",
+                                    "pm.test('Taking away needs no holding', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.errorMessage ? payload.errorMessage : '', JSON.stringify(json)).to.eql('');",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true);",
+                                    "});",
+                                    "})();"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "16d73900-5cf6-4e98-bd8f-55de92e61d49",
+                    "name": "OL M1 cannot give the taken permission back",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": [],
+                            "raw": "{{base_url}}"
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{olM1LToken}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation UpdateMembershipPermissions { UpdateMembershipPermissions(input: { membershipId: \"{{olM2}}\", permissions: {{olGiven}} }) { success errorMessage } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "id": "66f02af1-d39a-4e07-bf19-4349331fffa9",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.environment.set('olGiven', pm.environment.get('olAdministrator'));"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "7893bee6-d6b3-4a20-b6b8-2fea5eb505ca",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.UpdateMembershipPermissions : null;",
+                                    "pm.test('Inviting is beyond M1 again', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.not.eql(true);",
+                                    "  pm.expect(payload && payload.errorMessage, JSON.stringify(json)).to.eql(\"The organization permission '/OrganizationManagement/Members/Edit/Invite' cannot be given without holding it\");",
+                                    "});",
+                                    "})();"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "22dce5e1-ca1c-4ba3-a481-10d489634291",
+                    "name": "OL SU removes the organization of this folder",
+                    "request": {
+                        "url": {
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "query": [],
+                            "variable": [],
+                            "raw": "{{base_url}}"
+                        },
+                        "header": [
+                            {
+                                "key": "x-authentication-token",
+                                "value": "{{su_token}}"
+                            }
+                        ],
+                        "method": "POST",
+                        "body": {
+                            "mode": "graphql",
+                            "graphql": {
+                                "query": "mutation RemoveElements { RemoveElements(input: { collectionId: \"Tenants\", elementIds: [\"{{olLId}}\"] }) { success } }",
+                                "variables": ""
+                            }
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "id": "dd22d692-5ca1-4504-9a61-de0cfadd785a",
+                                "type": "text/javascript",
+                                "exec": [
+                                    "(function(){",
+                                    "const json = pm.response.json();",
+                                    "const errors = json.errors || [];",
+                                    "const payload = json.data ? json.data.RemoveElements : null;",
+                                    "pm.test('removed', function(){",
+                                    "  pm.expect(errors, 'unexpected GraphQL error: ' + JSON.stringify(errors)).to.have.length(0);",
+                                    "  pm.expect(payload && payload.success, JSON.stringify(json)).to.eql(true);",
+                                    "});",
+                                    "})();"
                                 ]
                             }
                         }
