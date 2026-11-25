@@ -41,6 +41,7 @@ target_link_libraries(PumaServerPg PRIVATE
 	ImtCore::imtnotifydb
 	ImtCore::imtlog
 	ImtCore::imtchat
+	ImtCore::imtchatdb
 	ImtCore::ImtCoreLoc
 	Acf::iqtdoc
 )
