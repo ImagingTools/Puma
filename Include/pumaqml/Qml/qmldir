@@ -1,3 +1,4 @@
 module pumaqml
 
 PumaConnectionSubscription 1.0 PumaConnectionSubscription.qml
+LdapGroupTreeView 1.0 LdapGroupTreeView.qml

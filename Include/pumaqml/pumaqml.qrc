@@ -3,5 +3,6 @@
 	<file alias="pumaqml/qmldir">Qml/qmldir</file>
 	<file alias="Puma/PumaServerConfigurator.qml">Qml/PumaServerConfigurator.qml</file>
 	<file alias="pumaqml/PumaConnectionSubscription.qml">Qml/PumaConnectionSubscription.qml</file>
+	<file alias="pumaqml/LdapGroupTreeView.qml">Qml/LdapGroupTreeView.qml</file>
     </qresource>
 </RCC>
