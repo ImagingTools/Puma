@@ -173,6 +173,38 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="LdapUserGroupSynchronizer" PackageId="ImtAuthPck" ComponentId="LdapUserGroupSynchronizer">
+            <Data IsEnabled="true" Flags="1">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="BaseDnParam" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaSettings/LdapGroupFilter"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="GroupNameFilterParam" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaSettings/LdapGroupNameFilter"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="EnableableParams" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>PumaSettings/LdapEnabled</Value>
+                                <Value>PumaSettings/LdapGroupSynchronizationEnabled</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserGroupCollection" Type="Reference" ExportId="UserGroupRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserCollection" Type="Reference" ExportId="UserRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="NotificationCenter" PackageId="ImtCoreVoce" ComponentId="NotificationCenter">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>

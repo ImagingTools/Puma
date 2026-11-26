@@ -236,6 +236,9 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>LdapEnabled</Value>
+                                <Value>LdapGroupSynchronizationEnabled</Value>
+                                <Value>LdapGroupFilter</Value>
+                                <Value>LdapGroupNameFilter</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -243,6 +246,9 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value></Value>
+                                <Value>Mirror the LDAP groups into the user groups (requires ImtCore version 23950 or later)</Value>
+                                <Value>Distinguished name of the directory subtree with the synchronized LDAP groups, e.g. DC=example,DC=com. If empty, the domain of the server is used</Value>
+                                <Value>Group name pattern, e.g. MyGroup*. The wildcard * matches any characters; empty matches all groups. Existing mirrored groups are retained if they no longer match</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -250,6 +256,9 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>LdapEnabled</Value>
+                                <Value>LdapGroupSynchronizationEnabled</Value>
+                                <Value>LdapGroupFilter</Value>
+                                <Value>LdapGroupNameFilter</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -257,6 +266,9 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>Enable LDAP</Value>
+                                <Value>Synchronize LDAP groups</Value>
+                                <Value>LDAP group filter (base DN)</Value>
+                                <Value>LDAP group filter (name)</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -271,6 +283,33 @@
                 <AttributeInfoMap>
                     <AttributeInfo Id="DefaultEnabled" Type="Boolean" ExportId="">
                         <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="LdapGroupFilter" PackageId="BasePck" ComponentId="TextParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DefaultText" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value=""/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="LdapGroupNameFilter" PackageId="BasePck" ComponentId="TextParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DefaultText" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value=""/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="LdapGroupSynchronizationEnabled" PackageId="BasePck" ComponentId="EnableableParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DefaultEnabled" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -507,6 +546,9 @@
         <Component ExportedId="DatabaseAccessSettings" ComponentId="DatabaseAccessSettings"/>
         <Component ExportedId="FileBasedSslConfiguration" ComponentId="FileBasedSslConfiguration"/>
         <Component ExportedId="LdapEnabled" ComponentId="LdapEnabled"/>
+        <Component ExportedId="LdapGroupFilter" ComponentId="LdapGroupFilter"/>
+        <Component ExportedId="LdapGroupNameFilter" ComponentId="LdapGroupNameFilter"/>
+        <Component ExportedId="LdapGroupSynchronizationEnabled" ComponentId="LdapGroupSynchronizationEnabled"/>
         <Component ExportedId="ServerConnectionInterface" ComponentId="Server/ServerConnectionInterface"/>
         <Component ExportedId="ServerPort" ComponentId="Server/ServerPort"/>
         <Component ExportedId="ServerTokensEnabled" ComponentId="ServerTokensEnabled"/>
