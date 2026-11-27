@@ -15,7 +15,15 @@ The assistant can do only what the user may do: it uses the same commands as the
 rights of the user. Changes (for example adding a user to a group) are shown first and applied only
 after the user confirms them.
 
-Available functions: search users, groups and roles of the organization, add a user to a group.
+The assistant knows Puma from its documentation and its public API. It can solve tasks of several steps,
+e.g. "find the users without a group, add them to Support and give the group the role Operator": it reads
+the data, then proposes a plan. The plan shows every change with the data it sends; the user confirms or
+rejects the whole plan. The steps run in order and stop at the first failure; applied steps are not undone
+automatically.
+
+What the assistant may use in Puma: reading users, groups, roles, the organization, its members and its
+permission scope; creating and changing groups (members, roles, parent groups, name). It never handles
+passwords, tokens or sessions.
 
 Permissions (below `Administration/Assistant`): `ViewPage` opens the page, `View` reads the configuration
 (without the key), `Edit` changes it. New organizations have them in their permission scope; for an
@@ -29,6 +37,8 @@ existing organization the system administrator adds them to its scope.
 | `PumaDatabasePostgres.acc`, `PumaDatabaseSQLite.acc` | Table `AssistantConfigurations` (`ImtAssistVoce/AssistantConfigurationSqlRepository`), created automatically |
 | `Include/puma/PumaFeatures.h` | Permissions `/Administration/Assistant/{ViewPage,View,Edit}` |
 | `Include/pumaqml/Qml/PumaMain.qml` | `AssistantCenter.controller` |
+| `Docs/Knowledge/Puma.md` and the qrc of the servers (`:/AssistantKnowledge/Puma`) | Knowledge of Puma: this overview, `README.md`, `LdapGroupFilter.md`, this page and the behaviour of the tenant API (`Tests/TenantApiPostman/README.md`); with the ImtCore knowledge (`:/AssistantKnowledge/ImtCore`) |
+| `Assistant` in `PumaServerBase.acc`: `AllowedQueries`, `AllowedMutations` | What the assistant may call. Extend the lists to give it more functions; commands of authentication and secret fields stay closed |
 
 Policy of the server, attributes of `Assistant` in `PumaServerBase.acc`:
 
