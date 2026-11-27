@@ -106,4 +106,4 @@ it in the background and its result is ignored; the reading itself stops at the 
   `readGroupCount`, `cancelled` and `cancel()` (registered in `Impl/PumaServerConfigurator/Main.cpp`).
 * ImtCore `Qml/imtgui/Settings/SettingsController.qml` – `registerPageExtension(pageId, component)`
   adds content below the parameters of a settings page; the item gets the JSON of the page in `pageData`.
-* `Include/pumaqml/Qml/PumaServerConfigurator.qml`, `LdapGroupTreeView.qml` – the preview.
+* `Impl/PumaServerConfigurator/Qml/PumaServerConfigurator.qml`, `LdapGroupTreeView.qml` – the preview (Qt only, not part of the web `pumaqml` module).

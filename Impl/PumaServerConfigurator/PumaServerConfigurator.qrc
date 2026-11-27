@@ -1,3 +1,6 @@
 <RCC>
-
+    <qresource prefix="/qml">
+	<file alias="Puma/PumaServerConfigurator.qml">Qml/PumaServerConfigurator.qml</file>
+	<file alias="Puma/LdapGroupTreeView.qml">Qml/LdapGroupTreeView.qml</file>
+    </qresource>
 </RCC>
