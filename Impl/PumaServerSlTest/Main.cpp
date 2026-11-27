@@ -16,6 +16,8 @@ int main(int argc, char* argv[])
 {
 	InitializeImtCoreAuthorizableServer();
 	ImtCoreInitNotifySqlResources();
+	// SQL scripts of the assistant configurations of the organizations
+	Q_INIT_RESOURCE(imtassistdb);
 	Q_INIT_RESOURCE(imtresthtml);
 	Q_INIT_RESOURCE(PumaServerSlTest);
 #ifdef WEB_COMPILE

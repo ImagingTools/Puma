@@ -26,6 +26,37 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="Assistant" PackageId="ImtAssistVoce" ComponentId="TenantAssistant">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ConfigurationCollection" Type="Reference" ExportId="AssistantConfigurationRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RequestHandlers" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>PumaHandlers</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SecretProtector" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="AssistantSecretProtector"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="AssistantSecretProtector" PackageId="ImtCryptPck" ComponentId="SystemSecretProtector">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="MachineScope" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="AuthenticationManager" PackageId="ImtAuthVoce" ComponentId="AuthenticationManager">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -292,6 +323,8 @@
                                 <Value>UserCollectionDocumentService</Value>
                                 <Value>UserGroupCollectionDocumentService</Value>
                                 <Value>NotificationCenter</Value>
+                                <Value>Assistant/AssistantController</Value>
+                                <Value>Assistant/ConfigurationController</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

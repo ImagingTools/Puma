@@ -211,6 +211,9 @@
                     <AttributeInfo Id="TenantDirectoryProfileRepository" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaDatabasePostgres/TenantDirectoryProfileSqlRepository"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="AssistantConfigurationRepository" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaDatabasePostgres/AssistantConfigurationSqlRepository"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ContractAttachmentRepository" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaDatabasePostgres/ContractAttachmentSqlRepository"/>
                     </AttributeInfo>
