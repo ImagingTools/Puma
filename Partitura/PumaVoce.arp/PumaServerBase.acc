@@ -273,14 +273,11 @@
                     <AttributeInfo Id="BindingManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="TenantController/TenantEntityBindingManager"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="CrossOrgGrantManager" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="TenantController/CrossOrgGrantManager"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="DatabaseConnectionChecker" Type="Reference" ExportId="DatabaseConnectionChecker">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="DelegatedAccess" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="TenantController/DelegatedAccessResolver"/>
+                        <Data IsEnabled="true" Value="TenantController/DelegatedAccess"/>
                     </AttributeInfo>
                     <AttributeInfo Id="DocumentRepositories" Type="Reference[]" ExportId="DocumentRepositories">
                         <Data IsEnabled="false"/>
@@ -524,10 +521,13 @@
         <Element Id="TenantController" PackageId="ImtUserAdministrationVoce" ComponentId="TenantController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="ContractRepository" Type="Reference" ExportId="ContractRepository">
+                    <AttributeInfo Id="ContractPermissionTree" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PermissionTree"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SnapshotRepository" Type="Reference" ExportId="SnapshotRepository">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="CrossOrgGrantRepository" Type="Reference" ExportId="CrossOrgGrantRepository">
+                    <AttributeInfo Id="ContractRepository" Type="Reference" ExportId="ContractRepository">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="CrossTenantMessageRepository" Type="Reference" ExportId="CrossTenantMessageRepository">
@@ -548,9 +548,6 @@
                     <AttributeInfo Id="RequestManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="WebSocketServerFramework"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="RoleRepository" Type="Reference" ExportId="RoleRepository">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="TenantConnectionCodeRepository" Type="Reference" ExportId="TenantConnectionCodeRepository">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -564,12 +561,6 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TenantMembershipRepository" Type="Reference" ExportId="TenantMembershipRepository">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TenantRelationshipProposalRepository" Type="Reference" ExportId="TenantRelationshipProposalRepository">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TenantRelationshipRepository" Type="Reference" ExportId="TenantRelationshipRepository">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TenantRepository" Type="Reference" ExportId="TenantRepository">
@@ -587,6 +578,27 @@
                     <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="ContractPartyRecordRepository" Type="Reference" ExportId="ContractPartyRecordRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ContractEventRepository" Type="Reference" ExportId="ContractEventRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ContractPartyRoleRepository" Type="Reference" ExportId="ContractPartyRoleRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ContractTypeRepository" Type="Reference" ExportId="ContractTypeRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantDirectoryProfileRepository" Type="Reference" ExportId="TenantDirectoryProfileRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ContractAttachmentRepository" Type="Reference" ExportId="ContractAttachmentRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserGroupCollection" Type="Reference" ExportId="UserGroupRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
@@ -597,7 +609,7 @@
                         <Data IsEnabled="true" Value="TenantController/TenantEntityBindingManager"/>
                     </AttributeInfo>
                     <AttributeInfo Id="DelegatedAccess" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="TenantController/DelegatedAccessResolver"/>
+                        <Data IsEnabled="true" Value="TenantController/DelegatedAccess"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
@@ -932,5 +944,6 @@
         <Component ExportedId="TenantNotificationPublisher" ComponentId="TenantController/TenantNotificationPublisher"/>
         <Component ExportedId="TracingConfiguration" ComponentId="PumaSettings/TracingConfiguration"/>
         <Component ExportedId="WebSocketServerFramework" ComponentId="WebSocketServerFramework"/>
+        <Component ExportedId="ContractNotificationPublisher" ComponentId="TenantController/ContractNotificationPublisher"/>
     </ExportedComponents>
 </Acf>

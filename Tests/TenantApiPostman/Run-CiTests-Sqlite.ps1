@@ -227,6 +227,11 @@ try {
     Start-TestServer
     $exitCode = Invoke-NewmanSuite
 
+    $contractSuite = Join-Path $ScriptDir "contracts-product-isolation\run.js"
+    if (-not (Test-Path $contractSuite)) { throw "Contract product isolation suite not found: $contractSuite" }
+    & node $contractSuite --http "http://localhost:$HttpPort/Puma/graphql" --ws "ws://localhost:$($HttpPort + 1000)" --env $EnvironmentPath --junit (Join-Path $ScriptDir "junit-report-contract-product-isolation-sqlite.xml")
+    if ($exitCode -eq 0) { $exitCode = $LASTEXITCODE }
+
     # The notification center on SQLite: the same collection, its own users and organizations
     $centerExitCode = Invoke-NewmanSuite $NotificationCenterCollectionPath $NotificationCenterJUnitReportPath $NotificationCenterJsonReportPath "notification center suite"
     if ($exitCode -eq 0) { $exitCode = $centerExitCode }

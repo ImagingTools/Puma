@@ -310,6 +310,9 @@ try {
     Start-TestServer
     $exitCode = Invoke-NewmanSuite
 
+    $contractExitCode = Invoke-WsSuite "..\contracts-product-isolation\run.js" "Contract product isolation suite" (Join-Path $ScriptDir "junit-report-contract-product-isolation.xml")
+    if ($exitCode -eq 0) { $exitCode = $contractExitCode }
+
     # Runs against the same live server, after newman has seeded users/tenants.
     $wsExitCode = Invoke-WsSuite "ws-subscriptions.js" "WebSocket subscription suite" $WsJUnitReportPath
     if ($exitCode -eq 0) { $exitCode = $wsExitCode }

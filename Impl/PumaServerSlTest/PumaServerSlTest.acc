@@ -35,6 +35,7 @@
                                 <Value>PumaServerBase/TenantNotificationPublisher</Value>
                                 <Value>PumaServerBase/ConnectionCodesNotificationPublisher</Value>
                                 <Value>PumaServerBase/CrossTenantMessageNotificationPublisher</Value>
+                                <Value>PumaServerBase/ContractNotificationPublisher</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -95,7 +96,8 @@
                                 <Value>PumaDatabaseSQLite/TenantMembershipRepository</Value>
                                 <Value>PumaDatabaseSQLite/SQLiteTenantInvitationRepository</Value>
                                 <Value>PumaDatabaseSQLite/SQLiteTenantEntityBindingRepository</Value>
-                                <Value>PumaDatabaseSQLite/SQLiteCrossOrgGrantRepository</Value>
+                                <Value>PumaDatabaseSQLite/SQLiteContractRepository</Value>
+                                <Value>PumaDatabaseSQLite/SQLiteContractPartyRecordRepository</Value>
                                 <Value>PumaDatabaseSQLite/TenantRepository</Value>
                                 <Value>PumaServerBase/PersonalAccessTokenManager</Value>
                             </Values>
@@ -106,9 +108,6 @@
                     </AttributeInfo>
                     <AttributeInfo Id="ContractRepository" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaDatabaseSQLite/SQLiteContractRepository"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="CrossOrgGrantRepository" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="PumaDatabaseSQLite/SQLiteCrossOrgGrantRepository"/>
                     </AttributeInfo>
                     <AttributeInfo Id="CrossTenantMessageRepository" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaDatabaseSQLite/SQLiteCrossTenantMessageRepository"/>
@@ -185,12 +184,6 @@
                     <AttributeInfo Id="TenantMembershipRepository" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaDatabaseSQLite/TenantMembershipRepository"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="TenantRelationshipProposalRepository" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="PumaDatabaseSQLite/SQLiteTenantRelationshipProposalRepository"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TenantRelationshipRepository" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="PumaDatabaseSQLite/SQLiteTenantRelationshipRepository"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="TenantRepository" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaDatabaseSQLite/TenantRepository"/>
                     </AttributeInfo>
@@ -217,6 +210,24 @@
                     </AttributeInfo>
                     <AttributeInfo Id="WebSocketPort" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="18789"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ContractPartyRecordRepository" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaDatabaseSQLite/SQLiteContractPartyRecordRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ContractEventRepository" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaDatabaseSQLite/SQLiteContractEventRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ContractPartyRoleRepository" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaDatabaseSQLite/SQLiteContractPartyRoleRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ContractTypeRepository" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaDatabaseSQLite/SQLiteContractTypeRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantDirectoryProfileRepository" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaDatabaseSQLite/SQLiteTenantDirectoryProfileRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ContractAttachmentRepository" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaDatabaseSQLite/SQLiteContractAttachmentRepository"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>

@@ -22,10 +22,7 @@
 //   ConnectionRequestApproved -> the owner of the requesting organization
 //   ConnectionRequestRejected -> the owner of the requesting organization
 //   ConnectionRemoved         -> the owners of both organizations
-//   RelationshipProposalReceived -> the owner of the counterparty organization
-//   RelationshipProposalApproved -> the owner of the initiating organization
-//   RelationshipProposalRejected -> the owner of the initiating organization
-//   RelationshipRemoved       -> the owners of both organizations, unless the connection ends with it
+//   OnOrganizationConnectionsChanged -> every session working in an organization whose connections changed
 
 'use strict';
 
@@ -39,7 +36,8 @@ const {
 
 const MEMBERSHIP = 'OnMembershipNotification';
 const CONNECTION = 'OnConnectionCodesNotification';
-const CHANNELS = [MEMBERSHIP, CONNECTION];
+const ORGANIZATION_CONNECTIONS = 'OnOrganizationConnectionsChanged';
+const CHANNELS = [MEMBERSHIP, CONNECTION, ORGANIZATION_CONNECTIONS];
 
 // How long a misrouted notification gets to show up after the expected ones arrived.
 const quietMs = 1500;
@@ -80,13 +78,19 @@ async function selectTenant(p, tenantId) {
 }
 
 // The selection names every field a case asserts on (MembershipNotification,
-// ConnectionNotification in the SDL).
+// ConnectionNotification, OrganizationConnectionsNotification in the SDL).
 const SELECTIONS = {
 	[MEMBERSHIP]: 'notificationType membershipId userId tenantId',
-	[CONNECTION]: 'notificationType tenantId connectionId requestId proposalId'
+	[CONNECTION]: 'notificationType tenantId connectionId requestId',
+	[ORGANIZATION_CONNECTIONS]: 'tenantId'
 };
 
+// The organization channel has no input: it follows the organization of the session
 function subscriptionQuery(commandId, input) {
+	if (commandId === ORGANIZATION_CONNECTIONS) {
+		return `subscription ${commandId} { ${commandId} { ${SELECTIONS[commandId]} } }`;
+	}
+
 	return `subscription ${commandId} { ${commandId}(input: ${input || '{}'}) { ${SELECTIONS[commandId]} } }`;
 }
 
@@ -226,16 +230,6 @@ function requestConnectionBetween(sourceTenantId, targetTenantId, code, recipien
 		() => act('CreateConnectionRequest',
 			`mutation CreateConnectionRequest { CreateConnectionRequest(input: { sourceTenantId: ${gqlString(sourceTenantId)},` +
 			` connectionCode: ${gqlString(code)}, message: "ws" }) { requestId errorMessage } }`, token));
-}
-
-function proposeRelationshipBetween(connectionId, initiatorTenantId, counterpartyTenantId, recipients, token) {
-	return expectRouting(CONNECTION,
-		sent => ({ notificationType: 'RelationshipProposalReceived', tenantId: counterpartyTenantId, proposalId: sent.proposalId }), recipients,
-		() => act('CreateRelationshipProposal',
-			'mutation CreateRelationshipProposal { CreateRelationshipProposal(input: { proposal: { id: "", ' +
-			`connectionId: ${gqlString(connectionId)}, proposalType: Create, initiatorTenantId: ${gqlString(initiatorTenantId)},` +
-			` counterpartyTenantId: ${gqlString(counterpartyTenantId)}, proposedSourceRole: Customer, proposedTargetRole: Supplier,` +
-			' status: Pending, message: "ws" } }) { proposalId errorMessage } }', token));
 }
 
 // --- the suite
@@ -460,35 +454,6 @@ async function main() {
 		connectionId = approved.connectionId;
 	});
 
-	const proposeRelationship = () => proposeRelationshipBetween(connectionId, tenantA, tenantB, [partner], owner.tenantToken);
-
-	let proposalId = null;
-
-	await test('a relationship proposal reaches the owner of the counterparty only', async () => {
-		requires(connectionId, 'the active connection');
-		proposalId = (await proposeRelationship()).proposalId;
-	});
-
-	await test('a rejected relationship proposal is reported to the initiating owner only', async () => {
-		requires(proposalId, 'the pending relationship proposal');
-		await expectRouting(CONNECTION, { notificationType: 'RelationshipProposalRejected', tenantId: tenantA, proposalId }, [owner],
-			() => act('RejectRelationshipProposal',
-				`mutation RejectRelationshipProposal { RejectRelationshipProposal(input: { proposalId: ${gqlString(proposalId)}, tenantId: ${gqlString(tenantB)} }) { success errorMessage } }`,
-				partner.tenantToken));
-	});
-
-	let relationshipId = null;
-
-	await test('an approved relationship proposal is reported to the initiating owner only', async () => {
-		requires(connectionId, 'the active connection');
-		const secondProposalId = (await proposeRelationship()).proposalId;
-		const approved = await expectRouting(CONNECTION, { notificationType: 'RelationshipProposalApproved', tenantId: tenantA, proposalId: secondProposalId }, [owner],
-			() => act('ApproveRelationshipProposal',
-				`mutation ApproveRelationshipProposal { ApproveRelationshipProposal(input: { proposalId: ${gqlString(secondProposalId)}, tenantId: ${gqlString(tenantB)} }) { success relationshipId errorMessage } }`,
-				partner.tenantToken));
-		relationshipId = approved.relationshipId;
-	});
-
 	// --- cross-organization access: a user acts only for the organizations he belongs to
 
 	const refused = async (label, query, token, reason) => {
@@ -501,60 +466,38 @@ async function main() {
 		return payload;
 	};
 
-	await test('the proposals of an organization are listed in full to its members only', async () => {
-		const listed = await act('GetRelationshipProposals',
-			`query GetRelationshipProposals { GetRelationshipProposals(input: { tenantId: ${gqlString(tenantA)} }) { proposals { id initiatorTenantId counterpartyTenantId status } errorMessage } }`,
-			owner.tenantToken);
-		const proposals = listed.proposals || [];
-		assert(proposals.length >= 2 && proposals.every(p => p.initiatorTenantId === tenantA && p.counterpartyTenantId === tenantB && p.status),
-			`proposals are not reported with their parties and status: ${JSON.stringify(proposals).slice(0, 300)}`);
-
-		await refused('GetRelationshipProposals',
-			`query GetRelationshipProposals { GetRelationshipProposals(input: { tenantId: ${gqlString(tenantA)} }) { proposals { id } errorMessage } }`,
-			bystander.token);
-	});
-
-	await test('nobody proposes a relationship on behalf of another organization', async () => {
+	await test('nobody reads or starts the contracts of other organizations', async () => {
 		requires(connectionId, 'the connection between A and B');
-		const proposal = (initiator, counterparty) =>
-			'mutation CreateRelationshipProposal { CreateRelationshipProposal(input: { proposal: { id: "", ' +
-			`connectionId: ${gqlString(connectionId)}, proposalType: Create, initiatorTenantId: ${gqlString(initiator)},` +
-			` counterpartyTenantId: ${gqlString(counterparty)}, proposedSourceRole: Partner, proposedTargetRole: Partner,` +
-			' status: Pending } }) { proposalId errorMessage } }';
-
-		await refused('CreateRelationshipProposal', proposal(tenantA, tenantB), bystander.token);
-		await refused('CreateRelationshipProposal', proposal(tenantA, tenantB), partner.tenantToken);
-		await refused('CreateRelationshipProposal', proposal(tenantC, tenantB), stranger.tenantToken, /not connected/);
-	});
-
-	await test('nobody answers a relationship proposal for another organization', async () => {
-		requires(proposalId, 'a proposal between A and B');
-		for (const [label, field] of [['ApproveRelationshipProposal', 'success'], ['RejectRelationshipProposal', 'success'], ['CancelRelationshipProposal', 'success']]) {
-			await refused(label,
-				`mutation ${label} { ${label}(input: { proposalId: ${gqlString(proposalId)}, tenantId: ${gqlString(tenantB)} }) { ${field} errorMessage } }`,
-				bystander.token);
-		}
-	});
-
-	await test('an answered proposal cannot be approved again', async () => {
-		requires(proposalId, 'the rejected proposal');
-		await refused('ApproveRelationshipProposal',
-			`mutation ApproveRelationshipProposal { ApproveRelationshipProposal(input: { proposalId: ${gqlString(proposalId)}, tenantId: ${gqlString(tenantB)} }) { success errorMessage } }`,
-			partner.tenantToken, /not waiting for approval/);
-	});
-
-	await test('nobody manages contracts or relationships of other organizations', async () => {
-		requires(relationshipId, 'the relationship between A and B');
 		await refused('GetContracts',
 			`query GetContracts { GetContracts(input: { tenantId: ${gqlString(tenantA)} }) { contracts { id } errorMessage } }`,
 			bystander.token);
+		// The partner is connected to A, still it does not act for A
 		await refused('CreateContract',
-			`mutation CreateContract { CreateContract(input: { relationshipId: ${gqlString(relationshipId)}, sourceTenantId: ${gqlString(tenantA)},` +
-			` targetTenantId: ${gqlString(tenantB)}, description: "forged" }) { contractId errorMessage } }`,
-			bystander.token);
-		await refused('RemoveTenantRelationship',
-			`mutation RemoveTenantRelationship { RemoveTenantRelationship(input: { tenantId: ${gqlString(tenantA)}, relationshipId: ${gqlString(relationshipId)} }) { success errorMessage } }`,
-			bystander.token);
+			`mutation CreateContract { CreateContract(input: { tenantId: ${gqlString(tenantA)}, draft: { name: "forged",` +
+			` parties: [{ tenantId: ${gqlString(tenantA)} }, { tenantId: ${gqlString(tenantB)} }] } }) { success contractId errorMessage } }`,
+			partner.tenantToken);
+	});
+
+	await test('a draft change reaches the initiator once and the partner only sees it after submission', async () => {
+		requires(connectionId, 'the connection between A and B');
+		const commandId = 'OnContractNotification';
+		const query = `subscription ${commandId} { ${commandId} { notificationType contractId tenantId } }`;
+		for (const p of [owner, admin, partner]) {
+			p.subIds.set(commandId, await p.session.subscribe(commandId, query));
+		}
+
+		const created = await expectRouting(commandId,
+			draft => ({ notificationType: 'ContractChanged', contractId: draft.contractId, tenantId: tenantA }), [owner, admin],
+			() => act('CreateContract',
+				`mutation { CreateContract(input: { tenantId: ${gqlString(tenantA)}, draft: { name: "WebSocket contract draft", typeId: "Services",` +
+				` parties: [{ tenantId: ${gqlString(tenantA)}, roleId: "Customer" }, { tenantId: ${gqlString(tenantB)}, roleId: "ServiceProvider" }],` +
+				` links: [{ tenantAId: ${gqlString(tenantA)}, tenantBId: ${gqlString(tenantB)}, roleAId: "Customer", roleBId: "ServiceProvider" }] } })` +
+				' { success contractId revision errorMessage } }', owner.tenantToken));
+
+		await expectRouting(commandId, { notificationType: 'ContractChanged', contractId: created.contractId }, [owner, admin, partner],
+			() => act('SubmitContract',
+				`mutation { SubmitContract(input: { tenantId: ${gqlString(tenantA)}, contractId: ${gqlString(created.contractId)}, revision: ${created.revision} }) { success errorMessage } }`,
+				owner.tenantToken));
 	});
 
 	await test('a user learns only the ids of his own organizations', async () => {
@@ -573,82 +516,6 @@ async function main() {
 	await test('only an administrator ensures the system organization', async () => {
 		await refused('EnsureSystemTenant',
 			'mutation EnsureSystemTenant { EnsureSystemTenant { success errorMessage } }', owner.tenantToken);
-	});
-
-	// --- cross-organization grants: only the granting organization delegates its roles
-
-	const grantsOf = async (tenantId, token) => (await act('GetCrossOrgGrants',
-		`query GetCrossOrgGrants { GetCrossOrgGrants(input: { tenantId: ${gqlString(tenantId)} }) { grants { id sourceTenantId targetTenantId description } errorMessage } }`,
-		token)).grants || [];
-
-	let grantId = null;
-
-	await test('nobody revokes or removes the grants of other organizations', async () => {
-		grantId = (await act('CreateCrossOrgGrant',
-			`mutation CreateCrossOrgGrant { CreateCrossOrgGrant(input: { sourceTenantId: ${gqlString(tenantA)}, targetTenantId: ${gqlString(tenantB)},` +
-			' roleIds: [], description: "ws grant" }) { grantId errorMessage } }', owner.tenantToken)).grantId;
-		requires(grantId, 'the grant from A to B');
-
-		for (const token of [bystander.token, stranger.tenantToken]) {
-			await refused('RevokeCrossOrgGrant',
-				`mutation RevokeCrossOrgGrant { RevokeCrossOrgGrant(input: { grantId: ${gqlString(grantId)} }) { success errorMessage } }`, token);
-			await refused('RemoveCrossOrgGrants',
-				`mutation RemoveCrossOrgGrants { RemoveCrossOrgGrants(input: { grantIds: [${gqlString(grantId)}] }) { success errorMessage } }`, token);
-		}
-		assert((await grantsOf(tenantA, owner.tenantToken)).some(g => g.id === grantId), 'the grant from A to B was revoked by an outsider');
-	});
-
-	// The owner of C fills a grant document naming A as grantor and saves it; returns the
-	// raw SaveDocument response. The document is closed whatever the save answered.
-	const saveGrantFromC = async (targetTenantId, description) => {
-		const doc = await act('CreateNewDocument',
-			'mutation CreateNewDocument { CreateNewDocument(input: { collectionId: "CrossOrgGrants", typeId: "CrossOrgGrant" }) { documentId } }',
-			stranger.tenantToken);
-		const documentId = requires(doc.documentId, 'a grant document created by the owner of C');
-
-		// CCrossOrgGrantDocumentValidatorComp requires at least one role and does not
-		// resolve role ids, so a placeholder keeps the save from failing for that reason.
-		const updated = await act('UpdateGrantFromRepresentation',
-			'mutation UpdateGrantFromRepresentation { UpdateGrantFromRepresentation(input: { documentId: ' + gqlString(documentId) +
-			`, grant: { id: "", sourceTenantId: ${gqlString(tenantA)}, targetTenantId: ${gqlString(targetTenantId)}, name: "ws grantor probe",` +
-			` roleIds: ["WsProbeRole"], description: ${gqlString(description)}, isActive: true } }) { status message } }`, stranger.tenantToken);
-		assert(updated.status === 'Success', `UpdateGrantFromRepresentation reported ${JSON.stringify(updated).slice(0, 300)}`);
-
-		const saved = await gql('mutation SaveDocument { SaveDocument(input: { collectionId: "CrossOrgGrants", documentId: ' + gqlString(documentId) +
-			', documentName: "ws grantor probe" }) { status message } }', stranger.tenantToken);
-
-		const closed = await act('CloseDocument',
-			'mutation CloseDocument { CloseDocument(input: { collectionId: "CrossOrgGrants", id: ' + gqlString(documentId) + ' }) { status message } }',
-			stranger.tenantToken);
-		assert(closed.status === 'Success', `CloseDocument reported ${JSON.stringify(closed).slice(0, 300)}`);
-
-		return saved;
-	};
-
-	const grantsWith = async (description) => ({
-		inA: (await grantsOf(tenantA, owner.tenantToken)).filter(g => g.description === description),
-		inC: (await grantsOf(tenantC, stranger.tenantToken)).filter(g => g.description === description)
-	});
-
-	// A grant needs an active connection between grantor and grantee; C and B have none.
-	await test('a grant to an unconnected organization is refused and stores nothing', async () => {
-		const description = `grant to an unconnected organization ${runTag}`;
-		const saved = await saveGrantFromC(tenantB, description);
-
-		const messages = ((saved && saved.errors) || []).map(e => e.message);
-		assert(messages.length === 1 && messages[0] === 'The organizations are not connected',
-			`SaveDocument was not refused with "The organizations are not connected": ${JSON.stringify(saved).slice(0, 300)}`);
-
-		const stored = await grantsWith(description);
-		assert(stored.inA.length === 0 && stored.inC.length === 0,
-			`a refused grant was stored anyway: ${JSON.stringify(stored).slice(0, 300)}`);
-	});
-
-	await test('the grantor revokes its grant', async () => {
-		requires(grantId, 'the grant from A to B');
-		await act('RevokeCrossOrgGrant',
-			`mutation RevokeCrossOrgGrant { RevokeCrossOrgGrant(input: { grantId: ${gqlString(grantId)} }) { success errorMessage } }`, owner.tenantToken);
-		assert(!(await grantsOf(tenantA, owner.tenantToken)).some(g => g.id === grantId), 'the revoked grant is still listed');
 	});
 
 	// --- C and D: the positive controls of the stranger, the bystander and the spy
@@ -684,36 +551,6 @@ async function main() {
 		connectionCD = approved.connectionId;
 	});
 
-	await test('a relationship proposal from C reaches both sessions of the owner of D, and only them', async () => {
-		requires(connectionCD, 'the connection between C and D');
-		const proposalCD = (await proposeRelationshipBetween(connectionCD, tenantC, tenantD, [bystander, spy], stranger.tenantToken)).proposalId;
-		await expectRouting(CONNECTION, { notificationType: 'RelationshipProposalApproved', tenantId: tenantC, proposalId: proposalCD }, [stranger],
-			() => act('ApproveRelationshipProposal',
-				`mutation ApproveRelationshipProposal { ApproveRelationshipProposal(input: { proposalId: ${gqlString(proposalCD)}, tenantId: ${gqlString(tenantD)} }) { success relationshipId errorMessage } }`,
-				bystander.tenantToken));
-	});
-
-	// The grantor is the organization of the request context: UpdateGrantFromRepresentation
-	// (CCrossOrgGrantCollectionDocumentServiceComp) overwrites whatever sourceTenantId the
-	// client names, so naming A from inside C has to produce a grant of C, never one of A.
-	// D is connected to C by now; the case fails when nothing was saved at all.
-	await test('a grant saved from another organization is stored as that organization\'s own', async () => {
-		requires(connectionCD, 'the connection between C and D');
-		const description = `grant naming A as grantor ${runTag}`;
-		const saved = await saveGrantFromC(tenantD, description);
-		assert(saved && !saved.errors && saved.data && saved.data.SaveDocument && saved.data.SaveDocument.status === 'Success',
-			`SaveDocument reported ${JSON.stringify(saved).slice(0, 300)}`);
-
-		const stored = await grantsWith(description);
-		assert(stored.inA.length === 0, `the owner of C saved a grant in the name of A: ${JSON.stringify(stored.inA).slice(0, 300)}`);
-		assert(stored.inC.length === 1 && stored.inC[0].sourceTenantId === tenantC && stored.inC[0].targetTenantId === tenantD,
-			`the saved grant is not C's own grant to D: ${JSON.stringify(stored.inC).slice(0, 300)}`);
-
-		await act('RevokeCrossOrgGrant',
-			`mutation RevokeCrossOrgGrant { RevokeCrossOrgGrant(input: { grantId: ${gqlString(stored.inC[0].id)} }) { success errorMessage } }`, stranger.tenantToken);
-		assert(!(await grantsOf(tenantC, stranger.tenantToken)).some(g => g.id === stored.inC[0].id), 'the revoked grant of C is still listed');
-	});
-
 	await test('an invitation from C reaches both sessions of the bystander, and only them', async () => {
 		const invitationId = (await expectRouting(MEMBERSHIP,
 			sent => ({ notificationType: 'InvitationReceived', tenantId: tenantC, userId: bystander.userId, membershipId: sent.invitationId }), [bystander, spy],
@@ -726,20 +563,29 @@ async function main() {
 				bystander.token));
 	});
 
-	await test('a removed relationship is reported to the owners of both organizations only', async () => {
-		requires(relationshipId, 'the relationship between A and B');
-		await expectRouting(CONNECTION, { notificationType: 'RelationshipRemoved', relationshipId }, [owner, partner],
-			() => act('RemoveTenantRelationship',
-				`mutation RemoveTenantRelationship { RemoveTenantRelationship(input: { tenantId: ${gqlString(tenantA)}, relationshipId: ${gqlString(relationshipId)} }) { success errorMessage } }`,
-				owner.tenantToken));
-	});
-
 	await test('a removed connection is reported to the owners of both organizations only', async () => {
 		requires(connectionId, 'the active connection');
+		const marks = new Map(everyone.map(p => [p, p.session.mark()]));
 		await expectRouting(CONNECTION, { notificationType: 'ConnectionRemoved', connectionId }, [owner, partner],
 			() => act('RemoveConnection',
 				`mutation RemoveConnection { RemoveConnection(input: { connectionId: ${gqlString(connectionId)}, tenantId: ${gqlString(tenantA)} }) { success errorMessage } }`,
 				owner.tenantToken));
+
+		// The sessions working in A (the owner and the administrator) and in B follow the change of their address books;
+		// the member has not selected A, the others work elsewhere
+		const told = new Map([[owner, tenantA], [admin, tenantA], [partner, tenantB]]);
+		const problems = [];
+		for (const p of everyone) {
+			const frames = framesSince(p, ORGANIZATION_CONNECTIONS, marks.get(p)).map(f => notificationOf(f, ORGANIZATION_CONNECTIONS));
+			const tenantId = told.get(p);
+			if (tenantId && (frames.length !== 1 || frames[0].tenantId !== tenantId)) {
+				problems.push(`${p.role} must get one change of ${tenantId} but received ${JSON.stringify(frames).slice(0, 300)}`);
+			}
+			else if (!tenantId && frames.length > 0) {
+				problems.push(`${p.role} must not be notified but received ${JSON.stringify(frames).slice(0, 300)}`);
+			}
+		}
+		assert(problems.length === 0, problems.join('\n        '));
 	});
 
 	// --- ownership, last: it changes who owns A

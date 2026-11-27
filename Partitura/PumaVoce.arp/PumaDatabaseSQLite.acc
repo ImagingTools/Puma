@@ -97,20 +97,23 @@
         <Component ExportedId="SnapshotRepository" ComponentId="SnapshotRepository"/>
         <Component ExportedId="RoleRepository" ComponentId="UserLocalRepositories/RoleRepository"/>
         <Component ExportedId="SQLiteContractRepository" ComponentId="UserLocalRepositories/SQLiteContractRepository"/>
-        <Component ExportedId="SQLiteCrossOrgGrantRepository" ComponentId="UserLocalRepositories/SQLiteCrossOrgGrantRepository"/>
         <Component ExportedId="SQLiteCrossTenantMessageRepository" ComponentId="UserLocalRepositories/SQLiteCrossTenantMessageRepository"/>
         <Component ExportedId="SQLiteTenantConnectionCodeRepository" ComponentId="UserLocalRepositories/SQLiteTenantConnectionCodeRepository"/>
         <Component ExportedId="SQLiteTenantConnectionRepository" ComponentId="UserLocalRepositories/SQLiteTenantConnectionRepository"/>
         <Component ExportedId="SQLiteTenantConnectionRequestRepository" ComponentId="UserLocalRepositories/SQLiteTenantConnectionRequestRepository"/>
         <Component ExportedId="SQLiteTenantEntityBindingRepository" ComponentId="UserLocalRepositories/SQLiteTenantEntityBindingRepository"/>
         <Component ExportedId="SQLiteTenantInvitationRepository" ComponentId="UserLocalRepositories/SQLiteTenantInvitationRepository"/>
-        <Component ExportedId="SQLiteTenantRelationshipProposalRepository" ComponentId="UserLocalRepositories/SQLiteTenantRelationshipProposalRepository"/>
-        <Component ExportedId="SQLiteTenantRelationshipRepository" ComponentId="UserLocalRepositories/SQLiteTenantRelationshipRepository"/>
         <Component ExportedId="SessionSqlRepository" ComponentId="UserLocalRepositories/SessionSqlRepository"/>
         <Component ExportedId="TenantMembershipRepository" ComponentId="UserLocalRepositories/SQLiteTenantMembershipRepository"/>
         <Component ExportedId="TenantRepository" ComponentId="UserLocalRepositories/SQLiteTenantRepository"/>
         <Component ExportedId="UserConnectionRepository" ComponentId="UserLocalRepositories/UserConnectionRepository"/>
         <Component ExportedId="UserGroupRepository" ComponentId="UserLocalRepositories/UserGroupRepository"/>
         <Component ExportedId="UserRepository" ComponentId="UserLocalRepositories/UserRepository"/>
+        <Component ExportedId="SQLiteContractPartyRecordRepository" ComponentId="UserLocalRepositories/SQLiteContractPartyRecordRepository"/>
+        <Component ExportedId="SQLiteContractEventRepository" ComponentId="UserLocalRepositories/SQLiteContractEventRepository"/>
+        <Component ExportedId="SQLiteContractPartyRoleRepository" ComponentId="UserLocalRepositories/SQLiteContractPartyRoleRepository"/>
+        <Component ExportedId="SQLiteContractTypeRepository" ComponentId="UserLocalRepositories/SQLiteContractTypeRepository"/>
+        <Component ExportedId="SQLiteTenantDirectoryProfileRepository" ComponentId="UserLocalRepositories/SQLiteTenantDirectoryProfileRepository"/>
+        <Component ExportedId="SQLiteContractAttachmentRepository" ComponentId="UserLocalRepositories/SQLiteContractAttachmentRepository"/>
     </ExportedComponents>
 </Acf>
