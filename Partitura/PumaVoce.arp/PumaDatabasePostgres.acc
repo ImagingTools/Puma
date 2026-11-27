@@ -28,24 +28,6 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="CrossOrgGrantSqlRepository" PackageId="ImtUserAdministrationVoce" ComponentId="CrossOrgGrantSqlRepository">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="DatabaseEngine"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
         <Element Id="CrossTenantMessageSqlRepository" PackageId="ImtUserAdministrationVoce" ComponentId="CrossTenantMessageSqlRepository">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -332,42 +314,6 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="TenantRelationshipProposalSqlRepository" PackageId="ImtUserAdministrationVoce" ComponentId="TenantRelationshipProposalSqlRepository">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="DatabaseEngine"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="TenantRelationshipSqlRepository" PackageId="ImtUserAdministrationVoce" ComponentId="TenantRelationshipSqlRepository">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="DatabaseEngine"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
         <Element Id="TenantSqlRepository" PackageId="ImtUserAdministrationVoce" ComponentId="TenantSqlRepository">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -481,6 +427,114 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="ContractPartyRecordSqlRepository" PackageId="ImtUserAdministrationVoce" ComponentId="ContractPartyRecordSqlRepository">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="DatabaseEngine"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ContractEventSqlRepository" PackageId="ImtUserAdministrationVoce" ComponentId="ContractEventSqlRepository">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="DatabaseEngine"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ContractPartyRoleSqlRepository" PackageId="ImtUserAdministrationVoce" ComponentId="ContractPartyRoleSqlRepository">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="DatabaseEngine"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ContractTypeSqlRepository" PackageId="ImtUserAdministrationVoce" ComponentId="ContractTypeSqlRepository">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="DatabaseEngine"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="TenantDirectoryProfileSqlRepository" PackageId="ImtUserAdministrationVoce" ComponentId="TenantDirectoryProfileSqlRepository">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="DatabaseEngine"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ContractAttachmentSqlRepository" PackageId="ImtUserAdministrationVoce" ComponentId="ContractAttachmentSqlRepository">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="DatabaseEngine"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
@@ -492,7 +546,6 @@
     </ExportedInterfaces>
     <ExportedComponents>
         <Component ExportedId="ContractSqlRepository" ComponentId="ContractSqlRepository"/>
-        <Component ExportedId="CrossOrgGrantSqlRepository" ComponentId="CrossOrgGrantSqlRepository"/>
         <Component ExportedId="CrossTenantMessageSqlRepository" ComponentId="CrossTenantMessageSqlRepository"/>
         <Component ExportedId="DatabaseEngine" ComponentId="DatabaseEngine"/>
         <Component ExportedId="ProductRepository" ComponentId="ProductRepository"/>
@@ -506,11 +559,15 @@
         <Component ExportedId="TenantEntityBindingSqlRepository" ComponentId="TenantEntityBindingSqlRepository"/>
         <Component ExportedId="TenantInvitationRepository" ComponentId="TenantInvitationSqlRepository"/>
         <Component ExportedId="TenantMembershipSqlRepository" ComponentId="TenantMembershipSqlRepository"/>
-        <Component ExportedId="TenantRelationshipProposalSqlRepository" ComponentId="TenantRelationshipProposalSqlRepository"/>
-        <Component ExportedId="TenantRelationshipSqlRepository" ComponentId="TenantRelationshipSqlRepository"/>
         <Component ExportedId="TenantRepository" ComponentId="TenantSqlRepository/TenantRepository"/>
         <Component ExportedId="UserConnectionRepository" ComponentId="UserConnectionRepository"/>
         <Component ExportedId="UserGroupSqlRepository" ComponentId="UserGroupSqlRepository"/>
         <Component ExportedId="UserSqlRepository" ComponentId="UserSqlRepository"/>
+        <Component ExportedId="ContractPartyRecordSqlRepository" ComponentId="ContractPartyRecordSqlRepository"/>
+        <Component ExportedId="ContractEventSqlRepository" ComponentId="ContractEventSqlRepository"/>
+        <Component ExportedId="ContractPartyRoleSqlRepository" ComponentId="ContractPartyRoleSqlRepository"/>
+        <Component ExportedId="ContractTypeSqlRepository" ComponentId="ContractTypeSqlRepository"/>
+        <Component ExportedId="TenantDirectoryProfileSqlRepository" ComponentId="TenantDirectoryProfileSqlRepository"/>
+        <Component ExportedId="ContractAttachmentSqlRepository" ComponentId="ContractAttachmentSqlRepository"/>
     </ExportedComponents>
 </Acf>

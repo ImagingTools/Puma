@@ -9,7 +9,6 @@
     </AcfHeader>
     <PositionMap>
         <Element ComponentName="ContractSqlRepository" X="975" Y="800" Note=""/>
-        <Element ComponentName="CrossOrgGrantSqlRepository" X="625" Y="775" Note=""/>
         <Element ComponentName="CrossTenantMessageSqlRepository" X="200" Y="775" Note=""/>
         <Element ComponentName="DatabaseEngine" X="625" Y="275" Note=""/>
         <Element ComponentName="PostgresMigrations" X="1050" Y="575" Note=""/>
@@ -21,12 +20,16 @@
         <Element ComponentName="TenantEntityBindingSqlRepository" X="1000" Y="450" Note=""/>
         <Element ComponentName="TenantInvitationSqlRepository" X="640.638743755" Y="415.778787338" Note=""/>
         <Element ComponentName="TenantMembershipSqlRepository" X="875" Y="700" Note=""/>
-        <Element ComponentName="TenantRelationshipProposalSqlRepository" X="1000" Y="50" Note=""/>
-        <Element ComponentName="TenantRelationshipSqlRepository" X="250" Y="225" Note=""/>
         <Element ComponentName="TenantSqlRepository" X="225" Y="675" Note=""/>
         <Element ComponentName="UserConnectionRepository" X="225" Y="125" Note=""/>
         <Element ComponentName="UserGroupSqlRepository" X="575" Y="575" Note=""/>
         <Element ComponentName="UserSqlRepository" X="950" Y="300" Note=""/>
+        <Element ComponentName="ContractPartyRecordSqlRepository" X="1400" Y="50" Note=""/>
+        <Element ComponentName="ContractEventSqlRepository" X="1400" Y="225" Note=""/>
+        <Element ComponentName="ContractPartyRoleSqlRepository" X="1400" Y="400" Note=""/>
+        <Element ComponentName="ContractTypeSqlRepository" X="1400" Y="575" Note=""/>
+        <Element ComponentName="TenantDirectoryProfileSqlRepository" X="1400" Y="750" Note=""/>
+        <Element ComponentName="ContractAttachmentSqlRepository" X="1400" Y="925" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

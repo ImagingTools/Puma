@@ -35,6 +35,7 @@
                                 <Value>PumaServerBase/TenantNotificationPublisher</Value>
                                 <Value>PumaServerBase/ConnectionCodesNotificationPublisher</Value>
                                 <Value>PumaServerBase/CrossTenantMessageNotificationPublisher</Value>
+                                <Value>PumaServerBase/ContractNotificationPublisher</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -95,7 +96,8 @@
                                 <Value>PumaDatabasePostgres/TenantMembershipSqlRepository</Value>
                                 <Value>PumaDatabasePostgres/TenantInvitationRepository</Value>
                                 <Value>PumaDatabasePostgres/TenantEntityBindingSqlRepository</Value>
-                                <Value>PumaDatabasePostgres/CrossOrgGrantSqlRepository</Value>
+                                <Value>PumaDatabasePostgres/ContractSqlRepository</Value>
+                                <Value>PumaDatabasePostgres/ContractPartyRecordSqlRepository</Value>
                                 <Value>PumaDatabasePostgres/TenantRepository</Value>
                                 <Value>PumaServerBase/PersonalAccessTokenManager</Value>
                             </Values>
@@ -106,9 +108,6 @@
                     </AttributeInfo>
                     <AttributeInfo Id="ContractRepository" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaDatabasePostgres/ContractSqlRepository"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="CrossOrgGrantRepository" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="PumaDatabasePostgres/CrossOrgGrantSqlRepository"/>
                     </AttributeInfo>
                     <AttributeInfo Id="CrossTenantMessageRepository" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaDatabasePostgres/CrossTenantMessageSqlRepository"/>
@@ -173,12 +172,6 @@
                     <AttributeInfo Id="TenantMembershipRepository" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaDatabasePostgres/TenantMembershipSqlRepository"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="TenantRelationshipProposalRepository" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="PumaDatabasePostgres/TenantRelationshipProposalSqlRepository"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TenantRelationshipRepository" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="PumaDatabasePostgres/TenantRelationshipSqlRepository"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="TenantRepository" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaDatabasePostgres/TenantRepository"/>
                     </AttributeInfo>
@@ -202,6 +195,24 @@
                     </AttributeInfo>
                     <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="VersionInfo"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ContractPartyRecordRepository" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaDatabasePostgres/ContractPartyRecordSqlRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ContractEventRepository" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaDatabasePostgres/ContractEventSqlRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ContractPartyRoleRepository" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaDatabasePostgres/ContractPartyRoleSqlRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ContractTypeRepository" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaDatabasePostgres/ContractTypeSqlRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantDirectoryProfileRepository" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaDatabasePostgres/TenantDirectoryProfileSqlRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ContractAttachmentRepository" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaDatabasePostgres/ContractAttachmentSqlRepository"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
