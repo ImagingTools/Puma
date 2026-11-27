@@ -8,7 +8,6 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="AccountLockoutController" X="500" Y="450" Note=""/>
         <Element ComponentName="AuthorizationController" X="150" Y="325" Note=""/>
         <Element ComponentName="CredentialController" X="150" Y="450" Note=""/>
         <Element ComponentName="Demultiplexer" X="625" Y="100" Note=""/>

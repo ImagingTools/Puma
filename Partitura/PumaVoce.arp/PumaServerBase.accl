@@ -8,6 +8,7 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
+        <Element ComponentName="AccountLockoutController" X="1000" Y="25" Note=""/>
         <Element ComponentName="AuthenticationManager" X="1000" Y="100" Note=""/>
         <Element ComponentName="ConnectedProductCatalog" X="250" Y="50" Note=""/>
         <Element ComponentName="HttpServerFramework" X="200" Y="100" Note=""/>

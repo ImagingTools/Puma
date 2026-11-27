@@ -110,6 +110,9 @@
         <Element Id="AuthorizationController" PackageId="PumaVoce" ComponentId="Authorization">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="AccountLockoutController" Type="Reference" ExportId="AccountLockoutController">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="AuthorizationSessionController" Type="Reference" ExportId="AuthorizationSessionController">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -268,6 +271,9 @@
         <Element Id="Pages" PackageId="" ComponentId="Pages">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="AccountLockoutController" Type="Reference" ExportId="AccountLockoutController">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="BindingManager" Type="Reference" ExportId="BindingManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -486,6 +492,9 @@
                     <Element Id="UsersPage" PackageId="ImtUserAdministrationVoce" ComponentId="UsersPage">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
+                                <AttributeInfo Id="AccountLockoutController" Type="Reference" ExportId="AccountLockoutController">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
                                 <AttributeInfo Id="BindingManager" Type="Reference" ExportId="BindingManager">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
