@@ -8,6 +8,8 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
+        <Element ComponentName="Assistant" X="-600" Y="1200" Note="AI assistant with configuration per organization (administration)"/>
+        <Element ComponentName="AssistantSecretProtector" X="-600" Y="1400" Note=""/>
         <Element ComponentName="AuthenticationManager" X="1000" Y="100" Note=""/>
         <Element ComponentName="ConnectedProductCatalog" X="250" Y="50" Note=""/>
         <Element ComponentName="HttpServerFramework" X="200" Y="100" Note=""/>

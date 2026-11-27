@@ -205,6 +205,9 @@
                     <AttributeInfo Id="TenantDirectoryProfileRepository" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaDatabaseSQLite/SQLiteTenantDirectoryProfileRepository"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="AssistantConfigurationRepository" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaDatabaseSQLite/SQLiteAssistantConfigurationRepository"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ContractAttachmentRepository" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaDatabaseSQLite/SQLiteContractAttachmentRepository"/>
                     </AttributeInfo>

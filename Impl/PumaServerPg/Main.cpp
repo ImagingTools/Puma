@@ -30,12 +30,12 @@ static QString MaskSensitiveMessage(const QString& message)
 	QString masked = message;
 
 	static const QRegularExpression jsonRegex(
-				R"((\"(password|passphrase|pwd)\"\s*:\s*)\"[^\"]*\")",
+				R"((\"(password|passphrase|pwd|apikey|api_key)\"\s*:\s*)\"[^\"]*\")",
 				QRegularExpression::CaseInsensitiveOption);
 	masked.replace(jsonRegex, R"(\1"***")");
 
 	static const QRegularExpression keyValueRegex(
-				R"(((password|passphrase|pwd)\s*[:=]\s*)([^\s,&;]+))",
+				R"(((password|passphrase|pwd|apikey|api_key)\s*[:=]\s*)([^\s,&;]+))",
 				QRegularExpression::CaseInsensitiveOption);
 	masked.replace(keyValueRegex, "\\1***");
 
@@ -61,6 +61,9 @@ int main(int argc, char* argv[])
 
 	InitializeImtCoreAuthorizableServer();
 	ImtCoreInitNotifySqlResources();
+	// Assistant: SQL scripts of the configurations, API catalog and knowledge of ImtCore
+	Q_INIT_RESOURCE(imtassistdb);
+	Q_INIT_RESOURCE(imtassistgql);
 	Q_INIT_RESOURCE(imtresthtml);
 	Q_INIT_RESOURCE(PumaServerPg);
 #ifdef WEB_COMPILE

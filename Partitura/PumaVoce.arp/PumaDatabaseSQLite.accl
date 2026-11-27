@@ -10,6 +10,7 @@
     <PositionMap>
         <Element ComponentName="DatabaseEngine" X="550" Y="125" Note=""/>
         <Element ComponentName="UserLocalRepositories" X="575" Y="400" Note=""/>
+        <Element ComponentName="SQLiteAssistantConfigurationRepository" X="900" Y="900" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

@@ -412,6 +412,48 @@ static void FillProduct(imtlic::IProductInfo& productInfo){
 
 	administrationFeatureInfo->InsertSubFeature(administrationGroupsFeatureInfo.PopPtr());
 
+	istd::TDelPtr<imtlic::CFeatureInfo> administrationAssistantFeatureInfo;
+	administrationAssistantFeatureInfo.SetPtr(new imtlic::CFeatureInfo);
+	administrationAssistantFeatureInfo->SetFeatureId("Assistant");
+	administrationAssistantFeatureInfo->SetFeatureName(QT_TRANSLATE_NOOP("Feature", "AI Assistant"));
+	administrationAssistantFeatureInfo->SetFeatureDescription(QT_TRANSLATE_NOOP("Feature", "Provides access to the AI assistant configuration of the organization."));
+	administrationAssistantFeatureInfo->SetOptional(false);
+	administrationAssistantFeatureInfo->SetIsPermission(true);
+
+	istd::TDelPtr<imtlic::CFeatureInfo> administrationAssistantViewPageFeatureInfo;
+	administrationAssistantViewPageFeatureInfo.SetPtr(new imtlic::CFeatureInfo);
+	administrationAssistantViewPageFeatureInfo->SetFeatureId("ViewPage");
+	administrationAssistantViewPageFeatureInfo->SetFeatureName(QT_TRANSLATE_NOOP("Feature", "View AI Assistant Page"));
+	administrationAssistantViewPageFeatureInfo->SetFeatureDescription(QT_TRANSLATE_NOOP("Feature", "Allows opening the AI assistant page of the administration."));
+	administrationAssistantViewPageFeatureInfo->SetOptional(false);
+	administrationAssistantViewPageFeatureInfo->SetIsPermission(true);
+	administrationAssistantViewPageFeatureInfo->SetRequirements(QByteArray("/Administration/Assistant/View").split(';'));
+
+	administrationAssistantFeatureInfo->InsertSubFeature(administrationAssistantViewPageFeatureInfo.PopPtr());
+
+	istd::TDelPtr<imtlic::CFeatureInfo> administrationAssistantViewFeatureInfo;
+	administrationAssistantViewFeatureInfo.SetPtr(new imtlic::CFeatureInfo);
+	administrationAssistantViewFeatureInfo->SetFeatureId("View");
+	administrationAssistantViewFeatureInfo->SetFeatureName(QT_TRANSLATE_NOOP("Feature", "View AI Assistant Configuration"));
+	administrationAssistantViewFeatureInfo->SetFeatureDescription(QT_TRANSLATE_NOOP("Feature", "Allows viewing the AI assistant configuration, without the API key."));
+	administrationAssistantViewFeatureInfo->SetOptional(false);
+	administrationAssistantViewFeatureInfo->SetIsPermission(true);
+
+	administrationAssistantFeatureInfo->InsertSubFeature(administrationAssistantViewFeatureInfo.PopPtr());
+
+	istd::TDelPtr<imtlic::CFeatureInfo> administrationAssistantEditFeatureInfo;
+	administrationAssistantEditFeatureInfo.SetPtr(new imtlic::CFeatureInfo);
+	administrationAssistantEditFeatureInfo->SetFeatureId("Edit");
+	administrationAssistantEditFeatureInfo->SetFeatureName(QT_TRANSLATE_NOOP("Feature", "Edit AI Assistant Configuration"));
+	administrationAssistantEditFeatureInfo->SetFeatureDescription(QT_TRANSLATE_NOOP("Feature", "Allows enabling the AI assistant and changing its provider, model and API key."));
+	administrationAssistantEditFeatureInfo->SetOptional(false);
+	administrationAssistantEditFeatureInfo->SetIsPermission(true);
+	administrationAssistantEditFeatureInfo->SetRequirements(QByteArray("/Administration/Assistant/View").split(';'));
+
+	administrationAssistantFeatureInfo->InsertSubFeature(administrationAssistantEditFeatureInfo.PopPtr());
+
+	administrationFeatureInfo->InsertSubFeature(administrationAssistantFeatureInfo.PopPtr());
+
 	productInfo.AddFeature("ce4a7f72-5303-4044-b25c-3a02020eebd3", *administrationFeatureInfo.GetPtr());
 
 	istd::TDelPtr<imtlic::CIdentifiableFeatureInfo> organizationManagementFeatureInfo;

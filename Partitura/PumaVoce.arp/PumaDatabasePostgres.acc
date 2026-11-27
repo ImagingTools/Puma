@@ -535,6 +535,24 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="AssistantConfigurationSqlRepository" PackageId="ImtAssistVoce" ComponentId="AssistantConfigurationSqlRepository">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="DatabaseEngine"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
@@ -569,5 +587,6 @@
         <Component ExportedId="ContractTypeSqlRepository" ComponentId="ContractTypeSqlRepository"/>
         <Component ExportedId="TenantDirectoryProfileSqlRepository" ComponentId="TenantDirectoryProfileSqlRepository"/>
         <Component ExportedId="ContractAttachmentSqlRepository" ComponentId="ContractAttachmentSqlRepository"/>
+        <Component ExportedId="AssistantConfigurationSqlRepository" ComponentId="AssistantConfigurationSqlRepository"/>
     </ExportedComponents>
 </Acf>

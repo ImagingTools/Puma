@@ -26,6 +26,68 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="Assistant" PackageId="ImtAssistVoce" ComponentId="TenantAssistant">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="AllowedQueries" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>UsersList</Value>
+                                <Value>UserItem</Value>
+                                <Value>GroupsList</Value>
+                                <Value>GroupItem</Value>
+                                <Value>RolesList</Value>
+                                <Value>RoleItem</Value>
+                                <Value>GetTenant</Value>
+                                <Value>GetMembershipsByTenant</Value>
+                                <Value>GetTenantPermissions</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="AllowedMutations" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>GroupAdd</Value>
+                                <Value>GroupUpdate</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ConfigurationCollection" Type="Reference" ExportId="AssistantConfigurationRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="KnowledgeDocuments" Type="String[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>:/AssistantKnowledge/ImtCore</Value>
+                                <Value>:/AssistantKnowledge/Puma</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RequestHandlers" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>PumaHandlers</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SecretProtector" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="AssistantSecretProtector"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="AssistantSecretProtector" PackageId="ImtCryptPck" ComponentId="SystemSecretProtector">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="MachineScope" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="AuthenticationManager" PackageId="ImtAuthVoce" ComponentId="AuthenticationManager">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -292,6 +354,8 @@
                                 <Value>UserCollectionDocumentService</Value>
                                 <Value>UserGroupCollectionDocumentService</Value>
                                 <Value>NotificationCenter</Value>
+                                <Value>Assistant/AssistantController</Value>
+                                <Value>Assistant/ConfigurationController</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

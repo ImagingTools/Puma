@@ -42,6 +42,9 @@ target_link_libraries(PumaServerPgTest PRIVATE
 	ImtCore::imtlog
 	ImtCore::imtchat
 	ImtCore::imtchatdb
+	ImtCore::imtassist
+	ImtCore::imtassistgql
+	ImtCore::imtassistdb
 	ImtCore::ImtCoreLoc
 	Acf::iqtdoc
 )
