@@ -1,6 +1,5 @@
 import QtQuick 2.12
 import imtgui 1.0
-import pumaqml 1.0
 
 Configurator {
 	id: configurator
