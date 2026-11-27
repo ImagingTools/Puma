@@ -489,6 +489,12 @@
         <Element Id="TenantController" PackageId="ImtUserAdministrationVoce" ComponentId="TenantController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="ContractPermissionTree" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PermissionTree"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SnapshotRepository" Type="Reference" ExportId="SnapshotRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ContractRepository" Type="Reference" ExportId="ContractRepository">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

@@ -59825,7 +59825,7 @@
                         "body": {
                             "mode": "graphql",
                             "graphql": {
-                                "query": "mutation GiveContractPermissions { GiveContractPermissions(input: { tenantId: \"{{cnYId}}\", contractId: \"{{cnC1Id}}\", granteeTenantId: \"{{cnXId}}\", productId: \"{{product_id}}\", permissionIds: [\"/Administration/Users/View\"] }) { success contractId revision errorMessage } }",
+                                "query": "mutation GiveContractPermissions { GiveContractPermissions(input: { tenantId: \"{{cnYId}}\", contractId: \"{{cnC1Id}}\", granteeTenantId: \"{{cnXId}}\", permissionIds: [\"/Administration/Users/View\"] }) { success contractId revision errorMessage } }",
                                 "variables": ""
                             }
                         },
