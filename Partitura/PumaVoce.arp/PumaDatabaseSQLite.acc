@@ -103,7 +103,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="ChangeSetJournal" PackageId="ImtDatabasePck" ComponentId="ChangeSetJournal">
+        <Element Id="DocumentActionJournal" PackageId="ImtDatabasePck" ComponentId="DocumentActionJournal">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
@@ -113,12 +113,12 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SqlJsonXPathExtractor" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ChangeSetJournalXPathExtractor"/>
+                        <Data IsEnabled="true" Value="DocumentActionJournalXPathExtractor"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="ChangeSetJournalXPathExtractor" PackageId="ImtDatabasePck" ComponentId="SqliteXPathExtractor">
+        <Element Id="DocumentActionJournalXPathExtractor" PackageId="ImtDatabasePck" ComponentId="SqliteXPathExtractor">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap/>
             </Data>
@@ -154,6 +154,6 @@
         <Component ExportedId="SQLiteTenantDirectoryProfileRepository" ComponentId="UserLocalRepositories/SQLiteTenantDirectoryProfileRepository"/>
         <Component ExportedId="SQLiteContractAttachmentRepository" ComponentId="UserLocalRepositories/SQLiteContractAttachmentRepository"/>
         <Component ExportedId="SQLiteAssistantConfigurationRepository" ComponentId="SQLiteAssistantConfigurationRepository"/>
-        <Component ExportedId="ChangeSetJournal" ComponentId="ChangeSetJournal"/>
+        <Component ExportedId="DocumentActionJournal" ComponentId="DocumentActionJournal"/>
     </ExportedComponents>
 </Acf>

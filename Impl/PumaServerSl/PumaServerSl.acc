@@ -208,8 +208,8 @@
                     <AttributeInfo Id="AssistantConfigurationRepository" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaDatabaseSQLite/SQLiteAssistantConfigurationRepository"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="AssistantChangeSetJournal" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="PumaDatabaseSQLite/ChangeSetJournal"/>
+                    <AttributeInfo Id="AssistantDocumentActionJournal" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaDatabaseSQLite/DocumentActionJournal"/>
                     </AttributeInfo>
                     <AttributeInfo Id="AssistantRollbackCollections" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">

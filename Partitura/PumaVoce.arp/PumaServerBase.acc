@@ -52,7 +52,7 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
-                    <AttributeInfo Id="ChangeSetJournal" Type="Reference" ExportId="AssistantChangeSetJournal">
+                    <AttributeInfo Id="DocumentActionJournal" Type="Reference" ExportId="AssistantDocumentActionJournal">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ConfigurationCollection" Type="Reference" ExportId="AssistantConfigurationRepository">

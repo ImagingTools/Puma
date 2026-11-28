@@ -214,8 +214,8 @@
                     <AttributeInfo Id="AssistantConfigurationRepository" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaDatabasePostgres/AssistantConfigurationSqlRepository"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="AssistantChangeSetJournal" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="PumaDatabasePostgres/ChangeSetJournal"/>
+                    <AttributeInfo Id="AssistantDocumentActionJournal" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaDatabasePostgres/DocumentActionJournal"/>
                     </AttributeInfo>
                     <AttributeInfo Id="AssistantRollbackCollections" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
