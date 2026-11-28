@@ -26,6 +26,24 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="AccountLockoutController" PackageId="ImtAuthPck" ComponentId="AccountLockoutController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="FailedAttemptsPeriod" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="300"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="LockoutDuration" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="900"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MaxFailedAttempts" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="5"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="AuthenticationManager" PackageId="ImtAuthVoce" ComponentId="AuthenticationManager">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -261,6 +279,9 @@
         <Element Id="PumaHandlers" PackageId="PumaVoce" ComponentId="PumaHandlers">
             <Data IsEnabled="true" Flags="2">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="AccountLockoutController" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="AccountLockoutController"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="AuthorizationSessionController" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="JwtSessionController"/>
                     </AttributeInfo>
@@ -605,6 +626,9 @@
         <Element Id="UserCollectionDocumentService" PackageId="ImtAuthVoce" ComponentId="UserCollectionDocumentService">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="AccountLockoutController" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="AccountLockoutController"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="BindingManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="TenantController/TenantEntityBindingManager"/>
                     </AttributeInfo>
