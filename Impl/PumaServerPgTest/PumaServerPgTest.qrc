@@ -13,10 +13,10 @@
         <file alias="migration_5.sql">Resources/Migrations/migration_5.sql</file>
     </qresource>
     <qresource prefix="/AssistantKnowledge/Puma">
+        <file alias="Assistant.md">../../Docs/Assistant.md</file>
+        <file alias="LdapGroupFilter.md">../../Docs/LdapGroupFilter.md</file>
         <file alias="Puma.md">../../Docs/Knowledge/Puma.md</file>
         <file alias="README.md">../../README.md</file>
-        <file alias="LdapGroupFilter.md">../../Docs/LdapGroupFilter.md</file>
-        <file alias="Assistant.md">../../Docs/Assistant.md</file>
         <file alias="TenantApiBehaviour.md">../../Tests/TenantApiPostman/README.md</file>
     </qresource>
 </RCC>

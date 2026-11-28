@@ -1,0 +1,26 @@
+{
+	"editableDir": "Docs/Knowledge",
+	"blocks": [
+		{
+			"prefix": "/AssistantKnowledge/Puma",
+			"directories": [
+				{
+					"path": "Docs/Knowledge",
+					"suffix": ".md"
+				}
+			],
+			"extraFiles": {
+				"README.md": "README.md",
+				"LdapGroupFilter.md": "Docs/LdapGroupFilter.md",
+				"Assistant.md": "Docs/Assistant.md",
+				"TenantApiBehaviour.md": "Tests/TenantApiPostman/README.md"
+			}
+		}
+	],
+	"qrcFiles": [
+		"Impl/PumaServerPg/PumaServerPg.qrc",
+		"Impl/PumaServerSl/PumaServerSl.qrc",
+		"Impl/PumaServerPgTest/PumaServerPgTest.qrc",
+		"Impl/PumaServerSlTest/PumaServerSlTest.qrc"
+	]
+}

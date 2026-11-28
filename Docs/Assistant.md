@@ -58,3 +58,22 @@ so the database must be protected like the other secrets of the server. A key-ba
 decision (see the pull request).
 
 The server log masks `apiKey` values like passwords.
+
+## Keeping the knowledge current
+
+The production servers have no access to GitHub or the internet: the assistant knows only what is compiled
+into the server. The knowledge therefore lives in the repository and is kept current by
+`.github/workflows/assistant-knowledge.yml`:
+
+1. After every merged pull request, Claude reads the change (instructions:
+   `.github/assistant-knowledge/prompt.md`). If the assistant must know about it, Claude updates
+   `Docs/Knowledge` and opens a pull request **Assistant knowledge: update for #N** with a summary and
+   suggestions (e.g. commands for `AllowedQueries`). If nothing matters, no pull request is opened.
+2. A person reviews and merges it; the next build of the servers compiles the new texts in.
+3. On every pull request the workflow checks that all knowledge files are in the resources of the servers
+   (`.github/assistant-knowledge/update_qrc.py --check`). After adding a file to `Docs/Knowledge`, run
+   `python3 .github/assistant-knowledge/update_qrc.py`.
+
+Set up once: the secret `ANTHROPIC_API_KEY` and, in the settings of the repository, "Allow GitHub Actions
+to create and approve pull requests". A run can also be started by hand for a merged pull request
+(Actions → Assistant knowledge → Run workflow).
