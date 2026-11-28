@@ -452,6 +452,16 @@ static void FillProduct(imtlic::IProductInfo& productInfo){
 
 	administrationAssistantFeatureInfo->InsertSubFeature(administrationAssistantEditFeatureInfo.PopPtr());
 
+	istd::TDelPtr<imtlic::CFeatureInfo> administrationAssistantRollbackAnyFeatureInfo;
+	administrationAssistantRollbackAnyFeatureInfo.SetPtr(new imtlic::CFeatureInfo);
+	administrationAssistantRollbackAnyFeatureInfo->SetFeatureId("RollbackAny");
+	administrationAssistantRollbackAnyFeatureInfo->SetFeatureName(QT_TRANSLATE_NOOP("Feature", "Roll Back Changes of Other Users"));
+	administrationAssistantRollbackAnyFeatureInfo->SetFeatureDescription(QT_TRANSLATE_NOOP("Feature", "Allows listing and rolling back the changes other users confirmed with the AI assistant; every user can roll back the own ones."));
+	administrationAssistantRollbackAnyFeatureInfo->SetOptional(false);
+	administrationAssistantRollbackAnyFeatureInfo->SetIsPermission(true);
+
+	administrationAssistantFeatureInfo->InsertSubFeature(administrationAssistantRollbackAnyFeatureInfo.PopPtr());
+
 	administrationFeatureInfo->InsertSubFeature(administrationAssistantFeatureInfo.PopPtr());
 
 	productInfo.AddFeature("ce4a7f72-5303-4044-b25c-3a02020eebd3", *administrationFeatureInfo.GetPtr());

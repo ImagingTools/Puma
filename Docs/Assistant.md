@@ -25,8 +25,15 @@ What the assistant may use in Puma: reading users, groups, roles, the organizati
 permission scope; creating and changing groups (members, roles, parent groups, name). It never handles
 passwords, tokens or sessions.
 
+**Undoing a change:** every confirmed change is recorded as a change set. Ask the assistant to undo it
+("undo the last change", "roll back the change to Support"); it shows what will be restored and applies the
+rollback after confirmation. Changed groups get their former state, groups created by the change set are
+removed; the memberships in the users follow. A change set is not rolled back if a group was changed again
+afterwards, or if it removed documents or changed data without revisions. Every user can roll back the own
+change sets; `RollbackAny` allows it for the change sets of others. Change sets are kept 90 days.
+
 Permissions (below `Administration/Assistant`): `ViewPage` opens the page, `View` reads the configuration
-(without the key), `Edit` changes it. New organizations have them in their permission scope; for an
+(without the key), `Edit` changes it, `RollbackAny` rolls back the changes of other users. New organizations have them in their permission scope; for an
 existing organization the system administrator adds them to its scope.
 
 ## For the operator of the server
@@ -35,7 +42,9 @@ existing organization the system administrator adds them to its scope.
 |---|---|
 | `Partitura/PumaVoce.arp/PumaServerBase.acc` | Element `Assistant` (`ImtAssistVoce/TenantAssistant`): the GraphQL handlers `Assistant/AssistantController` and `Assistant/ConfigurationController` are in the handlers of the servlet; the actions use `PumaHandlers` with the context of the user. Element `AssistantSecretProtector` protects the API keys. |
 | `PumaDatabasePostgres.acc`, `PumaDatabaseSQLite.acc` | Table `AssistantConfigurations` (`ImtAssistVoce/AssistantConfigurationSqlRepository`), created automatically |
-| `Include/puma/PumaFeatures.h` | Permissions `/Administration/Assistant/{ViewPage,View,Edit}` |
+| `PumaDatabasePostgres.acc`, `PumaDatabaseSQLite.acc` | Element `ChangeSetJournal` (`ImtDatabasePck/ChangeSetJournal`): tables `ChangeSets` and `ChangeSetEntries`, created with the first change set |
+| `Assistant` in `PumaServerBase.acc`: `ChangeSetJournal`, `RollbackCollections`, `RollbackDelegates` | Exported as `AssistantChangeSetJournal`, `AssistantRollbackCollections`, `AssistantRollbackDelegates`; each server sets the journal of its database and the user group repository. The permissions of the rollback are `/Administration/Groups/Edit/Change` and `/Administration/Groups/Edit/Remove` |
+| `Include/puma/PumaFeatures.h` | Permissions `/Administration/Assistant/{ViewPage,View,Edit,RollbackAny}` |
 | `Include/pumaqml/Qml/PumaMain.qml` | `AssistantCenter.controller` |
 | `Docs/Knowledge/Puma.md` and the qrc of the servers (`:/AssistantKnowledge/Puma`) | Knowledge of Puma: this overview, `README.md`, `LdapGroupFilter.md`, this page and the behaviour of the tenant API (`Tests/TenantApiPostman/README.md`); with the ImtCore knowledge (`:/AssistantKnowledge/ImtCore`) |
 | `Assistant` in `PumaServerBase.acc`: `AllowedQueries`, `AllowedMutations` | What the assistant may call. Extend the lists to give it more functions; commands of authentication and secret fields stay closed |

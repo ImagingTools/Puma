@@ -31,6 +31,8 @@
         <Element ComponentName="TenantDirectoryProfileSqlRepository" X="1400" Y="750" Note=""/>
         <Element ComponentName="ContractAttachmentSqlRepository" X="1400" Y="925" Note=""/>
         <Element ComponentName="AssistantConfigurationSqlRepository" X="900" Y="900" Note=""/>
+        <Element ComponentName="ChangeSetJournal" X="1150" Y="900" Note=""/>
+        <Element ComponentName="ChangeSetJournalXPathExtractor" X="1400" Y="900" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

@@ -52,6 +52,9 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
+                    <AttributeInfo Id="ChangeSetJournal" Type="Reference" ExportId="AssistantChangeSetJournal">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ConfigurationCollection" Type="Reference" ExportId="AssistantConfigurationRepository">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -70,6 +73,26 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>PumaHandlers</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RollbackCollections" Type="Reference[]" ExportId="AssistantRollbackCollections">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RollbackDelegates" Type="Reference[]" ExportId="AssistantRollbackDelegates">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RollbackEditPermissions" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>/Administration/Groups/Edit/Change</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RollbackRemovePermissions" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>/Administration/Groups/Edit/Remove</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

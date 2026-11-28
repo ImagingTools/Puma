@@ -553,6 +553,26 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="ChangeSetJournal" PackageId="ImtDatabasePck" ComponentId="ChangeSetJournal">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="DatabaseEngine"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SqlJsonXPathExtractor" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ChangeSetJournalXPathExtractor"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ChangeSetJournalXPathExtractor" PackageId="ImtDatabasePck" ComponentId="PostgresXPathExtractor">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
@@ -588,5 +608,6 @@
         <Component ExportedId="TenantDirectoryProfileSqlRepository" ComponentId="TenantDirectoryProfileSqlRepository"/>
         <Component ExportedId="ContractAttachmentSqlRepository" ComponentId="ContractAttachmentSqlRepository"/>
         <Component ExportedId="AssistantConfigurationSqlRepository" ComponentId="AssistantConfigurationSqlRepository"/>
+        <Component ExportedId="ChangeSetJournal" ComponentId="ChangeSetJournal"/>
     </ExportedComponents>
 </Acf>

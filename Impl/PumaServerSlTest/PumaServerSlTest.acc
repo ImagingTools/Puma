@@ -229,6 +229,23 @@
                     <AttributeInfo Id="AssistantConfigurationRepository" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaDatabaseSQLite/SQLiteAssistantConfigurationRepository"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="AssistantChangeSetJournal" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaDatabaseSQLite/ChangeSetJournal"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="AssistantRollbackCollections" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>PumaDatabaseSQLite/UserGroupRepository</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="AssistantRollbackDelegates" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>PumaDatabaseSQLite/UserGroupRepository</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
                     <AttributeInfo Id="ContractAttachmentRepository" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaDatabaseSQLite/SQLiteContractAttachmentRepository"/>
                     </AttributeInfo>
